@@ -1,6 +1,13 @@
-import { route } from 'quasar/wrappers'
-import { createRouter, createMemoryHistory, createWebHistory, createWebHashHistory } from 'vue-router'
-import routes from './routes'
+import { route } from "quasar/wrappers";
+import {
+  createRouter,
+  createMemoryHistory,
+  createWebHistory,
+  createWebHashHistory,
+} from "vue-router";
+import routes from "./routes";
+import { SessionStorage } from "quasar";
+import { api } from "boot/axios";
 
 /*
  * If not building with SSR mode, you can
@@ -14,7 +21,9 @@ import routes from './routes'
 export default route(function (/* { store, ssrContext } */) {
   const createHistory = process.env.SERVER
     ? createMemoryHistory
-    : (process.env.VUE_ROUTER_MODE === 'history' ? createWebHistory : createWebHashHistory)
+    : process.env.VUE_ROUTER_MODE === "history"
+    ? createWebHistory
+    : createWebHashHistory;
 
   const Router = createRouter({
     scrollBehavior: () => ({ left: 0, top: 0 }),
@@ -23,8 +32,28 @@ export default route(function (/* { store, ssrContext } */) {
     // Leave this as is and make changes in quasar.conf.js instead!
     // quasar.conf.js -> build -> vueRouterMode
     // quasar.conf.js -> build -> publicPath
-    history: createHistory(process.env.VUE_ROUTER_BASE)
-  })
+    history: createHistory(process.env.VUE_ROUTER_BASE),
+  });
 
-  return Router
-})
+  Router.beforeEach((to, from) => {
+    console.log("to an from ", to, from);
+    const publicPages = ["/login", "/403", "/"];
+    const authRequired = !publicPages.includes(to.path);
+
+    if (SessionStorage.getItem("auth_token")) {
+      api.defaults.headers.common["Authorization"] =
+        SessionStorage.getItem("auth_token");
+    }
+
+    if (authRequired) {
+      // console.log("La pagina requiere authenticacion...", to.fullPath);
+      // console.log("Token...", SessionStorage.getItem("auth_token"));
+      // console.log("token en api", api.defaults.headers.common["Authorization"]);
+      if (!SessionStorage.getItem("auth_token")) {
+        return "/";
+      }
+    }
+  });
+
+  return Router;
+});

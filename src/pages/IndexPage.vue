@@ -1,14 +1,5 @@
 <template>
-  <q-page class="flex flex-center">
-    <q-file filled v-model="file" label="Filled" />
-    <q-btn color="primary" icon="check" label="OK" @click="showFile" />
-    <q-btn
-      color="primary"
-      icon="check"
-      label="Obtener Pdf"
-      @click="obtenerPdf"
-    />
-  </q-page>
+  <q-page class="flex flex-center"> </q-page>
 </template>
 
 <script setup>

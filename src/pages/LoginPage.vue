@@ -3,7 +3,7 @@
     <q-page-container>
       <q-page class="flex flex-center">
         <q-card
-          class="bg-color"
+          class="bg-white"
           v-bind:style="$q.screen.lt.sm ? { width: '80%' } : { width: '30%' }"
         >
           <q-card-section>
@@ -74,6 +74,7 @@
                 </template>
               </q-input>
               <q-input
+                v-if="isRegistration"
                 type="password"
                 filled
                 v-model="form.password_confirmation"
@@ -102,6 +103,7 @@ import { useQuasar } from "quasar";
 import { ref, reactive, computed } from "vue";
 import { useSessionStore } from "src/stores/sessionStore";
 import { useRouter } from "vue-router";
+import { route } from "quasar/wrappers";
 
 const username = ref(null);
 const password = ref(null);
@@ -136,31 +138,52 @@ const isRegistration = computed(() =>
 );
 
 function submitForm() {
-  const payload = {
-    user: {
-      // fullname: form.fullname,
-      email: form.email,
-      password: form.password,
-      password_confirmation: form.password_confirmation,
-    },
-  };
-  const promise = sessionStore.registerUser(payload);
-  promise.then(
-    (result) => {
-      console.log("terminó la instruccion");
-      console.log("resultado", result);
-      console.log(result.data.id);
-      // $q.notify({
-      //   type: "positive",
-      //   message: `Se registro correctamente el usuario`,
-      //   timeout: 1500,
-      // });
-    },
-    (e) => {
-      console.log("Ocurrió un error al intentar registrar el usuario.");
-      console.error(e);
+  if (isRegistration.value) {
+    const payload = {
+      user: {
+        // fullname: form.fullname,
+        email: form.email,
+        password: form.password,
+        password_confirmation: form.password_confirmation,
+      },
+    };
+    const promise = sessionStore.registerUser(payload);
+    promise.then(
+      (result) => {
+        console.log("terminó la instruccion");
+        console.log("resultado", result);
+        console.log(result.data.id);
+        router.push("/main");
+        // $q.notify({
+        //   type: "positive",
+        //   message: `Se registro correctamente el usuario`,
+        //   timeout: 1500,
+        // });
+      },
+      (e) => {
+        console.log("Ocurrió un error al intentar registrar el usuario.", e);
+
+        console.error(e);
+      }
+    );
+  } else {
+    const payload= {
+      user:{
+        email: form.email,
+        password: form.password
+      }
     }
-  );
+    const promise = sessionStore.loginUser(payload);
+    promise.then(
+      (result) => {
+        console.log('result', result)
+        router.push("/main");
+      },
+      (error) => {
+        console.error('error', error);
+      }
+    );
+  }
 }
 
 function showNotification(error) {

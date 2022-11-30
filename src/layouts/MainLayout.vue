@@ -1,51 +1,150 @@
 <template>
   <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
+    <q-header class="text-white">
       <q-toolbar>
-        <q-toolbar-title> Quasar App </q-toolbar-title>
+        <q-toolbar-title> Biweekly Application </q-toolbar-title>
+        <span class="q-pr-sm" v-if="user">{{ user.email }}</span>
+        <q-btn
+          class="text-white"
+          icon="account_circle"
+          @click="onClick"
+          flat
+          round
+        >
+          <q-menu>
+            <q-list style="min-width: 100px">
+              <q-item clickable v-close-popup @click="logout">
+                <q-item-section>Cerrar Sesion</q-item-section>
+              </q-item>
+              <q-separator />
+              <q-item clickable v-close-popup>
+                <q-item-section>Acerca de...</q-item-section>
+              </q-item>
+            </q-list>
+          </q-menu>
+        </q-btn>
+      </q-toolbar>
+      <q-toolbar
+        class="bg-white text-deep-purple-14 no-border no-outline"
+        flat
+        style="border: 0px solid"
+      >
+        <q-btn
+          class="text-deep-purple-14"
+          label="Configuración"
+          flat
+          icon="settings"
+        >
+          <q-menu>
+            <q-list dense style="min-width: 100px">
+              <q-item
+                icon="print"
+                clickable
+                v-close-popup
+                @click="router.push('/main/usuarios')"
+              >
+                <q-item-section icon="print">Usuarios</q-item-section>
+              </q-item>
+              <q-item clickable v-close-popup>
+                <q-item-section>Catálogo de Cuentas</q-item-section>
+              </q-item>
+              <q-separator />
+              <q-item clickable>
+                <q-item-section>Preferences</q-item-section>
+                <q-item-section side>
+                  <q-icon name="keyboard_arrow_right" />
+                </q-item-section>
 
-        <q-icon name="fa-regular fa-file-pdf" size="25px" />
-        <q-icon name="fa-solid fa-fire-extinguisher" />
-        <q-icon name="fa-solid fa-barcode" />
+                <q-menu anchor="top end" self="top start">
+                  <q-list>
+                    <q-item v-for="n in 3" :key="n" dense clickable>
+                      <q-item-section>Submenu Label</q-item-section>
+                      <q-item-section side>
+                        <q-icon name="keyboard_arrow_right" />
+                      </q-item-section>
+                      <q-menu auto-close anchor="top end" self="top start">
+                        <q-list>
+                          <q-item v-for="n in 3" :key="n" dense clickable>
+                            <q-item-section>3rd level Label</q-item-section>
+                          </q-item>
+                        </q-list>
+                      </q-menu>
+                    </q-item>
+                  </q-list>
+                </q-menu>
+              </q-item>
+              <q-separator />
+              <q-item clickable v-close-popup>
+                <q-item-section>Quit</q-item-section>
+              </q-item>
+            </q-list>
+          </q-menu>
+        </q-btn>
+        <q-btn
+          class="text-deep-purple-14"
+          label="Administración"
+          flat
+          icon="menu"
+        >
+          <q-menu>
+            <q-list dense style="min-width: 100px">
+              <q-item clickable v-close-popup>
+                <q-item-section>Open...</q-item-section>
+              </q-item>
+              <q-item clickable v-close-popup>
+                <q-item-section>New</q-item-section>
+              </q-item>
+              <q-separator />
+              <q-item clickable>
+                <q-item-section>Preferences</q-item-section>
+                <q-item-section side>
+                  <q-icon name="keyboard_arrow_right" />
+                </q-item-section>
 
-        <div>Quasar v{{ $q.version }}</div>
+                <q-menu anchor="top end" self="top start">
+                  <q-list>
+                    <q-item v-for="n in 3" :key="n" dense clickable>
+                      <q-item-section>Submenu Label</q-item-section>
+                      <q-item-section side>
+                        <q-icon name="keyboard_arrow_right" />
+                      </q-item-section>
+                      <q-menu auto-close anchor="top end" self="top start">
+                        <q-list>
+                          <q-item v-for="n in 3" :key="n" dense clickable>
+                            <q-item-section>3rd level Label</q-item-section>
+                          </q-item>
+                        </q-list>
+                      </q-menu>
+                    </q-item>
+                  </q-list>
+                </q-menu>
+              </q-item>
+              <q-separator />
+              <q-item clickable v-close-popup>
+                <q-item-section>Quit</q-item-section>
+              </q-item>
+            </q-list>
+          </q-menu>
+        </q-btn>
       </q-toolbar>
     </q-header>
 
-    <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
-      <q-list>
-        <q-item-label header> Essential Links </q-item-label>
-      </q-list>
-    </q-drawer>
-
     <q-page-container>
-      <!-- <q-icon-picker
-        v-model="name"
-        :filter="filter"
-        :tags="tags"
-        font-size="3em"
-        tooltips
-        @tags="onTags"
-        style="height: calc(100vh - 140px)"
-      /> -->
-      <q-icon-picker
-        v-model="value"
-        :icon-set="iconSet"
-        v-model:pagination="pagination"
-        style="height: 220px"
-      />
-
       <router-view />
     </q-page-container>
   </q-layout>
 </template>
 
 <script setup>
-import { defineComponent, ref } from "vue";
-import EssentialLink from "components/EssentialLink.vue";
-import { useQuasar } from "quasar";
-import { matMenu } from "@quasar/extras/material-icons";
+import { defineComponent, ref, onMounted } from "vue";
+import { useSessionStore } from "src/stores/sessionStore.js";
+import { useRouter } from "vue-router";
+import { SessionStorage } from "quasar";
 
+/**
+ * state
+ */
+const user = ref(null);
 const filter = ref("");
 const iconSet = ref("fontawesome-v5");
 const name = ref("nombre");
@@ -57,64 +156,31 @@ const pagination = ref({
   page: 0,
 });
 
-function onTags(tags) {
-  if (this.loaded !== true) {
-    let cats = [];
-    let t = [...tags];
-    cats.splice(0, 0, ...t);
-    this.categories.splice(0, this.categories.length, ...cats);
-    this.categories.concat(...cats);
-    this.categories.forEach((cat) => {
-      this.$set(this.selected, cat, false);
-    });
-    this.loaded = true;
+const leftDrawerOpen = ref(false);
+
+/**
+ * stores
+ */
+const sessionStorage = useSessionStore();
+const router = useRouter();
+
+/**
+ * onMounted
+ */
+onMounted(() => {
+  user.value = SessionStorage.getItem("user");
+});
+
+function onClick() {}
+function logout() {
+  const promise = sessionStorage.logoutUser();
+  if (promise) {
+    promise.then(
+      (result) => {
+        router.push("/login");
+      },
+      (error) => {}
+    );
   }
 }
-
-const linksList = [
-  {
-    title: "Docs",
-    caption: "quasar.dev",
-    icon: "school",
-    link: "https://quasar.dev",
-  },
-  {
-    title: "Github",
-    caption: "github.com/quasarframework",
-    icon: "code",
-    link: "https://github.com/quasarframework",
-  },
-  {
-    title: "Discord Chat Channel",
-    caption: "chat.quasar.dev",
-    icon: "chat",
-    link: "https://chat.quasar.dev",
-  },
-  {
-    title: "Forum",
-    caption: "forum.quasar.dev",
-    icon: "record_voice_over",
-    link: "https://forum.quasar.dev",
-  },
-  {
-    title: "Twitter",
-    caption: "@quasarframework",
-    icon: "rss_feed",
-    link: "https://twitter.quasar.dev",
-  },
-  {
-    title: "Facebook",
-    caption: "@QuasarFramework",
-    icon: "public",
-    link: "https://facebook.quasar.dev",
-  },
-  {
-    title: "Quasar Awesome",
-    caption: "Community Quasar projects",
-    icon: "favorite",
-    link: "https://awesome.quasar.dev",
-  },
-];
-
-const leftDrawerOpen = ref(false);
 </script>

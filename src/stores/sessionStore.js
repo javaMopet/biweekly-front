@@ -1,25 +1,28 @@
 import { defineStore } from "pinia";
 import { api } from "src/boot/axios";
 import { ref, reactive } from "vue";
+import { SessionStorage } from "quasar";
 
 const BASE_URL = "http://localhost:3000/";
 
 export const useSessionStore = defineStore("session", () => {
-  const auth_token = ref(null);
-  const user = reactive({
+  const defaultUser = {
     id: null,
     username: null,
     email: null,
-  });
+  };
+
+  const auth_token = ref(null);
+  const user = ref(null);
 
   const getAuthToken = () => {
     return auth_token.value;
   };
   const getUserEmail = () => {
-    return user?.email;
+    return user.value?.email;
   };
   const getUserId = () => {
-    return user?.id;
+    return user.value?.id;
   };
 
   const isLoggetIn = () => {
@@ -32,7 +35,6 @@ export const useSessionStore = defineStore("session", () => {
    * Actions
    */
   const registerUser = (payload) => {
-    console.log("registrando:", payload);
     return new Promise((resolve, reject) => {
       api
         .post(`${BASE_URL}users`, payload)
@@ -41,16 +43,18 @@ export const useSessionStore = defineStore("session", () => {
           resolve(response);
         })
         .catch((error) => {
+          console.log(error.response.data.exception);
           reject(error);
         });
     });
   };
 
-  const loginUser = ({ commit }, payload) => {
+  const loginUser = (payload) => {
     return new Promise((resolve, reject) => {
       api
-        .get(`${BASE_URL}users/sign_in`, payload)
+        .post("users/sign_in/", payload)
         .then((response) => {
+          console.log("response.data", response.data);
           setUserInfo(response);
           resolve(response);
         })
@@ -59,16 +63,16 @@ export const useSessionStore = defineStore("session", () => {
         });
     });
   };
-  const logoutUser = ({ commit }) => {
+  const logoutUser = () => {
     const config = {
       headers: { authorization: auth_token },
     };
-    new Promise((resolve, reject) => {
-      axios
+    return new Promise((resolve, reject) => {
+      api
         .delete(`${BASE_URL}users/sign_out`, config)
-        .then(() => {
+        .then((response) => {
           resetUserInfo();
-          resolve();
+          resolve(response);
         })
         .catch((error) => {
           reject(error);
@@ -81,7 +85,7 @@ export const useSessionStore = defineStore("session", () => {
       headers: { authorization: payload.auth_token },
     };
     new Promise((resolve, reject) => {
-      axios
+      api
         .get(`${BASE_URL}member-data`, config)
         .then((response) => {
           setUserInforFromToken(response);
@@ -97,27 +101,27 @@ export const useSessionStore = defineStore("session", () => {
    * mutations
    */
 
-  function setUserInfo(data) {
-    console.log("data after save user:", data);
-    // user = data.data.user;
-    // auth_token.value = data.headers.authorization;
-    // axios.defaults.header.common["Authorization"] = data.header.authorization;
-    // localStorage.setItem("auth_token", data.headers.authorization);
+  function setUserInfo(response) {
+    console.log("data after save user:", response);
+    console.log("data after save user:", response.headers.authorization);
+    user.value = response.data.user;
+    auth_token.value = response.headers.authorization;
+    api.defaults.headers.common["Authorization"] = auth_token.value;
+    SessionStorage.set("auth_token", auth_token.value);
+    SessionStorage.set("user", user.value);
   }
+
   function setUserInforFromToken(data) {
-    user = data.data.user;
+    user.value = data.data.user;
     auth_token.value = localStorage.getItem("auth_token");
   }
 
   function resetUserInfo() {
-    user = {
-      id: null,
-      username: null,
-      email: null,
-    };
+    user.value = null;
     auth_token.value = null;
-    localStorage.removeItem("auth_token");
-    axios.defaults.headers.common["Authorization"] = null;
+    SessionStorage.remove("auth_token");
+    SessionStorage.remove("user");
+    api.defaults.headers.common["Authorization"] = null;
   }
 
   return {
