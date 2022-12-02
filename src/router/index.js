@@ -35,25 +35,25 @@ export default route(function (/* { store, ssrContext } */) {
     history: createHistory(process.env.VUE_ROUTER_BASE),
   });
 
-  Router.beforeEach((to, from) => {
-    console.log("to an from ", to, from);
-    const publicPages = ["/login", "/403", "/"];
-    const authRequired = !publicPages.includes(to.path);
+  // Router.beforeEach((to, from) => {
+  //   console.log("to an from ", to, from);
+  //   const publicPages = ["/login", "/403", "/"];
+  //   const authRequired = !publicPages.includes(to.path);
 
-    if (SessionStorage.getItem("auth_token")) {
-      api.defaults.headers.common["Authorization"] =
-        SessionStorage.getItem("auth_token");
-    }
+  //   if (SessionStorage.getItem("auth_token")) {
+  //     api.defaults.headers.common["Authorization"] =
+  //       SessionStorage.getItem("auth_token");
+  //   }
 
-    if (authRequired) {
-      // console.log("La pagina requiere authenticacion...", to.fullPath);
-      // console.log("Token...", SessionStorage.getItem("auth_token"));
-      // console.log("token en api", api.defaults.headers.common["Authorization"]);
-      if (!SessionStorage.getItem("auth_token")) {
-        return "/";
-      }
-    }
-  });
+  //   if (authRequired) {
+  //     // console.log("La pagina requiere authenticacion...", to.fullPath);
+  //     // console.log("Token...", SessionStorage.getItem("auth_token"));
+  //     // console.log("token en api", api.defaults.headers.common["Authorization"]);
+  //     if (!SessionStorage.getItem("auth_token")) {
+  //       return "/";
+  //     }
+  //   }
+  // });
 
   return Router;
 });

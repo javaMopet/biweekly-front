@@ -1,13 +1,22 @@
 <template>
   <q-layout>
-    <q-page-container class="bg-secondary">
+    <q-page-container>
       <q-page class="flex flex-center">
         <q-card
-          class="bg-white text-primary"
+          class="bg-white"
           v-bind:style="$q.screen.lt.sm ? { width: '80%' } : { width: '20%' }"
+          style="height: 600px"
         >
           <q-card-section>
-            <div class="row inline full-width justify-center text-h4 q-pt-lg">
+            <!-- <q-avatar
+              size="103px"
+              class="absolute-center shadow-10"
+              icon="security"
+              font-size="103px"
+              text-color="primary"
+            >
+            </q-avatar> -->
+            <div class="row inline full-width justify-center text-h4">
               Iniciar Sesión
             </div>
           </q-card-section>
