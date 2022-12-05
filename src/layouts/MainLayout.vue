@@ -1,5 +1,5 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
+  <q-layout view="hHh lpR lFf">
     <q-header class="text-white">
       <q-toolbar>
         <q-toolbar-title> Biweekly Application </q-toolbar-title>
@@ -24,153 +24,84 @@
           </q-menu>
         </q-btn>
       </q-toolbar>
-      <q-toolbar
-        class="bg-white text-deep-purple-14 no-border no-outline"
-        flat
-        style="border: 0px solid"
-      >
-        <q-btn
-          class="text-deep-purple-14"
-          label="Configuración"
-          flat
-          icon="settings"
-        >
-          <q-menu>
-            <q-list dense style="min-width: 100px">
-              <q-item
-                icon="print"
-                clickable
-                v-close-popup
-                @click="router.push('/main/usuarios')"
-              >
-                <q-item-section icon="print">Usuarios</q-item-section>
-              </q-item>
-              <q-item clickable v-close-popup>
-                <q-item-section>Catálogo de Cuentas</q-item-section>
-              </q-item>
-              <q-separator />
-              <q-item clickable>
-                <q-item-section>Preferences</q-item-section>
-                <q-item-section side>
-                  <q-icon name="keyboard_arrow_right" />
-                </q-item-section>
-
-                <q-menu anchor="top end" self="top start">
-                  <q-list>
-                    <q-item v-for="n in 3" :key="n" dense clickable>
-                      <q-item-section>Submenu Label</q-item-section>
-                      <q-item-section side>
-                        <q-icon name="keyboard_arrow_right" />
-                      </q-item-section>
-                      <q-menu auto-close anchor="top end" self="top start">
-                        <q-list>
-                          <q-item v-for="n in 3" :key="n" dense clickable>
-                            <q-item-section>3rd level Label</q-item-section>
-                          </q-item>
-                        </q-list>
-                      </q-menu>
-                    </q-item>
-                  </q-list>
-                </q-menu>
-              </q-item>
-              <q-separator />
-              <q-item clickable v-close-popup>
-                <q-item-section>Quit</q-item-section>
-              </q-item>
-            </q-list>
-          </q-menu>
-        </q-btn>
-        <q-btn
-          class="text-deep-purple-14"
-          label="Administración"
-          flat
-          icon="menu"
-        >
-          <q-menu>
-            <q-list dense style="min-width: 100px">
-              <q-item clickable v-close-popup>
-                <q-item-section>Open...</q-item-section>
-              </q-item>
-              <q-item clickable v-close-popup>
-                <q-item-section>New</q-item-section>
-              </q-item>
-              <q-separator />
-              <q-item clickable>
-                <q-item-section>Preferences</q-item-section>
-                <q-item-section side>
-                  <q-icon name="keyboard_arrow_right" />
-                </q-item-section>
-
-                <q-menu anchor="top end" self="top start">
-                  <q-list>
-                    <q-item v-for="n in 3" :key="n" dense clickable>
-                      <q-item-section>Submenu Label</q-item-section>
-                      <q-item-section side>
-                        <q-icon name="keyboard_arrow_right" />
-                      </q-item-section>
-                      <q-menu auto-close anchor="top end" self="top start">
-                        <q-list>
-                          <q-item v-for="n in 3" :key="n" dense clickable>
-                            <q-item-section>3rd level Label</q-item-section>
-                          </q-item>
-                        </q-list>
-                      </q-menu>
-                    </q-item>
-                  </q-list>
-                </q-menu>
-              </q-item>
-              <q-separator />
-              <q-item clickable v-close-popup>
-                <q-item-section>Quit</q-item-section>
-              </q-item>
-            </q-list>
-          </q-menu>
-        </q-btn>
-      </q-toolbar>
-      <!--
-  Animenu
-  -------
-  https://github.com/catalinred/animenu
-  https://twitter.com/catalinred
--->
-
-      <nav class="animenu" role="navigation" aria-label="Menu">
-        <button class="animenu__btn" type="button">
-          <span class="animenu__btn__bar"></span>
-          <span class="animenu__btn__bar"></span>
-          <span class="animenu__btn__bar"></span>
-        </button>
-
-        <ul class="animenu__nav">
-          <li><a href="#">Home</a></li>
-          <li>
-            <a href="#" class="animenu__nav__hasDropdown" aria-haspopup="true"
-              >Archive</a
-            >
-            <ul class="animenu__nav__dropdown" aria-label="submenu" role="menu">
-              <li><a href="#" role="menuitem">Sub Item 1</a></li>
-              <li><a href="#" role="menuitem">Sub Item 2</a></li>
-              <li><a href="#" role="menuitem">Sub Item 3</a></li>
-            </ul>
-          </li>
-          <li>
-            <a href="#" class="animenu__nav__hasDropdown" aria-haspopup="true"
-              >Categories</a
-            >
-            <ul class="animenu__nav__dropdown" aria-label="submenu" role="menu">
-              <li><a href="#" role="menuitem">Sub Item 1</a></li>
-              <li><a href="#" role="menuitem">Sub Item 2</a></li>
-              <li><a href="#" role="menuitem">Sub Item 3</a></li>
-            </ul>
-          </li>
-          <li><a href="#">About</a></li>
-          <li><a href="#">Contact</a></li>
-        </ul>
-      </nav>
     </q-header>
 
     <q-page-container>
-      <router-view />
+      <div class="row q-pt-lg">
+        <div class="col-1 q-pt-lg">
+          <!-- <div class="area">area</div> -->
+          <nav class="main-menu q-pt-xl">
+            <ul>
+              <li>
+                <a href="http://justinfarrow.com">
+                  <i class="fa fa-home fa-2x"></i>
+                  <span class="nav-text"> Dashboard </span>
+                </a>
+              </li>
+              <li class="has-subnav">
+                <a href="#">
+                  <i class="fa fa-laptop fa-2x"></i>
+                  <span class="nav-text"> Stars Components </span>
+                </a>
+              </li>
+              <li class="has-subnav">
+                <a href="#">
+                  <i class="fa fa-list fa-2x"></i>
+                  <span class="nav-text"> Forms </span>
+                </a>
+              </li>
+              <li class="has-subnav">
+                <a href="#">
+                  <i class="fa fa-folder-open fa-2x"></i>
+                  <span class="nav-text"> Pages </span>
+                </a>
+              </li>
+              <li>
+                <a href="#">
+                  <i class="fa fa-bar-chart-o fa-2x"></i>
+                  <span class="nav-text"> Graphs and Statistics </span>
+                </a>
+              </li>
+              <li>
+                <a href="#">
+                  <i class="fa fa-font fa-2x"></i>
+                  <span class="nav-text"> Quotes </span>
+                </a>
+              </li>
+              <li>
+                <a href="#">
+                  <i class="fa fa-table fa-2x"></i>
+                  <span class="nav-text"> Tables </span>
+                </a>
+              </li>
+              <li>
+                <a href="#">
+                  <i class="fa fa-map-marker fa-2x"></i>
+                  <span class="nav-text"> Maps </span>
+                </a>
+              </li>
+              <li>
+                <a href="#">
+                  <i class="fa fa-info fa-2x"></i>
+                  <span class="nav-text"> Documentation </span>
+                </a>
+              </li>
+            </ul>
+
+            <ul class="logout">
+              <li>
+                <a href="#">
+                  <i class="fa fa-power-off fa-2x"></i>
+                  <span class="nav-text"> Logout </span>
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+        <div class="col-11">
+          <router-view />
+        </div>
+      </div>
     </q-page-container>
   </q-layout>
 </template>
@@ -224,314 +155,146 @@ function logout() {
   }
 }
 </script>
-<style lang="scss">
-// Animenu
-// -------
-// https://github.com/catalinred/animenu
-// https://twitter.com/catalinred
 
-// Variables
-$baseMenuBackground: #111; // Base color theme
-$secondaryMenuBackground: #0186ba; // Secondary color (highlights, triangles...)
-$gutter: 10px; // Base gutter
+<style>
+@import url(//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css);
 
-// Latest CSS box model
-*,
-*:after,
-*:before {
-  box-sizing: border-box;
+@import url(https://fonts.googleapis.com/css?family=Titillium+Web:300);
+.fa-2x {
+  font-size: 2em;
+}
+.fa {
+  position: relative;
+  display: table-cell;
+  width: 60px;
+  height: 36px;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 20px;
 }
 
-// The classic hamburger icon
-// <button class="animenu__btn">
-//   <span class="animenu__btn__bar"></span>
-//   <span class="animenu__btn__bar"></span>
-//   <span class="animenu__btn__bar"></span>
-// </button>
-.animenu__btn {
-  display: none;
-  cursor: pointer;
-  background-color: $baseMenuBackground;
-  border: 0;
-  padding: 10px;
-  height: 40px;
-  width: 40px;
-
-  &:hover {
-    background-color: $secondaryMenuBackground;
-  }
+.main-menu:hover,
+nav.main-menu.expanded {
+  width: 250px;
+  overflow: visible;
 }
 
-.animenu__btn__bar {
-  display: block;
-  width: 20px;
-  height: 2px;
-  background-color: #fff;
-  transition: 0.15s cubic-bezier(0.75, -0.55, 0.25, 1.55);
-
-  & + .animenu__btn__bar {
-    margin-top: 4px;
-  }
-}
-
-.animenu__btn--active {
-  .animenu__btn__bar {
-    margin: 0;
-    position: absolute;
-
-    &:nth-child(1) {
-      transform: rotate(45deg);
-    }
-
-    &:nth-child(2) {
-      opacity: 0;
-    }
-
-    &:nth-child(3) {
-      transform: rotate(-45deg);
-    }
-  }
-}
-
-// Clear some defaults
-.animenu {
-  display: block;
-  ul {
-    padding: 0;
-    list-style: none;
-    font: 0 -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
-      "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
-      "Segoe UI Symbol";
-  }
-
-  li,
-  a {
-    display: inline-block;
-    font-size: 15px;
-  }
-
-  a {
-    color: lighten($baseMenuBackground, 60%);
-    text-decoration: none;
-  }
-}
-
-// First level -> main menu items
-// <nav class="animenu">
-//    <ul class="animenu__nav">
-//    ...
-//    </ul>
-//  </nav>
-.animenu__nav {
-  background-color: $baseMenuBackground;
-
-  > li {
-    position: relative;
-    border-right: 1px solid lighten($baseMenuBackground, 20%);
-
-    > a {
-      padding: $gutter 3 * $gutter;
-      text-transform: uppercase;
-    }
-
-    &:hover {
-      > ul {
-        opacity: 1;
-        visibility: visible;
-        margin: 0;
-      }
-
-      > a {
-        color: #fff;
-      }
-    }
-
-    // Duplicate stuff due to
-    // https://www.w3.org/TR/2018/PR-selectors-3-20180911/#grouping
-    &:focus-within {
-      > ul {
-        opacity: 1;
-        visibility: visible;
-        margin: 0;
-      }
-
-      > a {
-        color: #fff;
-      }
-    }
-  }
-
-  &__hasDropdown:before {
-    content: "";
-    position: absolute;
-    border: 4px solid transparent;
-    border-bottom: 0;
-    border-top-color: currentColor;
-    top: 50%;
-    margin-top: -2px;
-    right: 10px;
-  }
-}
-
-// Second level
-// <nav class="animenu">
-//    <ul class="animenu__nav">
-//      <li>
-//        <ul class="animenu__nav__dropdown"></ul>
-//      </li>
-//    </ul>
-//  </nav>
-.animenu__nav__dropdown {
-  min-width: 100%;
+.main-menu {
+  background: #2a2533;
+  border-right: 1px solid #e5e5e5;
   position: absolute;
-  top: 100%;
+  top: 0;
+  bottom: 0;
+  height: 100%;
   left: 0;
-  z-index: 1;
-  opacity: 0;
-  visibility: hidden;
-  margin: 2 * $gutter 0 0 0;
-  background-color: lighten($baseMenuBackground, 15%);
-  transition: margin 0.15s, opacity 0.15s;
-
-  > li {
-    width: 100%;
-    border-bottom: 1px solid lighten($baseMenuBackground, 25%);
-
-    &:first-child > a:after {
-      content: "";
-      position: absolute;
-      height: 0;
-      width: 0;
-      left: 1em;
-      top: -6px;
-      border: 6px solid transparent;
-      border-top: 0;
-      border-bottom-color: inherit;
-    }
-
-    &:last-child {
-      border: 0;
-    }
-  }
-
-  a {
-    padding: $gutter;
-    width: 100%;
-    border-color: lighten($baseMenuBackground, 15%);
-
-    &:hover {
-      background-color: $secondaryMenuBackground;
-      border-color: $secondaryMenuBackground;
-      color: #fff;
-    }
-
-    // Duplicate stuff due to
-    // https://www.w3.org/TR/2018/PR-selectors-3-20180911/#grouping
-    &:focus-within {
-      background-color: $secondaryMenuBackground;
-      border-color: $secondaryMenuBackground;
-      color: #fff;
-    }
-  }
+  width: 60px;
+  overflow: hidden;
+  -webkit-transition: width 0.15s linear;
+  transition: width 0.15s linear;
+  -webkit-transform: translateZ(0) scale(1, 1);
+  z-index: 1000;
 }
 
-// The main breakpoint is 767px
-// Adjust the first and second levels display
-@media screen and (max-width: 767px) {
-  .animenu__btn {
-    display: inline-block;
-  }
-
-  .animenu__nav,
-  .animenu__nav__dropdown {
-    display: none;
-  }
-
-  // First level -> main menu items
-  // <nav class="animenu">
-  //    <ul class="animenu__nav">
-  //    ...
-  //    </ul>
-  //  </nav>
-  .animenu__nav {
-    margin: $gutter 0;
-
-    > li {
-      width: 100%;
-      border-right: 0;
-      border-bottom: 1px solid lighten($baseMenuBackground, 25%);
-
-      &:last-child {
-        border: 0;
-      }
-
-      &:first-child > a:after {
-        content: "";
-        position: absolute;
-        height: 0;
-        width: 0;
-        left: 1em;
-        top: -6px;
-        border: 6px solid transparent;
-        border-top: 0;
-        border-bottom-color: inherit;
-      }
-
-      > a {
-        width: 100%;
-        padding: $gutter;
-        border-color: $baseMenuBackground;
-        position: relative; //dropdown caret
-      }
-    }
-
-    a:hover {
-      background-color: $secondaryMenuBackground;
-      border-color: $secondaryMenuBackground;
-      color: #fff;
-    }
-  }
-
-  // Second level
-  // <nav class="animenu">
-  //    <ul class="animenu__nav">
-  //      <li>
-  //        <ul class="animenu__nav__dropdown"></ul>
-  //      </li>
-  //    </ul>
-  //  </nav>
-  .animenu__nav__dropdown {
-    position: static;
-    background-color: lighten($baseMenuBackground, 15%);
-    margin: 0;
-    transition: none;
-    visibility: visible;
-    opacity: 1;
-
-    > li:first-child > a:after {
-      content: none;
-    }
-
-    a {
-      padding-left: 2 * $gutter;
-      width: 100%;
-    }
-  }
+.main-menu > ul {
+  margin: 7px 0;
 }
 
-// Expanding the animenu
-// <nav class="animenu">
-//    <ul class="animenu__nav animenu__nav--active">
-//      <li>
-//        <ul class="animenu__nav__dropdown"></ul>
-//      </li>
-//    </ul>
-//  </nav>
-.animenu__nav--active {
-  display: block !important;
+.main-menu li {
+  position: relative;
+  display: block;
+  width: 250px;
+}
 
-  & .animenu__nav__dropdown {
-    display: block;
-  }
+.main-menu li > a {
+  position: relative;
+  display: table;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: #999;
+  font-family: arial;
+  font-size: 14px;
+  text-decoration: none;
+  -webkit-transform: translateZ(0) scale(1, 1);
+  -webkit-transition: all 0.15s linear;
+  transition: all 0.15s linear;
+}
+
+.main-menu .nav-icon {
+  position: relative;
+  display: table-cell;
+  width: 60px;
+  height: 36px;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 18px;
+}
+
+.main-menu .nav-text {
+  position: relative;
+  display: table-cell;
+  vertical-align: middle;
+  width: 190px;
+  font-family: "Titillium Web", sans-serif;
+}
+
+.main-menu > ul.logout {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+}
+
+.no-touch .scrollable.hover {
+  overflow-y: hidden;
+}
+
+.no-touch .scrollable.hover:hover {
+  overflow-y: auto;
+  overflow: visible;
+}
+
+a:hover,
+a:focus {
+  text-decoration: none;
+}
+
+nav {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+
+nav ul,
+nav li {
+  outline: 0;
+  margin: 0;
+  padding: 0;
+}
+.main-menu li:hover > a,
+nav.main-menu li.active > a,
+.dropdown-menu > li > a:hover,
+.dropdown-menu > li > a:focus,
+.dropdown-menu > .active > a,
+.dropdown-menu > .active > a:hover,
+.dropdown-menu > .active > a:focus,
+.no-touch .dashboard-page nav.dashboard-menu ul li:hover a,
+.dashboard-page nav.dashboard-menu ul li.active a {
+  color: #fff;
+  background-color: #5fa2db;
+}
+.area {
+  float: left;
+  background: #e2e2e2;
+  width: 100%;
+  height: 100%;
+}
+@font-face {
+  font-family: "Titillium Web";
+  font-style: normal;
+  font-weight: 300;
+  src: local("Titillium WebLight"), local("TitilliumWeb-Light"),
+    url(http://themes.googleusercontent.com/static/fonts/titilliumweb/v2/anMUvcNT0H1YN4FII8wpr24bNCNEoFTpS2BTjF6FB5E.woff)
+      format("woff");
 }
 </style>
