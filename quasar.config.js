@@ -7,6 +7,9 @@
 
 // Configuration for your app
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js
+var dotenvExpand = require("dotenv-expand");
+var myEnv = require("dotenv").config();
+dotenvExpand.expand(myEnv);
 
 const { configure } = require("quasar/wrappers");
 
@@ -62,7 +65,16 @@ module.exports = configure(function (/* ctx */) {
 
       // publicPath: '/',
       // analyze: true,
-      // env: {},
+      env: {
+        API_URL:
+          process.env.API_URL ||
+          // Default API endpoint.
+          "http://localhost:3000",
+        GRAPHQL_URL:
+          process.env.GRAPHQL_URL ||
+          // Default graphql endpoint.
+          "http://localhost:3000/graphql",
+      },
       // rawDefine: {}
       // ignorePublicFolder: true,
       // minify: false,

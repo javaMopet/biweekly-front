@@ -40,11 +40,6 @@ export default route(function (/* { store, ssrContext } */) {
   //   const publicPages = ["/login", "/403", "/"];
   //   const authRequired = !publicPages.includes(to.path);
 
-  //   if (SessionStorage.getItem("auth_token")) {
-  //     api.defaults.headers.common["Authorization"] =
-  //       SessionStorage.getItem("auth_token");
-  //   }
-
   //   if (authRequired) {
   //     // console.log("La pagina requiere authenticacion...", to.fullPath);
   //     // console.log("Token...", SessionStorage.getItem("auth_token"));

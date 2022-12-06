@@ -3,7 +3,7 @@ import { api } from "src/boot/axios";
 import { ref, reactive } from "vue";
 import { SessionStorage } from "quasar";
 
-const BASE_URL = "http://localhost:3000/";
+// const BASE_URL = "http://localhost:3000/";
 
 export const useSessionStore = defineStore("session", () => {
   const defaultUser = {
@@ -69,7 +69,7 @@ export const useSessionStore = defineStore("session", () => {
     };
     return new Promise((resolve, reject) => {
       api
-        .delete(`${BASE_URL}users/sign_out`, config)
+        .delete(`/users/sign_out`, config)
         .then((response) => {
           resetUserInfo();
           resolve(response);
@@ -80,41 +80,39 @@ export const useSessionStore = defineStore("session", () => {
     });
   };
 
-  function loginUserWithToken({ commit }, payload) {
-    const config = {
-      headers: { authorization: payload.auth_token },
-    };
-    new Promise((resolve, reject) => {
-      api
-        .get(`${BASE_URL}member-data`, config)
-        .then((response) => {
-          setUserInforFromToken(response);
-          resolve(response);
-        })
-        .catch((error) => {
-          reject(error);
-        });
-    });
-  }
+  // function loginUserWithToken({ commit }, payload) {
+  //   const config = {
+  //     headers: { authorization: payload.auth_token },
+  //   };
+  //   new Promise((resolve, reject) => {
+  //     api
+  //       .get(`${BASE_URL}member-data`, config)
+  //       .then((response) => {
+  //         setUserInforFromToken(response);
+  //         resolve(response);
+  //       })
+  //       .catch((error) => {
+  //         reject(error);
+  //       });
+  //   });
+  // }
 
   /**
    * mutations
    */
 
   function setUserInfo(response) {
-    console.log("data after save user:", response);
-    console.log("data after save user:", response.headers.authorization);
     user.value = response.data.user;
     auth_token.value = response.headers.authorization;
-    api.defaults.headers.common["Authorization"] = auth_token.value;
+    // api.defaults.headers.common["Authorization"] = auth_token.value;
     SessionStorage.set("auth_token", auth_token.value);
     SessionStorage.set("user", user.value);
   }
 
-  function setUserInforFromToken(data) {
-    user.value = data.data.user;
-    auth_token.value = localStorage.getItem("auth_token");
-  }
+  // function setUserInforFromToken(data) {
+  //   user.value = data.data.user;
+  //   auth_token.value = localStorage.getItem("auth_token");
+  // }
 
   function resetUserInfo() {
     user.value = null;
@@ -132,6 +130,5 @@ export const useSessionStore = defineStore("session", () => {
     registerUser,
     loginUser,
     logoutUser,
-    loginUserWithToken,
   };
 });
