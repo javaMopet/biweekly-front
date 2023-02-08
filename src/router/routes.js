@@ -16,6 +16,16 @@ const routes = [
         path: "/main/usuarios",
         component: () => import("pages/UsuariosPage.vue"),
       },
+      {
+        path: "/main/catalogos",
+        component: () => import("pages/CatalogosPage.vue"),
+        children: [
+          {
+            path: "/main/catalogos/cuentas",
+            component: () => import("pages/CuentasPage.vue"),
+          },
+        ],
+      },
     ],
   },
 

@@ -37,7 +37,7 @@ export const useSessionStore = defineStore("session", () => {
   const registerUser = (payload) => {
     return new Promise((resolve, reject) => {
       api
-        .post(`${BASE_URL}users`, payload)
+        .post(`users`, payload)
         .then((response) => {
           setUserInfo(response);
           resolve(response);

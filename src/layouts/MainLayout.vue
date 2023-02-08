@@ -28,21 +28,48 @@
 
     <q-page-container>
       <div class="row q-pt-lg">
-        <div class="col-1 q-pt-lg">
+        <div style="border: 0px solid red; width: 70px" />
+        <div>
           <!-- <div class="area">area</div> -->
           <nav class="main-menu q-pt-xl">
             <ul>
               <li>
-                <a href="http://justinfarrow.com">
+                <!-- <a href="/main">
                   <i class="fa fa-home fa-2x"></i>
                   <span class="nav-text"> Dashboard </span>
-                </a>
+                </a> -->
+                <q-item
+                  clickable
+                  v-ripple
+                  dense
+                  inset-level="0"
+                  to="/main"
+                  class="text-white"
+                >
+                  <q-item-section>
+                    <q-icon name="fa fa-home fa-2x" />
+                  </q-item-section>
+                  <q-item-section class="nav-text">Dashboard</q-item-section>
+                </q-item>
               </li>
               <li class="has-subnav">
-                <a href="#">
+                <!-- <a href="/main/catalogos">
                   <i class="fa fa-laptop fa-2x"></i>
-                  <span class="nav-text"> Stars Components </span>
-                </a>
+                  <span class="nav-text"> Catálogos </span>
+                </a> -->
+                <q-item
+                  clickable
+                  v-ripple
+                  dense
+                  inset-level="0"
+                  to="/main/catalogos"
+                  class="text-white"
+                >
+                  <q-item-section>
+                    <q-icon name="fa fa-laptop fa-3x" />
+                  </q-item-section>
+                  <q-item-section class="nav-text">Catálogos</q-item-section>
+                </q-item>
               </li>
               <li class="has-subnav">
                 <a href="#">
@@ -98,7 +125,8 @@
             </ul>
           </nav>
         </div>
-        <div class="col-11">
+
+        <div style="height: 92vh; width: 93vw; border: 0px solid">
           <router-view />
         </div>
       </div>
