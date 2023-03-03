@@ -1,6 +1,6 @@
-import { boot } from "quasar/wrappers";
-import axios from "axios";
-import { SessionStorage } from "quasar";
+import { boot } from 'quasar/wrappers'
+import axios from 'axios'
+import { SessionStorage } from 'quasar'
 
 // Be careful when using SSR for cross-request state pollution
 // due to creating a Singleton instance here;
@@ -8,34 +8,34 @@ import { SessionStorage } from "quasar";
 // good idea to move this instance creation inside of the
 // "export default () => {}" function below (which runs individually
 // for each client)
-const api = axios.create({ baseURL: process.env.API_URL });
+const api = axios.create({ baseURL: process.env.API_URL })
 
 api.interceptors.request.use(
   async (config) => {
-    console.log("config", config.url);
-    if (SessionStorage.getItem("auth_token")) {
-      const token = SessionStorage.getItem("auth_token");
+    console.log('config', config.url)
+    if (SessionStorage.getItem('auth_token')) {
+      const token = SessionStorage.getItem('auth_token')
       config.headers = {
-        Authorization: `${token}`,
-      };
+        Authorization: `${token}`
+      }
     }
-    return config;
+    return config
   },
   (error) => {
-    Promise.reject(error);
+    Promise.reject(error)
   }
-);
+)
 
 export default boot(({ app }) => {
   // for use inside Vue files (Options API) through this.$axios and this.$api
 
-  app.config.globalProperties.$axios = axios;
+  app.config.globalProperties.$axios = axios
   // ^ ^ ^ this will allow you to use this.$axios (for Vue Options API form)
   //       so you won't necessarily have to import axios in each vue file
 
-  app.config.globalProperties.$api = api;
+  app.config.globalProperties.$api = api
   // ^ ^ ^ this will allow you to use this.$api (for Vue Options API form)
   //       so you can easily perform requests against your app's API
-});
+})
 
-export { api };
+export { api }

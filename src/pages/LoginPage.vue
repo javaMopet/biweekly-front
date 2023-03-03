@@ -1,10 +1,14 @@
 <template>
   <q-layout>
-    <q-page-container class="bg-secondary">
-      <q-page class="flex flex-center">
+    <q-page-container class="">
+      <q-page class="flex flex-center bg-color">
         <q-card
-          class="bg-white text-primary"
-          v-bind:style="$q.screen.lt.sm ? { width: '80%' } : { width: '20%' }"
+          class="bg-primary text-secondary card-login"
+          v-bind:style="
+            $q.screen.lt.sm || $q.screen.lt.md
+              ? { width: '80%' }
+              : { width: '30%' }
+          "
         >
           <q-card-section>
             <div class="row inline full-width justify-center text-h4 q-pt-lg">
@@ -13,42 +17,48 @@
           </q-card-section>
           <q-card-section class="q-pt-xl">
             <q-btn-toggle
+              icon="login"
               v-model="loginAction"
               class="my-custom-toggle"
               spread
-              no-caps
-              rounded
-              unelevated
-              toggle-color="primary"
-              color="white"
-              text-color="primary"
+              toggle-color="accent"
               :options="[
                 { label: 'Entrar', value: 'one' },
-                { label: 'Registrar', value: 'two' },
+                { label: 'Registrar', value: 'two' }
               ]"
+              padding="0.8rem"
+              push
+              style="border: 0px solid !important"
             />
           </q-card-section>
-          <q-card-section>
-            <q-form @submit.prevent="submitForm" class="q-gutter-md">
+          <q-card-section style="border: 0px solid red" align="center">
+            <q-form
+              @submit.prevent="submitForm"
+              class="q-gutter-md q-pa-lg"
+              style="max-width: 300px; border: 0px solid yellow"
+              fit
+            >
               <q-input
                 v-if="isRegistration"
                 v-model="form.fullname"
-                filled
                 lazy-rules
                 type="text"
                 label="Nombre Completo"
-                class="q-pb-md"
+                dark
               >
                 <template v-slot:prepend>
                   <q-icon name="badge" />
                 </template>
               </q-input>
               <q-input
-                filled
                 v-model="form.email"
                 label="Correo"
+                input-class="text-secondary"
+                class="text-secondary"
+                label-color="secondary"
                 lazy-rules
                 type="email"
+                dark
                 :rules="[(val) => !!val || 'Correo es requerido']"
               >
                 <template v-slot:prepend>
@@ -58,9 +68,12 @@
 
               <q-input
                 type="password"
-                filled
+                dark
                 v-model="form.password"
                 label="Contraseña"
+                input-class="text-secondary border-secondary bordered"
+                label-color="secondary"
+                class="border-secondary"
                 lazy-rules
                 :rules="[(val) => !!val || 'Contraseña es requerida']"
               >
@@ -71,10 +84,11 @@
               <q-input
                 v-if="isRegistration"
                 type="password"
-                filled
+                input-class="text-secondary"
                 v-model="form.password_confirmation"
                 label="Confirmación Contraseña"
                 lazy-rules
+                dark
                 :rules="[(val) => !!val || 'Contraseña es requerida']"
               >
                 <template v-slot:prepend>
@@ -83,7 +97,13 @@
               </q-input>
 
               <div class="row justify-center">
-                <q-btn :label="btnLabel" type="submit" color="primary" />
+                <q-btn
+                  :label="btnLabel"
+                  type="submit"
+                  color="primary"
+                  text-color="secondary"
+                  outline
+                />
               </div>
             </q-form>
           </q-card-section>
@@ -94,43 +114,43 @@
 </template>
 
 <script setup>
-import { useQuasar } from "quasar";
-import { ref, reactive, computed } from "vue";
-import { useSessionStore } from "src/stores/sessionStore";
-import { useRouter } from "vue-router";
-import { route } from "quasar/wrappers";
+import { useQuasar } from 'quasar'
+import { ref, reactive, computed } from 'vue'
+import { useSessionStore } from 'src/stores/sessionStore'
+import { useRouter } from 'vue-router'
+import { route } from 'quasar/wrappers'
 
-const username = ref(null);
-const password = ref(null);
-const returnUrl = ref(null);
+const username = ref(null)
+const password = ref(null)
+const returnUrl = ref(null)
 
-const $q = useQuasar();
+const $q = useQuasar()
 
-const router = useRouter();
+const router = useRouter()
 
-const sessionStore = useSessionStore();
+const sessionStore = useSessionStore()
 
 /**
  * state
  */
 const form = reactive({
-  fullname: "Horacio Peña Mendoza",
-  email: "hpenam@uaemex.mx",
-  password: "123456",
-  password_confirmation: "1234856",
-});
-const loginAction = ref("one");
+  fullname: 'Horacio Peña Mendoza',
+  email: 'hpenam@uaemex.mx',
+  password: '123456',
+  password_confirmation: '1234856'
+})
+const loginAction = ref('one')
 // const btnLabel = ref("Entrar");
 
 /**
  * computed
  */
 const btnLabel = computed(() =>
-  loginAction.value == "one" ? "Entrar" : "Registrar"
-);
+  loginAction.value == 'one' ? 'Entrar' : 'Registrar'
+)
 const isRegistration = computed(() =>
-  loginAction.value == "two" ? true : false
-);
+  loginAction.value == 'two' ? true : false
+)
 
 function submitForm() {
   if (isRegistration.value) {
@@ -139,16 +159,16 @@ function submitForm() {
         // fullname: form.fullname,
         email: form.email,
         password: form.password,
-        password_confirmation: form.password_confirmation,
-      },
-    };
-    const promise = sessionStore.registerUser(payload);
+        password_confirmation: form.password_confirmation
+      }
+    }
+    const promise = sessionStore.registerUser(payload)
     promise.then(
       (result) => {
-        console.log("terminó la instruccion");
-        console.log("resultado", result);
-        console.log(result.data.id);
-        router.push("/main");
+        console.log('terminó la instruccion')
+        console.log('resultado', result)
+        console.log(result.data.id)
+        router.push('/main')
         // $q.notify({
         //   type: "positive",
         //   message: `Se registro correctamente el usuario`,
@@ -156,36 +176,36 @@ function submitForm() {
         // });
       },
       (e) => {
-        console.log("Ocurrió un error al intentar registrar el usuario.", e);
+        console.log('Ocurrió un error al intentar registrar el usuario.', e)
 
-        console.error(e);
+        console.error(e)
       }
-    );
+    )
   } else {
     const payload = {
       user: {
         email: form.email,
-        password: form.password,
-      },
-    };
-    const promise = sessionStore.loginUser(payload);
+        password: form.password
+      }
+    }
+    const promise = sessionStore.loginUser(payload)
     promise.then(
       (result) => {
-        console.log("result", result);
-        router.push("/main");
+        console.log('result', result)
+        router.push('/main')
       },
       (error) => {
-        console.error("error", error);
+        console.error('error', error)
       }
-    );
+    )
   }
 }
 
 function showNotification(error) {
   $q.notify({
-    type: "negative",
-    message: error,
-  });
+    type: 'negative',
+    message: error
+  })
 }
 </script>
 
@@ -194,7 +214,20 @@ function showNotification(error) {
   border: 1px solid #027be3;
 }
 .bg-color {
-  background-color: rgb(223, 223, 228);
-  box-shadow: 0 50px 70px -20px rgba(0, 0, 0, 0.85);
+  // background-color: #ffffff;
+  // background-image: url('../../public/images/3968744.jpg');
+  // background-repeat: no-repeat;
+  // background-size: cover;
+  background: url('/public/images/1.jpg') 0 / cover fixed;
+  // -webkit-filter: blur(5px); /* Safari 6.0 - 9.0 */
+  // filter: blur(5px);
+  z-index: 2 !important;
+}
+.card-login {
+  box-shadow: 0 5px 70px -25px #f69068;
+  opacity: 0.8;
+  // -webkit-filter: none !important; /* Safari 6.0 - 9.0 */
+  // filter: none !important;
+  z-index: 1 !important;
 }
 </style>

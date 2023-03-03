@@ -1,35 +1,35 @@
-import { defineStore } from "pinia";
-import { api } from "src/boot/axios";
-import { ref, reactive } from "vue";
-import { SessionStorage } from "quasar";
+import { defineStore } from 'pinia'
+import { api } from 'src/boot/axios'
+import { ref, reactive } from 'vue'
+import { SessionStorage } from 'quasar'
 
 // const BASE_URL = "http://localhost:3000/";
 
-export const useSessionStore = defineStore("session", () => {
+export const useSessionStore = defineStore('session', () => {
   const defaultUser = {
     id: null,
     username: null,
-    email: null,
-  };
+    email: null
+  }
 
-  const auth_token = ref(null);
-  const user = ref(null);
+  const auth_token = ref(null)
+  const user = ref(null)
 
   const getAuthToken = () => {
-    return auth_token.value;
-  };
+    return auth_token.value
+  }
   const getUserEmail = () => {
-    return user.value?.email;
-  };
+    return user.value?.email
+  }
   const getUserId = () => {
-    return user.value?.id;
-  };
+    return user.value?.id
+  }
 
   const isLoggetIn = () => {
     const loggedOut =
-      auth_token.value == null || auth_token.value == JSON.stringify(null);
-    return !loggedOut;
-  };
+      auth_token.value == null || auth_token.value == JSON.stringify(null)
+    return !loggedOut
+  }
 
   /**
    * Actions
@@ -39,46 +39,46 @@ export const useSessionStore = defineStore("session", () => {
       api
         .post(`users`, payload)
         .then((response) => {
-          setUserInfo(response);
-          resolve(response);
+          setUserInfo(response)
+          resolve(response)
         })
         .catch((error) => {
-          console.log(error.response.data.exception);
-          reject(error);
-        });
-    });
-  };
+          console.log(error.response.data.exception)
+          reject(error)
+        })
+    })
+  }
 
   const loginUser = (payload) => {
     return new Promise((resolve, reject) => {
       api
-        .post("users/sign_in/", payload)
+        .post('users/sign_in/', payload)
         .then((response) => {
-          console.log("response.data", response.data);
-          setUserInfo(response);
-          resolve(response);
+          console.log('response.data', response.data)
+          setUserInfo(response)
+          resolve(response)
         })
         .catch((error) => {
-          reject(error);
-        });
-    });
-  };
+          reject(error)
+        })
+    })
+  }
   const logoutUser = () => {
     const config = {
-      headers: { authorization: auth_token },
-    };
+      headers: { authorization: auth_token }
+    }
     return new Promise((resolve, reject) => {
       api
         .delete(`/users/sign_out`, config)
         .then((response) => {
-          resetUserInfo();
-          resolve(response);
+          resetUserInfo()
+          resolve(response)
         })
         .catch((error) => {
-          reject(error);
-        });
-    });
-  };
+          reject(error)
+        })
+    })
+  }
 
   // function loginUserWithToken({ commit }, payload) {
   //   const config = {
@@ -102,11 +102,11 @@ export const useSessionStore = defineStore("session", () => {
    */
 
   function setUserInfo(response) {
-    user.value = response.data.user;
-    auth_token.value = response.headers.authorization;
+    user.value = response.data.user
+    auth_token.value = response.headers.authorization
     // api.defaults.headers.common["Authorization"] = auth_token.value;
-    SessionStorage.set("auth_token", auth_token.value);
-    SessionStorage.set("user", user.value);
+    SessionStorage.set('auth_token', auth_token.value)
+    SessionStorage.set('user', user.value)
   }
 
   // function setUserInforFromToken(data) {
@@ -115,11 +115,11 @@ export const useSessionStore = defineStore("session", () => {
   // }
 
   function resetUserInfo() {
-    user.value = null;
-    auth_token.value = null;
-    SessionStorage.remove("auth_token");
-    SessionStorage.remove("user");
-    api.defaults.headers.common["Authorization"] = null;
+    user.value = null
+    auth_token.value = null
+    SessionStorage.remove('auth_token')
+    SessionStorage.remove('user')
+    api.defaults.headers.common['Authorization'] = null
   }
 
   return {
@@ -129,6 +129,6 @@ export const useSessionStore = defineStore("session", () => {
     isLoggetIn,
     registerUser,
     loginUser,
-    logoutUser,
-  };
-});
+    logoutUser
+  }
+})
