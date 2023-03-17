@@ -1,5 +1,7 @@
 <template>
-  <div class="row">CuentasContables</div>
+  <div class="row bg-primary text-secondary q-pa-sm q-mt-sm text-subtitle1">
+    Cuentas Contables
+  </div>
   <div class="row fit" style="border: 0px solid red">
     <q-table
       style="width: 100%"
@@ -12,7 +14,7 @@
     >
       <template v-slot:top-left>
         <q-btn
-          label="Nueva cuentaContable"
+          label="Nueva cuenta Contable"
           color="primary"
           class=""
           @click="addRow()"
@@ -32,9 +34,6 @@
             <q-icon name="search" />
           </template>
         </q-input>
-      </template>
-      <template #body-cell-icono="props">
-        <q-icon :name="props.row.icono" size="35px" color="cyan" />
       </template>
       <template v-slot:body-cell-acciones="props">
         <q-td :props="props" fit>
@@ -60,8 +59,8 @@
 </template>
 
 <script setup>
-import { useQuery } from '@vue/apollo-composable'
-import { ref } from 'vue'
+import { useQuery, useLazyQuery } from '@vue/apollo-composable'
+import { ref, onMounted } from 'vue'
 import { LISTA_CUENTAS_CONTABLES } from '/src/graphql/cuentasContableGql'
 import CuentaContableForm from 'src/components/cuentasContables/CuentaContableForm.vue'
 
@@ -73,14 +72,7 @@ const filter = ref()
 const showFormItem = ref(true)
 
 const columns = [
-  // { name: 'id', label: 'Id', field: 'id', sortable: true, align: 'left' },
-  {
-    name: 'icono',
-    label: '',
-    field: 'icono',
-    sortable: true,
-    align: 'left'
-  },
+  { name: 'id', label: 'Id', field: 'id', sortable: true, align: 'left' },
   {
     name: 'nombre',
     label: 'Nombre',
@@ -89,38 +81,25 @@ const columns = [
     align: 'left'
   },
   {
-    name: 'descripcion',
-    label: 'Descripción',
-    field: 'descripcion',
-    sortable: true,
-    align: 'left'
-  },
-
-  {
-    name: 'color',
-    label: 'Color',
-    field: 'color',
+    name: 'subnivel',
+    label: 'Subnivel',
+    field: 'subnivel',
     sortable: true,
     align: 'left'
   },
   {
-    name: 'cuenta_contable',
-    label: 'Cuenta Contable',
-    field: (row) => `${row.cuentaContable.id} - ${row.cuentaContable.nombre}`,
+    name: 'padre',
+    label: 'Padre',
+    field: 'padreId',
+    // field: (row) => `${row.cuentaContable.id} - ${row.cuentaContable.nombre}`,
     sortable: true,
     align: 'left'
   },
   {
-    name: 'tipo_cuentaContable',
-    label: 'Tipo CuentaContable',
-    field: (row) => `${row.tipoCuentaContable.nombre}`,
-    sortable: true,
-    align: 'left'
-  },
-  {
-    name: 'creacion',
-    label: 'Fecha Creación',
-    field: 'createdAt',
+    name: 'tipoAfectacion',
+    label: 'Tipo Afectacion',
+    field: 'tipoAfectacion',
+    // field: (row) => `${row.tipoCuentaContable.nombre}`,
     sortable: true,
     align: 'left'
   },
@@ -133,18 +112,30 @@ const columns = [
   }
 ]
 
-const { onResult: onResultCuentasContables } = useQuery(LISTA_CATEGORIAS)
+const { load: cargarCuentasContables, onResult: onResultCuentasContables } =
+  useLazyQuery(LISTA_CUENTAS_CONTABLES)
 
 onResultCuentasContables(({ data }) => {
-  console.log('response', data)
-  lista_cuentasContables.value = JSON.parse(
-    JSON.stringify(data.listaCuentasContables)
-  )
+  if (!!data) {
+    console.log('response', data)
+    lista_cuentasContables.value = JSON.parse(
+      JSON.stringify(data.listaCuentasContables)
+    )
+  }
 })
 
 function addRow() {
   showFormItem.value = true
 }
+/**
+ * onMounted
+ */
+onMounted(() => {
+  const subnivel = -1
+  cargarCuentasContables(null, {
+    subnivel
+  })
+})
 </script>
 
 <style lang="scss" scoped></style>

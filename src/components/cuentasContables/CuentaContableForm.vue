@@ -7,88 +7,40 @@
     <q-card-section class="">
       <div class="q-gutter-md">
         <div>
+          <q-input
+            v-model="formItem.id"
+            type="text"
+            label="Id"
+            dense
+            maxlength="4"
+          />
+        </div>
+        <div>
           <q-input v-model="formItem.nombre" type="text" label="Nombre" dense />
         </div>
         <div>
           <q-input
-            v-model="formItem.descripcion"
-            type="text"
-            label="Descripcion"
+            v-model="formItem.subnivel"
+            type="number"
+            label="Subnivel"
             dense
           />
         </div>
-        <div class="row inline q-gutter-sm">
+        <div>
           <q-input
-            class="col"
-            v-model="formItem.icono"
+            v-model="formItem.padre"
             type="text"
+            label="Cuenta Padre"
             dense
-            outlined
-            maxlength="20"
-            :rules="[(val) => !!val || 'Icono requerido']"
-            lazyRules
           />
-
-          <div>
-            <q-btn @click="selectIcon" color="dark">
-              <q-icon
-                color="gray"
-                :name="formItem.icono || 'extension'"
-                class="size"
-                size="2.5em"
-              />
-            </q-btn>
-          </div>
         </div>
 
-        <div class="q-pa-md">
-          <div
-            class="q-gutter-md row items-start"
-            :style="{ backgroundColor: `${formItem.color}` }"
-          >
-            <q-input
-              filled
-              v-model="formItem.color"
-              :rules="['anyColor']"
-              hint="Selecciona un color para la categoría"
-              class="my-input"
-              :input-style="{ backgroundColor: `${formItem.color}` }"
-            >
-              <template v-slot:append>
-                <q-icon name="colorize" class="cursor-pointer">
-                  <q-popup-proxy
-                    cover
-                    transition-show="scale"
-                    transition-hide="scale"
-                  >
-                    <q-color
-                      v-model="formItem.color"
-                      no-header
-                      no-footer
-                      default-view="palette"
-                      class="my-picker"
-                    />
-                  </q-popup-proxy>
-                </q-icon>
-              </template>
-            </q-input>
-          </div>
-        </div>
         <div>
           <q-select
-            v-model="formItem.tipo_cuentaContable"
-            :options="tiposcuentaContableOptions"
-            label="Tipo CuentaContable"
+            v-model="formItem.tipoAfectacion"
+            :options="tiposAfectacionOptions"
+            label="Tipo de Afectación"
             option-label="nombre"
-            option-value="id"
-          />
-        </div>
-        <div>
-          <q-select
-            v-model="formItem.cuenta_contable"
-            :options="cuentasContablesOptions"
-            label="Cuenta Contable"
-            option-label="nombreCompleto"
             option-value="id"
           />
         </div>
@@ -120,48 +72,53 @@
 <script setup>
 import { useLazyQuery } from '@vue/apollo-composable'
 import { ref, onMounted } from 'vue'
-import { LISTA_TIPOS_CATEGORIA } from '/src/graphql/cuentasContables/cuentasContables_gql.js'
-import { LISTA_CUENTAS_CONTABLES } from '/src/graphql/cuentasContableGql'
+
 import IconPicker from '/src/components/IconPicker.vue'
 /**
  * state
  */
 const formItem = ref({
+  id: '',
   nombre: '',
-  icono: '',
-  descripcion: '',
-  color: ''
+  subnivel: 0,
+  padre: ''
 })
+
+const tiposAfectacionOptions = ref([
+  { id: 'C', nombre: 'Cargo' },
+  { id: 'A', nombre: 'Abono' }
+])
+
 const tiposCuentaContableOptions = ref([])
 const cuentasContablesOptions = ref([])
 /**
  * onMounted
  */
 onMounted(() => {
-  cargarTiposCuentaContable()
-  cargarCuentasContables()
+  // cargarTiposCuentaContable()
+  // cargarCuentasContables()
 })
 
-const {
-  load: cargarTiposCuentaContable,
-  onResult: onResultTiposCuentaContable
-} = useLazyQuery(LISTA_TIPOS_CATEGORIA)
-const { load: cargarCuentasContables, onResult: onResultCuentasContables } =
-  useLazyQuery(LISTA_CUENTAS_CONTABLES)
+// const {
+//   load: cargarTiposCuentaContable,
+//   onResult: onResultTiposCuentaContable
+// } = useLazyQuery(LISTA_TIPOS_CATEGORIA)
+// const { load: cargarCuentasContables, onResult: onResultCuentasContables } =
+//   useLazyQuery(LISTA_CUENTAS_CONTABLES)
 
-onResultTiposCuentaContable(({ data }) => {
-  if (!!data) {
-    console.log('data', data.listaTiposCuentaContable)
-    tiposCuentaContableOptions.value = data.listaTiposCuentaContable
-  }
-})
+// onResultTiposCuentaContable(({ data }) => {
+//   if (!!data) {
+//     console.log('data', data.listaTiposCuentaContable)
+//     tiposCuentaContableOptions.value = data.listaTiposCuentaContable
+//   }
+// })
 
-onResultCuentasContables(({ data }) => {
-  if (!!data) {
-    console.log('data', data)
-    cuentasContablesOptions.value = data.listaCuentasContables
-  }
-})
+// onResultCuentasContables(({ data }) => {
+//   if (!!data) {
+//     console.log('data', data)
+//     cuentasContablesOptions.value = data.listaCuentasContables
+//   }
+// })
 
 function saveItem() {
   console.log('save item')
