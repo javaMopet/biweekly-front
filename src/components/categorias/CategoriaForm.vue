@@ -139,7 +139,10 @@ const cuentasContablesOptions = ref([])
  */
 onMounted(() => {
   cargarTiposCategoria()
-  cargarCuentasContables()
+  cargarCuentasContables(null, {
+    subnivel: 0,
+    clasificacion: '5'
+  })
 })
 
 const { load: cargarTiposCategoria, onResult: onResultTiposCategoria } =
@@ -157,7 +160,9 @@ onResultTiposCategoria(({ data }) => {
 onResultCuentasContables(({ data }) => {
   if (!!data) {
     console.log('data', data)
-    cuentasContablesOptions.value = data.listaCuentasContables
+    cuentasContablesOptions.value = JSON.parse(
+      JSON.stringify(data.listaCuentasContables)
+    )
   }
 })
 

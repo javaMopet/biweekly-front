@@ -17,72 +17,6 @@
             dense
           />
         </div>
-        <div class="row inline q-gutter-sm">
-          <q-input
-            class="col"
-            v-model="formItem.icono"
-            type="text"
-            dense
-            outlined
-            maxlength="20"
-            :rules="[(val) => !!val || 'Icono requerido']"
-            lazyRules
-          />
-
-          <div>
-            <q-btn @click="selectIcon" color="dark">
-              <q-icon
-                color="gray"
-                :name="formItem.icono || 'extension'"
-                class="size"
-                size="2.5em"
-              />
-            </q-btn>
-          </div>
-        </div>
-
-        <div class="q-pa-md">
-          <div
-            class="q-gutter-md row items-start"
-            :style="{ backgroundColor: `${formItem.color}` }"
-          >
-            <q-input
-              filled
-              v-model="formItem.color"
-              :rules="['anyColor']"
-              hint="Selecciona un color para la categoría"
-              class="my-input"
-              :input-style="{ backgroundColor: `${formItem.color}` }"
-            >
-              <template v-slot:append>
-                <q-icon name="colorize" class="cursor-pointer">
-                  <q-popup-proxy
-                    cover
-                    transition-show="scale"
-                    transition-hide="scale"
-                  >
-                    <q-color
-                      v-model="formItem.color"
-                      no-header
-                      no-footer
-                      default-view="palette"
-                      class="my-picker"
-                    />
-                  </q-popup-proxy>
-                </q-icon>
-              </template>
-            </q-input>
-          </div>
-        </div>
-        <div>
-          <q-select
-            v-model="formItem.tipo_cuenta"
-            :options="tiposCuentaOptions"
-            label="Tipo Cuenta"
-            option-label="nombre"
-            option-value="id"
-          />
-        </div>
         <div>
           <q-select
             v-model="formItem.cuenta_contable"
@@ -120,8 +54,8 @@
 <script setup>
 import { useLazyQuery } from '@vue/apollo-composable'
 import { ref, onMounted } from 'vue'
-
 import IconPicker from '/src/components/IconPicker.vue'
+import { LISTA_CUENTAS_CONTABLES } from 'src/graphql/cuentasContableGql'
 /**
  * state
  */
@@ -138,14 +72,19 @@ const cuentasContablesOptions = ref([])
  */
 onMounted(() => {
   // cargarTiposCuenta()
-  // cargarCuentasContables()
+  cargarCuentasContables(null, {
+    subnivel: 0
+  })
 })
 
 // const { load: cargarTiposCuenta, onResult: onResultTiposCuenta } = useLazyQuery(
 //   LISTA_TIPOS_CATEGORIA
 // )
-// const { load: cargarCuentasContables, onResult: onResultCuentasContables } =
-//   useLazyQuery(LISTA_CUENTAS_CONTABLES)
+const {
+  load: cargarCuentasContables,
+  onResult: onResultCuentasContables,
+  onError: onErrorCuentasContables
+} = useLazyQuery(LISTA_CUENTAS_CONTABLES)
 
 // onResultTiposCuenta(({ data }) => {
 //   if (!!data) {
@@ -154,12 +93,17 @@ onMounted(() => {
 //   }
 // })
 
-// onResultCuentasContables(({ data }) => {
-//   if (!!data) {
-//     console.log('data', data)
-//     cuentasContablesOptions.value = data.listaCuentasContables
-//   }
-// })
+onResultCuentasContables(({ data }) => {
+  if (!!data) {
+    console.log('data', data)
+    cuentasContablesOptions.value = data.listaCuentasContables
+  }
+})
+onErrorCuentasContables((response) => {
+  if (!!response) {
+    console.log('data', response)
+  }
+})
 
 function saveItem() {
   console.log('save item')

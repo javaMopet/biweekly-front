@@ -5,10 +5,12 @@ export const LISTA_CUENTAS = gql`
     listaCuentas {
       id
       nombre
-      nombreCompleto
-      padreId
-      subnivel
-      tipoAfectacion
+      descripcion
+      cuentaContableId
+      cuentaContable {
+        id
+        nombre
+      }
     }
   }
 `

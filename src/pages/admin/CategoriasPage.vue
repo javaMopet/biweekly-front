@@ -2,6 +2,7 @@
   <div class="row">Categorias</div>
   <div class="row fit" style="border: 0px solid red">
     <q-table
+      grid
       style="width: 100%"
       dense
       :rows="lista_categorias"
@@ -60,9 +61,10 @@
 </template>
 
 <script setup>
-import { useQuery } from '@vue/apollo-composable'
-import { ref } from 'vue'
+import { useQuery, useLazyQuery } from '@vue/apollo-composable'
+import { ref, onMounted } from 'vue'
 import { LISTA_CATEGORIAS } from '/src/graphql/categorias/categorias_gql.js'
+// import { LISTA_CUENTAS_CONTABLES } from '/src/graphql/cuentasContableGql'
 import CategoriaForm from 'src/components/categorias/CategoriaForm.vue'
 
 /**
@@ -132,6 +134,10 @@ const columns = [
     align: 'center'
   }
 ]
+/**
+ * onMount
+ */
+onMounted(() => {})
 
 const { onResult: onResultCategorias } = useQuery(LISTA_CATEGORIAS)
 
@@ -143,6 +149,20 @@ onResultCategorias(({ data }) => {
 function addRow() {
   showFormItem.value = true
 }
+/**
+ * graphql
+ */
+// const { load: cargarCuentasContables, onResult: onResultCuentasContables } =
+//   useLazyQuery(LISTA_CUENTAS_CONTABLES)
+
+// onResultCuentasContables(({ data }) => {
+//   if (!!data) {
+//     console.log('data', data.listaCuentasContables)
+//     cuentasContablesOptions.value = JSON.parse(
+//       JSON.stringify(data.listaCuentasContables)
+//     )
+//   }
+// })
 </script>
 
 <style lang="scss" scoped></style>

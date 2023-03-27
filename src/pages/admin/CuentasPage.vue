@@ -2,6 +2,7 @@
   <div class="row">Cuentas</div>
   <div class="row fit" style="border: 0px solid red">
     <q-table
+      grid
       style="width: 100%"
       dense
       :rows="lista_cuentas"
@@ -33,6 +34,30 @@
           </template>
         </q-input>
       </template>
+      <template #item="props">
+        <q-card class="my-card q-ma-sm">
+          <q-card-section>
+            <div class="text-h6">
+              {{ props.row.nombre }}
+            </div>
+            <div class="text-subtitle2">
+              {{ props.row.cuentaContable.id }} -
+              {{ props.row.cuentaContable.nombre }}
+            </div>
+          </q-card-section>
+          <q-card-section>
+            <q-btn icon="edit" size="sm" flat dense @click="editRow(props)" />
+            <q-btn
+              icon="delete"
+              size="sm"
+              class="q-ml-sm"
+              flat
+              dense
+              @click="deleteRow(props)"
+            />
+          </q-card-section>
+        </q-card>
+      </template>
       <template #body-cell-icono="props">
         <q-icon :name="props.row.icono" size="35px" color="cyan" />
       </template>
@@ -60,8 +85,8 @@
 </template>
 
 <script setup>
-import { useQuery } from '@vue/apollo-composable'
-import { ref } from 'vue'
+import { useLazyQuery } from '@vue/apollo-composable'
+import { ref, onMounted } from 'vue'
 import { LISTA_CUENTAS } from '/src/graphql/cuentas'
 import RegistroCuentaForm from 'src/components/cuentas/RegistroCuentaForm.vue'
 
@@ -75,19 +100,13 @@ const showFormItem = ref(false)
 const columns = [
   // { name: 'id', label: 'Id', field: 'id', sortable: true, align: 'left' },
   {
-    name: 'icono',
-    label: '',
-    field: 'icono',
-    sortable: true,
-    align: 'left'
-  },
-  {
     name: 'nombre',
     label: 'Nombre',
     field: 'nombre',
     sortable: true,
     align: 'left'
   },
+
   {
     name: 'descripcion',
     label: 'Descripción',
@@ -97,30 +116,9 @@ const columns = [
   },
 
   {
-    name: 'color',
-    label: 'Color',
-    field: 'color',
-    sortable: true,
-    align: 'left'
-  },
-  {
     name: 'cuenta_contable',
     label: 'Cuenta Contable',
     field: (row) => `${row.cuentaContable.id} - ${row.cuentaContable.nombre}`,
-    sortable: true,
-    align: 'left'
-  },
-  {
-    name: 'tipo_cuenta',
-    label: 'Tipo Cuenta',
-    field: (row) => `${row.tipoCuenta.nombre}`,
-    sortable: true,
-    align: 'left'
-  },
-  {
-    name: 'creacion',
-    label: 'Fecha Creación',
-    field: 'createdAt',
     sortable: true,
     align: 'left'
   },
@@ -132,12 +130,21 @@ const columns = [
     align: 'center'
   }
 ]
+/**
+ * onMounted
+ */
+onMounted(() => {
+  cargarCuentas()
+})
 
-const { onResult: onResultCuentas } = useQuery(LISTA_CUENTAS)
+const { onResult: onResultCuentas, load: cargarCuentas } =
+  useLazyQuery(LISTA_CUENTAS)
 
 onResultCuentas(({ data }) => {
-  console.log('response', data)
-  lista_cuentas.value = JSON.parse(JSON.stringify(data.listaCuentas))
+  if (!!data) {
+    // console.log('response', data)
+    lista_cuentas.value = JSON.parse(JSON.stringify(data.listaCuentas))
+  }
 })
 
 function addRow() {
