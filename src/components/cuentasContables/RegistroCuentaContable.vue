@@ -3,7 +3,7 @@
     <q-card-section class="bg-primary text-secondary">
       {{ actionName }}
       <!-- <pre>{{ editedFormItem }}</pre> -->
-      <pre>{{ props.editedItem }}</pre>
+      <pre>{{ editedFormItem }}</pre>
     </q-card-section>
 
     <q-card-section class="">
@@ -16,11 +16,8 @@
               label="Id"
               dense
               maxlength="5"
-              mask="#####"
               lazy-rules
-              :rules="[
-                (val) => (val && val.length > 0) || 'Favor de ingresar el Id'
-              ]"
+              :rules="[(val) => !!val || 'Favor de ingresar el Id']"
             />
           </div>
           <div>
@@ -49,7 +46,7 @@
             </div>
             <div class="col">
               <q-input
-                v-model="editedFormItem.padre_id"
+                v-model="editedFormItem.padreId"
                 type="text"
                 label="Cuenta Padre"
                 dense
@@ -95,9 +92,12 @@
 
 <script setup>
 // import { useLazyQuery } from '@vue/apollo-composable'
-import { ref, defineProps, computed, onMounted } from 'vue'
+import { ref, defineProps, defineEmits, computed, onMounted } from 'vue'
 
-import { CUENTA_CONTABLE_CREATE } from 'src/graphql/cuentasContableGql'
+import {
+  CUENTA_CONTABLE_CREATE,
+  CUENTA_CONTABLE_UPDATE
+} from 'src/graphql/cuentasContableGql'
 import { useMutation } from '@vue/apollo-composable'
 
 // import IconPicker from '/src/components/IconPicker.vue'
@@ -131,6 +131,10 @@ const props = defineProps({
     }
   }
 })
+/**
+ * emits
+ */
+const emit = defineEmits(['cuentaContableSaved', 'cuentaContableUpdated'])
 /**
  * computed
  */
@@ -167,13 +171,20 @@ onMounted(() => {
  * METHODS
  */
 function saveItem() {
-  const input = { ...editedFormItem.value, action: undefined }
+  const id = editedFormItem.value.id
+  const input = {
+    ...editedFormItem.value,
+    action: undefined,
+    tipo_afectacion: undefined,
+    label: undefined,
+    selectable: undefined
+  }
 
   console.log('save item', input)
   if (props.editedItem.action === 'add') {
     insertCuentaContable({ input })
   } else {
-    // updateCuentaContable({ id, input })
+    updateCuentaContable({ id, input })
   }
 }
 
@@ -186,12 +197,39 @@ const {
   onError: onErrorInsertCuentaContable
 } = useMutation(CUENTA_CONTABLE_CREATE)
 
+const {
+  mutate: updateCuentaContable,
+  onDone: onDoneUpdateCuentaContable,
+  onError: onErrorUpdateCuentaContable
+} = useMutation(CUENTA_CONTABLE_UPDATE)
+
 onDoneInsertCuentaContable(({ data }) => {
   if (!!data) {
-    console.log('data', data)
+    const item = data.cuentaContableCreate.cuentaContable
+    const itemSaved = {
+      ...item,
+      label: `${item.id} - ${item.nombre}`
+    }
+    console.log('data', itemSaved)
+    emit('cuentaContableSaved', itemSaved)
   }
 })
 onErrorInsertCuentaContable((error) => {
+  console.error(error)
+})
+onDoneUpdateCuentaContable(({ data }) => {
+  if (!!data) {
+    console.log('data', data)
+    const item = data.cuentaContableUpdate.cuentaContable
+    const itemUpdated = {
+      ...item,
+      label: `${item.id} - ${item.nombre}`
+    }
+    console.log('data', itemUpdated)
+    emit('cuentaContableUpdated', itemUpdated)
+  }
+})
+onErrorUpdateCuentaContable((error) => {
   console.error(error)
 })
 </script>

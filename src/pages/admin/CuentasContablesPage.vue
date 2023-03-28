@@ -94,7 +94,9 @@
               <q-separator />
               <q-item clickable v-close-popup @click="deleteItem(props)">
                 <q-item-section
-                  >Eliminar Menú {{ props.node.nombre }}</q-item-section
+                  >Eliminar Cuenta Contable "{{
+                    props.node.label
+                  }}"</q-item-section
                 >
               </q-item>
               <q-item clickable v-close-popup>
@@ -119,17 +121,26 @@
     <q-dialog v-model="showFormItem" persistent>
       <RegistroCuentaContable
         :edited-item="editedItem"
+        @cuentaContableSaved="cuentaContableSaved"
+        @cuentaContableUpdated="cuentaContableUpdated"
       ></RegistroCuentaContable>
     </q-dialog>
   </Teleport>
 </template>
 
 <script setup>
-import { useLazyQuery } from '@vue/apollo-composable'
+import { useLazyQuery, useMutation } from '@vue/apollo-composable'
 import { ref, computed, onMounted } from 'vue'
-import { ARBOL_CUENTAS_CONTABLES } from '/src/graphql/cuentasContableGql'
+import {
+  ARBOL_CUENTAS_CONTABLES,
+  ITEM_DELETE
+} from '/src/graphql/cuentasContableGql'
 import RegistroCuentaContable from 'src/components/cuentasContables/RegistroCuentaContable.vue'
-
+import { useNotificacion } from 'src/composables/utils/useNotificacion.js'
+/**
+ * composables
+ */
+const notificacion = useNotificacion()
 /**
  * state
  */
@@ -222,11 +233,14 @@ const arbolLleno = computed({
 function addItem(item_padre) {
   console.log('Agregando Item  al padre:', item_padre.node)
   console.log('Padre_id:', item_padre.node.id)
+  console.log('Padre_id:', item_padre.node.children)
+  const last_item =
+    item_padre.node.children[item_padre.node.children.length - 1]
   editedItem.value = {
     action: 'add',
-    id: null,
+    id: last_item.id + 1,
     nombre: null,
-    padre_id: item_padre.node.id,
+    padreId: item_padre.node.id,
     subnivel: item_padre.node.subnivel - 1,
     tipo_afectacion: item_padre.node.tipo_afectacion,
     tipoAfectacion: item_padre.node.tipo_afectacion === 'C' ? 'Cargo' : 'Abono'
@@ -242,6 +256,9 @@ function editItem(item) {
     children: undefined
   }
   showFormItem.value = true
+}
+function deleteItem(item) {
+  deleteCuentaContable({ id: item.node.id })
 }
 /**
  *
@@ -266,6 +283,39 @@ function searchTree(element, id) {
   }
   return null
 }
+
+function cuentaContableSaved(itemSaved) {
+  console.log('saved', itemSaved)
+  notificacion.mostrarNotificacionPositiva(
+    `La cuenta contable ${itemSaved.label} se guardó correctamente.`,
+    2000
+  )
+  showFormItem.value = false
+}
+function cuentaContableUpdated(itemUpdated) {
+  console.log('updated', itemUpdated)
+  notificacion.mostrarNotificacionPositiva(
+    `La cuenta contable ${itemUpdated.label} se actualizó correctamente.`,
+    2000
+  )
+  showFormItem.value = false
+}
+
+/**
+ * GRAPHQL
+ */
+const {
+  mutate: deleteCuentaContable,
+  onDone: onDoneDeleteCuentaContable,
+  onError: onErrorDeleteCuentaContable
+} = useMutation(ITEM_DELETE)
+
+onDoneDeleteCuentaContable(({ data }) => {
+  console.log('data', data)
+})
+onErrorDeleteCuentaContable((error) => {
+  console.error(error)
+})
 </script>
 
 <style lang="scss" scoped>

@@ -21,10 +21,38 @@ export const ARBOL_CUENTAS_CONTABLES = gql`
 
 export const CUENTA_CONTABLE_CREATE = gql`
   mutation cuentaContableCreate($input: CuentaContableInput!) {
-    cuentaContableCreate(input: $input) {
+    cuentaContableCreate(cuentaContableInput: $input) {
       cuentaContable {
         id
         nombre
+        tipoAfectacion
+        subnivel
+        padreId
+      }
+    }
+  }
+`
+export const CUENTA_CONTABLE_UPDATE = gql`
+  mutation cuentaContableUpdate($id: ID!, $input: CuentaContableInput!) {
+    cuentaContableUpdate(id: $id, cuentaContableInput: $input) {
+      cuentaContable {
+        id
+        nombre
+        tipoAfectacion
+        subnivel
+        padreId
+      }
+    }
+  }
+`
+
+export const ITEM_DELETE = gql`
+  mutation cuentaContableDelete($id: ID!) {
+    cuentaContableDelete(id: $id) {
+      cuentaContable {
+        id
+        nombre
+        nombreCompleto
         tipoAfectacion
         subnivel
         padreId
