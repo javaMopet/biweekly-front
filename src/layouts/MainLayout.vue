@@ -46,7 +46,7 @@ import { useSessionStore } from 'src/stores/sessionStore.js'
 import { useRouter } from 'vue-router'
 import { SessionStorage } from 'quasar'
 import EssentialLink from 'src/components/EssentialLink.vue'
-import { LISTA_MENUS } from 'src/graphql/menu/menus_gql'
+import { LISTA_MENUS } from 'src/graphql/menus'
 
 /**
  * state

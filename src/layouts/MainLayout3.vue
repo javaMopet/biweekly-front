@@ -127,51 +127,51 @@
 </template>
 
 <script setup>
-import { defineComponent, ref, onMounted } from "vue";
-import { useSessionStore } from "src/stores/sessionStore.js";
-import { useRouter } from "vue-router";
-import { SessionStorage } from "quasar";
+import { defineComponent, ref, onMounted } from 'vue'
+import { useSessionStore } from 'src/stores/sessionStore.js'
+import { useRouter } from 'vue-router'
+import { SessionStorage } from 'quasar'
 
 /**
  * state
  */
-const user = ref(null);
-const filter = ref("");
-const iconSet = ref("fontawesome-v5");
-const name = ref("nombre");
-const tags = ref([]);
-const value = ref();
+const user = ref(null)
+const filter = ref('')
+const iconSet = ref('fontawesome-v5')
+const name = ref('nombre')
+const tags = ref([])
+const value = ref()
 
 const pagination = ref({
   itemsPerPage: 60,
-  page: 0,
-});
+  page: 0
+})
 
-const leftDrawerOpen = ref(false);
+const leftDrawerOpen = ref(false)
 
 /**
  * stores
  */
-const sessionStorage = useSessionStore();
-const router = useRouter();
+const sessionStore = useSessionStore()
+const router = useRouter()
 
 /**
  * onMounted
  */
 onMounted(() => {
-  user.value = SessionStorage.getItem("user");
-});
+  user.value = SessionStorage.getItem('user')
+})
 
 function onClick() {}
 function logout() {
-  const promise = sessionStorage.logoutUser();
+  const promise = sessionStore.logoutUser()
   if (promise) {
     promise.then(
       (result) => {
-        router.push("/login");
+        router.push('/login')
       },
       (error) => {}
-    );
+    )
   }
 }
 </script>
@@ -254,7 +254,7 @@ nav.main-menu.expanded {
   display: table-cell;
   vertical-align: middle;
   width: 190px;
-  font-family: "Titillium Web", sans-serif;
+  font-family: 'Titillium Web', sans-serif;
 }
 
 .main-menu > ul.logout {
@@ -310,11 +310,11 @@ nav.main-menu li.active > a,
   height: 100%;
 }
 @font-face {
-  font-family: "Titillium Web";
+  font-family: 'Titillium Web';
   font-style: normal;
   font-weight: 300;
-  src: local("Titillium WebLight"), local("TitilliumWeb-Light"),
+  src: local('Titillium WebLight'), local('TitilliumWeb-Light'),
     url(http://themes.googleusercontent.com/static/fonts/titilliumweb/v2/anMUvcNT0H1YN4FII8wpr24bNCNEoFTpS2BTjF6FB5E.woff)
-      format("woff");
+      format('woff');
 }
 </style>

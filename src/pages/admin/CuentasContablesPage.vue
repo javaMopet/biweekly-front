@@ -1,7 +1,9 @@
 <template>
-  <div class="row bg-primary text-secondary q-pa-sm q-mt-sm text-subtitle1">
-    Cuentas Contables
-  </div>
+  <q-toolbar class="bg-primary text-secondary">
+    <q-toolbar-title> Cuentas Contables </q-toolbar-title>
+
+    <q-btn flat round dense icon="more_vert" />
+  </q-toolbar>
   <div class="row fit" style="border: 0px solid red">
     <q-tree
       v-if="arbolLleno"
@@ -17,36 +19,52 @@
       dense
     >
       <template v-slot:default-header="props">
-        <div class="row items-center">
+        <div
+          :class="{
+            row: true,
+            'items-center': true,
+            encabezado: props.node.subnivel != 0,
+            'full-width': true
+          }"
+        >
           <div class="column">
-            <div class="text-weight-bold text-black">
+            <!-- <div class="text-weight-bold text-black">
               <span>{{ props.node.nombre }}</span>
-            </div>
+            </div> -->
             <span
               :class="{
                 active: props.node.id == props.tree.selected,
-                'text-danger': true
+                'text-weight-bold': props.node.subnivel == 0
               }"
               >{{ props.node.label }}
             </span>
           </div>
-          <!-- <q-menu touch-position context-menu>
+          <q-menu touch-position context-menu>
             <q-list dense style="min-width: 100px">
-              <q-item clickable v-close-popup @click="addItem(prop)">
+              <q-item
+                v-if="props.node.subnivel != 0"
+                clickable
+                v-close-popup
+                @click="addItem(props)"
+              >
                 <q-item-section
-                  >Agregar Submenú a {{ prop.node.nombre }}</q-item-section
+                  >Agregar Sub-Cuenta Contable a "{{
+                    props.node.label
+                  }}"</q-item-section
                 >
               </q-item>
-              <q-item clickable v-close-popup @click="editItem(prop)">
+              <q-item clickable v-close-popup @click="editItem(props)">
                 <q-item-section
-                  >Editar Menú {{ prop.node.nombre }}</q-item-section
+                  >Editar Cuenta Contable "{{
+                    props.node.label
+                  }}"</q-item-section
                 >
               </q-item>
-              <q-item clickable v-close-popup @click="moverItem(prop)">
+              <!-- <q-item clickable v-close-popup @click="moverItem(props)">
                 <q-item-section
-                  >Mover Menú {{ prop.node.nombre }}</q-item-section
+                  >Mover Cuenta Contable {{ props.node.nombre }}</q-item-section
                 >
-              </q-item>
+              </q-item> -->
 
               <q-separator />
               <q-item clickable>
@@ -74,16 +92,16 @@
                 </q-menu>
               </q-item>
               <q-separator />
-              <q-item clickable v-close-popup @click="deleteItem(prop)">
+              <q-item clickable v-close-popup @click="deleteItem(props)">
                 <q-item-section
-                  >Eliminar Menú {{ prop.node.nombre }}</q-item-section
+                  >Eliminar Menú {{ props.node.nombre }}</q-item-section
                 >
               </q-item>
               <q-item clickable v-close-popup>
                 <q-item-section>Cerrar</q-item-section>
               </q-item>
             </q-list>
-          </q-menu> -->
+          </q-menu>
         </div>
       </template>
     </q-tree>
@@ -99,30 +117,33 @@
 
   <Teleport to="#modal">
     <q-dialog v-model="showFormItem" persistent>
-      <CuentaContableForm></CuentaContableForm>
+      <RegistroCuentaContable
+        :edited-item="editedItem"
+      ></RegistroCuentaContable>
     </q-dialog>
   </Teleport>
 </template>
 
 <script setup>
-import { useQuery, useLazyQuery } from '@vue/apollo-composable'
+import { useLazyQuery } from '@vue/apollo-composable'
 import { ref, computed, onMounted } from 'vue'
-import {
-  LISTA_CUENTAS_CONTABLES,
-  ARBOL_CUENTAS_CONTABLES
-} from '/src/graphql/cuentasContableGql'
-import CuentaContableForm from 'src/components/cuentasContables/CuentaContableForm.vue'
+import { ARBOL_CUENTAS_CONTABLES } from '/src/graphql/cuentasContableGql'
+import RegistroCuentaContable from 'src/components/cuentasContables/RegistroCuentaContable.vue'
 
 /**
  * state
  */
-const lista_cuentasContables = ref([])
+
 const arbolCuentas = ref([])
 const expanded = ref([])
 const selected = ref(null)
 const filter = ref()
 const showFormItem = ref(false)
 const cuentaSeleccionada = ref({ id: undefined, label: '' })
+const editedItem = ref({
+  id: null,
+  nombre: null
+})
 
 const columns = [
   { name: 'id', label: 'Id', field: 'id', sortable: true, align: 'left' },
@@ -195,6 +216,38 @@ const arbolLleno = computed({
     return arbolCuentas.value.length > 0
   }
 })
+/**
+ * METHODS
+ */
+function addItem(item_padre) {
+  console.log('Agregando Item  al padre:', item_padre.node)
+  console.log('Padre_id:', item_padre.node.id)
+  editedItem.value = {
+    action: 'add',
+    id: null,
+    nombre: null,
+    padre_id: item_padre.node.id,
+    subnivel: item_padre.node.subnivel - 1,
+    tipo_afectacion: item_padre.node.tipo_afectacion,
+    tipoAfectacion: item_padre.node.tipo_afectacion === 'C' ? 'Cargo' : 'Abono'
+  }
+  showFormItem.value = true
+}
+function editItem(item) {
+  console.log('item to edit...', item.node)
+  editedItem.value = {
+    ...item.node,
+    action: 'edit',
+    tipoAfectacion: item.node.tipo_afectacion === 'C' ? 'Cargo' : 'Abono',
+    children: undefined
+  }
+  showFormItem.value = true
+}
+/**
+ *
+ * @param {} val
+ */
+
 function onSelected(val) {
   console.log('selected', val)
   cuentaSeleccionada.value = searchTree(arbolCuentas.value[0], val)
@@ -219,5 +272,9 @@ function searchTree(element, id) {
 .active {
   background-color: rgb(22, 39, 39);
   color: white;
+}
+.encabezado {
+  background-color: #efece8;
+  color: #162a5c;
 }
 </style>

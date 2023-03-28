@@ -114,11 +114,11 @@
 </template>
 
 <script setup>
-import { useQuasar } from 'quasar'
-import { ref, reactive, computed } from 'vue'
+import { useQuasar, SessionStorage } from 'quasar'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { useSessionStore } from 'src/stores/sessionStore'
 import { useRouter } from 'vue-router'
-import { route } from 'quasar/wrappers'
+import { api } from 'src/boot/axios'
 
 const username = ref(null)
 const password = ref(null)
@@ -151,6 +151,13 @@ const btnLabel = computed(() =>
 const isRegistration = computed(() =>
   loginAction.value == 'two' ? true : false
 )
+
+/**
+ * onMounted
+ */
+onMounted(() => {
+  resetUserInfo()
+})
 
 function submitForm() {
   if (isRegistration.value) {
@@ -206,6 +213,12 @@ function showNotification(error) {
     type: 'negative',
     message: error
   })
+}
+function resetUserInfo() {
+  // auth_token.value = null
+  SessionStorage.remove('auth_token')
+  SessionStorage.remove('user')
+  api.defaults.headers.common['Authorization'] = null
 }
 </script>
 
