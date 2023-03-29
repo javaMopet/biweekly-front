@@ -1,9 +1,9 @@
 <template>
   <q-card class="my-card" style="width: 400px">
-    <q-card-section class="bg-primary text-secondary">
+    <q-card-section class="bg-primary text-accent-light">
       {{ actionName }}
       <!-- <pre>{{ editedFormItem }}</pre> -->
-      <pre>{{ editedFormItem }}</pre>
+      <!-- <pre>{{ editedFormItem }}</pre> -->
     </q-card-section>
 
     <q-card-section class="">
@@ -16,8 +16,10 @@
               label="Id"
               dense
               maxlength="5"
+              mask="#####"
               lazy-rules
               :rules="[(val) => !!val || 'Favor de ingresar el Id']"
+              :readonly="idReadonly"
             />
           </div>
           <div>
@@ -26,6 +28,7 @@
               type="text"
               label="Nombre"
               dense
+              autofocus
               lazy-rules
               :rules="[
                 (val) =>
@@ -71,15 +74,15 @@
             />
           </div>
         </div>
-        <div align="right">
+        <div align="right" class="q-gutter-sm">
           <q-btn
             label="Cancelar"
             v-close-popup
-            color="primary"
+            color="negative"
             flat
             class="q-ml-sm"
           />
-          <q-btn :label="lblSubmit" type="submit" color="primary" />
+          <q-btn :label="lblSubmit" type="submit" color="positive" />
         </div>
       </q-form>
     </q-card-section>
@@ -109,7 +112,7 @@ const formItem = ref({
   nombre: '',
   subnivel: 0,
   padre: '',
-  tipo_afectacion: ''
+  tipoAfectacion: ''
 })
 
 const tiposAfectacionOptions = ref(['Cargo', 'Abono'])
@@ -159,6 +162,12 @@ const lblSubmit = computed({
   }
 })
 
+const idReadonly = computed({
+  get() {
+    return props.editedItem.action === 'edit' ? true : false
+  }
+})
+
 /**
  * onMounted
  */
@@ -177,7 +186,8 @@ function saveItem() {
     action: undefined,
     tipo_afectacion: undefined,
     label: undefined,
-    selectable: undefined
+    selectable: undefined,
+    __typename: undefined
   }
 
   console.log('save item', input)

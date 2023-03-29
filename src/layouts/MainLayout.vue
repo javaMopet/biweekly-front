@@ -1,10 +1,12 @@
 <template>
-  <q-layout view="hHh lpR lFr">
-    <q-header bordered class="bg-primary text-secondary">
+  <q-layout view="hHh LpR lFr">
+    <q-header bordered class="bg-primary text-white">
       <q-toolbar>
         <q-btn dense flat round icon="menu" @click="toggleLeftDrawer" />
 
-        <q-toolbar-title> Biweekly Application </q-toolbar-title>
+        <q-toolbar-title class="font-title">
+          Biweekly Application
+        </q-toolbar-title>
         <span class="q-pr-sm" v-if="user">{{ user.email }}</span>
         <q-btn icon="account_circle" @click="onClickAccount" flat round>
           <q-menu>
@@ -104,7 +106,9 @@ function logout() {
       (result) => {
         router.push('/login')
       },
-      (error) => {}
+      (error) => {
+        router.push('/login')
+      }
     )
   }
 }
@@ -114,3 +118,9 @@ function onClickAccount() {}
 //   essentialLinks.value = data.menuLevels;
 // });
 </script>
+<style lang="scss" scoped>
+.font-title {
+  font-family: 'Lobster Two', cursive;
+  font-size: 1.5rem;
+}
+</style>

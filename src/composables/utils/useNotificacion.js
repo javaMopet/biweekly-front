@@ -10,10 +10,9 @@ export function useNotificacion() {
       message,
       timeout,
       progress: true,
-      // color: 'cyan-9',
-      color: 'green-7',
-      textColor: 'green-1'
-      // classes: 'glossy'
+      color: 'positive',
+      textColor: 'white',
+      classes: 'glossy'
     })
   }
 
@@ -31,7 +30,8 @@ export function useNotificacion() {
       position: 'center',
       type: 'info',
       message,
-      timeout
+      timeout,
+      color: 'info'
     })
   }
 

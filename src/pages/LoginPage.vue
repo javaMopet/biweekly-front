@@ -3,7 +3,7 @@
     <q-page-container class="">
       <q-page class="flex flex-center bg-color">
         <q-card
-          class="bg-primary text-secondary card-login"
+          class="bg-primary text-accent card-login"
           v-bind:style="
             $q.screen.lt.sm || $q.screen.lt.md
               ? { width: '80%' }
@@ -53,9 +53,9 @@
               <q-input
                 v-model="form.email"
                 label="Correo"
-                input-class="text-secondary"
-                class="text-secondary"
-                label-color="secondary"
+                input-class="text-accent"
+                class="text-accent"
+                label-color="accent"
                 lazy-rules
                 type="email"
                 dark
@@ -71,9 +71,9 @@
                 dark
                 v-model="form.password"
                 label="Contraseña"
-                input-class="text-secondary border-secondary bordered"
-                label-color="secondary"
-                class="border-secondary"
+                input-class="text-accent border-accent bordered"
+                label-color="accent"
+                class="border-accent"
                 lazy-rules
                 :rules="[(val) => !!val || 'Contraseña es requerida']"
               >
@@ -84,7 +84,7 @@
               <q-input
                 v-if="isRegistration"
                 type="password"
-                input-class="text-secondary"
+                input-class="text-accent"
                 v-model="form.password_confirmation"
                 label="Confirmación Contraseña"
                 lazy-rules
@@ -101,7 +101,7 @@
                   :label="btnLabel"
                   type="submit"
                   color="primary"
-                  text-color="secondary"
+                  text-color="accent"
                   outline
                 />
               </div>
@@ -238,7 +238,7 @@ function resetUserInfo() {
 }
 .card-login {
   box-shadow: 0 5px 70px -25px #f69068;
-  opacity: 0.8;
+  opacity: 0.9;
   // -webkit-filter: none !important; /* Safari 6.0 - 9.0 */
   // filter: none !important;
   z-index: 1 !important;
