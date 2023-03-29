@@ -77,18 +77,18 @@
     </q-table>
   </div>
 
-  <teleport to="body">
+  <Teleport to="#modal">
     <q-dialog v-model="showFormItem" persistent>
-      <RegistroCuentaForm></RegistroCuentaForm>
+      <RegistroCuenta></RegistroCuenta>
     </q-dialog>
-  </teleport>
+  </Teleport>
 </template>
 
 <script setup>
 import { useLazyQuery } from '@vue/apollo-composable'
 import { ref, onMounted } from 'vue'
 import { LISTA_CUENTAS } from '/src/graphql/cuentas'
-import RegistroCuentaForm from 'src/components/cuentas/RegistroCuentaForm.vue'
+import RegistroCuenta from 'src/components/cuentas/RegistroCuenta.vue'
 
 /**
  * state
