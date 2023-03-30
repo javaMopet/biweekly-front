@@ -29,8 +29,10 @@
               <div class="row items-center no-wrap">
                 <!-- <q-item-label>{{ props.row.color }}</q-item-label> -->
                 <div class="col">
-                  <q-item-label>{{ props.row.nombre }}</q-item-label>
-                  <q-item-label caption class="text-accent-light">
+                  <q-item-label class="text-h6">{{
+                    props.row.nombre
+                  }}</q-item-label>
+                  <q-item-label class="text-accent-light text-subtitle2">
                     {{ props.row.cuentaContable.nombreCompleto }}
                   </q-item-label>
                 </div>
@@ -101,7 +103,7 @@
           <q-btn
             icon="delete"
             size="sm"
-            class="q-ml-sm"
+            class="q-ml-sm text-negative"
             flat
             dense
             @click="deleteRow(props)"

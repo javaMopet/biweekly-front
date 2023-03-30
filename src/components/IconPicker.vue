@@ -23,7 +23,7 @@
               icon-set="material-icons"
               sected-color="orange-8"
               :filter="filter"
-              style="height: 487px"
+              style="height: 637px"
               :tags="tags"
               @tags="onTags"
             >

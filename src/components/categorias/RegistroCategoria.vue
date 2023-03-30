@@ -1,133 +1,166 @@
 <template>
   <q-card class="my-card" style="width: 400px">
-    <q-card-section class="bg-primary text-accent-light">
-      Nueva Categoria
+    <q-card-section class="bg-primary text-accent-light text-subtitle1">
+      {{ actionName }}
       <!-- <pre>{{ editedIndex }}</pre>
       <pre>{{ editedItem }}</pre> -->
       <!-- <pre>{{ tiposCategoriaOptions }}</pre> -->
       <!-- <pre>{{ editedFormItem.tipoCategoriaId }}</pre> -->
+      <!-- <pre>{{ editedFormItem.icono }}</pre> -->
     </q-card-section>
 
     <q-card-section class="">
-      <div class="q-gutter-md">
-        <div class="">
-          <q-btn-toggle
-            name="tipoCategoria"
-            push
-            spread
-            glossy
-            rounded
-            v-model="editedFormItem.tipoCategoriaId"
-            color="grey-5"
-            toggle-color="primary"
-            label="nombre"
-            :options="tiposCategoriaOptions"
-            @update:model-value="tipoCategoriaChange"
-          />
-        </div>
-        <div>
-          <q-input
-            v-model="editedFormItem.nombre"
-            type="text"
-            label="Nombre"
-            dense
-          />
-        </div>
-        <div>
-          <q-input
-            v-model="editedFormItem.descripcion"
-            type="text"
-            label="Descripcion"
-            dense
-          />
-        </div>
-        <div class="row inline q-gutter-sm">
-          <q-input
-            class="col"
-            v-model="editedFormItem.icono"
-            type="text"
-            dense
-            outlined
-            maxlength="20"
-            :rules="[(val) => !!val || 'Icono requerido']"
-            lazyRules
-          />
-
+      <q-form @submit="saveItem" class="q-gutter-md">
+        <div class="q-gutter-md">
+          <div class="">
+            <q-btn-toggle
+              name="tipoCategoria"
+              push
+              spread
+              v-model="editedFormItem.tipoCategoriaId"
+              color="primary"
+              toggle-color="accent-contrast"
+              toggle-text-color="white"
+              label="nombre"
+              :options="tiposCategoriaOptions"
+              @update:model-value="tipoCategoriaChange"
+            />
+          </div>
           <div>
-            <q-btn @click="selectIcon" color="dark">
-              <q-icon
-                color="gray"
-                :name="formItem.icono || 'extension'"
-                class="size"
-                size="2.5em"
-              />
-            </q-btn>
-          </div>
-        </div>
-
-        <div class="q-pa-md">
-          <div class="q-gutter-md row items-start">
-            <div
-              class="col"
-              style=""
-              :style="{
-                backgroundColor: `${editedFormItem.color}`,
-                height: 55 + 'px'
-              }"
-            >
-              &nbsp;
-            </div>
             <q-input
-              filled
-              v-model="editedFormItem.color"
-              :rules="['anyColor']"
-              hint="Selecciona un color para la categoría"
-              class="my-input"
-            >
-              <template v-slot:append>
-                <q-icon name="colorize" class="cursor-pointer">
-                  <q-popup-proxy
-                    cover
-                    transition-show="scale"
-                    transition-hide="scale"
+              v-model="editedFormItem.nombre"
+              type="text"
+              label="Nombre"
+              dense
+              autofocus
+              :rules="[(val) => !!val || 'Favor de ingresar el nombre']"
+              lazyRules
+            />
+          </div>
+          <div>
+            <q-input
+              v-model="editedFormItem.descripcion"
+              type="text"
+              label="Descripcion"
+              dense
+              :rules="[(val) => !!val || 'Favor de ingresar la descripción']"
+              lazyRules
+            />
+          </div>
+          <div class="row">
+            <div class="col">
+              <q-input
+                class="col"
+                v-model="editedFormItem.icono"
+                type="text"
+                dense
+                outlined
+                maxlength="30"
+                :rules="[(val) => !!val || 'Icono requerido']"
+                lazyRules
+              />
+            </div>
+            <div class="col-auto q-ml-md">
+              <q-btn @click="selectIcon" color="primary">
+                <q-icon
+                  color="gray"
+                  :name="formItem.icono || 'extension'"
+                  class="size"
+                  size="2.5em"
+                />
+              </q-btn>
+            </div>
+          </div>
+          <div>
+            <div style="border: 0px solid red">
+              <q-input
+                filled
+                v-model="editedFormItem.color"
+                :rules="['anyColor']"
+                hint="Selecciona un color para la categoría"
+                class="my-input"
+                style="min-width: 100%"
+              >
+                <template #before>
+                  <div
+                    :style="{
+                      backgroundColor: `${editedFormItem.color}`,
+                      height: 55 + 'px',
+                      width: 55 + 'px'
+                    }"
                   >
-                    <q-color
-                      v-model="editedFormItem.color"
-                      no-header
-                      no-footer
-                      default-view="palette"
-                      class="my-picker"
-                    />
-                  </q-popup-proxy>
-                </q-icon>
-              </template>
-            </q-input>
+                    &nbsp;
+                  </div>
+                </template>
+                <template v-slot:append>
+                  <q-icon name="colorize" class="cursor-pointer">
+                    <q-popup-proxy
+                      cover
+                      transition-show="scale"
+                      transition-hide="scale"
+                    >
+                      <q-color
+                        v-model="editedFormItem.color"
+                        no-footer
+                        :palette="[
+                          '#019A9D',
+                          '#D9B801',
+                          '#E8045A',
+                          '#B2028A',
+                          '#2A0449',
+                          '#019A9D'
+                        ]"
+                        default-view="palette"
+                        class="my-picker"
+                      />
+                    </q-popup-proxy>
+                  </q-icon>
+                </template>
+              </q-input>
+            </div>
+          </div>
+          <div>
+            <div class="row q-gutter-x-md">
+              <div class="col">
+                <q-select
+                  v-model="editedFormItem.cuentaContable"
+                  :options="cuentasContablesOptions"
+                  label="Cuenta Contable"
+                  option-label="nombreCompleto"
+                  option-value="id"
+                  :rules="[(val) => !!val || 'Icono requerido']"
+                  lazyRules
+                />
+              </div>
+              <div
+                class="col-auto row items-center justify-center"
+                style="border: 0px solid green"
+              >
+                <q-btn
+                  color="accent-contrast"
+                  icon="add"
+                  @click="registrarCuentaContable"
+                />
+              </div>
+            </div>
           </div>
         </div>
-        <!-- <div>
-          <q-select
-            v-model="editedFormItem.tipoCategoria"
-            :options="tiposCategoriaOptions"
-            label="Tipo Categoria"
-            option-label="nombre"
-            option-value="id"
+        <div class="col row justify-end">
+          <q-btn
+            label="Cancelar"
+            color="primary"
+            flat
+            v-close-popup
+            class="q-ml-sm"
           />
-        </div> -->
-        <div>
-          <q-select
-            v-model="editedFormItem.cuentaContable"
-            :options="cuentasContablesOptions"
-            label="Cuenta Contable"
-            option-label="nombreCompleto"
-            option-value="id"
-          />
+          <q-btn :label="lblSubmit" type="submit" color="primary" />
         </div>
-      </div>
+      </q-form>
     </q-card-section>
-    <q-card-section class="q-gutter-sm" align="right">
+    <!-- <q-card-section class="q-gutter-sm" align="right">
       <q-btn color="primary" label="Cancelar" v-close-popup outline />
-      <q-btn color="primary" icon="check" label="Guardar" @click="saveItem" />
-    </q-card-section>
+      <q-btn color="primary" label="Guardar" @click="saveItem" />
+    </q-card-section> -->
   </q-card>
 
   <Teleport to="#modal">
@@ -138,7 +171,7 @@
       >
         <q-card-section>
           <IconPicker
-            v-model="editedFormItem.icon"
+            v-model="editedFormItem.icono"
             @onClose="cancelIconPicker"
             @onIconSelected="onIconSelected"
           ></IconPicker>
@@ -158,6 +191,7 @@ import {
 } from '/src/graphql/categorias'
 import { LISTA_CUENTAS_CONTABLES } from '/src/graphql/cuentasContableGql'
 import IconPicker from '/src/components/IconPicker.vue'
+import RegistroCuentaContable from '../cuentasContables/RegistroCuentaContable.vue'
 /**
  * state
  */
@@ -227,8 +261,8 @@ const editedFormItem = computed({
 const actionName = computed({
   get() {
     return !!editedFormItem.value.id
-      ? 'Actualizar la Cuenta Contable'
-      : 'Nueva Cuenta Contable'
+      ? 'Actualizar Categoria'
+      : 'Nueva Categoria'
   }
 })
 const lblSubmit = computed({
@@ -290,6 +324,9 @@ function saveItem() {
   }
 }
 
+function registrarCuentaContable() {
+  console.log('registrar una cuenta contable')
+}
 /**
  * GRAPHQL
  */
@@ -362,7 +399,7 @@ function selectIcon() {
 }
 function onIconSelected(value) {
   console.log('IconoSeleccionado', value)
-  formItem.value.icono = value
+  editedFormItem.value.icono = value
   show_icon_picker.value = false
 }
 </script>

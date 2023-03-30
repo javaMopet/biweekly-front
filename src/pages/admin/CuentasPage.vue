@@ -1,5 +1,8 @@
 <template>
-  <div class="row">Cuentas</div>
+  <q-toolbar class="text-dark">
+    <q-toolbar-title> Cuentas </q-toolbar-title>
+    <q-btn flat round dense icon="arrow_back" @click="$router.back()" />
+  </q-toolbar>
   <div class="row fit" style="border: 0px solid red">
     <q-table
       grid
@@ -36,9 +39,9 @@
       </template>
       <template #item="props">
         <q-card class="my-card text-primary q-ma-sm" style="width: 340px">
-          <q-card-section class="bg-primary text-accent-light">
+          <q-card-section class="bg-secondary text-white">
             <div class="text-h6">{{ props.row.nombre }}</div>
-            <div class="text-subtitle2">
+            <div class="text-subtitle2 text-accent-light">
               {{ props.row.cuentaContable.nombreCompleto }}
             </div>
           </q-card-section>
@@ -53,13 +56,12 @@
             <q-btn
               round
               color="primary"
-              outline
+              flat
               icon="edit"
               @click="editRow(props)"
             />
             <q-btn
               round
-              color="negative"
               flat
               icon="delete"
               class="q-ml-sm"
@@ -93,20 +95,19 @@
       <template #body-cell-icono="props">
         <q-icon :name="props.row.icono" size="35px" color="cyan" />
       </template>
-      <template v-slot:body-cell-acciones="props">
+      <!-- <template v-slot:body-cell-acciones="props">
         <q-td :props="props" fit>
-          <q-btn icon="edit" size="sm" flat dense @click="editRow(props)" />
+          <q-btn icon="edit" size="sm" dense @click="editRow(props)" />
           <q-btn
             icon="delete"
             size="sm"
             class="q-ml-sm"
-            color="negative"
             flat
             dense
             @click="deleteRow(props)"
           />
         </q-td>
-      </template>
+      </template> -->
     </q-table>
   </div>
 
