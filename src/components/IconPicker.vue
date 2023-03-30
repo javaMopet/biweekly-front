@@ -44,7 +44,7 @@
 </template>
 
 <script setup>
-import { ref, defineEmits } from 'vue';
+import { ref, defineEmits } from 'vue'
 const data = ref({
   value: '',
   paginationColor: 'secondary',
@@ -52,35 +52,35 @@ const data = ref({
     itemsPerPage: 99,
     page: 0
   }
-});
+})
 // const tags = ref(['food', 'calendar']);
-const loaded = ref(false);
-const categories = ref([]);
-const tags = ref([]);
-const filter = ref('');
+const loaded = ref(false)
+const categories = ref([])
+const tags = ref([])
+const filter = ref('')
 
 class onTags {
   constructor(tags) {
     if (loaded.value !== true) {
-      console.log('tags', tags);
-      let cats = [];
-      let t = [...tags];
-      cats.splice(0, 0, ...t);
-      categories.value.splice(0, this.categories.length, ...cats);
-      categories.value.concat(...cats);
+      console.log('tags', tags)
+      let cats = []
+      let t = [...tags]
+      cats.splice(0, 0, ...t)
+      categories.value.splice(0, this.categories.length, ...cats)
+      categories.value.concat(...cats)
       categories.value.forEach((cat) => {
-        this.$set(this.selected, cat, false);
-      });
-      this.loaded = true;
+        this.$set(this.selected, cat, false)
+      })
+      this.loaded = true
     }
   }
 }
-const emit = defineEmits(['onClose', 'onIconSelected']);
+const emit = defineEmits(['onClose', 'onIconSelected'])
 
 function setValue(name) {
-  console.log('setting value', name);
-  data.value.value = name;
-  emit('onIconSelected', name);
+  console.log('setting value', name)
+  data.value.value = name
+  emit('onIconSelected', name)
 }
 
 const categorias = ref([
@@ -111,7 +111,7 @@ const categorias = ref([
   'travel',
   'weather',
   'web'
-]);
+])
 const categoriesMaterial = ref([
   'accessibility',
   'arrow',
@@ -132,9 +132,9 @@ const categoriesMaterial = ref([
   'travel',
   'weather',
   'web'
-]);
+])
 function close() {
-  emit('onClose');
+  emit('onClose')
 }
 </script>
 <style lang="scss" scoped>
