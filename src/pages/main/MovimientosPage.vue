@@ -6,7 +6,6 @@
   <q-space style="height: 10px" />
   <div class="row fit" style="border: 0px solid red">
     <q-table
-      grid
       style="width: 100%"
       dense
       :rows="listaMovimientos"
@@ -28,16 +27,16 @@
             <q-item-section>
               <div class="row items-center no-wrap">
                 <!-- <q-item-label>{{ props.row.color }}</q-item-label> -->
-                <div class="col">
+                <!-- <div class="col">
                   <q-item-label class="text-h6">{{
                     props.row.nombre
                   }}</q-item-label>
                   <q-item-label class="text-accent-light text-subtitle2">
                     {{ props.row.cuentaContable.nombreCompleto }}
                   </q-item-label>
-                </div>
+                </div> -->
                 <div class="col-auto q-pl-md">
-                  <q-avatar
+                  <!-- <q-avatar
                     size="30px"
                     :class="{
                       'text-white': true,
@@ -45,7 +44,7 @@
                       'bg-negative': props.row.tipoMovimiento.id === '2'
                     }"
                     >{{ props.row.tipoMovimiento.nombre[0] }}</q-avatar
-                  >
+                  > -->
                 </div>
               </div>
             </q-item-section>
@@ -160,25 +159,18 @@ const rowIndexDelete = ref(null)
 const showFormItem = ref(false)
 
 const columns = [
-  // { name: 'id', label: 'Id', field: 'id', sortable: true, align: 'left' },
-  {
-    name: 'icono',
-    label: '',
-    field: 'icono',
-    sortable: true,
-    align: 'left'
-  },
+  { name: 'id', label: 'Id', field: 'id', sortable: true, align: 'left' },
   {
     name: 'nombre',
     label: 'Nombre',
-    field: 'nombre',
+    field: (row) => (!!row.categoria ? row.categoria.nombre : ''),
     sortable: true,
     align: 'left'
   },
   {
     name: 'descripcion',
     label: 'Descripción',
-    field: 'descripcion',
+    field: (row) => row.movimiento.observaciones,
     sortable: true,
     align: 'left'
   },
@@ -193,14 +185,14 @@ const columns = [
   {
     name: 'cuenta_contable',
     label: 'Cuenta Contable',
-    field: (row) => `${row.cuentaContable.id} - ${row.cuentaContable.nombre}`,
+    // field: (row) => `${row.cuentaContable.id} - ${row.cuentaContable.nombre}`,
     sortable: true,
     align: 'left'
   },
   {
     name: 'tipo_movimiento',
     label: 'Tipo Movimiento',
-    field: (row) => `${row.tipoMovimiento.nombre}`,
+    // field: (row) => `${row.tipoMovimiento.nombre}`,
     sortable: true,
     align: 'left'
   },
@@ -296,7 +288,10 @@ const { onResult: onResultMovimientos, onError: onErrorListaMovimientos } =
   useQuery(LISTA_MOVIMIENTOS, null, options)
 
 onResultMovimientos(({ data }) => {
-  listaMovimientos.value = JSON.parse(JSON.stringify(data.listaMovimientos))
+  if (!!data) {
+    console.log('data', data.listaMovimientos[0])
+    listaMovimientos.value = JSON.parse(JSON.stringify(data.listaMovimientos))
+  }
 })
 onErrorListaMovimientos((error) => {
   console.error(error)
@@ -317,6 +312,7 @@ onDoneDeleteMovimiento(({ data }) => {
     mostrarNotificacion('elminó', deletedItem)
   }
 })
+
 onErrorDeleteMovimiento((error) => {
   console.error(error)
 })

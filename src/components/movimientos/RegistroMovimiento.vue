@@ -2,11 +2,7 @@
   <q-card class="my-card" style="width: 400px">
     <q-card-section class="bg-primary text-accent-light text-subtitle1">
       {{ actionName }}
-      <!-- <pre>{{ editedIndex }}</pre>
-      <pre>{{ editedItem }}</pre> -->
       <!-- <pre>{{ tiposMovimientoOptions }}</pre> -->
-      <!-- <pre>{{ editedFormItem.tipoMovimientoId }}</pre> -->
-      <!-- <pre>{{ editedFormItem.icono }}</pre> -->
     </q-card-section>
 
     <q-card-section class="">
@@ -28,12 +24,12 @@
           </div>
           <div>
             <q-input
-              v-model="editedFormItem.nombre"
+              v-model="editedFormItem.fecha"
               type="text"
-              label="Nombre"
+              label="Fecha"
               dense
               autofocus
-              :rules="[(val) => !!val || 'Favor de ingresar el nombre']"
+              :rules="[(val) => !!val || 'Favor de ingresar la fecha']"
               lazyRules
             />
           </div>
@@ -197,13 +193,13 @@ import RegistroCuentaContable from '../cuentasContables/RegistroCuentaContable.v
  */
 const defaultItem = {
   id: null,
-  nombre: null,
-  icono: null,
-  descripcion: null,
-  color: null,
+  numero: null,
+  estadoMovimiento: null,
   tipoMovimiento: null,
-  tipoMovimientoId: '1',
-  cuentaContable: null
+  fecha: null,
+  observaciones: null,
+  userId: '1',
+  detallesMovimiento: []
 }
 const formItem = ref({ ...defaultItem })
 // const tiposMovimientoOptions = ref([])

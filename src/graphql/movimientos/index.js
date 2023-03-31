@@ -7,7 +7,15 @@ export const LISTA_MOVIMIENTOS = gql`
       movimiento {
         id
         numero
-        obsevaciones
+        observaciones
+        estadoMovimiento {
+          id
+          nombre
+        }
+        tipoMovimiento {
+          id
+          nombre
+        }
       }
       categoria {
         id
@@ -21,6 +29,7 @@ export const LISTA_MOVIMIENTOS = gql`
       }
       importe
       tipoAfectacion
+      tipoDetalle
     }
   }
 `
@@ -29,7 +38,6 @@ export const LISTA_TIPOS_MOVIMIENTO = gql`
     listaTiposMovimiento {
       id
       nombre
-      tipoAfectacion
       label
       value
     }
