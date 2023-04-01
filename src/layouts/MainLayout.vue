@@ -89,8 +89,11 @@ onErrorCargarMenu((error) => {
  */
 onMounted(() => {
   user.value = SessionStorage.getItem('user')
-  console.log('usuarioId', user.value.id)
-  cargarMenu(null, { usuarioId: user.value.id })
+  if (!!user.value) {
+    cargarMenu(null, { usuarioId: user.value.id })
+  } else {
+    router.push('/login')
+  }
 })
 /**
  * methods

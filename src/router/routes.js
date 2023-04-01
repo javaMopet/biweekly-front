@@ -9,10 +9,10 @@ const routes = [
   },
 
   {
-    path: '/main',
+    path: '/home',
     component: () => import('layouts/MainLayout.vue'),
     children: [
-      { path: '', component: () => import('pages/IndexPage.vue') },
+      { path: '', component: () => import('src/pages/HomePage.vue') },
       {
         path: '/movimientos',
         component: () => import('src/pages/main/MovimientosPage.vue')

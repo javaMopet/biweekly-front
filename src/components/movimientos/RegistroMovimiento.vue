@@ -1,155 +1,90 @@
 <template>
   <q-card class="my-card" style="width: 400px">
-    <q-card-section class="bg-primary text-accent-light text-subtitle1">
+    <q-card-section class="bg-primary text-white text-subtitle1">
       {{ actionName }}
       <!-- <pre>{{ tiposMovimientoOptions }}</pre> -->
     </q-card-section>
 
-    <q-card-section class="">
+    <q-card-section>
       <q-form @submit="saveItem" class="q-gutter-md">
-        <div class="q-gutter-md">
-          <div class="">
-            <q-btn-toggle
-              name="tipoMovimiento"
-              push
-              spread
-              v-model="editedFormItem.tipoMovimientoId"
-              color="primary"
-              toggle-color="accent-contrast"
-              toggle-text-color="white"
-              label="nombre"
-              :options="tiposMovimientoOptions"
-              @update:model-value="tipoMovimientoChange"
-            />
-          </div>
-          <div>
-            <q-input
-              v-model="editedFormItem.fecha"
-              type="text"
-              label="Fecha"
-              dense
-              autofocus
-              :rules="[(val) => !!val || 'Favor de ingresar la fecha']"
-              lazyRules
-            />
-          </div>
-          <div>
-            <q-input
-              v-model="editedFormItem.descripcion"
-              type="text"
-              label="Descripcion"
-              dense
-              :rules="[(val) => !!val || 'Favor de ingresar la descripción']"
-              lazyRules
-            />
-          </div>
-          <div class="row">
+        <div class="">
+          <q-btn-toggle
+            v-model="editedFormItem.tipoMovimientoId"
+            rounded
+            spread
+            no-caps
+            color="accent"
+            toggle-color="accent-contrast"
+            :options="tiposMovimientoOptions"
+          />
+        </div>
+        <div>
+          <!-- <q-btn-toggle
+            name="tipoMovimiento"
+            rounded
+            unelevated
+            spread
+            no-caps
+            v-model="editedFormItem.tipoMovimientoId"
+            color="primary"
+            toggle-color="accent-contrast"
+            toggle-text-color="white"
+            label="nombre"
+            :options="tiposMovimientoOptions"
+            @update:model-value="tipoMovimientoChange"
+          /> -->
+        </div>
+
+        <div class="">
+          <CategoriaSelect
+            v-model="editedFormItem.detallesMovimiento[0].categoria"
+          ></CategoriaSelect>
+        </div>
+        <div class="row">
+          <div class="col q-px-md">
             <div class="col">
-              <q-input
-                class="col"
-                v-model="editedFormItem.icono"
-                type="text"
-                dense
-                outlined
-                maxlength="30"
-                :rules="[(val) => !!val || 'Icono requerido']"
-                lazyRules
-              />
-            </div>
-            <div class="col-auto q-ml-md">
-              <q-btn @click="selectIcon" color="primary">
-                <q-icon
-                  color="gray"
-                  :name="formItem.icono || 'extension'"
-                  class="size"
-                  size="2.5em"
-                />
-              </q-btn>
+              <DateInput
+                v-model="editedFormItem.fecha"
+                lbl_field="Fecha"
+              ></DateInput>
             </div>
           </div>
-          <div>
-            <div style="border: 0px solid red">
-              <q-input
-                filled
-                v-model="editedFormItem.color"
-                :rules="['anyColor']"
-                hint="Selecciona un color para la categoría"
-                class="my-input"
-                style="min-width: 100%"
-              >
-                <template #before>
-                  <div
-                    :style="{
-                      backgroundColor: `${editedFormItem.color}`,
-                      height: 55 + 'px',
-                      width: 55 + 'px'
-                    }"
-                  >
-                    &nbsp;
-                  </div>
-                </template>
-                <template v-slot:append>
-                  <q-icon name="colorize" class="cursor-pointer">
-                    <q-popup-proxy
-                      cover
-                      transition-show="scale"
-                      transition-hide="scale"
-                    >
-                      <q-color
-                        v-model="editedFormItem.color"
-                        no-footer
-                        :palette="[
-                          '#019A9D',
-                          '#D9B801',
-                          '#E8045A',
-                          '#B2028A',
-                          '#2A0449',
-                          '#019A9D'
-                        ]"
-                        default-view="palette"
-                        class="my-picker"
-                      />
-                    </q-popup-proxy>
-                  </q-icon>
-                </template>
-              </q-input>
-            </div>
-          </div>
-          <div>
-            <div class="row q-gutter-x-md">
-              <div class="col">
-                <q-select
-                  v-model="editedFormItem.cuentaContable"
-                  :options="cuentasContablesOptions"
-                  label="Cuenta Contable"
-                  option-label="nombreCompleto"
-                  option-value="id"
-                  :rules="[(val) => !!val || 'Icono requerido']"
-                  lazyRules
-                />
-              </div>
-              <div
-                class="col-auto row items-center justify-center"
-                style="border: 0px solid green"
-              >
-                <q-btn
-                  color="accent-contrast"
-                  icon="add"
-                  @click="registrarCuentaContable"
-                />
-              </div>
-            </div>
+          <div class="col">
+            <q-input
+              v-model="editedFormItem.detallesMovimiento[0].importe"
+              label="Importe"
+              dense
+              :rules="[(val) => !!val || 'Favor de ingresar el importe']"
+              lazyRules
+              filled
+              mask="#.##"
+              fill-mask
+              reverse-fill-mask
+              hint="Mask: #.00"
+              input-class="text-right"
+            >
+              <template #prepend> $ </template>
+            </q-input>
           </div>
         </div>
-        <div class="col row justify-end">
-          <q-btn
-            label="Cancelar"
-            color="primary"
-            flat
-            v-close-popup
-            class="q-ml-sm"
+        <div class="">
+          <CuentaSelect
+            v-model="editedFormItem.detallesMovimiento[1].cuenta"
+          ></CuentaSelect>
+        </div>
+
+        <div>
+          <q-input
+            v-model="editedFormItem.observaciones"
+            type="textarea"
+            label="Obsevaciones"
+            dense
+            rows="3"
           />
-          <q-btn :label="lblSubmit" type="submit" color="primary" />
+        </div>
+        <div class="col row justify-end q-gutter-x-md">
+          <q-btn label="Cancelar" color="primary" flat v-close-popup dense />
+          <q-btn :label="lblSubmit" dense type="submit" color="primary" />
         </div>
       </q-form>
     </q-card-section>
@@ -158,23 +93,6 @@
       <q-btn color="primary" label="Guardar" @click="saveItem" />
     </q-card-section> -->
   </q-card>
-
-  <Teleport to="#modal">
-    <q-dialog v-model="show_icon_picker">
-      <q-card
-        class="my-card"
-        style="max-height: 65vh; max-width: 60vw; width: 900px"
-      >
-        <q-card-section>
-          <IconPicker
-            v-model="editedFormItem.icono"
-            @onClose="cancelIconPicker"
-            @onIconSelected="onIconSelected"
-          ></IconPicker>
-        </q-card-section>
-      </q-card>
-    </q-dialog>
-  </Teleport>
 </template>
 
 <script setup>
@@ -186,24 +104,39 @@ import {
   MOVIMIENTO_UPDATE
 } from '/src/graphql/movimientos'
 import { LISTA_CUENTAS_CONTABLES } from '/src/graphql/cuentasContableGql'
-import IconPicker from '/src/components/IconPicker.vue'
-import RegistroCuentaContable from '../cuentasContables/RegistroCuentaContable.vue'
+import DateInput from '../formComponents/DateInput.vue'
+import CategoriaSelect from '../formComponents/CategoriaSelect.vue'
+import CuentaSelect from '../formComponents/CuentaSelect.vue'
+import { useFormato } from 'src/composables/utils/useFormato'
+import { SessionStorage } from 'quasar'
+/**
+ * composables
+ */
+const formato = useFormato()
 /**
  * state
  */
+const userId = SessionStorage.getItem('user').id
 const defaultItem = {
-  id: null,
   numero: null,
-  estadoMovimiento: null,
-  tipoMovimiento: null,
-  fecha: null,
-  observaciones: null,
-  userId: '1',
-  detallesMovimiento: []
+  estadoMovimientoId: parseInt(2),
+  tipoMovimientoId: '1',
+  fecha: formato.formatoFecha(new Date()),
+  observaciones: '',
+  usuarioId: userId,
+  detallesMovimiento: [
+    {
+      importe: 0
+    },
+    {
+      cuenta: null
+    }
+  ]
 }
 const formItem = ref({ ...defaultItem })
-// const tiposMovimientoOptions = ref([])
 const cuentasContablesOptions = ref([])
+const categoria = ref(null)
+
 /**
  * onMounted
  */
@@ -296,15 +229,18 @@ function tipoMovimientoChange(value) {
 }
 function saveItem() {
   console.log('save item')
-  const cuenta_contable_id = editedFormItem.value.cuentaContable.id
+  const categoriaId = categoria.value.id
   const input = {
     ...editedFormItem.value,
-    cuentaContableId: parseInt(cuenta_contable_id),
-    tipoMovimientoId: parseInt(editedFormItem.value.tipoMovimientoId),
+    categoriaId,
+    // cuentaContableId: parseInt(cuenta_contable_id),
+    // tipoMovimientoId: parseInt(editedFormItem.value.tipoMovimientoId),
     tipoMovimiento: undefined,
     cuentaContable: undefined,
     __typename: undefined
   }
+  console.log('input ', input)
+  return
   if (!editedFormItem.value.id) {
     console.log('guardando movimiento nueva', input)
     createMovimiento({
@@ -382,22 +318,6 @@ onDoneUpdateMovimiento(({ data }) => {
 onErrorUpdateMovimiento((error) => {
   console.error(error)
 })
-
-/**
- * icon picker
- */
-const show_icon_picker = ref(false)
-function cancelIconPicker() {
-  show_icon_picker.value = false
-}
-function selectIcon() {
-  show_icon_picker.value = true
-}
-function onIconSelected(value) {
-  console.log('IconoSeleccionado', value)
-  editedFormItem.value.icono = value
-  show_icon_picker.value = false
-}
 </script>
 
 <style lang="sass" scoped>

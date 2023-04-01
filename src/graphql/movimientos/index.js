@@ -4,10 +4,48 @@ export const LISTA_MOVIMIENTOS = gql`
   query listaMovimientos {
     listaMovimientos {
       id
+      numero
+      estadoMovimientoId
+      tipoMovimientoId
+      fecha
+      observaciones
+      userId
+      tipoMovimiento {
+        id
+        value
+        nombre
+      }
+      detallesMovimiento {
+        categoria {
+          id
+          nombre
+        }
+        cuenta {
+          id
+          nombre
+        }
+        importe
+        tipoAfectacion
+        tipoDetalle
+        cuentaContable {
+          id
+          nombre
+          nombreCompleto
+        }
+      }
+    }
+  }
+`
+
+export const LISTA_DETALLES_MOVIMIENTO = gql`
+  query listaDetallesMovimiento {
+    listaDetallesMovimiento {
+      id
       movimiento {
         id
         numero
         observaciones
+        fecha
         estadoMovimiento {
           id
           nombre

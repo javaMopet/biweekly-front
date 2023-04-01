@@ -71,13 +71,87 @@
         </q-card>
       </template>
       <template v-slot:top-left>
-        <q-btn
+        <!-- <q-btn
           label="Nueva movimiento"
           color="primary"
           class=""
           @click="addRow()"
           icon="queue"
-        />
+        /> -->
+        <div class="q-pa-md">
+          <q-btn-dropdown
+            split
+            color="primary"
+            glossy
+            no-caps
+            label="Nuevo"
+            v-model="btnElement"
+          >
+            <q-list>
+              <q-item clickable v-close-popup @click="addIngreso">
+                <q-item-section avatar>
+                  <q-avatar color="accent" text-color="white">I</q-avatar>
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label>Ingreso</q-item-label>
+                </q-item-section>
+              </q-item>
+
+              <q-item clickable v-close-popup @click="addEgreso">
+                <q-item-section avatar>
+                  <q-avatar color="secondary" text-color="white">E</q-avatar>
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label>Egreso</q-item-label>
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </q-btn-dropdown>
+        </div>
+        <!-- <div class="q-mt-md">
+          <q-page-sticky position="bottom-left" :offset="[18, 18]">
+            <q-fab
+              v-model="fab2"
+              label="Acciones"
+              label-class="bg-secondary white"
+              vertical-actions-align="left"
+              color="primary"
+              icon="add"
+              direction="up"
+              label-position="left"
+              external-label
+              :hide-label="true"
+            >
+              <q-fab-action
+                label-class="bg-secondary white"
+                external-label
+                color="positive-pastel"
+                @click="addRow"
+                icon="arrow_upward"
+                label="Ingreso"
+                label-position="right"
+              />
+              <q-fab-action
+                label-class="bg-secondary white"
+                external-label
+                color="negative-pastel"
+                @click="addRow"
+                icon="arrow_downward"
+                label="Egreso"
+                label-position="right"
+              />
+              <q-fab-action
+                label-class="bg-secondary white"
+                external-label
+                color="blue-6"
+                @click="addRow"
+                icon="sync_alt"
+                label="Transferencia"
+                label-position="right"
+              />
+            </q-fab>
+          </q-page-sticky>
+        </div> -->
       </template>
 
       <template v-slot:top-right>
@@ -131,25 +205,46 @@ import { LISTA_MOVIMIENTOS, MOVIMIENTO_DELETE } from '/src/graphql/movimientos'
 // import { LISTA_CUENTAS_CONTABLES } from '/src/graphql/cuentasContableGql'
 import RegistroMovimiento from 'src/components/movimientos/RegistroMovimiento.vue'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
-import { useQuasar } from 'quasar'
+import { useQuasar, SessionStorage } from 'quasar'
+import { DateTime } from 'luxon'
+import { useFormato } from 'src/composables/utils/useFormato'
+
 /**
  * composables
  */
 const notificacion = useNotificacion()
 const $q = useQuasar()
+const formato = useFormato()
 
 /**
  * state
  */
 const defaultItem = {
-  id: null,
-  nombre: null,
-  icono: null,
-  descripcion: null,
-  color: null,
-  tipoMovimiento: null,
+  // id: null,
+  // importe: 1500,
+  // tipoAfectacion: 'C',
+  // tipoDetalle: 'N',
+
+  numero: null,
+  estadoMovimientoId: parseInt(2),
   tipoMovimientoId: '1',
-  cuentaContable: null
+  fecha: formato.formatoFecha(new Date()),
+  observaciones: '',
+  userId: SessionStorage.getItem('user').id,
+  detallesMovimiento: [
+    {
+      importe: 0
+    },
+    {
+      cuenta: null
+    }
+  ]
+
+  // categoria: {
+  //   id: null,
+  //   nombre: '',
+  //   descripcion: ''
+  // }
 }
 const listaMovimientos = ref([])
 const filter = ref()
@@ -157,49 +252,57 @@ const editedItem = ref({ ...defaultItem })
 const editedIndex = ref(null)
 const rowIndexDelete = ref(null)
 const showFormItem = ref(false)
+const fab2 = ref(false)
+const btnElement = ref(null)
 
 const columns = [
   { name: 'id', label: 'Id', field: 'id', sortable: true, align: 'left' },
   {
     name: 'nombre',
     label: 'Nombre',
-    field: (row) => (!!row.categoria ? row.categoria.nombre : ''),
+    field: (row) =>
+      !!row.detallesMovimiento[0]
+        ? row.detallesMovimiento[0].categoria.nombre
+        : '',
     sortable: true,
     align: 'left'
   },
   {
     name: 'descripcion',
     label: 'Descripción',
-    field: (row) => row.movimiento.observaciones,
+    field: 'observaciones',
     sortable: true,
     align: 'left'
   },
 
   {
-    name: 'color',
-    label: 'Color',
-    field: 'color',
+    name: 'importe',
+    label: 'Importe',
+    field: (row) =>
+      !!row.detallesMovimiento[0]
+        ? formato.toCurrency(row.detallesMovimiento[0].importe)
+        : '',
     sortable: true,
     align: 'left'
   },
   {
-    name: 'cuenta_contable',
-    label: 'Cuenta Contable',
-    // field: (row) => `${row.cuentaContable.id} - ${row.cuentaContable.nombre}`,
+    name: 'fecha',
+    label: 'Fecha',
+    field: 'fecha_campo',
     sortable: true,
     align: 'left'
   },
   {
     name: 'tipo_movimiento',
     label: 'Tipo Movimiento',
-    // field: (row) => `${row.tipoMovimiento.nombre}`,
+    field: (row) => row.tipoMovimiento.nombre,
     sortable: true,
     align: 'left'
   },
   {
-    name: 'creacion',
-    label: 'Fecha Creación',
-    field: 'createdAt',
+    name: 'estado',
+    label: 'Estado',
+    field: 'estadoMovimientoId',
     sortable: true,
     align: 'left'
   },
@@ -219,17 +322,21 @@ onMounted(() => {})
  * METHODS
  */
 
+function addIngreso(event) {
+  console.log('Agregando un ingreso', event)
+}
+function addEgreso(event) {
+  console.log('Agregando un egreso', event)
+}
 function addRow() {
   editedItem.value = { ...defaultItem }
   editedIndex.value = null
   showFormItem.value = true
 }
 function editRow(item) {
-  editedItem.value = {
-    ...item.row,
-    tipoMovimientoId: item.row.tipoMovimiento.id
-  }
+  editedItem.value = JSON.parse(JSON.stringify(item.row))
   editedIndex.value = item.rowIndex
+  console.log('Editar elemento...', editedItem.value, editedIndex.value)
   showFormItem.value = true
 }
 
@@ -277,6 +384,12 @@ function mostrarNotificacion(action, cuenta) {
     2500
   )
 }
+function onMainClick(val) {
+  console.log('val', val)
+}
+function onItemClick(item) {
+  console.log('item', item)
+}
 /**
  * GRAPHQL
  */
@@ -291,6 +404,13 @@ onResultMovimientos(({ data }) => {
   if (!!data) {
     console.log('data', data.listaMovimientos[0])
     listaMovimientos.value = JSON.parse(JSON.stringify(data.listaMovimientos))
+    listaMovimientos.value.forEach((element) => {
+      console.log('element', element.observaciones)
+      element.date = DateTime.fromISO(element.fecha)
+      element.fecha_campo = DateTime.fromISO(element.fecha).toFormat(
+        'dd/MM/yyyy'
+      )
+    })
   }
 })
 onErrorListaMovimientos((error) => {

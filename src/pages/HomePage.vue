@@ -1,5 +1,19 @@
 <template>
-  <q-page class="flex flex-center"> Indice </q-page>
+  <div class="">MENSAJE DE BIENVENIDA</div>
+  <q-list bordered>
+    <q-item clickable v-ripple>
+      <q-item-section avatar>
+        <q-icon color="primary" name="bluetooth" />
+      </q-item-section>
+      <q-item-section>Dashboard</q-item-section>
+    </q-item>
+    <q-item clickable v-ripple>
+      <q-item-section avatar>
+        <q-icon color="primary" name="bluetooth" />
+      </q-item-section>
+      <q-item-section>Categorias</q-item-section>
+    </q-item>
+  </q-list>
 </template>
 
 <script setup>
