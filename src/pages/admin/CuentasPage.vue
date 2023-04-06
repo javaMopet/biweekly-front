@@ -38,19 +38,42 @@
         </q-input>
       </template>
       <template #item="props">
-        <q-card class="my-card text-primary q-ma-sm" style="width: 340px">
-          <q-card-section class="bg-secondary text-white">
-            <div class="text-h6">{{ props.row.nombre }}</div>
-            <div class="text-subtitle2 text-accent-light">
-              {{ props.row.cuentaContable.nombreCompleto }}
+        <q-card class="my-card text-primary q-ma-sm" style="width: 350px">
+          <q-card-section
+            :class="{
+              'bg-dark': props.row.tipoCuenta.id === '1',
+              'bg-contrast ': props.row.tipoCuenta.id === '2',
+              'bg-secondary': props.row.tipoCuenta.id === '3',
+              'text-white': true
+            }"
+          >
+            <div class="row">
+              <div class="column col">
+                <div class="text-h6">{{ props.row.nombre }}</div>
+              </div>
+              <div
+                class=""
+                :class="{
+                  'text-accent-contrast': props.row.tipoCuenta.id === '1',
+                  'text-yellow-3': props.row.tipoCuenta.id === '2',
+                  'text-accent-light': props.row.tipoCuenta.id === '3',
+                  'col-auto column items-center q-mx-md': true
+                }"
+              >
+                <q-icon :name="props.row.tipoCuenta.icon" size="30px" />
+                <span>{{ props.row.tipoCuenta.nombre }}</span>
+              </div>
             </div>
           </q-card-section>
 
           <q-card-section>
+            <div class="text-caption text-accent">
+              {{ props.row.cuentaContable.nombreCompleto }}
+            </div>
             {{ props.row.descripcion }}
           </q-card-section>
 
-          <q-separator dark />
+          <q-separator inset />
 
           <q-card-actions>
             <q-btn
@@ -69,45 +92,10 @@
             />
           </q-card-actions>
         </q-card>
-        <!-- <q-card class="my-card q-ma-sm">
-          <q-card-section>
-            <div class="text-h6">
-              {{ props.row.nombre }}
-            </div>
-            <div class="text-subtitle2">
-              {{ props.row.cuentaContable.id }} -
-              {{ props.row.cuentaContable.nombre }}
-            </div>
-          </q-card-section>
-          <q-card-section>
-            <q-btn icon="edit" size="sm" flat dense @click="editRow(props)" />
-            <q-btn
-              icon="delete"
-              size="sm"
-              class="q-ml-sm"
-              flat
-              dense
-              @click="deleteRow(props)"
-            />
-          </q-card-section>
-        </q-card> -->
       </template>
       <template #body-cell-icono="props">
         <q-icon :name="props.row.icono" size="35px" color="cyan" />
       </template>
-      <!-- <template v-slot:body-cell-acciones="props">
-        <q-td :props="props" fit>
-          <q-btn icon="edit" size="sm" dense @click="editRow(props)" />
-          <q-btn
-            icon="delete"
-            size="sm"
-            class="q-ml-sm"
-            flat
-            dense
-            @click="deleteRow(props)"
-          />
-        </q-td>
-      </template> -->
     </q-table>
   </div>
 
@@ -121,11 +109,12 @@
       ></RegistroCuenta>
     </q-dialog>
   </Teleport>
+  <!-- <pre>{{ listaCuentas }}</pre> -->
 </template>
 
 <script setup>
-import { useLazyQuery, useMutation } from '@vue/apollo-composable'
-import { ref, onMounted } from 'vue'
+import { useLazyQuery, useQuery, useMutation } from '@vue/apollo-composable'
+import { ref, computed, onMounted } from 'vue'
 import { LISTA_CUENTAS, CUENTA_DELETE } from '/src/graphql/cuentas'
 import RegistroCuenta from 'src/components/cuentas/RegistroCuenta.vue'
 import { useQuasar } from 'quasar'
@@ -138,6 +127,40 @@ const $q = useQuasar()
 const notificacion = useNotificacion()
 
 /**
+ * GRAPHQL
+ */
+const graphql_options = ref({
+  fetchPolicy: 'cache-and-network'
+  // fetchPolicy: 'cache-only'
+})
+const { onError: onErrorListaCuentas, result: resultCuentas } = useQuery(
+  LISTA_CUENTAS,
+  null,
+  graphql_options
+)
+
+const {
+  mutate: deleteCuenta,
+  onDone: onDoneDeleteCuenta,
+  onError: onErrorDeleteCuenta
+} = useMutation(CUENTA_DELETE)
+
+onDoneDeleteCuenta(({ data }) => {
+  if (!!data) {
+    console.log('item deleted ', data)
+    const deletedItem = data.cuentaDelete.cuenta
+    listaCuentas.value.splice(rowIndexDelete.value, 1)
+    rowIndexDelete.value = null
+    mostrarNotificacion('elminó', deletedItem)
+  }
+})
+onErrorDeleteCuenta((error) => {
+  console.error(error)
+})
+onErrorListaCuentas((error) => {
+  console.error(error)
+})
+/**
  * state
  */
 const defaultItem = {
@@ -145,13 +168,23 @@ const defaultItem = {
   nombre: null,
   descripcion: null
 }
-const listaCuentas = ref([])
+// const listaCuentas = ref([])
 const filter = ref()
 const showFormItem = ref(false)
 const editedItem = ref({ ...defaultItem })
 const editedIndex = ref(null)
 const rowIndexDelete = ref(null)
-
+/**
+ * computed
+ */
+const listaCuentas = computed({
+  get() {
+    return resultCuentas.value?.listaCuentas ?? []
+  }
+})
+/**
+ *
+ */
 const columns = [
   // { name: 'id', label: 'Id', field: 'id', sortable: true, align: 'left' },
   {
@@ -189,18 +222,15 @@ const columns = [
  * onMounted
  */
 onMounted(() => {
-  cargarCuentas()
+  // cargarCuentas()
 })
 
-const { onResult: onResultCuentas, load: cargarCuentas } =
-  useLazyQuery(LISTA_CUENTAS)
-
-onResultCuentas(({ data }) => {
-  if (!!data) {
-    console.log('response', data)
-    listaCuentas.value = JSON.parse(JSON.stringify(data.listaCuentas))
-  }
-})
+// onResultCuentas(({ data }) => {
+//   if (!!data) {
+//     console.log('response', data)
+//     listaCuentas.value = JSON.parse(JSON.stringify(data.listaCuentas))
+//   }
+// })
 
 function addRow() {
   editedItem.value = { ...defaultItem }
@@ -259,28 +289,6 @@ function mostrarNotificacion(action, cuenta) {
     2500
   )
 }
-/**
- * GRAPHQL
- */
-
-const {
-  mutate: deleteCuenta,
-  onDone: onDoneDeleteCuenta,
-  onError: onErrorDeleteCuenta
-} = useMutation(CUENTA_DELETE)
-
-onDoneDeleteCuenta(({ data }) => {
-  if (!!data) {
-    console.log('item deleted ', data)
-    const deletedItem = data.cuentaDelete.cuenta
-    listaCuentas.value.splice(rowIndexDelete.value, 1)
-    rowIndexDelete.value = null
-    mostrarNotificacion('elminó', deletedItem)
-  }
-})
-onErrorDeleteCuenta((error) => {
-  console.error(error)
-})
 </script>
 
 <style lang="scss" scoped></style>

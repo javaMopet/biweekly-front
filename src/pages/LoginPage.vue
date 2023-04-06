@@ -175,7 +175,7 @@ function submitForm() {
         console.log('terminó la instruccion')
         console.log('resultado', result)
         console.log(result.data.id)
-        router.push('/main')
+        router.push('/home')
         // $q.notify({
         //   type: "positive",
         //   message: `Se registro correctamente el usuario`,
@@ -199,7 +199,7 @@ function submitForm() {
     promise.then(
       (result) => {
         console.log('result', result)
-        router.push('/main')
+        router.push('/home')
       },
       (error) => {
         console.error('error', error)

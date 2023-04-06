@@ -1,52 +1,71 @@
 <template>
-  <q-card class="my-card" style="width: 400px">
+  <q-card class="my-card" style="width: 550px">
     <q-card-section class="bg-primary text-accent-light">
       {{ actionName }}
       <!-- <pre>{{ editedIndex }}</pre> -->
       <!-- <pre>{{ editedItem }}</pre> -->
+      <!-- <pre>{{ cuentaContableProps }}</pre> -->
     </q-card-section>
 
     <q-card-section class="">
       <q-form @submit="saveItem" class="q-gutter-md">
         <div class="q-gutter-md">
-          <div>
-            <q-input
-              v-model="editedFormItem.nombre"
-              type="text"
-              label="Nombre"
-              dense
-              lazy-rules
-              :rules="[
-                (val) =>
-                  (val && val.length > 0) ||
-                  'Favor de ingresar el nombre de la Cuenta'
-              ]"
+          <div class="">
+            <q-btn-toggle
+              v-model="editedFormItem.tipoCuenta.id"
+              toggle-color="accent-contrast"
+              :options="tiposCuentaOptions"
+              no-caps
+              color="primary"
+              spread
+              @update:model-value="tipoCuentaUpdated"
             />
           </div>
-          <div>
-            <q-input
-              v-model="editedFormItem.descripcion"
-              type="text"
-              label="Descripcion"
-              dense
-              lazy-rules
-              :rules="[
-                (val) =>
-                  (val && val.length > 0) ||
-                  'Favor de ingresar la descripción de la Cuenta'
-              ]"
-            />
-          </div>
-          <div>
-            <q-select
-              v-model="editedFormItem.cuentaContable"
-              :options="cuentasContablesOptions"
-              label="Cuenta Contable"
-              option-label="nombreCompleto"
-              option-value="id"
-              lazy-rules
-              :rules="[selectValidation]"
-            />
+          <div class="column items-center" style="border: 0px solid red">
+            <div
+              class="q-gutter-lg q-mt-md"
+              style="width: 70%; border: 0px solid red"
+            >
+              <div>
+                <q-input
+                  v-model="editedFormItem.nombre"
+                  type="text"
+                  label="Nombre"
+                  dense
+                  filled
+                  autofocus
+                  lazy-rules
+                  :rules="[
+                    (val) =>
+                      (val && val.length > 0) ||
+                      'Favor de ingresar el nombre de la Cuenta'
+                  ]"
+                />
+              </div>
+              <div class="">
+                <CuentaContableSelect
+                  v-model="editedFormItem.cuentaContable"
+                  :subnivel="cuentaContableProps.subnivel"
+                  :clasificacion="cuentaContableProps.clasificacion"
+                  :tipo-afectacion="cuentaContableProps.tipoAfectacion"
+                ></CuentaContableSelect>
+              </div>
+              <div>
+                <q-input
+                  v-model="editedFormItem.descripcion"
+                  type="text"
+                  label="Descripcion"
+                  dense
+                  filled
+                  lazy-rules
+                  :rules="[
+                    (val) =>
+                      (val && val.length > 0) ||
+                      'Favor de ingresar la descripción de la Cuenta'
+                  ]"
+                />
+              </div>
+            </div>
           </div>
         </div>
         <div align="right" class="q-gutter-x-sm">
@@ -66,10 +85,21 @@
 </template>
 
 <script setup>
-import { useLazyQuery, useMutation } from '@vue/apollo-composable'
-import { ref, computed, defineProps, defineEmits, onMounted } from 'vue'
-import { LISTA_CUENTAS_CONTABLES } from 'src/graphql/cuentasContableGql'
-import { CUENTA_CREATE, CUENTA_UPDATE } from 'src/graphql/cuentas'
+import { useQuery, useMutation } from '@vue/apollo-composable'
+import {
+  ref,
+  reactive,
+  computed,
+  defineProps,
+  defineEmits,
+  onMounted
+} from 'vue'
+import {
+  CUENTA_CREATE,
+  CUENTA_UPDATE,
+  LISTA_TIPOS_CUENTA
+} from 'src/graphql/cuentas'
+import CuentaContableSelect from '../formComponents/CuentaContableSelect.vue'
 
 /**
  * state
@@ -77,10 +107,66 @@ import { CUENTA_CREATE, CUENTA_UPDATE } from 'src/graphql/cuentas'
 const formItem = ref({
   nombre: '',
   descripcion: '',
-  cuentaContable: ''
+  cuentaContable: null,
+  tipoCuenta: {
+    id: '1'
+  }
 })
 
-const cuentasContablesOptions = ref([])
+const cuentaContableProps = reactive({
+  subnivel: 0,
+  tipoAfectacion: 'C',
+  clasificacion: ''
+})
+
+/**
+ * GRAPHQL
+ */
+const graphql_options = ref({
+  fetchPolicy: 'network-only'
+})
+const { result: resultTiposCuenta, onError: onErrorTiposCuenta } = useQuery(
+  LISTA_TIPOS_CUENTA,
+  null,
+  graphql_options
+)
+
+const {
+  mutate: createCuenta,
+  onDone: onDoneCreateCuenta,
+  onError: onErrorCreateCuenta
+} = useMutation(CUENTA_CREATE)
+const {
+  mutate: updateCuenta,
+  onDone: onDoneUpdateCuenta,
+  onError: onErrorUpdateCuenta
+} = useMutation(CUENTA_UPDATE)
+
+onDoneCreateCuenta(({ data }) => {
+  console.log('saved data...', data)
+  if (!!data) {
+    const itemSaved = data.cuentaCreate.cuenta
+    emit('cuentaSaved', itemSaved)
+  }
+})
+onErrorCreateCuenta((error) => {
+  console.log(error)
+  console.error(error)
+})
+onDoneUpdateCuenta(({ data }) => {
+  if (!!data) {
+    console.log('updated data...', data)
+    const itemUpdated = data.cuentaUpdate.cuenta
+    emit('cuentaUpdated', itemUpdated)
+  }
+})
+onErrorUpdateCuenta((error) => {
+  console.error(error)
+})
+
+onErrorTiposCuenta((error) => {
+  console.error(error)
+})
 /**
  * props
  */
@@ -107,6 +193,11 @@ const emit = defineEmits(['cuentaSaved', 'cuentaUpdated'])
 /**
  * computed
  */
+const tiposCuentaOptions = computed({
+  get() {
+    return resultTiposCuenta.value?.listaTiposCuenta ?? []
+  }
+})
 const editedFormItem = computed({
   get() {
     return !!props.editedItem.id ? props.editedItem : formItem.value
@@ -117,9 +208,7 @@ const editedFormItem = computed({
 })
 const actionName = computed({
   get() {
-    return !!editedFormItem.value.id
-      ? 'Actualizar la Cuenta Contable'
-      : 'Nueva Cuenta Contable'
+    return !!editedFormItem.value.id ? 'Actualizar la Cuenta' : 'Nueva Cuenta'
   }
 })
 const lblSubmit = computed({
@@ -133,10 +222,6 @@ const lblSubmit = computed({
  */
 onMounted(() => {
   // cargarTiposCuenta()
-  cargarCuentasContables(null, {
-    subnivel: 0,
-    clasificacion: '112'
-  })
 })
 /**
  * methods
@@ -144,10 +229,13 @@ onMounted(() => {
 function saveItem() {
   console.log('save item')
   const cuenta_contable_id = editedFormItem.value.cuentaContable.id
+  const tipo_cuenta_id = editedFormItem.value.tipoCuenta.id
   const input = {
     ...editedFormItem.value,
     cuentaContableId: parseInt(cuenta_contable_id),
     cuentaContable: undefined,
+    tipoCuentaId: parseInt(tipo_cuenta_id),
+    tipoCuenta: undefined,
     __typename: undefined
   }
   if (!editedFormItem.value.id) {
@@ -164,64 +252,25 @@ function saveItem() {
     })
   }
 }
-const selectValidation = (val) => {
-  if (!val) {
-    return `Favor de seleccionar un valor.`
+function tipoCuentaUpdated(value) {
+  console.log('tipo ade cuenta acutalizado', value)
+  switch (value) {
+    case '1':
+      cuentaContableProps.tipoAfectacion = 'C'
+      cuentaContableProps.clasificacion = ''
+      break
+    case '2':
+      cuentaContableProps.tipoAfectacion = 'C'
+      cuentaContableProps.clasificacion = '11100'
+      break
+    case '3':
+      cuentaContableProps.tipoAfectacion = 'A'
+      cuentaContableProps.clasificacion = ''
+      break
+    default:
+      break
   }
 }
-
-/**
- * GRAPHQL
- */
-
-const {
-  mutate: createCuenta,
-  onDone: onDoneCreateCuenta,
-  onError: onErrorCreateCuenta
-} = useMutation(CUENTA_CREATE)
-const {
-  mutate: updateCuenta,
-  onDone: onDoneUpdateCuenta,
-  onError: onErrorUpdateCuenta
-} = useMutation(CUENTA_UPDATE)
-
-const {
-  load: cargarCuentasContables,
-  onResult: onResultCuentasContables,
-  onError: onErrorCuentasContables
-} = useLazyQuery(LISTA_CUENTAS_CONTABLES)
-
-onResultCuentasContables(({ data }) => {
-  if (!!data) {
-    cuentasContablesOptions.value = data.listaCuentasContables
-  }
-})
-onErrorCuentasContables((response) => {
-  if (!!response) {
-    console.log('data', response)
-  }
-})
-onDoneCreateCuenta(({ data }) => {
-  console.log('saved data...', data)
-  if (!!data) {
-    const itemSaved = data.cuentaCreate.cuenta
-    emit('cuentaSaved', itemSaved)
-  }
-})
-onErrorCreateCuenta((error) => {
-  console.log(error)
-  console.error(error)
-})
-onDoneUpdateCuenta(({ data }) => {
-  if (!!data) {
-    console.log('updated data...', data)
-    const itemUpdated = data.cuentaUpdate.cuenta
-    emit('cuentaUpdated', itemUpdated)
-  }
-})
-onErrorUpdateCuenta((error) => {
-  console.error(error)
-})
 </script>
 
 <style lang="sass" scoped>

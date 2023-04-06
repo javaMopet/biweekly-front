@@ -2,10 +2,13 @@ import { defineStore } from 'pinia'
 import { api } from 'src/boot/axios'
 import { ref, reactive } from 'vue'
 import { SessionStorage } from 'quasar'
+// import { useRouter } from 'vue-router'
 
 // const BASE_URL = "http://localhost:3000/";
 
 export const useSessionStore = defineStore('session', () => {
+  // const $router = useRouter()
+
   const defaultUser = {
     id: null,
     username: null,
@@ -22,7 +25,16 @@ export const useSessionStore = defineStore('session', () => {
     return user.value?.email
   }
   const getUserId = () => {
-    return user.value?.id
+    user.value = SessionStorage.getItem('user')
+      ? SessionStorage.getItem('user')
+      : null
+
+    if (!!user.value && !!user.value.id) {
+      return user.value?.id
+    } else {
+      // $router.push('/login')
+      return null
+    }
   }
 
   const isLoggetIn = () => {

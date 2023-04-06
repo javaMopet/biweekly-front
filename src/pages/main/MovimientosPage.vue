@@ -79,6 +79,51 @@
           icon="queue"
         /> -->
         <div class="q-pa-md">
+          <q-btn-dropdown color="accent" label="NUEVO">
+            <q-list>
+              <q-item clickable v-close-popup @click="addIngreso">
+                <q-item-section avatar>
+                  <q-avatar
+                    color="positive"
+                    text-color="white"
+                    icon="arrow_upward"
+                  ></q-avatar>
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label>Ingreso</q-item-label>
+                  <!-- <q-item-label caption>February 22, 2016</q-item-label> -->
+                </q-item-section>
+              </q-item>
+
+              <q-item clickable v-close-popup @click="addGasto">
+                <q-item-section avatar>
+                  <q-avatar
+                    color="negative"
+                    text-color="white"
+                    icon="arrow_downward"
+                  ></q-avatar>
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label>Gasto</q-item-label>
+                </q-item-section>
+              </q-item>
+
+              <q-item clickable v-close-popup @click="addTransferencia">
+                <q-item-section avatar>
+                  <q-avatar
+                    color="blue-5"
+                    text-color="white"
+                    icon="sync_alt"
+                  ></q-avatar>
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label>Transferencia</q-item-label>
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </q-btn-dropdown>
+        </div>
+        <!-- <div class="q-pa-md">
           <q-btn-dropdown
             split
             color="primary"
@@ -107,7 +152,7 @@
               </q-item>
             </q-list>
           </q-btn-dropdown>
-        </div>
+        </div> -->
         <!-- <div class="q-mt-md">
           <q-page-sticky position="bottom-left" :offset="[18, 18]">
             <q-fab
@@ -202,12 +247,12 @@
 import { useMutation, useQuery } from '@vue/apollo-composable'
 import { ref, onMounted } from 'vue'
 import { LISTA_MOVIMIENTOS, MOVIMIENTO_DELETE } from '/src/graphql/movimientos'
-// import { LISTA_CUENTAS_CONTABLES } from '/src/graphql/cuentasContableGql'
 import RegistroMovimiento from 'src/components/movimientos/RegistroMovimiento.vue'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
-import { useQuasar, SessionStorage } from 'quasar'
+import { useQuasar } from 'quasar'
 import { DateTime } from 'luxon'
 import { useFormato } from 'src/composables/utils/useFormato'
+import { useSessionStore } from 'src/stores/sessionStore'
 
 /**
  * composables
@@ -215,6 +260,7 @@ import { useFormato } from 'src/composables/utils/useFormato'
 const notificacion = useNotificacion()
 const $q = useQuasar()
 const formato = useFormato()
+const sessionStore = useSessionStore()
 
 /**
  * state
@@ -227,13 +273,15 @@ const defaultItem = {
 
   numero: null,
   estadoMovimientoId: parseInt(2),
-  tipoMovimientoId: '1',
-  fecha: formato.formatoFecha(new Date()),
+  tipoMovimientoId: '',
+  fecha: null,
+  date: formato.formatoFecha(new Date()),
   observaciones: '',
-  userId: SessionStorage.getItem('user').id,
+  userId: sessionStore.getUserId(), //SessionStorage.getItem('user').id,
   detallesMovimiento: [
     {
       importe: 0
+      // userId: sessionStore.getUserId()
     },
     {
       cuenta: null
@@ -324,12 +372,17 @@ onMounted(() => {})
 
 function addIngreso(event) {
   console.log('Agregando un ingreso', event)
+  addRow('1')
 }
-function addEgreso(event) {
+function addGasto(event) {
   console.log('Agregando un egreso', event)
+  addRow('2')
 }
-function addRow() {
-  editedItem.value = { ...defaultItem }
+function addTransferencia() {
+  addRow('3')
+}
+function addRow(tipo_movimiento) {
+  editedItem.value = { ...defaultItem, tipoMovimientoId: tipo_movimiento }
   editedIndex.value = null
   showFormItem.value = true
 }

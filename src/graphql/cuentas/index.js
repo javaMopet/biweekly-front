@@ -12,6 +12,24 @@ export const LISTA_CUENTAS = gql`
         nombre
         nombreCompleto
       }
+      tipoCuenta {
+        id
+        nombre
+        label
+        value
+        icon
+      }
+    }
+  }
+`
+export const LISTA_TIPOS_CUENTA = gql`
+  query listaTiposCuenta {
+    listaTiposCuenta {
+      id
+      nombre
+      label
+      value
+      icon
     }
   }
 `
@@ -28,6 +46,13 @@ export const CUENTA_CREATE = gql`
           id
           nombre
           nombreCompleto
+        }
+        tipoCuenta {
+          id
+          nombre
+          label
+          value
+          icon
         }
       }
     }
@@ -46,6 +71,13 @@ export const CUENTA_UPDATE = gql`
           nombre
           nombreCompleto
         }
+        tipoCuenta {
+          id
+          nombre
+          label
+          value
+          icon
+        }
       }
     }
   }
@@ -63,6 +95,13 @@ export const CUENTA_DELETE = gql`
           id
           nombre
           nombreCompleto
+        }
+        tipoCuenta {
+          id
+          nombre
+          label
+          value
+          icon
         }
       }
     }

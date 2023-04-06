@@ -13,22 +13,12 @@ export const LISTA_CATEGORIAS = gql`
         nombre
         nombreCompleto
       }
-      tipoCategoria {
+      tipoMovimientoId
+      tipoMovimiento {
         id
         nombre
         value
       }
-    }
-  }
-`
-export const LISTA_TIPOS_CATEGORIA = gql`
-  query listaTiposCategoria {
-    listaTiposCategoria {
-      id
-      nombre
-      tipoAfectacion
-      label
-      value
     }
   }
 `
@@ -47,7 +37,8 @@ export const CATEGORIA_CREATE = gql`
           nombre
           nombreCompleto
         }
-        tipoCategoria {
+        tipoMovimientoId
+        tipoMovimiento {
           id
           nombre
           value
@@ -70,7 +61,8 @@ export const CATEGORIA_UPDATE = gql`
           nombre
           nombreCompleto
         }
-        tipoCategoria {
+        tipoMovimientoId
+        tipoMovimiento {
           id
           nombre
           value
@@ -94,7 +86,7 @@ export const CATEGORIA_DELETE = gql`
           nombre
           nombreCompleto
         }
-        tipoCategoria {
+        tipoMovimiento {
           id
           nombre
           value

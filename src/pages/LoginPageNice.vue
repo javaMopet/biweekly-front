@@ -33,7 +33,7 @@
               text-color="primary"
               :options="[
                 { label: 'Entrar', value: 'one' },
-                { label: 'Registrar', value: 'two' },
+                { label: 'Registrar', value: 'two' }
               ]"
             />
           </q-card-section>
@@ -103,43 +103,43 @@
 </template>
 
 <script setup>
-import { useQuasar } from "quasar";
-import { ref, reactive, computed } from "vue";
-import { useSessionStore } from "src/stores/sessionStore";
-import { useRouter } from "vue-router";
-import { route } from "quasar/wrappers";
+import { useQuasar } from 'quasar'
+import { ref, reactive, computed } from 'vue'
+import { useSessionStore } from 'src/stores/sessionStore'
+import { useRouter } from 'vue-router'
+import { route } from 'quasar/wrappers'
 
-const username = ref(null);
-const password = ref(null);
-const returnUrl = ref(null);
+const username = ref(null)
+const password = ref(null)
+const returnUrl = ref(null)
 
-const $q = useQuasar();
+const $q = useQuasar()
 
-const router = useRouter();
+const router = useRouter()
 
-const sessionStore = useSessionStore();
+const sessionStore = useSessionStore()
 
 /**
  * state
  */
 const form = reactive({
-  fullname: "Horacio Peña Mendoza",
-  email: "hpenam@uaemex.mx",
-  password: "123456",
-  password_confirmation: "1234856",
-});
-const loginAction = ref("one");
+  fullname: 'Horacio Peña Mendoza',
+  email: 'hpenam@uaemex.mx',
+  password: '123456',
+  password_confirmation: '1234856'
+})
+const loginAction = ref('one')
 // const btnLabel = ref("Entrar");
 
 /**
  * computed
  */
 const btnLabel = computed(() =>
-  loginAction.value == "one" ? "Entrar" : "Registrar"
-);
+  loginAction.value == 'one' ? 'Entrar' : 'Registrar'
+)
 const isRegistration = computed(() =>
-  loginAction.value == "two" ? true : false
-);
+  loginAction.value == 'two' ? true : false
+)
 
 function submitForm() {
   if (isRegistration.value) {
@@ -148,16 +148,16 @@ function submitForm() {
         // fullname: form.fullname,
         email: form.email,
         password: form.password,
-        password_confirmation: form.password_confirmation,
-      },
-    };
-    const promise = sessionStore.registerUser(payload);
+        password_confirmation: form.password_confirmation
+      }
+    }
+    const promise = sessionStore.registerUser(payload)
     promise.then(
       (result) => {
-        console.log("terminó la instruccion");
-        console.log("resultado", result);
-        console.log(result.data.id);
-        router.push("/main");
+        console.log('terminó la instruccion')
+        console.log('resultado', result)
+        console.log(result.data.id)
+        router.push('/home')
         // $q.notify({
         //   type: "positive",
         //   message: `Se registro correctamente el usuario`,
@@ -165,36 +165,36 @@ function submitForm() {
         // });
       },
       (e) => {
-        console.log("Ocurrió un error al intentar registrar el usuario.", e);
+        console.log('Ocurrió un error al intentar registrar el usuario.', e)
 
-        console.error(e);
+        console.error(e)
       }
-    );
+    )
   } else {
     const payload = {
       user: {
         email: form.email,
-        password: form.password,
-      },
-    };
-    const promise = sessionStore.loginUser(payload);
+        password: form.password
+      }
+    }
+    const promise = sessionStore.loginUser(payload)
     promise.then(
       (result) => {
-        console.log("result", result);
-        router.push("/main");
+        console.log('result', result)
+        router.push('/home')
       },
       (error) => {
-        console.error("error", error);
+        console.error('error', error)
       }
-    );
+    )
   }
 }
 
 function showNotification(error) {
   $q.notify({
-    type: "negative",
-    message: error,
-  });
+    type: 'negative',
+    message: error
+  })
 }
 </script>
 

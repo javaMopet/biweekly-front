@@ -83,27 +83,45 @@ export const LISTA_TIPOS_MOVIMIENTO = gql`
 `
 
 export const MOVIMIENTO_CREATE = gql`
-  mutation movimientoCreate($input: MovimientoInput!) {
-    movimientoCreate(movimientoInput: $input) {
+  mutation movimientoCreate(
+    $input: MovimientoInput!
+    $detallesInput: [DetalleMovimientoInput!]!
+  ) {
+    movimientoCreate(
+      movimientoInput: $input
+      detallesMovimientoInput: $detallesInput
+    ) {
       movimiento {
         id
-        movimiento {
+        numero
+        estadoMovimientoId
+        tipoMovimientoId
+        fecha
+        observaciones
+        userId
+        tipoMovimiento {
           id
-          numero
-          obsevaciones
-        }
-        categoria {
-          id
+          value
           nombre
-          descripcion
         }
-        cuenta {
-          id
-          nombre
-          descripcion
+        detallesMovimiento {
+          categoria {
+            id
+            nombre
+          }
+          cuenta {
+            id
+            nombre
+          }
+          importe
+          tipoAfectacion
+          tipoDetalle
+          cuentaContable {
+            id
+            nombre
+            nombreCompleto
+          }
         }
-        importe
-        tipoAfectacion
       }
     }
   }

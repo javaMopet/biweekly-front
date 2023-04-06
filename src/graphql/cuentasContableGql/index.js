@@ -1,8 +1,16 @@
 import gql from 'graphql-tag'
 
 export const LISTA_CUENTAS_CONTABLES = gql`
-  query listaCuentasContables($subnivel: Int!, $clasificacion: String!) {
-    listaCuentasContables(subnivel: $subnivel, clasificacion: $clasificacion) {
+  query listaCuentasContables(
+    $subnivel: Int
+    $clasificacion: String
+    $tipoAfectacion: String
+  ) {
+    listaCuentasContables(
+      subnivel: $subnivel
+      clasificacion: $clasificacion
+      tipoAfectacion: $tipoAfectacion
+    ) {
       id
       nombre
       nombreCompleto
@@ -28,6 +36,11 @@ export const CUENTA_CONTABLE_CREATE = gql`
         tipoAfectacion
         subnivel
         padreId
+        padre {
+          id
+          nombre
+          nombreCompleto
+        }
       }
     }
   }
@@ -41,6 +54,11 @@ export const CUENTA_CONTABLE_UPDATE = gql`
         tipoAfectacion
         subnivel
         padreId
+        padre {
+          id
+          nombre
+          nombreCompleto
+        }
       }
     }
   }

@@ -39,6 +39,7 @@
         style="width: 600px"
         no-connectors
         :filter="filter"
+        loa
       >
         <template v-slot:default-header="props">
           <div
@@ -183,8 +184,8 @@
 </template>
 
 <script setup>
-import { useLazyQuery, useMutation } from '@vue/apollo-composable'
-import { ref, computed, onMounted } from 'vue'
+import { useQuery, useMutation } from '@vue/apollo-composable'
+import { ref, computed, watch } from 'vue'
 import {
   ARBOL_CUENTAS_CONTABLES,
   ITEM_DELETE
@@ -204,7 +205,7 @@ const $router = useRouter()
  * state
  */
 
-const arbolCuentas = ref([])
+// const arbolCuentas = ref([])
 const expanded = ref([])
 const selected = ref(null)
 const filter = ref('')
@@ -260,28 +261,6 @@ const columns = [
   }
 ]
 
-const { load: cargarCuentasContables, onResult: onResultCuentasContables } =
-  useLazyQuery(ARBOL_CUENTAS_CONTABLES)
-
-onResultCuentasContables(({ data }) => {
-  if (!!data) {
-    console.log('response', data.arbolCuentasContables)
-    arbolCuentas.value = JSON.parse(JSON.stringify(data.arbolCuentasContables))
-  }
-})
-
-function addRow() {
-  showFormItem.value = true
-}
-/**
- * onMounted
- */
-onMounted(() => {
-  const subnivel = -1
-  cargarCuentasContables(null, {
-    subnivel
-  })
-})
 /**
  * computed
  */
@@ -290,20 +269,46 @@ const arbolLleno = computed({
     return arbolCuentas.value.length > 0
   }
 })
+const arbolCuentas = computed({
+  get() {
+    return resultArbolCuentas.value?.arbolCuentasContables ?? []
+  }
+})
 /**
  * METHODS
  */
 function addItem(item_padre) {
   console.log('Agregando Item  al padre:', item_padre.node)
-  console.log('Padre_id:', item_padre.node.id)
-  console.log('Padre_id:', item_padre.node.children)
-  const last_item =
-    item_padre.node.children[item_padre.node.children.length - 1]
+  console.log('subnivel:', item_padre.node.subnivel)
+  const subnivel_padre = item_padre.node.subnivel
+
+  const begin_cta_padre = item_padre.node.id
+    .toString()
+    .substring(0, 4 - subnivel_padre)
+  console.log('begin_cta_padre:', begin_cta_padre)
+
+  const numero_hijos = !!item_padre.node.children
+    ? item_padre.node.children.length
+    : 0
+  console.log('numero de hijos', numero_hijos)
+  let id = ''
+  if (subnivel_padre < 2 && numero_hijos > 0) {
+    const last_item = item_padre.node.children[numero_hijos - 1]
+    console.log('last item encontrado', last_item)
+    id = parseInt(last_item.id) + 1
+  } else {
+    id = begin_cta_padre.toString()
+  }
+
   editedItem.value = {
     action: 'add',
-    id: last_item.id + 1,
+    id: id.toString(),
     nombre: null,
     padreId: item_padre.node.id,
+    padre: {
+      ...item_padre.node,
+      nombreCompleto: `${item_padre.node.id} - ${item_padre.node.nombre}`
+    },
     subnivel: item_padre.node.subnivel - 1,
     tipoAfectacion:
       item_padre.node.tipoAfectacion === 'C'
@@ -318,6 +323,7 @@ function editItem(item) {
   console.log('item to edit...', item.node)
   editedItem.value = {
     ...item.node,
+    id: item.node.id.toString(),
     action: 'edit',
     tipoAfectacion:
       item.node.tipoAfectacion === 'C'
@@ -416,6 +422,16 @@ function cuentaContableUpdated(itemUpdated) {
 /**
  * GRAPHQL
  */
+const graphql_options = ref({
+  fetchPolicy: 'network-only'
+})
+
+const {
+  result: resultArbolCuentas,
+  onError: onErrorArbolCuentasContables,
+  loading: loadingArbol
+} = useQuery(ARBOL_CUENTAS_CONTABLES, null, graphql_options)
+
 const {
   mutate: deleteCuentaContable,
   onDone: onDoneDeleteCuentaContable,
@@ -441,6 +457,15 @@ onDoneDeleteCuentaContable(({ data }) => {
 })
 onErrorDeleteCuentaContable((error) => {
   console.error(error)
+})
+onErrorArbolCuentasContables((error) => {
+  console.error(error)
+})
+/**
+ * watch
+ */
+watch(loadingArbol, (newValue, oldValue) => {
+  console.log('cargando arbol', newValue, oldValue)
 })
 </script>
 

@@ -1,33 +1,60 @@
 <template>
-  <q-select
-    filled
-    v-model="cuentaContable"
-    :options="filteredOptions"
-    option-label="nombreCompleto"
-    label="Cuenta Contable"
-    use-input
-    input-debounce="0"
-    @filter="filterFn"
-    behavior="menu"
-    clearable=""
-  >
-    <template v-slot:no-option>
-      <q-item>
-        <q-item-section class="text-grey"> No results </q-item-section>
-      </q-item>
-    </template>
-  </q-select>
+  <div class="row q-gutter-x-sm">
+    <div class="col">
+      <q-select
+        filled
+        v-model="cuentaContable"
+        :options="filteredOptions"
+        option-label="nombreCompleto"
+        :label="props.inputLabel"
+        use-input
+        input-debounce="0"
+        @filter="filterFn"
+        behavior="menu"
+        clearable=""
+        dense
+        map-options
+        hide-selected
+        fill-input
+        lazy-rules
+        :rules="[(val) => !!val || 'requerido']"
+      >
+        <template v-slot:no-option>
+          <q-item>
+            <q-item-section class="text-grey"> No results </q-item-section>
+          </q-item>
+        </template>
+      </q-select>
+    </div>
+    <div class="q-mt-xs" style="border: 0px solid red">
+      <q-btn
+        color="accent"
+        outline
+        icon="add"
+        dense
+        @click="registrarCuentaContable"
+      />
+    </div>
+  </div>
+
+  <Teleport to="#modal">
+    <q-dialog v-model="form_cuentaContable_show" persistent>
+      <RegistroCuentaContable></RegistroCuentaContable>
+    </q-dialog>
+  </Teleport>
 </template>
 
 <script setup>
 import { useQuery } from '@vue/apollo-composable'
 import { LISTA_CUENTAS_CONTABLES } from 'src/graphql/cuentasContableGql'
 import { ref, computed, defineProps, defineEmits } from 'vue'
+import RegistroCuentaContable from '../cuentasContables/RegistroCuentaContable.vue'
 
 /**
  * state
  */
 const filteredOptions = ref([])
+const form_cuentaContable_show = ref(false)
 /**
  * props
  */
@@ -44,13 +71,25 @@ const props = defineProps({
   },
   subnivel: {
     type: Number,
-    required: true,
+    required: false,
     default: 0
   },
   clasificacion: {
     type: String,
-    required: true,
+    required: false,
     default: ''
+  },
+  tipoAfectacion: {
+    type: String,
+    required: false,
+    default: () => {
+      return null
+    }
+  },
+  inputLabel: {
+    type: String,
+    required: false,
+    default: 'Cuenta Contable'
   }
 })
 /**
@@ -66,8 +105,9 @@ const graphql_options = ref({
 const { result: resultadoLista, onError: onErrorListaCuentas } = useQuery(
   LISTA_CUENTAS_CONTABLES,
   {
-    subnivel: parseInt(props.subnivel),
-    clasificacion: props.clasificacion
+    subnivel: null, //parseInt(props.subnivel),
+    clasificacion: null, // props.clasificacion,
+    tipoAfectacion: null //props.tipoAfectacion
   },
   graphql_options
 )
@@ -84,7 +124,12 @@ const cuentaContable = computed({
 })
 const options = computed({
   get() {
-    return resultadoLista.value?.listaCuentasContables ?? []
+    return (resultadoLista.value?.listaCuentasContables ?? []).filter(
+      (cc) =>
+        cc.subnivel === props.subnivel &&
+        cc.tipoAfectacion === props.tipoAfectacion &&
+        cc.id.toString().startsWith(props.clasificacion)
+    )
   }
 })
 onErrorListaCuentas((error) => {
@@ -107,6 +152,10 @@ function filterFn(val, update) {
       (v) => v.nombreCompleto.toLowerCase().indexOf(needle) > -1
     )
   })
+}
+function registrarCuentaContable() {
+  console.log('registrar una cuenta contable')
+  form_cuentaContable_show.value = true
 }
 </script>
 

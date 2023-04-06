@@ -16,7 +16,7 @@
       :rows-per-page-options="[0]"
     >
       <template #item="props">
-        <q-card class="my-card q-ma-sm" flat bordered>
+        <q-card class="my-card q-ma-sm" flat bordered style="width: 350px">
           <q-item
             class="bg-dark text-white"
             :style="`border-top: 6px solid ${props.row.color}`"
@@ -41,10 +41,10 @@
                     size="30px"
                     :class="{
                       'text-white': true,
-                      'bg-positive': props.row.tipoCategoria.id === '1',
-                      'bg-negative': props.row.tipoCategoria.id === '2'
+                      'bg-positive': props.row.tipoMovimiento.id === '1',
+                      'bg-negative': props.row.tipoMovimiento.id === '2'
                     }"
-                    >{{ props.row.tipoCategoria.nombre[0] }}</q-avatar
+                    >{{ props.row.tipoMovimiento.nombre[0] }}</q-avatar
                   >
                 </div>
               </div>
@@ -148,8 +148,8 @@ const defaultItem = {
   icono: null,
   descripcion: null,
   color: null,
-  tipoCategoria: null,
-  tipoCategoriaId: '1',
+  tipoMovimiento: null,
+  tipoMovimientoId: '1',
   cuentaContable: null
 }
 const listaCategorias = ref([])
@@ -200,7 +200,7 @@ const columns = [
   {
     name: 'tipo_categoria',
     label: 'Tipo Categoria',
-    field: (row) => `${row.tipoCategoria.nombre}`,
+    field: (row) => `${row.tipoMovimiento.nombre}`,
     sortable: true,
     align: 'left'
   },
@@ -235,7 +235,7 @@ function addRow() {
 function editRow(item) {
   editedItem.value = {
     ...item.row,
-    tipoCategoriaId: item.row.tipoCategoria.id
+    tipoMovimientoId: item.row.tipoMovimiento.id
   }
   editedIndex.value = item.rowIndex
   showFormItem.value = true

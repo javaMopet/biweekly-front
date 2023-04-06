@@ -2,40 +2,46 @@
   <q-card class="my-card" style="width: 400px">
     <q-card-section class="bg-primary text-accent-light text-subtitle1">
       {{ actionName }}
-      <!-- <pre>{{ editedIndex }}</pre>
-      <pre>{{ editedItem }}</pre> -->
-      <!-- <pre>{{ tiposCategoriaOptions }}</pre> -->
-      <!-- <pre>{{ editedFormItem.tipoCategoriaId }}</pre> -->
       <!-- <pre>{{ editedFormItem.icono }}</pre> -->
     </q-card-section>
 
     <q-card-section class="">
       <q-form @submit="saveItem" class="q-gutter-md">
         <div class="q-gutter-md">
-          <div class="">
-            <q-btn-toggle
-              name="tipoCategoria"
-              push
-              spread
-              v-model="editedFormItem.tipoCategoriaId"
-              color="primary"
-              toggle-color="accent-contrast"
-              toggle-text-color="white"
-              label="nombre"
-              :options="tiposCategoriaOptions"
-              @update:model-value="tipoCategoriaChange"
-            />
-          </div>
-          <div>
-            <q-input
-              v-model="editedFormItem.nombre"
-              type="text"
-              label="Nombre"
-              dense
-              autofocus
-              :rules="[(val) => !!val || 'Favor de ingresar el nombre']"
-              lazyRules
-            />
+          <q-btn-toggle
+            v-model="editedFormItem.tipoMovimientoId"
+            toggle-color="accent-contrast"
+            :options="tiposMovimientoOptions"
+            rounded
+            spread
+            no-caps
+            color="accent"
+          />
+          <div class="q-pt-md">
+            <div class="row q-gutter-x-md">
+              <div class="col-auto">
+                <q-btn @click="selectIcon" color="primary">
+                  <q-icon
+                    color="gray"
+                    :name="formItem.icono || 'extension'"
+                    class="size"
+                    size="2.5em"
+                  />
+                </q-btn>
+              </div>
+              <div class="col">
+                <q-input
+                  v-model="editedFormItem.nombre"
+                  type="text"
+                  label="Nombre"
+                  dense
+                  filled
+                  autofocus
+                  :rules="[(val) => !!val || 'Favor de ingresar el nombre']"
+                  lazyRules
+                />
+              </div>
+            </div>
           </div>
           <div>
             <q-input
@@ -43,33 +49,10 @@
               type="text"
               label="Descripcion"
               dense
+              filled
               :rules="[(val) => !!val || 'Favor de ingresar la descripción']"
               lazyRules
             />
-          </div>
-          <div class="row">
-            <div class="col">
-              <q-input
-                class="col"
-                v-model="editedFormItem.icono"
-                type="text"
-                dense
-                outlined
-                maxlength="30"
-                :rules="[(val) => !!val || 'Icono requerido']"
-                lazyRules
-              />
-            </div>
-            <div class="col-auto q-ml-md">
-              <q-btn @click="selectIcon" color="primary">
-                <q-icon
-                  color="gray"
-                  :name="formItem.icono || 'extension'"
-                  class="size"
-                  size="2.5em"
-                />
-              </q-btn>
-            </div>
           </div>
           <div>
             <div style="border: 0px solid red">
@@ -80,8 +63,9 @@
                 hint="Selecciona un color para la categoría"
                 class="my-input"
                 style="min-width: 100%"
+                dense
               >
-                <template #before>
+                <template #after>
                   <div
                     :style="{
                       backgroundColor: `${editedFormItem.color}`,
@@ -98,6 +82,7 @@
                       cover
                       transition-show="scale"
                       transition-hide="scale"
+                      ref="ppproxy"
                     >
                       <q-color
                         v-model="editedFormItem.color"
@@ -108,10 +93,12 @@
                           '#E8045A',
                           '#B2028A',
                           '#2A0449',
-                          '#019A9D'
+                          '#019A9D',
+                          '#1ad560'
                         ]"
                         default-view="palette"
                         class="my-picker"
+                        @update:model-value="colorSelecionado"
                       />
                     </q-popup-proxy>
                   </q-icon>
@@ -120,32 +107,25 @@
             </div>
           </div>
           <div>
-            <div class="row q-gutter-x-md">
-              <div class="col">
-                <q-select
-                  v-model="editedFormItem.cuentaContable"
-                  :options="cuentasContablesOptions"
-                  label="Cuenta Contable"
-                  option-label="nombreCompleto"
-                  option-value="id"
-                  :rules="[(val) => !!val || 'Icono requerido']"
-                  lazyRules
-                />
-              </div>
-              <div
-                class="col-auto row items-center justify-center"
-                style="border: 0px solid green"
-              >
-                <q-btn
-                  color="accent-contrast"
-                  icon="add"
-                  @click="registrarCuentaContable"
-                />
-              </div>
+            <div class="col">
+              <CuentaContableSelect
+                v-model="editedFormItem.cuentaContable"
+                :subnivel="cuentaContableSubnivel"
+                clasificacion=""
+                tipo-afectacion="C"
+              ></CuentaContableSelect>
             </div>
           </div>
+          <div class="">
+            <CuentaSelect
+              v-model="editedFormItem.cuenta"
+              :opcional="true"
+              label="Cuenta Bancaria por Defecto"
+              hint="Esta cuenta se tomará por Default al agregar un movimiento"
+            ></CuentaSelect>
+          </div>
         </div>
-        <div class="col row justify-end">
+        <div class="col row justify-end q-pt-lg">
           <q-btn
             label="Cancelar"
             color="primary"
@@ -157,10 +137,6 @@
         </div>
       </q-form>
     </q-card-section>
-    <!-- <q-card-section class="q-gutter-sm" align="right">
-      <q-btn color="primary" label="Cancelar" v-close-popup outline />
-      <q-btn color="primary" label="Guardar" @click="saveItem" />
-    </q-card-section> -->
   </q-card>
 
   <Teleport to="#modal">
@@ -184,40 +160,41 @@
 <script setup>
 import { useQuery, useLazyQuery, useMutation } from '@vue/apollo-composable'
 import { ref, computed, onMounted } from 'vue'
-import {
-  LISTA_TIPOS_CATEGORIA,
-  CATEGORIA_CREATE,
-  CATEGORIA_UPDATE
-} from '/src/graphql/categorias'
+import { CATEGORIA_CREATE, CATEGORIA_UPDATE } from '/src/graphql/categorias'
+import { LISTA_TIPOS_MOVIMIENTO } from 'src/graphql/movimientos'
 import { LISTA_CUENTAS_CONTABLES } from '/src/graphql/cuentasContableGql'
 import IconPicker from '/src/components/IconPicker.vue'
 import RegistroCuentaContable from '../cuentasContables/RegistroCuentaContable.vue'
+import CuentaContableSelect from '../formComponents/CuentaContableSelect.vue'
+import CuentaSelect from '../formComponents/CuentaSelect.vue'
 /**
  * state
  */
 const defaultItem = {
   id: null,
   nombre: null,
-  icono: null,
+  icono: 'insert_emoticon',
   descripcion: null,
-  color: null,
-  tipoCategoria: null,
-  tipoCategoriaId: '1',
+  color: '#019a9d',
+  tipoMovimiento: null,
+  tipoMovimientoId: '2',
   cuentaContable: null
 }
 const formItem = ref({ ...defaultItem })
-// const tiposCategoriaOptions = ref([])
-const cuentasContablesOptions = ref([])
+// const tipoMovimientoOptions = ref([])
+const cuentaContableSubnivel = ref(0)
+
+const ppproxy = ref(null)
 /**
  * onMounted
  */
 onMounted(() => {
-  console.log('tipoCategoriaId', editedFormItem.value.tipoCategoriaId)
-  // cargarTiposCategoria()
-  cargarCuentasContables(null, {
-    subnivel: 0,
-    clasificacion: '5'
-  })
+  console.log('tipoMovimientoId', editedFormItem.value.tipoMovimientoId)
+  // cargartipoMovimiento()
+  // cargarCuentasContables(null, {
+  //   subnivel: 0,
+  //   clasificacion: '5'
+  // })
 })
 /**
  * props
@@ -245,9 +222,11 @@ const emit = defineEmits(['categoriaSaved', 'categoriaUpdated'])
 /**
  * computed
  */
-const tiposCategoriaOptions = computed({
+const tiposMovimientoOptions = computed({
   get() {
-    return resultTiposCategoria.value?.listaTiposCategoria ?? []
+    return (resultTipoMovimiento.value?.listaTiposMovimiento ?? []).filter(
+      (tipoMovimiento) => tipoMovimiento.id === '1' || tipoMovimiento.id === '2'
+    )
   }
 })
 const editedFormItem = computed({
@@ -275,7 +254,7 @@ const lblSubmit = computed({
  * METHODS
  */
 
-function tipoCategoriaChange(value) {
+function tipoMovimientoChange(value) {
   console.log('cambio en el tipo de categoria', value)
   editedFormItem.value.cuentaContable = null
   if (value === '1') {
@@ -301,12 +280,15 @@ function tipoCategoriaChange(value) {
 function saveItem() {
   console.log('save item')
   const cuenta_contable_id = editedFormItem.value.cuentaContable.id
+  const cuenta_id = editedFormItem.value.cuenta.id
   const input = {
     ...editedFormItem.value,
     cuentaContableId: parseInt(cuenta_contable_id),
-    tipoCategoriaId: parseInt(editedFormItem.value.tipoCategoriaId),
-    tipoCategoria: undefined,
+    cuentaId: parseInt(cuenta_id),
+    tipoMovimientoId: parseInt(editedFormItem.value.tipoMovimientoId),
+    tipoMovimiento: undefined,
     cuentaContable: undefined,
+    cuenta: undefined,
     __typename: undefined
   }
   if (!editedFormItem.value.id) {
@@ -324,36 +306,33 @@ function saveItem() {
   }
 }
 
-function registrarCuentaContable() {
-  console.log('registrar una cuenta contable')
-}
 /**
  * GRAPHQL
  */
 const options = ref({
   fetchPolicy: 'network-only'
 })
-const { onResult: onResultTiposCategoria, result: resultTiposCategoria } =
-  useQuery(LISTA_TIPOS_CATEGORIA, null, options)
+const { onResult: onResultTipoMovimiento, result: resultTipoMovimiento } =
+  useQuery(LISTA_TIPOS_MOVIMIENTO, null, options)
 
-const { load: cargarCuentasContables, onResult: onResultCuentasContables } =
-  useLazyQuery(LISTA_CUENTAS_CONTABLES)
+// const { load: cargarCuentasContables, onResult: onResultCuentasContables } =
+//   useLazyQuery(LISTA_CUENTAS_CONTABLES)
 
-// onResultTiposCategoria(({ data }) => {
+// onResulttipoMovimiento(({ data }) => {
 //   if (!!data) {
-//     console.log('data', data.listaTiposCategoria)
-//     tiposCategoriaOptions.value = data.listaTiposCategoria
+//     console.log('data', data.listatipoMovimiento)
+//     tipoMovimientoOptions.value = data.listatipoMovimiento
 //   }
 // })
 
-onResultCuentasContables(({ data }) => {
-  if (!!data) {
-    console.log('data', data)
-    cuentasContablesOptions.value = JSON.parse(
-      JSON.stringify(data.listaCuentasContables)
-    )
-  }
-})
+// onResultCuentasContables(({ data }) => {
+//   if (!!data) {
+//     console.log('data', data)
+//     cuentasContablesOptions.value = JSON.parse(
+//       JSON.stringify(data.listaCuentasContables)
+//     )
+//   }
+// })
 const {
   mutate: createCategoria,
   onDone: onDoneCreateCategoria,
@@ -401,6 +380,9 @@ function onIconSelected(value) {
   console.log('IconoSeleccionado', value)
   editedFormItem.value.icono = value
   show_icon_picker.value = false
+}
+function colorSelecionado(value) {
+  ppproxy.value.hide()
 }
 </script>
 

@@ -2,7 +2,9 @@
   <q-card class="my-card" style="width: 400px">
     <q-card-section class="bg-primary text-white text-subtitle1">
       {{ actionName }}
-      <!-- <pre>{{ tiposMovimientoOptions }}</pre> -->
+      <!-- <pre>{{ props.editedItem }}</pre>
+      <pre>{{ editedFormItem.tipoMovimientoId }}</pre> -->
+      <!-- <pre>{{ editedFormItem }}</pre> -->
     </q-card-section>
 
     <q-card-section>
@@ -16,6 +18,7 @@
             color="accent"
             toggle-color="accent-contrast"
             :options="tiposMovimientoOptions"
+            @update:model-value="tipoMovimientoChange"
           />
         </div>
         <div>
@@ -38,13 +41,14 @@
         <div class="">
           <CategoriaSelect
             v-model="editedFormItem.detallesMovimiento[0].categoria"
+            :tipoMovimientoId="editedFormItem.tipoMovimientoId"
           ></CategoriaSelect>
         </div>
         <div class="row">
           <div class="col q-px-md">
             <div class="col">
               <DateInput
-                v-model="editedFormItem.fecha"
+                v-model="editedFormItem.date"
                 lbl_field="Fecha"
               ></DateInput>
             </div>
@@ -62,6 +66,7 @@
               reverse-fill-mask
               hint="Mask: #.00"
               input-class="text-right"
+              clearable
             >
               <template #prepend> $ </template>
             </q-input>
@@ -96,34 +101,37 @@
 </template>
 
 <script setup>
-import { useQuery, useLazyQuery, useMutation } from '@vue/apollo-composable'
+import { useQuery, useMutation } from '@vue/apollo-composable'
 import { ref, computed, onMounted } from 'vue'
 import {
   LISTA_TIPOS_MOVIMIENTO,
   MOVIMIENTO_CREATE,
   MOVIMIENTO_UPDATE
 } from '/src/graphql/movimientos'
-import { LISTA_CUENTAS_CONTABLES } from '/src/graphql/cuentasContableGql'
+
 import DateInput from '../formComponents/DateInput.vue'
 import CategoriaSelect from '../formComponents/CategoriaSelect.vue'
 import CuentaSelect from '../formComponents/CuentaSelect.vue'
 import { useFormato } from 'src/composables/utils/useFormato'
-import { SessionStorage } from 'quasar'
+import { DateTime } from 'luxon'
+import { useSessionStore } from 'src/stores/sessionStore'
 /**
  * composables
  */
 const formato = useFormato()
+const sessionStore = useSessionStore()
 /**
  * state
  */
-const userId = SessionStorage.getItem('user').id
+
 const defaultItem = {
   numero: null,
   estadoMovimientoId: parseInt(2),
   tipoMovimientoId: '1',
-  fecha: formato.formatoFecha(new Date()),
+  fecha: null,
+  date: formato.formatoFecha(new Date()),
   observaciones: '',
-  usuarioId: userId,
+  userId: sessionStore.getUserId(),
   detallesMovimiento: [
     {
       importe: 0
@@ -141,12 +149,12 @@ const categoria = ref(null)
  * onMounted
  */
 onMounted(() => {
-  console.log('tipoMovimientoId', editedFormItem.value.tipoMovimientoId)
+  // console.log('tipoMovimientoId', editedFormItem.value.tipoMovimientoId)
   // cargarTiposMovimiento()
-  cargarCuentasContables(null, {
-    subnivel: 0,
-    clasificacion: '5'
-  })
+  // cargarCuentasContables(null, {
+  //   subnivel: 0,
+  //   clasificacion: '5'
+  // })
 })
 /**
  * props
@@ -181,7 +189,7 @@ const tiposMovimientoOptions = computed({
 })
 const editedFormItem = computed({
   get() {
-    return !!props.editedItem.id ? props.editedItem : formItem.value
+    return !!props.editedItem ? props.editedItem : formItem.value
   },
   set(val) {
     formItem.value = val
@@ -205,46 +213,83 @@ const lblSubmit = computed({
  */
 
 function tipoMovimientoChange(value) {
-  console.log('cambio en el tipo de movimiento', value)
-  editedFormItem.value.cuentaContable = null
-  if (value === '1') {
-    console.log('cargarcuentas de ingreso')
-    cargarCuentasContables(null, {
-      subnivel: 0,
-      clasificacion: '4'
-    })
-  } else if (value === '2') {
-    console.log('cargarcuentas de egreso')
-    cargarCuentasContables(null, {
-      subnivel: 0,
-      clasificacion: '5'
-    })
-  } else {
-    console.log('cargar todas las cuentas ')
-    cargarCuentasContables(null, {
-      subnivel: 0,
-      clasificacion: ''
-    })
-  }
+  // console.log('cambio en el tipo de movimiento', value)
+  // editedFormItem.value.detallesMovimiento[0].categoria = null
+  // if (value === '1') {
+  //   console.log('Cargar categorias de ingreso')
+  //   // categorias
+  //   cargarCuentasContables(null, {
+  //     subnivel: 0,
+  //     clasificacion: '4'
+  //   })
+  // } else if (value === '2') {
+  //   console.log('Cargar categorias de egreso')
+  //   cargarCuentasContables(null, {
+  //     subnivel: 0,
+  //     clasificacion: '5'
+  //   })
+  // } else {
+  //   console.log('cargar todas las cuentas ')
+  //   cargarCuentasContables(null, {
+  //     subnivel: 0,
+  //     clasificacion: ''
+  //   })
+  // }
 }
 function saveItem() {
   console.log('save item')
-  const categoriaId = categoria.value.id
+  const date = !!editedFormItem.value.date
+    ? DateTime.fromFormat(editedFormItem.value.date, 'dd/MM/yyyy')
+    : null
+
+  const userId = sessionStore.getUserId()
+
+  console.log('usuarioId', userId)
+
+  const fecha = !!date ? date.toISODate() : null
+  const detallesInput = JSON.parse(
+    JSON.stringify(editedFormItem.value.detallesMovimiento)
+  )
+  const importe = parseFloat(detallesInput[0].importe)
+  console.log('importe', importe)
   const input = {
     ...editedFormItem.value,
-    categoriaId,
+    detallesMovimiento: undefined,
+    numero: 0,
+    tipoMovimientoId: parseInt(editedFormItem.value.tipoMovimientoId),
+    fecha,
+    date: undefined,
+
     // cuentaContableId: parseInt(cuenta_contable_id),
     // tipoMovimientoId: parseInt(editedFormItem.value.tipoMovimientoId),
-    tipoMovimiento: undefined,
-    cuentaContable: undefined,
+
     __typename: undefined
   }
-  console.log('input ', input)
-  return
+
+  // const input = JSON.parse(JSON.stringify(editedFormItem.value))
+  // input.numero = 0
+  // input.tipoMovimientoId = parseInt(editedFormItem.value.tipoMovimientoId)
+  // input.fecha = date
+  // input.date = undefined
+
+  detallesInput.forEach((detalle) => {
+    ;(detalle.importe = parseFloat(importe)),
+      (detalle.categoriaId = !!detalle.categoria
+        ? parseInt(detalle.categoria.id)
+        : null)
+    detalle.categoria = undefined
+    ;(detalle.cuentaId = !!detalle.cuenta ? parseInt(detalle.cuenta.id) : null),
+      (detalle.cuenta = undefined)
+  })
+
+  console.log('input...... ', input)
+  console.log('detallesinput...... ', detallesInput)
+
   if (!editedFormItem.value.id) {
     console.log('guardando movimiento nueva', input)
     createMovimiento({
-      input
+      input,
+      detallesInput
     })
   } else {
     const id = editedFormItem.value.id
@@ -268,8 +313,8 @@ const options = ref({
 const { onResult: onResultTiposMovimiento, result: resultTiposMovimiento } =
   useQuery(LISTA_TIPOS_MOVIMIENTO, null, options)
 
-const { load: cargarCuentasContables, onResult: onResultCuentasContables } =
-  useLazyQuery(LISTA_CUENTAS_CONTABLES)
+// const { load: cargarCuentasContables, onResult: onResultCuentasContables } =
+//   useLazyQuery(LISTA_CUENTAS_CONTABLES)
 
 // onResultTiposMovimiento(({ data }) => {
 //   if (!!data) {
@@ -278,14 +323,14 @@ const { load: cargarCuentasContables, onResult: onResultCuentasContables } =
 //   }
 // })
 
-onResultCuentasContables(({ data }) => {
-  if (!!data) {
-    console.log('data', data)
-    cuentasContablesOptions.value = JSON.parse(
-      JSON.stringify(data.listaCuentasContables)
-    )
-  }
-})
+// onResultCuentasContables(({ data }) => {
+//   if (!!data) {
+//     console.log('data', data)
+//     cuentasContablesOptions.value = JSON.parse(
+//       JSON.stringify(data.listaCuentasContables)
+//     )
+//   }
+// })
 const {
   mutate: createMovimiento,
   onDone: onDoneCreateMovimiento,
@@ -305,7 +350,6 @@ onDoneCreateMovimiento(({ data }) => {
   }
 })
 onErrorCreateMovimiento((error) => {
-  console.log(error)
   console.error(error)
 })
 onDoneUpdateMovimiento(({ data }) => {

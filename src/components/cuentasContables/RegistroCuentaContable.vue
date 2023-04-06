@@ -3,23 +3,36 @@
     <q-card-section class="bg-primary text-accent-light">
       {{ actionName }}
       <!-- <pre>{{ editedFormItem }}</pre> -->
-      <!-- <pre>{{ editedFormItem }}</pre> -->
     </q-card-section>
 
     <q-card-section class="">
       <q-form @submit="saveItem" class="q-gutter-md">
         <div class="q-gutter-md">
+          <div class="">
+            <CuentaContableSelect
+              v-model="editedFormItem.padre"
+              tipo-afectacion="C"
+              input-label="Padre"
+            ></CuentaContableSelect>
+          </div>
           <div>
             <q-input
               v-model="editedFormItem.id"
               type="text"
               label="Id"
+              placeholder="Favor de ingresar el Id"
               dense
               maxlength="5"
+              min
               mask="#####"
               lazy-rules
-              :rules="[(val) => !!val || 'Favor de ingresar el Id']"
+              :rules="[
+                (val) => !!val || 'Favor de ingresar el Id',
+                (val) =>
+                  (!!val && val.length >= 5) || 'Please use maximum 5 character'
+              ]"
               :readonly="idReadonly"
+              autofocus
             />
           </div>
           <div>
@@ -28,7 +41,6 @@
               type="text"
               label="Nombre"
               dense
-              autofocus
               lazy-rules
               :rules="[
                 (val) =>
@@ -47,7 +59,7 @@
                 readonly
               />
             </div>
-            <div class="col">
+            <!-- <div class="col">
               <q-input
                 v-model="editedFormItem.padreId"
                 type="text"
@@ -55,7 +67,7 @@
                 dense
                 readonly
               />
-            </div>
+            </div> -->
           </div>
 
           <div>
@@ -86,10 +98,6 @@
         </div>
       </q-form>
     </q-card-section>
-    <!-- <q-card-section class="q-gutter-sm" align="right">
-      <q-btn color="primary" label="Cancelar" v-close-popup outline />
-      <q-btn color="primary" icon="check" label="Guardar" @click="saveItem" />
-    </q-card-section> -->
   </q-card>
 </template>
 
@@ -102,6 +110,7 @@ import {
   CUENTA_CONTABLE_UPDATE
 } from 'src/graphql/cuentasContableGql'
 import { useMutation } from '@vue/apollo-composable'
+import CuentaContableSelect from '../formComponents/CuentaContableSelect.vue'
 
 // import IconPicker from '/src/components/IconPicker.vue'
 /**
@@ -181,8 +190,11 @@ onMounted(() => {
  */
 function saveItem() {
   const id = editedFormItem.value.id
+  const padreId = parseInt(editedFormItem.value.padre.id)
   const input = {
     ...editedFormItem.value,
+    padreId,
+    padre: undefined,
     action: undefined,
     tipo_afectacion: undefined,
     label: undefined,

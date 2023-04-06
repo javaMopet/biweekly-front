@@ -1,36 +1,52 @@
 <template>
-  <q-select
-    filled
-    v-model="categoria"
-    :options="filteredOptions"
-    option-label="nombre"
-    label="Categoria"
-    use-input
-    input-debounce="0"
-    @filter="filterFn"
-    behavior="menu"
-    clearable=""
-    :rules="[(val) => !!val || 'Favor de ingresar la categoria']"
-    lazyRules
-    dense
-  >
-    <template v-slot:no-option>
-      <q-item>
-        <q-item-section class="text-grey"> No results </q-item-section>
-      </q-item>
-    </template>
-  </q-select>
+  <!-- <pre>{{ filteredOptions }}</pre> -->
+  <div class="row q-gutter-x-sm">
+    <div class="col">
+      <q-select
+        filled
+        v-model="categoria"
+        :options="filteredOptions"
+        option-label="nombre"
+        label="Categoria"
+        use-input
+        input-debounce="0"
+        @filter="filterFn"
+        behavior="menu"
+        clearable=""
+        :rules="[(val) => !!val || 'Favor de ingresar la categoria']"
+        lazyRules
+        dense
+      >
+        <template v-slot:no-option>
+          <q-item>
+            <q-item-section class="text-grey"> No results </q-item-section>
+          </q-item>
+        </template>
+      </q-select>
+    </div>
+    <div class="col-auto">
+      <q-btn color="accent" icon="add" @click="agregarCategoria" />
+    </div>
+  </div>
+
+  <Teleport to="#modal">
+    <q-dialog v-model="showRegistroCategoria" persistent>
+      <registro-categoria></registro-categoria>
+    </q-dialog>
+  </Teleport>
 </template>
 
 <script setup>
 import { useQuery } from '@vue/apollo-composable'
 import { LISTA_CATEGORIAS } from 'src/graphql/categorias'
-import { ref, computed, defineProps, defineEmits } from 'vue'
+import { ref, computed, defineProps, defineEmits, Teleport } from 'vue'
+import RegistroCategoria from '../categorias/RegistroCategoria.vue'
 
 /**
  * state
  */
 const filteredOptions = ref([])
+const showRegistroCategoria = ref(false)
 /**
  * props
  */
@@ -41,6 +57,11 @@ const props = defineProps({
     default: () => {
       return null
     }
+  },
+  tipoMovimientoId: {
+    type: String,
+    required: false,
+    default: ''
   }
 })
 /**
@@ -71,7 +92,9 @@ const categoria = computed({
 })
 const options = computed({
   get() {
-    return resultadoLista.value?.listaCategorias ?? []
+    return (resultadoLista.value?.listaCategorias ?? []).filter(
+      (categoria) => categoria.tipoMovimientoId === props.tipoMovimientoId
+    )
   }
 })
 onErrorListaCuentas((error) => {
@@ -94,6 +117,9 @@ function filterFn(val, update) {
       (v) => v.nombre.toLowerCase().indexOf(needle) > -1
     )
   })
+}
+function agregarCategoria() {
+  showRegistroCategoria.value = true
 }
 </script>
 
