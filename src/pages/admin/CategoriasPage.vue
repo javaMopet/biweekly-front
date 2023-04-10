@@ -4,113 +4,181 @@
     <q-btn flat round dense icon="arrow_back" @click="$router.back()" />
   </q-toolbar>
   <q-space style="height: 10px" />
-  <div class="row fit" style="border: 0px solid red">
-    <q-table
-      grid
-      style="width: 100%"
-      dense
-      :rows="listaCategorias"
-      :columns="columns"
-      row-key="id"
-      :filter="filter"
-      :rows-per-page-options="[0]"
-    >
-      <template #item="props">
-        <q-card class="my-card q-ma-sm" flat bordered style="width: 350px">
-          <q-item
-            class="bg-dark text-white"
-            :style="`border-top: 6px solid ${props.row.color}`"
-          >
-            <q-item-section avatar>
-              <q-icon :name="props.row.icono" />
-            </q-item-section>
-
-            <q-item-section>
-              <div class="row items-center no-wrap">
-                <!-- <q-item-label>{{ props.row.color }}</q-item-label> -->
-                <div class="col">
-                  <q-item-label class="text-h6">{{
-                    props.row.nombre
-                  }}</q-item-label>
-                  <q-item-label class="text-accent-light text-subtitle2">
-                    {{ props.row.cuentaContable.nombreCompleto }}
-                  </q-item-label>
-                </div>
-                <div class="col-auto q-pl-md">
-                  <q-avatar
-                    size="30px"
-                    :class="{
-                      'text-white': true,
-                      'bg-positive': props.row.tipoMovimiento.id === '1',
-                      'bg-negative': props.row.tipoMovimiento.id === '2'
-                    }"
-                    >{{ props.row.tipoMovimiento.nombre[0] }}</q-avatar
-                  >
-                </div>
-              </div>
-            </q-item-section>
-          </q-item>
-
-          <q-card-section>
-            {{ props.row.descripcion }}
-          </q-card-section>
-
-          <q-separator inset />
-
-          <q-card-actions style="border: 0px solid red">
-            <q-btn round flat icon="edit" @click="editRow(props)" />
-            <!-- color="primary" -->
-            <q-btn
-              round
-              flat
-              icon="delete"
-              class="q-ml-sm"
-              @click="deleteRow(props)"
-            />
-            <!-- color="negative" -->
-          </q-card-actions>
-        </q-card>
-      </template>
-      <template v-slot:top-left>
-        <q-btn
-          label="Nueva categoria"
-          color="primary"
-          class=""
-          @click="addRow()"
-          icon="queue"
-        />
-      </template>
-
-      <template v-slot:top-right>
-        <q-input
-          outlined
-          dense
-          debounce="300"
-          v-model="filter"
-          placeholder="Buscar"
-        >
-          <template v-slot:append>
-            <q-icon name="search" />
-          </template>
-        </q-input>
-      </template>
-      <template #body-cell-icono="props">
-        <q-icon :name="props.row.icono" size="35px" color="cyan" />
-      </template>
-      <template v-slot:body-cell-acciones="props">
-        <q-td :props="props" fit>
-          <q-btn icon="edit" size="sm" flat dense @click="editRow(props)" />
-          <q-btn
-            icon="delete"
-            size="sm"
-            class="q-ml-sm text-negative"
-            flat
+  <div class="row fit q-gutter-sm" style="border: 0px solid red">
+    <div class="col">
+      <q-table
+        dense
+        :rows="listaCategoriasIngresos"
+        :columns="columns"
+        row-key="id"
+        :filter="filterIngresos"
+        :rows-per-page-options="[0]"
+        hide-header
+      >
+        <template #top-left>
+          <div class="text-h6 text-">Ingresos</div>
+        </template>
+        <template v-slot:top-right>
+          <q-input
+            outlined
             dense
-            @click="deleteRow(props)"
-          />
-        </q-td>
-      </template>
-    </q-table>
+            debounce="300"
+            v-model="filterIngresos"
+            placeholder="Buscar Ingresos"
+          >
+            <template v-slot:append>
+              <q-icon name="search" />
+            </template>
+          </q-input>
+        </template>
+
+        <template #body-cell-icono="props">
+          <q-td
+            class="bg-primary-light text-primary"
+            :props="props"
+            fit
+            style="width: 20px"
+          >
+            <q-icon :name="props.row.icono" size="35px" />
+          </q-td>
+        </template>
+        <template v-slot:body-cell-nombre="props">
+          <q-td
+            class="bg-primary-light text-dark"
+            :props="props"
+            fit
+            :style="`border-left: 3px solid ${props.row.color}`"
+          >
+            <div class="column">
+              <span class="text-subtitle1">{{ props.row.nombre }} </span>
+              <span class="text-positive text-subtitle2">{{
+                props.row.descripcion
+              }}</span>
+            </div>
+          </q-td>
+        </template>
+        <template #body-cell-cuentaContable="props">
+          <q-td class="bg-primary-light text-dark">
+            <div class="column">
+              <!-- <span class="text-accent text-caption">Cuenta Contable:</span> -->
+              <span class="text-accent text-caption">{{
+                props.row.cuentaContable.nombreCompleto
+              }}</span>
+            </div>
+          </q-td>
+        </template>
+        <template v-slot:body-cell-acciones="props">
+          <q-td :props="props" fit class="bg-primary-light text-dark">
+            <q-btn
+              icon="edit"
+              size="md"
+              dense
+              @click="editRow(props)"
+              rounded
+              color="dark"
+              flat
+            />
+            <q-btn
+              icon="delete"
+              size="md"
+              class="q-ml-sm"
+              color="accent"
+              rounded
+              dense
+              @click="deleteRow(props)"
+              flat
+            />
+          </q-td>
+        </template>
+      </q-table>
+    </div>
+    <div class="col">
+      <q-table
+        dense
+        :rows="listaCategoriasEgresos"
+        :columns="columns"
+        row-key="id"
+        :filter="filterGastos"
+        :rows-per-page-options="[0]"
+        hide-header
+      >
+        <template #top-left>
+          <div class="text-h6 text-">Gastos</div>
+        </template>
+        <template v-slot:top-right>
+          <q-input
+            outlined
+            dense
+            debounce="300"
+            v-model="filterGastos"
+            placeholder="Buscar Gastos"
+          >
+            <template v-slot:append>
+              <q-icon name="search" />
+            </template>
+          </q-input>
+        </template>
+        <template v-slot:body-cell-nombre="props">
+          <q-td
+            class="bg-primary-light text-dark"
+            :props="props"
+            fit
+            :style="`border-left: 3px solid ${props.row.color}`"
+          >
+            <div class="column">
+              <span class="text-subtitle1">{{ props.row.nombre }} </span>
+              <span class="text-positive text-subtitle2">{{
+                props.row.descripcion
+              }}</span>
+            </div>
+          </q-td>
+        </template>
+        <template #body-cell-icono="props">
+          <q-td
+            class="bg-primary-light text-primary"
+            :props="props"
+            fit
+            style="width: 20px"
+          >
+            <q-icon :name="props.row.icono" size="35px" />
+          </q-td>
+        </template>
+
+        <template #body-cell-cuentaContable="props">
+          <q-td class="bg-primary-light text-dark">
+            <div class="column">
+              <!-- <span class="text-accent text-caption">Cuenta Contable:</span> -->
+              <span class="text-accent text-caption">{{
+                props.row.cuentaContable.nombreCompleto
+              }}</span>
+            </div>
+          </q-td>
+        </template>
+        <template v-slot:body-cell-acciones="props">
+          <q-td :props="props" fit class="bg-primary-light text-dark">
+            <q-btn
+              icon="edit"
+              size="md"
+              dense
+              @click="editRow(props)"
+              rounded
+              color="dark"
+              flat
+            />
+            <q-btn
+              icon="delete"
+              size="md"
+              class="q-ml-sm"
+              color="accent"
+              rounded
+              dense
+              @click="deleteRow(props)"
+              flat
+            />
+          </q-td>
+        </template>
+      </q-table>
+    </div>
   </div>
 
   <Teleport to="#modal">
@@ -127,7 +195,7 @@
 
 <script setup>
 import { useMutation, useQuery } from '@vue/apollo-composable'
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { LISTA_CATEGORIAS, CATEGORIA_DELETE } from '/src/graphql/categorias'
 // import { LISTA_CUENTAS_CONTABLES } from '/src/graphql/cuentasContableGql'
 import RegistroCategoria from 'src/components/categorias/RegistroCategoria.vue'
@@ -153,72 +221,30 @@ const defaultItem = {
   cuentaContable: null
 }
 const listaCategorias = ref([])
-const filter = ref()
+const filterIngresos = ref()
+const filterGastos = ref()
 const editedItem = ref({ ...defaultItem })
-const editedIndex = ref(null)
+const editedIndex = ref(-1)
 const rowIndexDelete = ref(null)
 const showFormItem = ref(false)
 
-const columns = [
-  // { name: 'id', label: 'Id', field: 'id', sortable: true, align: 'left' },
-  {
-    name: 'icono',
-    label: '',
-    field: 'icono',
-    sortable: true,
-    align: 'left'
-  },
-  {
-    name: 'nombre',
-    label: 'Nombre',
-    field: 'nombre',
-    sortable: true,
-    align: 'left'
-  },
-  {
-    name: 'descripcion',
-    label: 'Descripción',
-    field: 'descripcion',
-    sortable: true,
-    align: 'left'
-  },
-
-  {
-    name: 'color',
-    label: 'Color',
-    field: 'color',
-    sortable: true,
-    align: 'left'
-  },
-  {
-    name: 'cuenta_contable',
-    label: 'Cuenta Contable',
-    field: (row) => `${row.cuentaContable.id} - ${row.cuentaContable.nombre}`,
-    sortable: true,
-    align: 'left'
-  },
-  {
-    name: 'tipo_categoria',
-    label: 'Tipo Categoria',
-    field: (row) => `${row.tipoMovimiento.nombre}`,
-    sortable: true,
-    align: 'left'
-  },
-  {
-    name: 'creacion',
-    label: 'Fecha Creación',
-    field: 'createdAt',
-    sortable: true,
-    align: 'left'
-  },
-  {
-    name: 'acciones',
-    label: 'Acciones',
-    field: 'action',
-    sortable: false,
-    align: 'center'
+/**
+ * computed
+ */
+const listaCategoriasIngresos = computed({
+  get() {
+    return listaCategorias.value.filter(
+      (categoria) => categoria.tipoMovimientoId === '1'
+    )
   }
-]
+})
+const listaCategoriasEgresos = computed({
+  get() {
+    return listaCategorias.value.filter(
+      (categoria) => categoria.tipoMovimientoId === '2'
+    )
+  }
+})
 /**
  * onMount
  */
@@ -272,10 +298,11 @@ function categoriaSaved(itemSaved) {
   listaCategorias.value.push(itemSaved)
   mostrarNotificacion('guardó', itemSaved)
 }
-function categoriaUpdated(itemUpdated) {
+function categoriaUpdated(itemUpdated, indice) {
+  console.log('se actualizó el item con indice: ', indice)
   showFormItem.value = false
   mostrarNotificacion('actualizó', itemUpdated)
-  listaCategorias.value[editedIndex.value] = itemUpdated
+  // listaCategorias.value[indice] = itemUpdated
   editedItem.value = { ...defaultItem }
   editedIndex.value = null
 }
@@ -320,6 +347,68 @@ onDoneDeleteCategoria(({ data }) => {
 onErrorDeleteCategoria((error) => {
   console.error(error)
 })
+
+const columns = [
+  // { name: 'id', label: 'Id', field: 'id', sortable: true, align: 'left' },
+  {
+    name: 'icono',
+    label: '',
+    sortable: true,
+    align: 'left',
+    filter: false
+  },
+  {
+    name: 'nombre',
+    label: 'Categoria',
+    field: 'nombre',
+    sortable: true,
+    align: 'left',
+    filter: true
+  },
+  // {
+  //   name: 'descripcion',
+  //   label: 'Descripción',
+  //   field: 'descripcion',
+  //   sortable: true,
+  //   align: 'left'
+  // },
+
+  // {
+  //   name: 'color',
+  //   label: 'Color',
+  //   field: 'color',
+  //   sortable: true,
+  //   align: 'left'
+  // },
+  {
+    name: 'cuentaContable',
+    label: 'Cuenta Contable',
+    field: '',
+    sortable: true,
+    align: 'left'
+  },
+  // {
+  //   name: 'tipo_categoria',
+  //   label: 'Tipo Categoria',
+  //   field: (row) => `${row.tipoMovimiento.nombre}`,
+  //   sortable: true,
+  //   align: 'left'
+  // },
+  // {
+  //   name: 'creacion',
+  //   label: 'Fecha Creación',
+  //   field: 'createdAt',
+  //   sortable: true,
+  //   align: 'left'
+  // },
+  {
+    name: 'acciones',
+    label: '',
+    field: 'action',
+    sortable: false,
+    align: 'center'
+  }
+]
 </script>
 
 <style lang="scss" scoped>

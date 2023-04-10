@@ -3,6 +3,7 @@
     <q-card-section class="bg-primary text-accent-light text-subtitle1">
       {{ actionName }}
       <!-- <pre>{{ editedFormItem.icono }}</pre> -->
+      <pre>{{ props.editedIndex }}</pre>
     </q-card-section>
 
     <q-card-section class="">
@@ -23,7 +24,7 @@
                 <q-btn @click="selectIcon" color="primary">
                   <q-icon
                     color="gray"
-                    :name="formItem.icono || 'extension'"
+                    :name="editedFormItem.icono || 'extension'"
                     class="size"
                     size="2.5em"
                   />
@@ -158,13 +159,11 @@
 </template>
 
 <script setup>
-import { useQuery, useLazyQuery, useMutation } from '@vue/apollo-composable'
+import { useQuery, useMutation } from '@vue/apollo-composable'
 import { ref, computed, onMounted } from 'vue'
 import { CATEGORIA_CREATE, CATEGORIA_UPDATE } from '/src/graphql/categorias'
 import { LISTA_TIPOS_MOVIMIENTO } from 'src/graphql/movimientos'
-import { LISTA_CUENTAS_CONTABLES } from '/src/graphql/cuentasContableGql'
 import IconPicker from '/src/components/IconPicker.vue'
-import RegistroCuentaContable from '../cuentasContables/RegistroCuentaContable.vue'
 import CuentaContableSelect from '../formComponents/CuentaContableSelect.vue'
 import CuentaSelect from '../formComponents/CuentaSelect.vue'
 /**
@@ -181,21 +180,9 @@ const defaultItem = {
   cuentaContable: null
 }
 const formItem = ref({ ...defaultItem })
-// const tipoMovimientoOptions = ref([])
 const cuentaContableSubnivel = ref(0)
-
 const ppproxy = ref(null)
-/**
- * onMounted
- */
-onMounted(() => {
-  console.log('tipoMovimientoId', editedFormItem.value.tipoMovimientoId)
-  // cargartipoMovimiento()
-  // cargarCuentasContables(null, {
-  //   subnivel: 0,
-  //   clasificacion: '5'
-  // })
-})
+
 /**
  * props
  */
@@ -280,7 +267,7 @@ function tipoMovimientoChange(value) {
 function saveItem() {
   console.log('save item')
   const cuenta_contable_id = editedFormItem.value.cuentaContable.id
-  const cuenta_id = editedFormItem.value.cuenta.id
+  const cuenta_id = editedFormItem.value.cuenta?.id
   const input = {
     ...editedFormItem.value,
     cuentaContableId: parseInt(cuenta_contable_id),
@@ -315,24 +302,6 @@ const options = ref({
 const { onResult: onResultTipoMovimiento, result: resultTipoMovimiento } =
   useQuery(LISTA_TIPOS_MOVIMIENTO, null, options)
 
-// const { load: cargarCuentasContables, onResult: onResultCuentasContables } =
-//   useLazyQuery(LISTA_CUENTAS_CONTABLES)
-
-// onResulttipoMovimiento(({ data }) => {
-//   if (!!data) {
-//     console.log('data', data.listatipoMovimiento)
-//     tipoMovimientoOptions.value = data.listatipoMovimiento
-//   }
-// })
-
-// onResultCuentasContables(({ data }) => {
-//   if (!!data) {
-//     console.log('data', data)
-//     cuentasContablesOptions.value = JSON.parse(
-//       JSON.stringify(data.listaCuentasContables)
-//     )
-//   }
-// })
 const {
   mutate: createCategoria,
   onDone: onDoneCreateCategoria,
@@ -359,7 +328,7 @@ onDoneUpdateCategoria(({ data }) => {
   if (!!data) {
     console.log('updated data...', data)
     const itemUpdated = data.categoriaUpdate.categoria
-    emit('categoriaUpdated', itemUpdated)
+    emit('categoriaUpdated', itemUpdated, props.editedIndex)
   }
 })
 onErrorUpdateCategoria((error) => {

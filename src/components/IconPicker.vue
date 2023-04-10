@@ -23,13 +23,13 @@
               icon-set="material-icons"
               sected-color="orange-8"
               :filter="filter"
-              style="height: 487px"
+              style="height: 517px"
               :tags="tags"
               @tags="onTags"
             >
               <template #icon="name">
                 <q-btn @click="setValue(name)">
-                  <q-icon color="dark" :name="name" size="2.5em" />
+                  <q-icon color="dark" :name="name" size="2.4em" />
                 </q-btn>
               </template>
             </q-icon-picker>
