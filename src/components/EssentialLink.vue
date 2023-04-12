@@ -7,6 +7,7 @@
         :inset-level="nivel / 2"
         dense
         :to="'/' + ruta"
+        active-class="text-orange"
       >
         <q-item-section avatar>
           <q-icon :name="icono" />

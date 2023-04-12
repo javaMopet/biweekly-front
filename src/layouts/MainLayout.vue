@@ -24,8 +24,14 @@
       </q-toolbar>
     </q-header>
 
-    <q-drawer show-if-above v-model="leftDrawerOpen" side="left" elevated>
-      <q-list>
+    <q-drawer
+      show-if-above
+      v-model="leftDrawerOpen"
+      side="left"
+      elevated
+      class="bg-primary shadow-24"
+    >
+      <q-list class="shadow-15">
         <EssentialLink
           v-for="link in essentialLinks"
           :key="link.nombre"
@@ -121,9 +127,16 @@ function onClickAccount() {}
 //   essentialLinks.value = data.menuLevels;
 // });
 </script>
-<style lang="scss" scoped>
+<style lang="scss">
 .font-title {
   font-family: 'Lobster Two', cursive;
+  font-size: 1.5rem;
+}
+.font-subtitle {
+  // font-family: 'Lobster Two', cursive;
+  // font-family: 'Assistant', sans-serif;
+  // font-family: 'Monserrat Alternates', sans-serif;
+  font-family: 'Sen', sans-serif;
   font-size: 1.5rem;
 }
 </style>

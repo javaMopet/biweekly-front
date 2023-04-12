@@ -1,115 +1,148 @@
 <template>
-  <q-toolbar class="text-dark">
-    <q-toolbar-title> Cuentas </q-toolbar-title>
-    <q-btn flat round dense icon="arrow_back" @click="$router.back()" />
-  </q-toolbar>
-  <div class="row fit" style="border: 0px solid red">
-    <q-table
-      grid
-      style="width: 100%"
-      dense
-      :rows="listaCuentas"
-      :columns="columns"
-      row-key="id"
-      :filter="filter"
-      :rows-per-page-options="[0]"
-    >
-      <template v-slot:top-left>
-        <q-btn
+  <div class="column" style="border: 1px solid red">
+    <div class="row text-h5 text-contrast q-pa-md font-subtitle">CUENTAS</div>
+    <div class="row fit" style="border: 0px solid red">
+      <q-table
+        grid
+        style="width: 100%"
+        dense
+        :rows="listaCuentas"
+        :columns="columns"
+        row-key="id"
+        :filter="filter"
+        :rows-per-page-options="[0]"
+      >
+        <template v-slot:top-left>
+          <!-- <q-btn
           label="Nueva cuenta"
           color="primary"
           class=""
           @click="addRow()"
           icon="queue"
-        />
-      </template>
-
-      <template v-slot:top-right>
-        <q-input
-          outlined
-          dense
-          debounce="300"
-          v-model="filter"
-          placeholder="Buscar"
-        >
-          <template v-slot:append>
-            <q-icon name="search" />
-          </template>
-        </q-input>
-      </template>
-      <template #item="props">
-        <q-card class="my-card text-primary q-ma-sm" style="width: 350px">
-          <q-card-section
-            :class="{
-              'bg-dark': props.row.tipoCuenta.id === '1',
-              'bg-contrast ': props.row.tipoCuenta.id === '2',
-              'bg-secondary': props.row.tipoCuenta.id === '3',
-              'text-white': true
-            }"
+        /> -->
+          <q-btn-dropdown
+            split
+            icon="add"
+            label="AGREGAR"
+            color="primary"
+            @click="addRow(0)"
           >
-            <div class="row">
-              <div class="column col">
-                <div class="text-h6">{{ props.row.nombre }}</div>
+            <q-list>
+              <q-item clickable v-close-popup @click="addRow(1)">
+                <q-item-section avatar>
+                  <q-icon name="account_balance" />
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label>Ahorros</q-item-label>
+                </q-item-section>
+              </q-item>
+              <q-item clickable v-close-popup @click="addRow(3)">
+                <q-item-section avatar>
+                  <q-icon name="credit_card" />
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label>Tarjeta Crédito</q-item-label>
+                </q-item-section>
+              </q-item>
+              <q-item clickable v-close-popup @click="addRow(2)">
+                <q-item-section avatar>
+                  <q-icon name="payments" />
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label>Efectivo</q-item-label>
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </q-btn-dropdown>
+        </template>
+
+        <template v-slot:top-right>
+          <q-input
+            outlined
+            dense
+            debounce="300"
+            v-model="filter"
+            placeholder="Buscar"
+          >
+            <template v-slot:append>
+              <q-icon name="search" />
+            </template>
+          </q-input>
+        </template>
+        <template #item="props">
+          <q-card class="my-card text-primary q-ma-sm" style="width: 350px">
+            <q-card-section
+              :class="{
+                'bg-dark': props.row.tipoCuenta.id === '1',
+                'bg-contrast ': props.row.tipoCuenta.id === '2',
+                'bg-secondary': props.row.tipoCuenta.id === '3',
+                'text-white': true
+              }"
+            >
+              <div class="row">
+                <div class="column col">
+                  <div class="text-h6">{{ props.row.nombre }}</div>
+                </div>
+                <div
+                  class=""
+                  :class="{
+                    'text-accent-contrast': props.row.tipoCuenta.id === '1',
+                    'text-yellow-3': props.row.tipoCuenta.id === '2',
+                    'text-accent-light': props.row.tipoCuenta.id === '3',
+                    'col-auto column items-center q-mx-md': true
+                  }"
+                >
+                  <q-icon :name="props.row.tipoCuenta.icon" size="30px" />
+                  <span>{{ props.row.tipoCuenta.nombre }}</span>
+                </div>
               </div>
-              <div
-                class=""
-                :class="{
-                  'text-accent-contrast': props.row.tipoCuenta.id === '1',
-                  'text-yellow-3': props.row.tipoCuenta.id === '2',
-                  'text-accent-light': props.row.tipoCuenta.id === '3',
-                  'col-auto column items-center q-mx-md': true
-                }"
-              >
-                <q-icon :name="props.row.tipoCuenta.icon" size="30px" />
-                <span>{{ props.row.tipoCuenta.nombre }}</span>
+            </q-card-section>
+
+            <q-card-section>
+              <div class="text-caption text-accent">
+                {{ props.row.cuentaContable.nombreCompleto }}
               </div>
-            </div>
-          </q-card-section>
+              {{ props.row.descripcion }}
+            </q-card-section>
 
-          <q-card-section>
-            <div class="text-caption text-accent">
-              {{ props.row.cuentaContable.nombreCompleto }}
-            </div>
-            {{ props.row.descripcion }}
-          </q-card-section>
+            <q-separator inset />
 
-          <q-separator inset />
+            <q-card-actions>
+              <q-btn
+                round
+                color="primary"
+                flat
+                icon="edit"
+                @click="editRow(props)"
+              />
+              <q-btn
+                round
+                flat
+                icon="delete"
+                class="q-ml-sm"
+                @click="deleteRow(props)"
+              />
+            </q-card-actions>
+          </q-card>
+        </template>
+        <template #body-cell-icono="props">
+          <q-icon :name="props.row.icono" size="35px" color="cyan" />
+        </template>
+      </q-table>
+    </div>
 
-          <q-card-actions>
-            <q-btn
-              round
-              color="primary"
-              flat
-              icon="edit"
-              @click="editRow(props)"
-            />
-            <q-btn
-              round
-              flat
-              icon="delete"
-              class="q-ml-sm"
-              @click="deleteRow(props)"
-            />
-          </q-card-actions>
-        </q-card>
-      </template>
-      <template #body-cell-icono="props">
-        <q-icon :name="props.row.icono" size="35px" color="cyan" />
-      </template>
-    </q-table>
+    <Teleport to="#modal">
+      <q-dialog v-model="showFormItem" persistent>
+        <RegistroCuenta
+          :edited-item="editedItem"
+          :edited-index="editedIndex"
+          @cuentaSaved="cuentaSaved"
+          @cuentaUpdated="cuentaUpdated"
+        ></RegistroCuenta>
+      </q-dialog>
+    </Teleport>
+    <!-- <pre>{{ listaCuentas }}</pre> -->
   </div>
-
-  <Teleport to="#modal">
-    <q-dialog v-model="showFormItem" persistent>
-      <RegistroCuenta
-        :edited-item="editedItem"
-        :edited-index="editedIndex"
-        @cuentaSaved="cuentaSaved"
-        @cuentaUpdated="cuentaUpdated"
-      ></RegistroCuenta>
-    </q-dialog>
-  </Teleport>
-  <!-- <pre>{{ listaCuentas }}</pre> -->
 </template>
 
 <script setup>
@@ -166,7 +199,10 @@ onErrorListaCuentas((error) => {
 const defaultItem = {
   id: null,
   nombre: null,
-  descripcion: null
+  descripcion: null,
+  tipoCuenta: {
+    id: null
+  }
 }
 // const listaCuentas = ref([])
 const filter = ref()
@@ -174,6 +210,7 @@ const showFormItem = ref(false)
 const editedItem = ref({ ...defaultItem })
 const editedIndex = ref(null)
 const rowIndexDelete = ref(null)
+
 /**
  * computed
  */
@@ -232,8 +269,10 @@ onMounted(() => {
 //   }
 // })
 
-function addRow() {
+function addRow(tipoCuentaId) {
+  console.log('tipo de cuenta', tipoCuentaId)
   editedItem.value = { ...defaultItem }
+  editedItem.value.tipoCuenta.id = tipoCuentaId.toString()
   editedIndex.value = null
   showFormItem.value = true
 }

@@ -23,5 +23,8 @@ body {
   // font-family: 'IBM Plex Sans Condensed', sans-serif;
   font-family: 'Roboto Flex', sans-serif;
   // font-size: 0.95rem;
+  // --tw-bg-opacity: 1;
+  // background-color: rgb(17 24 39 / var(--tw-bg-opacity));
+  color: white;
 }
 </style>

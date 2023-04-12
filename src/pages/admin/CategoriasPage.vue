@@ -1,6 +1,34 @@
 <template>
+  <div class="row text-h5 text-contrast q-pa-md font-subtitle">CATEGORIAS</div>
   <q-toolbar class="text-dark">
-    <q-toolbar-title> Categorias </q-toolbar-title>
+    <q-btn-dropdown
+      split
+      icon="add"
+      label="AGREGAR"
+      color="primary"
+      @click="addRow"
+    >
+      <q-list>
+        <q-item clickable v-close-popup @click="addRow">
+          <q-item-section avatar>
+            <q-icon name="fa-solid fa-hand-holding-dollar" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label>Ingreso</q-item-label>
+          </q-item-section>
+        </q-item>
+        <q-item clickable v-close-popup @click="addRow">
+          <q-item-section avatar>
+            <q-icon name="fa-solid fa-file-invoice-dollar" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label>Gasto</q-item-label>
+          </q-item-section>
+        </q-item>
+      </q-list>
+    </q-btn-dropdown>
+    <q-toolbar-title> </q-toolbar-title>
+
     <q-btn flat round dense icon="arrow_back" @click="$router.back()" />
   </q-toolbar>
   <q-space style="height: 10px" />
@@ -50,23 +78,28 @@
             :style="`border-left: 3px solid ${props.row.color}`"
           >
             <div class="column">
-              <span class="text-subtitle1">{{ props.row.nombre }} </span>
+              <div class="">
+                <span class="text-subtitle1">{{ props.row.nombre }} </span>
+                &nbsp;
+                <span class="text-accent text-caption">{{
+                  props.row.cuentaContable.nombreCompleto
+                }}</span>
+              </div>
               <span class="text-positive text-subtitle2">{{
                 props.row.descripcion
               }}</span>
             </div>
           </q-td>
         </template>
-        <template #body-cell-cuentaContable="props">
+        <!-- <template #body-cell-cuentaContable="props">
           <q-td class="bg-primary-light text-dark">
             <div class="column">
-              <!-- <span class="text-accent text-caption">Cuenta Contable:</span> -->
               <span class="text-accent text-caption">{{
                 props.row.cuentaContable.nombreCompleto
               }}</span>
             </div>
           </q-td>
-        </template>
+        </template> -->
         <template v-slot:body-cell-acciones="props">
           <q-td :props="props" fit class="bg-primary-light text-dark">
             <q-btn
@@ -126,7 +159,13 @@
             :style="`border-left: 3px solid ${props.row.color}`"
           >
             <div class="column">
-              <span class="text-subtitle1">{{ props.row.nombre }} </span>
+              <div class="">
+                <span class="text-subtitle1">{{ props.row.nombre }} </span>
+                &nbsp;
+                <span class="text-accent text-caption">{{
+                  props.row.cuentaContable.nombreCompleto
+                }}</span>
+              </div>
               <span class="text-positive text-subtitle2">{{
                 props.row.descripcion
               }}</span>
@@ -143,17 +182,15 @@
             <q-icon :name="props.row.icono" size="35px" />
           </q-td>
         </template>
-
-        <template #body-cell-cuentaContable="props">
+        <!-- <template #body-cell-cuentaContable="props">
           <q-td class="bg-primary-light text-dark">
             <div class="column">
-              <!-- <span class="text-accent text-caption">Cuenta Contable:</span> -->
               <span class="text-accent text-caption">{{
                 props.row.cuentaContable.nombreCompleto
               }}</span>
             </div>
           </q-td>
-        </template>
+        </template> -->
         <template v-slot:body-cell-acciones="props">
           <q-td :props="props" fit class="bg-primary-light text-dark">
             <q-btn
@@ -380,13 +417,13 @@ const columns = [
   //   sortable: true,
   //   align: 'left'
   // },
-  {
-    name: 'cuentaContable',
-    label: 'Cuenta Contable',
-    field: '',
-    sortable: true,
-    align: 'left'
-  },
+  // {
+  //   name: 'cuentaContable',
+  //   label: 'Cuenta Contable',
+  //   field: '',
+  //   sortable: true,
+  //   align: 'left'
+  // },
   // {
   //   name: 'tipo_categoria',
   //   label: 'Tipo Categoria',

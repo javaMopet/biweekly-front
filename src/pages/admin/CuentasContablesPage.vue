@@ -1,73 +1,73 @@
 <template>
-  <q-toolbar class="text-dark">
-    <q-toolbar-title> Cuentas Contables </q-toolbar-title>
-    <q-btn flat round dense icon="arrow_back" @click="$router.back()" />
-  </q-toolbar>
-  <q-space style="height: 10px" />
-  <div class="q-pl-sm">
-    <div class="col">
-      <div>
-        <q-input
-          ref="filterRef"
-          filled
-          v-model="filter"
-          label="Buscar Cuenta Contable"
-          clearable
-          dense
-          style="width: 600px"
-        >
-          <template v-slot:append>
-            <q-icon name="filter_alt" />
-          </template>
-        </q-input>
-      </div>
-    </div>
-    <div class="row fit" style="border: 0px solid red">
-      <!-- <q-scroll-area style="width: 600px; height: calc(100vh - 200px)"> -->
-      <q-tree
-        v-if="arbolLleno"
-        :nodes="arbolCuentas"
-        node-key="id"
-        label-key="label"
-        v-model:selected="selected"
-        v-model:expanded="expanded"
-        default-expand-all
-        color="secondary"
-        selected-color="accent"
-        @update:selected="onSelected"
-        dense
-        style="width: 600px"
-        no-connectors
-        :filter="filter"
-        loa
-      >
-        <template v-slot:default-header="props">
-          <div
-            :class="{
-              row: true,
-              'items-center': true,
-              encabezado: props.node.subnivel != 0,
-              'full-width': true
-            }"
+  <div class="row text-h5 text-contrast q-pa-md font-subtitle">
+    CUENTAS CONTABLES
+  </div>
+  <div class="column items-center" style="border: 0px solid red">
+    <div class="q-pl-sm">
+      <div class="col">
+        <div>
+          <q-input
+            ref="filterRef"
+            outlined
+            v-model="filter"
+            label="Buscar Cuenta Contable"
+            clearable
+            dense
+            style="width: 800px"
+            color="secondary"
           >
-            <div class="column">
-              <span
-                :class="{
-                  active: props.node.id == props.tree.selected,
-                  'text-weight-regular text-primary-dark':
-                    props.node.subnivel == 0
-                }"
-                >{{ props.node.label }}(<span
-                  class="text-grey-7 text-caption"
-                  >{{
-                    props.node.tipoAfectacion == 'C'
-                      ? 'Cargo'
-                      : props.node.tipoAfectacion == 'A'
-                      ? 'Abono'
-                      : props.node.tipoAfectacion
-                  }}</span
-                >)
-                <!-- <span class="text-weight-light text-caption">
+            <template v-slot:append>
+              <q-icon name="filter_alt" />
+            </template>
+          </q-input>
+        </div>
+      </div>
+      <div class="row fit" style="border: 0px solid red">
+        <!-- <q-scroll-area style="width: 600px; height: calc(100vh - 200px)"> -->
+        <q-tree
+          v-if="arbolLleno"
+          :nodes="arbolCuentas"
+          node-key="id"
+          label-key="label"
+          v-model:selected="selected"
+          v-model:expanded="expanded"
+          default-expand-all
+          color="secondary"
+          selected-color="accent"
+          @update:selected="onSelected"
+          dense
+          style="width: 800px"
+          no-connectors
+          :filter="filter"
+          loa
+        >
+          <template v-slot:default-header="props">
+            <div
+              :class="{
+                row: true,
+                'items-center': true,
+                encabezado: props.node.subnivel != 0,
+                'full-width': true
+              }"
+            >
+              <div class="column">
+                <span
+                  :class="{
+                    active: props.node.id == props.tree.selected,
+                    'text-weight-regular text-primary-dark':
+                      props.node.subnivel == 0
+                  }"
+                  >{{ props.node.label }}(<span
+                    class="text-contrast text-caption"
+                    >{{
+                      props.node.tipoAfectacion == 'C'
+                        ? 'Cargo'
+                        : props.node.tipoAfectacion == 'A'
+                        ? 'Abono'
+                        : props.node.tipoAfectacion
+                    }}</span
+                  >)
+                  <!-- <span class="text-weight-light text-caption">
                 &nbsp;--------------&nbsp; &nbsp;-----&nbsp;&nbsp;-----&nbsp;
                 {{
                   props.node.tipoAfectacion == 'C'
@@ -77,8 +77,8 @@
                     : props.node.tipoAfectacion
                 }}
               </span> -->
-              </span>
-              <!-- <div class="text-weight-regular">
+                </span>
+                <!-- <div class="text-weight-regular">
               <span class="text-grey-7 text-caption">{{
                 props.node.tipoAfectacion == 'C'
                   ? 'Cargo'
@@ -87,32 +87,32 @@
                   : props.node.tipoAfectacion
               }}</span>
             </div> -->
-            </div>
-            <q-menu touch-position context-menu>
-              <q-list dense style="min-width: 100px">
-                <q-item
-                  v-if="props.node.subnivel != 0"
-                  clickable
-                  v-close-popup
-                  @click="addItem(props)"
-                >
-                  <q-item-section
-                    >Agregar Sub-Cuenta Contable a "{{
-                      props.node.label
-                    }}"</q-item-section
+              </div>
+              <q-menu touch-position context-menu>
+                <q-list dense style="min-width: 100px">
+                  <q-item
+                    v-if="props.node.subnivel != 0"
+                    clickable
+                    v-close-popup
+                    @click="addItem(props)"
                   >
-                </q-item>
-                <q-item clickable v-close-popup @click="editItem(props)">
-                  <q-item-section>Editar {{ props.node.id }} </q-item-section>
-                </q-item>
-                <!-- <q-item clickable v-close-popup @click="moverItem(props)">
+                    <q-item-section
+                      >Agregar Sub-Cuenta Contable a "{{
+                        props.node.label
+                      }}"</q-item-section
+                    >
+                  </q-item>
+                  <q-item clickable v-close-popup @click="editItem(props)">
+                    <q-item-section>Editar {{ props.node.id }} </q-item-section>
+                  </q-item>
+                  <!-- <q-item clickable v-close-popup @click="moverItem(props)">
                 <q-item-section
                   >Mover Cuenta Contable {{ props.node.nombre }}</q-item-section
                 >
               </q-item> -->
 
-                <q-separator />
-                <!-- <q-item clickable>
+                  <q-separator />
+                  <!-- <q-item clickable>
                 <q-item-section>Preferences</q-item-section>
                 <q-item-section side>
                   <q-icon name="keyboard_arrow_right" />
@@ -136,32 +136,34 @@
                   </q-list>
                 </q-menu>
               </q-item> -->
-                <q-separator />
-                <q-item
-                  v-if="
-                    !!props.node.children
-                      ? props.node.children.length <= 0
-                        ? true
-                        : false
-                      : true
-                  "
-                  clickable
-                  v-close-popup
-                  @click="deleteItem(props)"
-                  class="bg-warning text-dark"
-                >
-                  <q-item-section>Eliminar {{ props.node.id }} </q-item-section>
-                </q-item>
-                <q-item clickable v-close-popup>
-                  <q-item-section>Cerrar</q-item-section>
-                </q-item>
-              </q-list>
-            </q-menu>
-          </div>
-        </template>
-      </q-tree>
-      <!-- </q-scroll-area> -->
-      <!-- <q-card class="my-card">
+                  <q-separator />
+                  <q-item
+                    v-if="
+                      !!props.node.children
+                        ? props.node.children.length <= 0
+                          ? true
+                          : false
+                        : true
+                    "
+                    clickable
+                    v-close-popup
+                    @click="deleteItem(props)"
+                    class="bg-warning text-dark"
+                  >
+                    <q-item-section
+                      >Eliminar {{ props.node.id }}
+                    </q-item-section>
+                  </q-item>
+                  <q-item clickable v-close-popup>
+                    <q-item-section>Cerrar</q-item-section>
+                  </q-item>
+                </q-list>
+              </q-menu>
+            </div>
+          </template>
+        </q-tree>
+        <!-- </q-scroll-area> -->
+        <!-- <q-card class="my-card">
       <q-card-section>
         <div class="text-h6">{{ cuentaSeleccionada.label }}</div>
         <div class="text-subtitle2">
@@ -169,18 +171,19 @@
         </div>
       </q-card-section>
     </q-card> -->
+      </div>
     </div>
-  </div>
 
-  <Teleport to="#modal">
-    <q-dialog v-model="showFormItem" persistent>
-      <RegistroCuentaContable
-        :edited-item="editedItem"
-        @cuentaContableSaved="cuentaContableSaved"
-        @cuentaContableUpdated="cuentaContableUpdated"
-      ></RegistroCuentaContable>
-    </q-dialog>
-  </Teleport>
+    <Teleport to="#modal">
+      <q-dialog v-model="showFormItem" persistent>
+        <RegistroCuentaContable
+          :edited-item="editedItem"
+          @cuentaContableSaved="cuentaContableSaved"
+          @cuentaContableUpdated="cuentaContableUpdated"
+        ></RegistroCuentaContable>
+      </q-dialog>
+    </Teleport>
+  </div>
 </template>
 
 <script setup>
@@ -479,7 +482,7 @@ watch(loadingArbol, (newValue, oldValue) => {
   color: #010b24;
 }
 .encabezado {
-  background-color: #efece8;
-  color: #162a5c;
+  background-color: $primary;
+  color: $contrast;
 }
 </style>

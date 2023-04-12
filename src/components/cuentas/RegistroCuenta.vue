@@ -3,7 +3,7 @@
     <q-card-section class="bg-primary text-accent-light">
       {{ actionName }}
       <!-- <pre>{{ editedIndex }}</pre> -->
-      <!-- <pre>{{ editedItem }}</pre> -->
+      <pre>{{ editedFormItem }}</pre>
       <!-- <pre>{{ cuentaContableProps }}</pre> -->
     </q-card-section>
 
@@ -200,7 +200,7 @@ const tiposCuentaOptions = computed({
 })
 const editedFormItem = computed({
   get() {
-    return !!props.editedItem.id ? props.editedItem : formItem.value
+    return !!props.editedItem ? props.editedItem : formItem.value
   },
   set(val) {
     formItem.value = val

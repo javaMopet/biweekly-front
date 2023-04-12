@@ -1,25 +1,47 @@
 <template>
-  <div class="">MENSAJE DE BIENVENIDA</div>
-  <q-list bordered>
-    <q-item clickable v-ripple>
-      <q-item-section avatar>
-        <q-icon color="primary" name="bluetooth" />
-      </q-item-section>
-      <q-item-section>Dashboard</q-item-section>
-    </q-item>
-    <q-item clickable v-ripple>
+  <div class="column">
+    <q-list borderless>
+      <q-item clickable v-ripple to="/movimientos">
+        <q-item-section avatar>
+          <q-icon color="primary" name="dashboard" />
+        </q-item-section>
+        <q-item-section>Dashboard</q-item-section>
+      </q-item>
+      <q-item clickable v-ripple to="/admin/categorias">
+        <q-item-section avatar>
+          <q-icon color="primary" name="category" />
+        </q-item-section>
+        <q-item-section>Categorias</q-item-section>
+      </q-item>
+      <q-item clickable v-ripple to="/admin/cuentas">
+        <q-item-section avatar>
+          <q-icon color="primary" name="wallet" />
+        </q-item-section>
+        <q-item-section>Cuentas</q-item-section>
+      </q-item>
+      <q-item clickable v-ripple to="/admin/cuentas_contables">
+        <q-item-section avatar>
+          <q-icon color="primary" name="list_alt" />
+        </q-item-section>
+        <q-item-section>Cuentas Contables</q-item-section>
+      </q-item>
+      <!-- <q-item clickable v-ripple>
       <q-item-section avatar>
         <q-icon color="primary" name="bluetooth" />
       </q-item-section>
       <q-item-section>Categorias</q-item-section>
-    </q-item>
-  </q-list>
+    </q-item> -->
+    </q-list>
+  </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
 import { api } from 'src/boot/axios'
 import { exportFile } from 'quasar'
+import { useRouter } from 'vue-router'
+
+const $router = useRouter()
 
 const file = ref([])
 
@@ -51,3 +73,11 @@ function obtenerPdf() {
     })
 }
 </script>
+<style lang="scss" scoped>
+div {
+  color: $secondary;
+  font-weight: bold;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  background-color: $primary-light;
+}
+</style>
