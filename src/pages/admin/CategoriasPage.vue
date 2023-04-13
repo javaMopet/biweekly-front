@@ -1,5 +1,5 @@
 <template>
-  <div class="row text-h5 text-contrast q-pa-md font-subtitle">CATEGORIAS</div>
+  <div class="row text-h5 text-secondary q-pa-md font-subtitle">CATEGORIAS</div>
   <q-toolbar class="text-dark">
     <q-btn-dropdown
       split

@@ -4,8 +4,9 @@
       <q-toolbar>
         <q-btn dense flat round icon="menu" @click="toggleLeftDrawer" />
 
-        <q-toolbar-title class="font-title">
-          Biweekly Application
+        <q-toolbar-title class="font-title text-h2">
+          <span class="font-title-letter text-secondary text-h4">B</span>iweekly
+          Application
         </q-toolbar-title>
         <span class="q-pr-sm" v-if="user">{{ user.email }}</span>
         <q-btn icon="account_circle" @click="onClickAccount" flat round>
@@ -29,9 +30,10 @@
       v-model="leftDrawerOpen"
       side="left"
       elevated
-      class="bg-primary shadow-24"
+      class="bg-menu shadow-10"
     >
-      <q-list class="shadow-15">
+      <q-space split />
+      <q-list class="no-shadow q-mt-lg">
         <EssentialLink
           v-for="link in essentialLinks"
           :key="link.nombre"
@@ -130,13 +132,22 @@ function onClickAccount() {}
 <style lang="scss">
 .font-title {
   font-family: 'Lobster Two', cursive;
-  font-size: 1.5rem;
+  font-size: 1.8rem;
+}
+.font-title-letter {
+  font-family: 'Lobster Two', cursive;
+  font-size: 2rem !important;
 }
 .font-subtitle {
-  // font-family: 'Lobster Two', cursive;
-  // font-family: 'Assistant', sans-serif;
-  // font-family: 'Monserrat Alternates', sans-serif;
-  font-family: 'Sen', sans-serif;
+  //   font-family: 'Lobster Two', cursive;
+  // font-family: 'Montserrat Alternates', sans-serif;
+  // font-family: 'Roboto Flex', sans-serif;
+  font-family: 'Roboto Slab', serif;
   font-size: 1.5rem;
+}
+.bg-menu {
+  background-color: #e9e8eb !important;
+  color: #14153f;
+  font-size: 0.95rem;
 }
 </style>

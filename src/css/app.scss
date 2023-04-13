@@ -6,7 +6,7 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@300;400&display=swap');
 
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:ital,wght@0,300;0,400;1,400&family=Kalam&family=Lobster+Two&family=Montserrat+Alternates:wght@300&family=Roboto+Flex:wght@200;300;400&family=Sen:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lobster+Two&family=Montserrat+Alternates:wght@300&family=Roboto+Flex:wght@200;300;400&family=Roboto+Slab:wght@500&display=swap');
 
 .text-accent-light {
   color: $accent-light !important;
@@ -56,4 +56,10 @@
 }
 .bg-contrast-light {
   background: $contrast-light !important;
+}
+.text-secondary-light {
+  color: $secondary-light !important;
+}
+.bg-secondary-light {
+  background: $secondary-light !important;
 }

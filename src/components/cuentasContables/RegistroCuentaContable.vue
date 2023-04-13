@@ -1,7 +1,17 @@
 <template>
   <q-card class="my-card" style="width: 400px">
-    <q-card-section class="bg-primary text-accent-light">
-      {{ actionName }}
+    <q-card-section class="bg-primary">
+      <q-btn
+        round
+        flat
+        dense
+        icon="close"
+        class="float-right"
+        color="accent"
+        v-close-popup
+        vertical-top
+      ></q-btn>
+      <div class="text-subtitle1 text-accent-light">{{ actionName }}</div>
       <!-- <pre>{{ editedFormItem }}</pre> -->
     </q-card-section>
 
@@ -13,27 +23,44 @@
               v-model="editedFormItem.padre"
               tipo-afectacion="C"
               input-label="Padre"
+              :readonly="isReadonly"
             ></CuentaContableSelect>
           </div>
-          <div>
-            <q-input
-              v-model="editedFormItem.id"
-              type="text"
-              label="Id"
-              placeholder="Favor de ingresar el Id"
-              dense
-              maxlength="5"
-              min
-              mask="#####"
-              lazy-rules
-              :rules="[
-                (val) => !!val || 'Favor de ingresar el Id',
-                (val) =>
-                  (!!val && val.length >= 5) || 'Please use maximum 5 character'
-              ]"
-              :readonly="idReadonly"
-              autofocus
-            />
+          <div class="row">
+            <div class="col q-mr-xs">
+              <q-input
+                v-model="editedFormItem.id"
+                type="text"
+                label="Id"
+                placeholder="Favor de ingresar el Id"
+                dense
+                maxlength="6"
+                min
+                mask="######"
+                lazy-rules
+                :rules="[
+                  (val) => !!val || 'Favor de ingresar el Id',
+                  (val) =>
+                    (!!val && val.length >= 6) ||
+                    'Please use maximum 5 character'
+                ]"
+                :readonly="isReadonly"
+                autofocus
+                outlined
+                color="secondary"
+              />
+            </div>
+            <div class="col q-ml-xs">
+              <q-input
+                v-model="editedFormItem.subnivel"
+                type="text"
+                label="Subnivel"
+                dense
+                readonly
+                outlined
+                color="secondary"
+              />
+            </div>
           </div>
           <div>
             <q-input
@@ -47,29 +74,11 @@
                   (val && val.length > 0) ||
                   'Favor de ingresar el nombre de la Cuenta Contable'
               ]"
+              outlined
+              color="secondary"
             />
           </div>
-          <div class="row">
-            <div class="col">
-              <q-input
-                v-model="editedFormItem.subnivel"
-                type="text"
-                label="Subnivel"
-                dense
-                readonly
-              />
-            </div>
-            <!-- <div class="col">
-              <q-input
-                v-model="editedFormItem.padreId"
-                type="text"
-                label="Cuenta Padre"
-                dense
-                readonly
-              />
-            </div> -->
-          </div>
-
+          <div></div>
           <div>
             <q-select
               v-model="editedFormItem.tipoAfectacion"
@@ -83,6 +92,9 @@
                   (val && val.length > 0) ||
                   'Favor de ingresar el tipo de afectación de la cuenta contable'
               ]"
+              outlined
+              color="secondary"
+              dense
             />
           </div>
         </div>
@@ -90,11 +102,11 @@
           <q-btn
             label="Cancelar"
             v-close-popup
-            color="negative"
+            color="secondary"
             flat
             class="q-ml-sm"
           />
-          <q-btn :label="lblSubmit" type="submit" color="positive" />
+          <q-btn :label="lblSubmit" type="submit" color="primary" />
         </div>
       </q-form>
     </q-card-section>
@@ -171,7 +183,7 @@ const lblSubmit = computed({
   }
 })
 
-const idReadonly = computed({
+const isReadonly = computed({
   get() {
     return props.editedItem.action === 'edit' ? true : false
   }

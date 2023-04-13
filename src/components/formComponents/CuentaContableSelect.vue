@@ -2,7 +2,8 @@
   <div class="row q-gutter-x-sm">
     <div class="col">
       <q-select
-        filled
+        outlined
+        color="secondary"
         v-model="cuentaContable"
         :options="filteredOptions"
         option-label="nombreCompleto"
@@ -18,6 +19,7 @@
         fill-input
         lazy-rules
         :rules="[(val) => !!val || 'requerido']"
+        :readonly="props.readonly"
       >
         <template v-slot:no-option>
           <q-item>
@@ -26,7 +28,7 @@
         </template>
       </q-select>
     </div>
-    <div class="q-mt-xs" style="border: 0px solid red">
+    <div class="q-mt-xs" style="border: 0px solid red" v-if="!props.readonly">
       <q-btn
         color="accent"
         outline
@@ -90,6 +92,11 @@ const props = defineProps({
     type: String,
     required: false,
     default: 'Cuenta Contable'
+  },
+  readonly: {
+    type: Boolean,
+    required: false,
+    default: false
   }
 })
 /**

@@ -1,5 +1,5 @@
 <template>
-  <div class="row text-h5 text-contrast q-pa-md font-subtitle">
+  <div class="row text-h5 text-secondary q-pa-md font-subtitle">
     CUENTAS CONTABLES
   </div>
   <div class="column items-center" style="border: 0px solid red">
@@ -57,16 +57,14 @@
                     'text-weight-regular text-primary-dark':
                       props.node.subnivel == 0
                   }"
-                  >{{ props.node.label }}(<span
-                    class="text-contrast text-caption"
-                    >{{
-                      props.node.tipoAfectacion == 'C'
-                        ? 'Cargo'
-                        : props.node.tipoAfectacion == 'A'
-                        ? 'Abono'
-                        : props.node.tipoAfectacion
-                    }}</span
-                  >)
+                  >{{ props.node.label
+                  }}<span class="text-primary text-caption">{{
+                    props.node.tipoAfectacion == 'C'
+                      ? ' (Cargo)'
+                      : props.node.tipoAfectacion == 'A'
+                      ? ' (Abono)'
+                      : props.node.tipoAfectacion
+                  }}</span>
                   <!-- <span class="text-weight-light text-caption">
                 &nbsp;--------------&nbsp; &nbsp;-----&nbsp;&nbsp;-----&nbsp;
                 {{
@@ -88,13 +86,13 @@
               }}</span>
             </div> -->
               </div>
-              <q-menu touch-position context-menu>
+              <q-menu touch-position context-menu class="text-primary">
                 <q-list dense style="min-width: 100px">
                   <q-item
                     v-if="props.node.subnivel != 0"
                     clickable
                     v-close-popup
-                    @click="addItem(props)"
+                    @click="addRow(props)"
                   >
                     <q-item-section
                       >Agregar Sub-Cuenta Contable a "{{
@@ -223,47 +221,6 @@ const itemToDelete = ref({
   item: null
 })
 
-const columns = [
-  { name: 'id', label: 'Id', field: 'id', sortable: true, align: 'left' },
-  {
-    name: 'nombre',
-    label: 'Nombre',
-    field: 'nombre',
-    sortable: true,
-    align: 'left'
-  },
-  {
-    name: 'subnivel',
-    label: 'Subnivel',
-    field: 'subnivel',
-    sortable: true,
-    align: 'left'
-  },
-  {
-    name: 'padre',
-    label: 'Padre',
-    field: 'padreId',
-    // field: (row) => `${row.cuentaContable.id} - ${row.cuentaContable.nombre}`,
-    sortable: true,
-    align: 'left'
-  },
-  {
-    name: 'tipoAfectacion',
-    label: 'Tipo Afectacion',
-    field: 'tipoAfectacion',
-    // field: (row) => `${row.tipoCuentaContable.nombre}`,
-    sortable: true,
-    align: 'left'
-  },
-  {
-    name: 'acciones',
-    label: 'Acciones',
-    field: 'action',
-    sortable: false,
-    align: 'center'
-  }
-]
-
 /**
  * computed
  */
@@ -280,29 +237,30 @@ const arbolCuentas = computed({
 /**
  * METHODS
  */
-function addItem(item_padre) {
-  console.log('Agregando Item  al padre:', item_padre.node)
-  console.log('subnivel:', item_padre.node.subnivel)
+function addRow(item_padre) {
+  // console.log('Agregando Item  al padre:', item_padre.node)
+  // console.log('subnivel:', item_padre.node.subnivel)
   const subnivel_padre = item_padre.node.subnivel
 
   const begin_cta_padre = item_padre.node.id
     .toString()
-    .substring(0, 4 - subnivel_padre)
-  console.log('begin_cta_padre:', begin_cta_padre)
+    .substring(0, 5 - subnivel_padre)
+  // console.log('begin_cta_padre:', begin_cta_padre)
 
   const numero_hijos = !!item_padre.node.children
     ? item_padre.node.children.length
     : 0
-  console.log('numero de hijos', numero_hijos)
+  // console.log('numero de hijos', numero_hijos)
   let id = ''
   if (subnivel_padre < 2 && numero_hijos > 0) {
     const last_item = item_padre.node.children[numero_hijos - 1]
-    console.log('last item encontrado', last_item)
+    // console.log('last item encontrado', last_item)
     id = parseInt(last_item.id) + 1
   } else {
     id = begin_cta_padre.toString()
   }
 
+  console.log('id', id)
   editedItem.value = {
     action: 'add',
     id: id.toString(),
@@ -482,7 +440,7 @@ watch(loadingArbol, (newValue, oldValue) => {
   color: #010b24;
 }
 .encabezado {
-  background-color: $primary;
-  color: $contrast;
+  background-color: $secondary-light;
+  color: $primary;
 }
 </style>

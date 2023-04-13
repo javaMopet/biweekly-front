@@ -7,7 +7,7 @@
         :inset-level="nivel / 2"
         dense
         :to="'/' + ruta"
-        active-class="text-orange"
+        active-class="text-secondary"
       >
         <q-item-section avatar>
           <q-icon :name="icono" />
@@ -75,3 +75,4 @@ export default {
   }
 }
 </script>
+<style lang="scss" scoped></style>
