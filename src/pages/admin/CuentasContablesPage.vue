@@ -146,7 +146,7 @@
                     clickable
                     v-close-popup
                     @click="deleteItem(props)"
-                    class="bg-warning text-dark"
+                    class="bg-negative text-white"
                   >
                     <q-item-section
                       >Eliminar {{ props.node.id }}

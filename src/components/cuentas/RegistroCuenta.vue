@@ -1,10 +1,17 @@
 <template>
   <q-card class="my-card" style="width: 550px">
     <q-card-section class="bg-primary text-accent-light">
-      {{ actionName }}
-      <!-- <pre>{{ editedIndex }}</pre> -->
-      <pre>{{ editedFormItem }}</pre>
-      <!-- <pre>{{ cuentaContableProps }}</pre> -->
+      <q-btn
+        round
+        flat
+        dense
+        icon="close"
+        class="float-right"
+        color="accent"
+        v-close-popup
+        vertical-top
+      ></q-btn>
+      <div class="text-subtitle1 text-accent-light">{{ actionName }}</div>
     </q-card-section>
 
     <q-card-section class="">
@@ -32,7 +39,8 @@
                   type="text"
                   label="Nombre"
                   dense
-                  filled
+                  outlined
+                  color="secondary"
                   autofocus
                   lazy-rules
                   :rules="[
@@ -56,7 +64,8 @@
                   type="text"
                   label="Descripcion"
                   dense
-                  filled
+                  outlined
+                  color="secondary"
                   lazy-rules
                   :rules="[
                     (val) =>
@@ -222,6 +231,7 @@ const lblSubmit = computed({
  */
 onMounted(() => {
   // cargarTiposCuenta()
+  obtenerCuentasContables(editedFormItem.value.tipoCuenta.id.toString())
 })
 /**
  * methods
@@ -253,11 +263,14 @@ function saveItem() {
   }
 }
 function tipoCuentaUpdated(value) {
+  obtenerCuentasContables(value)
+}
+function obtenerCuentasContables(value) {
   console.log('tipo ade cuenta acutalizado', value)
   switch (value) {
     case '1':
       cuentaContableProps.tipoAfectacion = 'C'
-      cuentaContableProps.clasificacion = ''
+      cuentaContableProps.clasificacion = '112'
       break
     case '2':
       cuentaContableProps.tipoAfectacion = 'C'
@@ -265,7 +278,7 @@ function tipoCuentaUpdated(value) {
       break
     case '3':
       cuentaContableProps.tipoAfectacion = 'A'
-      cuentaContableProps.clasificacion = ''
+      cuentaContableProps.clasificacion = '212'
       break
     default:
       break

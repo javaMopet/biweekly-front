@@ -45,7 +45,6 @@
                     'Please use maximum 5 character'
                 ]"
                 :readonly="isReadonly"
-                autofocus
                 outlined
                 color="secondary"
               />
@@ -69,6 +68,7 @@
               label="Nombre"
               dense
               lazy-rules
+              autofocus
               :rules="[
                 (val) =>
                   (val && val.length > 0) ||

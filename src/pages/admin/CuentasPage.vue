@@ -1,6 +1,6 @@
 <template>
-  <div class="column" style="border: 1px solid red">
-    <div class="row text-h5 text-contrast q-pa-md font-subtitle">CUENTAS</div>
+  <div class="column q-ma-md" style="border: 0px solid red">
+    <div class="row text-h5 text-secondary q-pa-md font-subtitle">CUENTAS</div>
     <div class="row fit" style="border: 0px solid red">
       <q-table
         grid
@@ -11,21 +11,15 @@
         row-key="id"
         :filter="filter"
         :rows-per-page-options="[0]"
+        hide-pagination
       >
         <template v-slot:top-left>
-          <!-- <q-btn
-          label="Nueva cuenta"
-          color="primary"
-          class=""
-          @click="addRow()"
-          icon="queue"
-        /> -->
           <q-btn-dropdown
             split
             icon="add"
             label="AGREGAR"
             color="primary"
-            @click="addRow(0)"
+            @click="addRow(1)"
           >
             <q-list>
               <q-item clickable v-close-popup @click="addRow(1)">
@@ -62,7 +56,7 @@
             dense
             debounce="300"
             v-model="filter"
-            placeholder="Buscar"
+            placeholder="Buscar Cuenta"
           >
             <template v-slot:append>
               <q-icon name="search" />
@@ -74,8 +68,8 @@
             <q-card-section
               :class="{
                 'bg-dark': props.row.tipoCuenta.id === '1',
-                'bg-contrast ': props.row.tipoCuenta.id === '2',
-                'bg-secondary': props.row.tipoCuenta.id === '3',
+                'bg-accent ': props.row.tipoCuenta.id === '2',
+                'bg-accent': props.row.tipoCuenta.id === '3',
                 'text-white': true
               }"
             >
@@ -88,7 +82,7 @@
                   :class="{
                     'text-accent-contrast': props.row.tipoCuenta.id === '1',
                     'text-yellow-3': props.row.tipoCuenta.id === '2',
-                    'text-accent-light': props.row.tipoCuenta.id === '3',
+                    'text-accent-contrast': props.row.tipoCuenta.id === '3',
                     'col-auto column items-center q-mx-md': true
                   }"
                 >
@@ -202,7 +196,8 @@ const defaultItem = {
   descripcion: null,
   tipoCuenta: {
     id: null
-  }
+  },
+  cuentaContable: null
 }
 // const listaCuentas = ref([])
 const filter = ref()
