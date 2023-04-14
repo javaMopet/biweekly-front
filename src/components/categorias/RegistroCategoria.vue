@@ -1,9 +1,17 @@
 <template>
   <q-card class="my-card" style="width: 400px">
     <q-card-section class="bg-primary text-accent-light text-subtitle1">
-      {{ actionName }}
-      <!-- <pre>{{ editedFormItem.icono }}</pre> -->
-      <pre>{{ props.editedIndex }}</pre>
+      <q-btn
+        round
+        flat
+        dense
+        icon="close"
+        class="float-right"
+        color="accent"
+        v-close-popup
+        vertical-top
+      ></q-btn>
+      <div class="text-subtitle1 text-accent-light">{{ actionName }}</div>
     </q-card-section>
 
     <q-card-section class="">
@@ -13,10 +21,9 @@
             v-model="editedFormItem.tipoMovimientoId"
             toggle-color="accent-contrast"
             :options="tiposMovimientoOptions"
-            rounded
+            color="primary"
             spread
             no-caps
-            color="accent"
           />
           <div class="q-pt-md">
             <div class="row q-gutter-x-md">
@@ -36,7 +43,8 @@
                   type="text"
                   label="Nombre"
                   dense
-                  filled
+                  outlined
+                  color="secondary"
                   autofocus
                   :rules="[(val) => !!val || 'Favor de ingresar el nombre']"
                   lazyRules
@@ -50,63 +58,13 @@
               type="text"
               label="Descripcion"
               dense
-              filled
+              outlined
+              color="secondary"
               :rules="[(val) => !!val || 'Favor de ingresar la descripción']"
               lazyRules
             />
           </div>
-          <div>
-            <div style="border: 0px solid red">
-              <q-input
-                filled
-                v-model="editedFormItem.color"
-                :rules="['anyColor']"
-                hint="Selecciona un color para la categoría"
-                class="my-input"
-                style="min-width: 100%"
-                dense
-              >
-                <template #after>
-                  <div
-                    :style="{
-                      backgroundColor: `${editedFormItem.color}`,
-                      height: 55 + 'px',
-                      width: 55 + 'px'
-                    }"
-                  >
-                    &nbsp;
-                  </div>
-                </template>
-                <template v-slot:append>
-                  <q-icon name="colorize" class="cursor-pointer">
-                    <q-popup-proxy
-                      cover
-                      transition-show="scale"
-                      transition-hide="scale"
-                      ref="ppproxy"
-                    >
-                      <q-color
-                        v-model="editedFormItem.color"
-                        no-footer
-                        :palette="[
-                          '#019A9D',
-                          '#D9B801',
-                          '#E8045A',
-                          '#B2028A',
-                          '#2A0449',
-                          '#019A9D',
-                          '#1ad560'
-                        ]"
-                        default-view="palette"
-                        class="my-picker"
-                        @update:model-value="colorSelecionado"
-                      />
-                    </q-popup-proxy>
-                  </q-icon>
-                </template>
-              </q-input>
-            </div>
-          </div>
+          <div></div>
           <div>
             <div class="col">
               <CuentaContableSelect
@@ -118,11 +76,94 @@
             </div>
           </div>
           <div class="">
+            <!-- <q-input
+              v-model="editedFormItem.importe"
+              label="Importe"
+              dense
+              :rules="[(val) => !!val || 'Favor de ingresar el importe']"
+              lazyRules
+              outlined
+              color="secondary"
+              mask="#.##"
+              fill-mask
+              reverse-fill-mask
+              hint="Este importe se tomará por defecto al agreagar un movimiento"
+              input-class="text-right"
+            >
+              <template #prepend> $ </template>
+            </q-input> -->
+            <div class="row" style="border: 0px solid red">
+              <div class="col">
+                <q-input
+                  outlined
+                  color="secondary"
+                  v-model="editedFormItem.color"
+                  :rules="['anyColor']"
+                  class="my-input"
+                  style="min-width: 100%"
+                  dense
+                >
+                  <template #after>
+                    <div
+                      :style="{
+                        backgroundColor: `${editedFormItem.color}`,
+                        height: 55 + 'px',
+                        width: 55 + 'px'
+                      }"
+                    >
+                      &nbsp;
+                    </div>
+                  </template>
+                  <template v-slot:append>
+                    <q-icon name="colorize" class="cursor-pointer">
+                      <q-popup-proxy
+                        cover
+                        transition-show="scale"
+                        transition-hide="scale"
+                        ref="ppproxy"
+                      >
+                        <q-color
+                          v-model="editedFormItem.color"
+                          no-footer
+                          :palette="[
+                            '#019A9D',
+                            '#D9B801',
+                            '#E8045A',
+                            '#B2028A',
+                            '#2A0449',
+                            '#019A9D',
+                            '#1ad560'
+                          ]"
+                          default-view="palette"
+                          class="my-picker"
+                          @update:model-value="colorSelecionado"
+                        />
+                      </q-popup-proxy>
+                    </q-icon>
+                  </template>
+                </q-input>
+              </div>
+              <div class="col">
+                <q-input
+                  v-model="editedFormItem.importe"
+                  type="text"
+                  label="Importe"
+                  outlined
+                  color="secondary"
+                  dense
+                  input-class="text-right"
+                >
+                  <template #prepend> $ </template>
+                </q-input>
+              </div>
+            </div>
+          </div>
+          <div class="">
             <CuentaSelect
               v-model="editedFormItem.cuenta"
               :opcional="true"
               label="Cuenta Bancaria por Defecto"
-              hint="Esta cuenta se tomará por Default al agregar un movimiento"
+              hint="Esta cuenta se tomará por defecto al agregar un movimiento"
             ></CuentaSelect>
           </div>
         </div>
@@ -270,6 +311,7 @@ function saveItem() {
   const cuenta_id = editedFormItem.value.cuenta?.id
   const input = {
     ...editedFormItem.value,
+    importe: parseFloat(editedFormItem.value.importe),
     cuentaContableId: parseInt(cuenta_contable_id),
     cuentaId: parseInt(cuenta_id),
     tipoMovimientoId: parseInt(editedFormItem.value.tipoMovimientoId),
@@ -278,6 +320,7 @@ function saveItem() {
     cuenta: undefined,
     __typename: undefined
   }
+  console.log('guardando item:', input)
   if (!editedFormItem.value.id) {
     console.log('guardando categoria nueva', input)
     createCategoria({

@@ -8,6 +8,7 @@ export const LISTA_CATEGORIAS = gql`
       descripcion
       color
       icono
+      importe
       cuentaContable {
         id
         nombre
@@ -18,6 +19,10 @@ export const LISTA_CATEGORIAS = gql`
         id
         nombre
         value
+      }
+      cuenta {
+        id
+        nombre
       }
     }
   }
@@ -32,6 +37,7 @@ export const CATEGORIA_CREATE = gql`
         descripcion
         color
         icono
+        importe
         cuentaContable {
           id
           nombre
@@ -42,6 +48,10 @@ export const CATEGORIA_CREATE = gql`
           id
           nombre
           value
+        }
+        cuenta {
+          id
+          nombre
         }
       }
     }
@@ -56,6 +66,7 @@ export const CATEGORIA_UPDATE = gql`
         descripcion
         color
         icono
+        importe
         cuentaContable {
           id
           nombre
@@ -66,6 +77,10 @@ export const CATEGORIA_UPDATE = gql`
           id
           nombre
           value
+        }
+        cuenta {
+          id
+          nombre
         }
       }
     }
@@ -81,6 +96,7 @@ export const CATEGORIA_DELETE = gql`
         descripcion
         color
         icono
+        importe
         cuentaContable {
           id
           nombre
@@ -90,6 +106,10 @@ export const CATEGORIA_DELETE = gql`
           id
           nombre
           value
+        }
+        cuenta {
+          id
+          nombre
         }
       }
     }

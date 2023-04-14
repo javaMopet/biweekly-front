@@ -300,6 +300,7 @@ function editRow(item) {
     ...item.row,
     tipoMovimientoId: item.row.tipoMovimiento.id
   }
+  console.log('item', editedItem.value)
   editedIndex.value = item.rowIndex
   showFormItem.value = true
 }

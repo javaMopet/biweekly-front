@@ -3,7 +3,8 @@
   <div class="row q-gutter-x-sm">
     <div class="col">
       <q-select
-        filled
+        outlined
+        color="secondary"
         v-model="categoria"
         :options="filteredOptions"
         option-label="nombre"

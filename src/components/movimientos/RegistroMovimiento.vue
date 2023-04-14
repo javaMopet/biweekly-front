@@ -1,10 +1,17 @@
 <template>
-  <q-card class="my-card" style="width: 400px">
-    <q-card-section class="bg-primary text-white text-subtitle1">
-      {{ actionName }}
-      <!-- <pre>{{ props.editedItem }}</pre>
-      <pre>{{ editedFormItem.tipoMovimientoId }}</pre> -->
-      <!-- <pre>{{ editedFormItem }}</pre> -->
+  <q-card class="my-card" style="width: 520px">
+    <q-card-section class="bg-primary text-accent-light text-subtitle1">
+      <q-btn
+        round
+        flat
+        dense
+        icon="close"
+        class="float-right"
+        color="accent"
+        v-close-popup
+        vertical-top
+      ></q-btn>
+      <div class="text-subtitle1 text-accent-light">{{ actionName }}</div>
     </q-card-section>
 
     <q-card-section>
@@ -12,47 +19,38 @@
         <div class="">
           <q-btn-toggle
             v-model="editedFormItem.tipoMovimientoId"
-            rounded
             spread
             no-caps
-            color="accent"
-            toggle-color="accent-contrast"
+            color="primary"
+            toggle-color="accent"
+            toggle-text-color="accent-contrast"
             :options="tiposMovimientoOptions"
-            @update:model-value="tipoMovimientoChange"
+            @update:model-value="onChangeTipoMovimiento"
+            push
+            glossy
           />
         </div>
-        <div>
-          <!-- <q-btn-toggle
-            name="tipoMovimiento"
-            rounded
-            unelevated
-            spread
-            no-caps
-            v-model="editedFormItem.tipoMovimientoId"
-            color="primary"
-            toggle-color="accent-contrast"
-            toggle-text-color="white"
-            label="nombre"
-            :options="tiposMovimientoOptions"
-            @update:model-value="tipoMovimientoChange"
-          /> -->
-        </div>
+        <div></div>
 
         <div class="">
           <CategoriaSelect
             v-model="editedFormItem.detallesMovimiento[0].categoria"
             :tipoMovimientoId="editedFormItem.tipoMovimientoId"
+            @update:model-value="onChangeCategoria"
           ></CategoriaSelect>
+          <CuentaSelect
+            v-model="editedFormItem.detallesMovimiento[0].cuenta"
+            label="Cuenta Origen"
+          ></CuentaSelect>
         </div>
         <div class="row">
-          <div class="col q-px-md">
-            <div class="col">
-              <DateInput
-                v-model="editedFormItem.date"
-                lbl_field="Fecha"
-              ></DateInput>
-            </div>
+          <div class="col">
+            <DateInput
+              v-model="editedFormItem.date"
+              lbl_field="Fecha"
+            ></DateInput>
           </div>
+
           <div class="col">
             <q-input
               v-model="editedFormItem.detallesMovimiento[0].importe"
@@ -85,11 +83,13 @@
             label="Obsevaciones"
             dense
             rows="3"
+            outlined
+            color="secondary"
           />
         </div>
         <div class="col row justify-end q-gutter-x-md">
-          <q-btn label="Cancelar" color="primary" flat v-close-popup dense />
-          <q-btn :label="lblSubmit" dense type="submit" color="primary" />
+          <q-btn label="Cancelar" color="negative" flat v-close-popup dense />
+          <q-btn :label="lblSubmit" dense type="submit" color="positive" />
         </div>
       </q-form>
     </q-card-section>
@@ -199,7 +199,7 @@ const actionName = computed({
   get() {
     return !!editedFormItem.value.id
       ? 'Actualizar Movimiento'
-      : 'Nueva Movimiento'
+      : 'Nuevo Movimiento'
   }
 })
 const lblSubmit = computed({
@@ -212,9 +212,10 @@ const lblSubmit = computed({
  * METHODS
  */
 
-function tipoMovimientoChange(value) {
-  // console.log('cambio en el tipo de movimiento', value)
-  // editedFormItem.value.detallesMovimiento[0].categoria = null
+function onChangeTipoMovimiento(value) {
+  console.log('cambio en el tipo de movimiento', value)
+
+  editedFormItem.value.detallesMovimiento[0].categoria = null
   // if (value === '1') {
   //   console.log('Cargar categorias de ingreso')
   //   // categorias
@@ -235,6 +236,15 @@ function tipoMovimientoChange(value) {
   //     clasificacion: ''
   //   })
   // }
+}
+function formByTipoMovimiento(tipoMovimientoId) {
+  switch (tipoMovimientoId) {
+    case value:
+      break
+
+    default:
+      break
+  }
 }
 function saveItem() {
   console.log('save item')
@@ -303,6 +313,16 @@ function saveItem() {
 
 function registrarCuentaContable() {
   console.log('registrar una cuenta contable')
+}
+function onChangeCategoria() {
+  console.log(
+    'Cambio de categoria',
+    editedFormItem.value.detallesMovimiento[0].categoria
+  )
+  const categoria = editedFormItem.value.detallesMovimiento[0].categoria
+  const importe = categoria?.importe || 0.0
+  console.log('importe', importe)
+  editedFormItem.value.detallesMovimiento[0].importe = importe
 }
 /**
  * GRAPHQL

@@ -78,6 +78,8 @@ export const LISTA_TIPOS_MOVIMIENTO = gql`
       nombre
       label
       value
+      icon
+      icono
     }
   }
 `

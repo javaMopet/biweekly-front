@@ -1,5 +1,11 @@
 <template>
-  <q-input v-model="valor_fecha" dense filled :label="lbl_field">
+  <q-input
+    v-model="valor_fecha"
+    dense
+    outlined
+    color="secondary"
+    :label="lbl_field"
+  >
     <template v-slot:append>
       <q-icon name="event" class="cursor-pointer">
         <q-popup-proxy

@@ -78,10 +78,29 @@
           @click="addRow()"
           icon="queue"
         /> -->
-        <div class="q-pa-md">
-          <q-btn-dropdown color="accent" label="NUEVO">
+        <div class="row q-pa-md q-gutter-x-lg">
+          <q-btn-dropdown
+            split
+            icon="add"
+            color="primary"
+            label="AGREGAR"
+            @click="addItem('2')"
+            dense
+          >
             <q-list>
-              <q-item clickable v-close-popup @click="addIngreso">
+              <q-item clickable v-close-popup @click="addItem('2')">
+                <q-item-section avatar>
+                  <q-avatar
+                    color="negative"
+                    text-color="white"
+                    icon="arrow_downward"
+                  ></q-avatar>
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label>Gasto</q-item-label>
+                </q-item-section>
+              </q-item>
+              <q-item clickable v-close-popup @click="addItem('1')">
                 <q-item-section avatar>
                   <q-avatar
                     color="positive"
@@ -95,20 +114,7 @@
                 </q-item-section>
               </q-item>
 
-              <q-item clickable v-close-popup @click="addGasto">
-                <q-item-section avatar>
-                  <q-avatar
-                    color="negative"
-                    text-color="white"
-                    icon="arrow_downward"
-                  ></q-avatar>
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label>Gasto</q-item-label>
-                </q-item-section>
-              </q-item>
-
-              <q-item clickable v-close-popup @click="addTransferencia">
+              <q-item clickable v-close-popup @click="addItem('3')">
                 <q-item-section avatar>
                   <q-avatar
                     color="blue-5"
@@ -122,6 +128,22 @@
               </q-item>
             </q-list>
           </q-btn-dropdown>
+          <q-select
+            v-model="periodo"
+            :options="periodoOptions"
+            option-label="nombre"
+            label="Periodo"
+            outlined
+            dense
+          />
+          <q-select
+            v-model="mes"
+            :options="mesOptions"
+            option-label="nombre"
+            label="Mes"
+            outlined
+            dense
+          />
         </div>
         <!-- <div class="q-pa-md">
           <q-btn-dropdown
@@ -294,6 +316,28 @@ const defaultItem = {
   //   descripcion: ''
   // }
 }
+
+const periodoOptions = ref([
+  { id: 1, nombre: 'Quincenal' },
+  { id: 2, nombre: 'Mensual' }
+])
+const periodo = ref(periodoOptions.value[0])
+const mesOptions = ref([
+  { id: 1, nombre: 'Enero' },
+  { id: 2, nombre: 'Febrero' },
+  { id: 3, nombre: 'Marzo' },
+  { id: 4, nombre: 'Abril' },
+  { id: 5, nombre: 'Mayo' },
+  { id: 6, nombre: 'Junio' },
+  { id: 7, nombre: 'Julio' },
+  { id: 8, nombre: 'Agosto' },
+  { id: 9, nombre: 'Septiembre' },
+  { id: 10, nombre: 'Octubre' },
+  { id: 11, nombre: 'Noviembre' },
+  { id: 12, nombre: 'Diciembre' }
+])
+const mes = ref(mesOptions.value[0])
+
 const listaMovimientos = ref([])
 const filter = ref()
 const editedItem = ref({ ...defaultItem })
@@ -370,18 +414,7 @@ onMounted(() => {})
  * METHODS
  */
 
-function addIngreso(event) {
-  console.log('Agregando un ingreso', event)
-  addRow('1')
-}
-function addGasto(event) {
-  console.log('Agregando un egreso', event)
-  addRow('2')
-}
-function addTransferencia() {
-  addRow('3')
-}
-function addRow(tipo_movimiento) {
+function addItem(tipo_movimiento) {
   editedItem.value = { ...defaultItem, tipoMovimientoId: tipo_movimiento }
   editedIndex.value = null
   showFormItem.value = true
