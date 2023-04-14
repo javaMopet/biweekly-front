@@ -39,7 +39,7 @@
           style="width: 800px"
           no-connectors
           :filter="filter"
-          loa
+          class="font-tree"
         >
           <template v-slot:default-header="props">
             <div
@@ -431,10 +431,16 @@ watch(loadingArbol, (newValue, oldValue) => {
 </script>
 
 <style lang="scss" scoped>
+.font-tree {
+  // font-family: 'Chivo Mono', monospace;
+  font-family: 'Mulish', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
 .active {
-  // background-color: rgb(22, 39, 39);
+  background-color: #fcf6f2;
   // color: rgb(250, 225, 188) !important;
-  color: rgb(0, 52, 224) !important;
+  color: #984603 !important;
 }
 .text-primary-dark {
   color: #010b24;

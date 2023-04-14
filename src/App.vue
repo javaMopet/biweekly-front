@@ -22,6 +22,7 @@ body {
   // font-family: 'Sen', sans-serif;
   // font-family: 'IBM Plex Sans Condensed', sans-serif;
   font-family: 'Roboto Flex', sans-serif;
+  // font-family: 'Chivo Mono', monospace;
   // font-size: 0.95rem;
   // background-color: #e5e8f0 !important;
   color: primary;
