@@ -20,12 +20,15 @@
           <div class="">
             <q-btn-toggle
               v-model="editedFormItem.tipoCuenta.id"
-              toggle-color="accent-contrast"
-              :options="tiposCuentaOptions"
+              spread
               no-caps
               color="primary"
-              spread
+              toggle-color="accent"
+              toggle-text-color="accent-contrast"
+              :options="tiposCuentaOptions"
               @update:model-value="tipoCuentaUpdated"
+              push
+              glossy
             />
           </div>
           <div class="column items-center" style="border: 0px solid red">

@@ -13,6 +13,7 @@
   "dependencies": {
     "@quasar/extras": "^1.15.6",
     "@vue/apollo-composable": "^4.0.0-beta.4",
+    "accounting-js": "^1.1.1",
     "axios": "^0.21.1",
     "dotenv": "^16.0.3",
     "dotenv-expand": "^9.0.0",

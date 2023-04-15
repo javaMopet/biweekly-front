@@ -4,8 +4,8 @@
       <q-toolbar>
         <q-btn dense flat round icon="menu" @click="toggleLeftDrawer" />
 
-        <q-toolbar-title class="font-title text-h2">
-          <span class="font-title-letter text-secondary text-h4">B</span>iweekly
+        <q-toolbar-title class="font-title">
+          <span class="font-title-letter text-secondary">B</span>iweekly
           Application
         </q-toolbar-title>
         <span class="q-pr-sm" v-if="user">{{ user.email }}</span>
@@ -132,11 +132,11 @@ function onClickAccount() {}
 <style lang="scss">
 .font-title {
   font-family: 'Lobster Two', cursive;
-  font-size: 1.8rem;
+  font-size: 1.5rem;
 }
 .font-title-letter {
   font-family: 'Lobster Two', cursive;
-  font-size: 2rem !important;
+  font-size: 1.7rem !important;
 }
 .font-subtitle {
   //   font-family: 'Lobster Two', cursive;

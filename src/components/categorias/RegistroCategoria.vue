@@ -19,11 +19,15 @@
         <div class="q-gutter-md">
           <q-btn-toggle
             v-model="editedFormItem.tipoMovimientoId"
-            toggle-color="accent-contrast"
-            :options="tiposMovimientoOptions"
-            color="primary"
             spread
             no-caps
+            color="primary"
+            toggle-color="accent"
+            toggle-text-color="accent-contrast"
+            :options="tiposMovimientoOptions"
+            @update:model-value="onChangeTipoMovimiento"
+            push
+            glossy
           />
           <div class="q-pt-md">
             <div class="row q-gutter-x-md">
@@ -75,6 +79,7 @@
               ></CuentaContableSelect>
             </div>
           </div>
+
           <div class="">
             <!-- <q-input
               v-model="editedFormItem.importe"
@@ -144,7 +149,7 @@
                 </q-input>
               </div>
               <div class="col">
-                <q-input
+                <!-- <q-input
                   v-model="editedFormItem.importe"
                   type="text"
                   label="Importe"
@@ -154,7 +159,11 @@
                   input-class="text-right"
                 >
                   <template #prepend> $ </template>
-                </q-input>
+                </q-input> -->
+                <PriceInput
+                  currency-code="MNX"
+                  v-model="precioMovimiento"
+                ></PriceInput>
               </div>
             </div>
           </div>
@@ -201,12 +210,14 @@
 
 <script setup>
 import { useQuery, useMutation } from '@vue/apollo-composable'
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import { CATEGORIA_CREATE, CATEGORIA_UPDATE } from '/src/graphql/categorias'
 import { LISTA_TIPOS_MOVIMIENTO } from 'src/graphql/movimientos'
 import IconPicker from '/src/components/IconPicker.vue'
 import CuentaContableSelect from '../formComponents/CuentaContableSelect.vue'
 import CuentaSelect from '../formComponents/CuentaSelect.vue'
+import PriceInput from '../formComponents/PriceInput.vue'
+
 /**
  * state
  */
@@ -223,7 +234,26 @@ const defaultItem = {
 const formItem = ref({ ...defaultItem })
 const cuentaContableSubnivel = ref(0)
 const ppproxy = ref(null)
+const amount = ref(123.45)
+const config = ref({
+  spinner: true,
+  step: 10,
+  min: -10,
+  max: 200,
+  prefix: '$ ',
+  suffix: ' MXN',
+  precision: 2,
+  decimal: '.',
+  thousands: ',',
+  template: 'bootstrap',
+  masked: true,
+  align: 'center'
+})
+const precioMovimiento = ref('1300')
 
+const example3 = ref({
+  currencyFormat: ''
+})
 /**
  * props
  */
@@ -334,6 +364,9 @@ function saveItem() {
       input
     })
   }
+}
+function onChangeTipoMovimiento(value) {
+  console.log('tipoMovimeinto', value)
 }
 
 /**
