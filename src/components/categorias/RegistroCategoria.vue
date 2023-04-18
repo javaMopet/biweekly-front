@@ -12,7 +12,7 @@
         vertical-top
       ></q-btn>
       <div class="text-subtitle1 text-accent-light">{{ actionName }}</div>
-      <pre>{{ editedFormItem }}</pre>
+      <!-- <pre>{{ editedFormItem }}</pre> -->
     </q-card-section>
 
     <q-card-section class="">

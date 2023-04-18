@@ -95,6 +95,8 @@ import {
   MOVIMIENTO_UPDATE
 } from '/src/graphql/movimientos'
 import { INGRESO_CREATE } from 'src/graphql/ingresos'
+import { EGRESO_CREATE } from 'src/graphql/egresos'
+import { TRANSFERENCIA_CREATE } from 'src/graphql/transferencias'
 
 import DateInput from '../formComponents/DateInput.vue'
 import CategoriaSelect from '../formComponents/CategoriaSelect.vue'
@@ -211,7 +213,7 @@ const lblSubmit = computed({
 })
 const isTransferencia = computed({
   get() {
-    return editedFormItem.value.tipoMovimientoId === '3'
+    return tipoMovimiento.value === '3'
   }
 })
 
@@ -313,18 +315,33 @@ function formByTipoMovimiento(tipoMovimientoId) {
 // }
 
 function saveItem() {
-  const input = { ...editedFormItem.value, fecha: obtenerFechaISO() }
+  const input = {
+    ...editedFormItem.value,
+    categoriaId: parseInt(editedFormItem.value.categoria.id),
+    categoria: undefined,
+    cuentaId: parseInt(editedFormItem.value.cuenta.id),
+    cuenta: undefined,
+    registro: {
+      importe: parseFloat(editedFormItem.value.registro.importe),
+      fecha: obtenerFechaISO()
+    },
+    date: undefined,
+    tipoMovimientoId: undefined
+  }
   console.log('saveItem input:', input)
   console.log('saveItem tipoMovimiento:', tipoMovimiento.value)
-  return
   switch (tipoMovimiento.value) {
     case '1':
       console.log('guardando ingreso')
       createIngreso({ input })
       break
     case '2':
+      console.log('guardando ingreso')
+      createEgreso({ input })
       break
     case '3':
+      console.log('guardando transferencia')
+      createTransferencia({ input })
       break
 
     default:
@@ -350,10 +367,11 @@ function onChangeCategoria() {
     editedFormItem.value.categoria
     // editedFormItem.value.detallesMovimiento[0].categoria
   )
-  // const categoria = editedFormItem.value.detallesMovimiento[0].categoria
-  // const importe = categoria?.importe || ''
-  // console.log('importe', importe)
-  // editedFormItem.value.detallesMovimiento[0].importe = importe.toString()
+  const categoria = editedFormItem.value.categoria
+  const importe = categoria?.importe || ''
+  console.log('importe', importe)
+  editedFormItem.value.registro.importe = importe.toString()
+  editedFormItem.value.cuenta = categoria?.cuenta
 }
 /**
  * GRAPHQL
@@ -369,6 +387,16 @@ const {
   onDone: onDoneCreateIngreso,
   onError: onErrorCreateIngreso
 } = useMutation(INGRESO_CREATE)
+const {
+  mutate: createEgreso,
+  onDone: onDoneCreateEgreso,
+  onError: onErrorCreateEgreso
+} = useMutation(EGRESO_CREATE)
+const {
+  mutate: createTransferencia,
+  onDone: onDoneCreateTransferencia,
+  onError: onErrorCreateTransferencia
+} = useMutation(TRANSFERENCIA_CREATE)
 
 // const { load: cargarCuentasContables, onResult: onResultCuentasContables } =
 //   useLazyQuery(LISTA_CUENTAS_CONTABLES)
@@ -419,10 +447,22 @@ onDoneUpdateMovimiento(({ data }) => {
 onDoneCreateIngreso(({ data }) => {
   console.log('Ingreso creado data', data)
 })
+onDoneCreateEgreso(({ data }) => {
+  console.log('Egreso creado data', data)
+})
+onDoneCreateTransferencia(({ data }) => {
+  console.log('Egreso creado data', data)
+})
 onErrorUpdateMovimiento((error) => {
   console.error(error)
 })
 onErrorCreateIngreso((error) => {
+  console.error(error)
+})
+onErrorCreateEgreso((error) => {
+  console.error(error)
+})
+onErrorCreateTransferencia((error) => {
   console.error(error)
 })
 </script>
