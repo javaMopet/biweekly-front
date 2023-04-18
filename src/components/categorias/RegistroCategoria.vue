@@ -12,6 +12,7 @@
         vertical-top
       ></q-btn>
       <div class="text-subtitle1 text-accent-light">{{ actionName }}</div>
+      <pre>{{ editedFormItem }}</pre>
     </q-card-section>
 
     <q-card-section class="">
@@ -79,26 +80,9 @@
               ></CuentaContableSelect>
             </div>
           </div>
-
           <div class="">
-            <!-- <q-input
-              v-model="editedFormItem.importe"
-              label="Importe"
-              dense
-              :rules="[(val) => !!val || 'Favor de ingresar el importe']"
-              lazyRules
-              outlined
-              color="secondary"
-              mask="#.##"
-              fill-mask
-              reverse-fill-mask
-              hint="Este importe se tomará por defecto al agreagar un movimiento"
-              input-class="text-right"
-            >
-              <template #prepend> $ </template>
-            </q-input> -->
             <div class="row" style="border: 0px solid red">
-              <div class="col">
+              <div class="col q-mr-xs">
                 <q-input
                   outlined
                   color="secondary"
@@ -108,12 +92,12 @@
                   style="min-width: 100%"
                   dense
                 >
-                  <template #after>
+                  <template #before>
                     <div
                       :style="{
                         backgroundColor: `${editedFormItem.color}`,
-                        height: 55 + 'px',
-                        width: 55 + 'px'
+                        height: 40 + 'px',
+                        width: 40 + 'px'
                       }"
                     >
                       &nbsp;
@@ -148,18 +132,7 @@
                   </template>
                 </q-input>
               </div>
-              <div class="col">
-                <!-- <q-input
-                  v-model="editedFormItem.importe"
-                  type="text"
-                  label="Importe"
-                  outlined
-                  color="secondary"
-                  dense
-                  input-class="text-right"
-                >
-                  <template #prepend> $ </template>
-                </q-input> -->
+              <div class="col q-ml-xs">
                 <PriceInput
                   currency-code="MNX"
                   v-model="editedFormItem.importe"
@@ -255,9 +228,6 @@ const precioMovimiento = computed({
   }
 })
 
-const example3 = ref({
-  currencyFormat: ''
-})
 /**
  * props
  */

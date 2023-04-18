@@ -144,9 +144,6 @@ var currenciesOpts = {
 }
 const currencies = ref(Object.assign({}, currenciesOpts))
 function setCurrency(code) {
-  console.log('setting currency', code)
-  console.log('setting currency', props.currencyCode)
-  console.log('setting currency', currencies.value)
   selectedCurrency.value = currencies.value[code] || {}
 }
 </script>
