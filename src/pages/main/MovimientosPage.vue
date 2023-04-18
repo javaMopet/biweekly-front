@@ -288,40 +288,24 @@ const sessionStore = useSessionStore()
  * state
  */
 const defaultItem = {
-  // id: null,
-  // importe: 1500,
-  // tipoAfectacion: 'C',
-  // tipoDetalle: 'N',
-
-  numero: null,
-  estadoMovimientoId: parseInt(2),
-  tipoMovimientoId: '',
-  fecha: null,
-  date: formato.formatoFecha(new Date()),
-  observaciones: '',
-  userId: sessionStore.getUserId(), //SessionStorage.getItem('user').id,
-  detallesMovimiento: [
-    {
-      importe: 0
-      // userId: sessionStore.getUserId()
-    },
-    {
-      cuenta: null
-    }
-  ]
-
-  // categoria: {
-  //   id: null,
-  //   nombre: '',
-  //   descripcion: ''
-  // }
+  categoria: null,
+  cuenta: null,
+  registro: {
+    estadoRegistroId: 2,
+    importe: '',
+    fecha: '',
+    date: formato.formatoFecha(new Date())
+  },
+  observaciones: ''
 }
 
 const periodoOptions = ref([
   { id: 1, nombre: 'Quincenal' },
   { id: 2, nombre: 'Mensual' }
 ])
+
 const periodo = ref(periodoOptions.value[0])
+
 const mesOptions = ref([
   { id: 1, nombre: 'Enero' },
   { id: 2, nombre: 'Febrero' },

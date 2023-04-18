@@ -1,7 +1,7 @@
 <template>
   <q-layout view="hHh LpR lFr">
     <q-header bordered class="bg-primary text-white">
-      <q-toolbar>
+      <q-toolbar class="text-h6">
         <q-btn dense flat round icon="menu" @click="toggleLeftDrawer" />
 
         <q-toolbar-title class="font-title">
@@ -9,7 +9,13 @@
           Application
         </q-toolbar-title>
         <span class="q-pr-sm" v-if="user">{{ user.email }}</span>
-        <q-btn icon="account_circle" @click="onClickAccount" flat round>
+        <q-btn
+          icon="account_circle"
+          @click="onClickAccount"
+          flat
+          round
+          size="1.2rem"
+        >
           <q-menu>
             <q-list style="min-width: 100px">
               <q-item clickable v-close-popup @click="logout">
@@ -132,7 +138,7 @@ function onClickAccount() {}
 <style lang="scss">
 .font-title {
   font-family: 'Lobster Two', cursive;
-  font-size: 1.5rem;
+  font-size: 1.8rem;
 }
 .font-title-letter {
   font-family: 'Lobster Two', cursive;

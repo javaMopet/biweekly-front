@@ -5,6 +5,8 @@
     outlined
     color="secondary"
     :label="lbl_field"
+    lazy-rules
+    :rules="[(val) => props.opcional || !!val || 'Favor de ingresar la fecha.']"
   >
     <template v-slot:append>
       <q-icon name="event" class="cursor-pointer">
@@ -58,6 +60,11 @@ const props = defineProps({
     type: String,
     default: '',
     required: true
+  },
+  optional: {
+    type: Boolean,
+    required: false,
+    default: true
   }
 })
 /**

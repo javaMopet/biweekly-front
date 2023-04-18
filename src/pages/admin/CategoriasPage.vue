@@ -298,6 +298,7 @@ function addRow() {
 function editRow(item) {
   editedItem.value = {
     ...item.row,
+    importe: item.row.importe.toString(),
     tipoMovimientoId: item.row.tipoMovimiento.id
   }
   console.log('item', editedItem.value)

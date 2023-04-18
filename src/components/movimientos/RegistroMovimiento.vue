@@ -12,13 +12,14 @@
         vertical-top
       ></q-btn>
       <div class="text-subtitle1 text-accent-light">{{ actionName }}</div>
+      <!-- <pre>{{ editedFormItem.detallesMovimiento[0] }}</pre> -->
     </q-card-section>
 
     <q-card-section>
       <q-form @submit="saveItem" class="q-gutter-md">
         <div class="">
           <q-btn-toggle
-            v-model="editedFormItem.tipoMovimientoId"
+            v-model="tipoMovimiento"
             spread
             no-caps
             color="primary"
@@ -33,47 +34,36 @@
         <div></div>
 
         <div class="">
-          <CategoriaSelect
-            v-model="editedFormItem.detallesMovimiento[0].categoria"
-            :tipoMovimientoId="editedFormItem.tipoMovimientoId"
-            @update:model-value="onChangeCategoria"
-          ></CategoriaSelect>
           <CuentaSelect
-            v-model="editedFormItem.detallesMovimiento[0].cuenta"
+            v-if="isTransferencia"
+            v-model="cuentaOrigen"
             label="Cuenta Origen"
           ></CuentaSelect>
+          <CategoriaSelect
+            v-else
+            v-model="editedFormItem.categoria"
+            :tipoMovimientoId="tipoMovimiento"
+            @update:model-value="onChangeCategoria"
+          ></CategoriaSelect>
         </div>
         <div class="row">
           <div class="col">
             <DateInput
-              v-model="editedFormItem.date"
+              v-model="editedFormItem.registro.date"
               lbl_field="Fecha"
+              :opcional="false"
             ></DateInput>
           </div>
-
           <div class="col">
-            <q-input
-              v-model="editedFormItem.detallesMovimiento[0].importe"
-              label="Importe"
-              dense
-              :rules="[(val) => !!val || 'Favor de ingresar el importe']"
-              lazyRules
-              filled
-              mask="#.##"
-              fill-mask
-              reverse-fill-mask
-              hint="Mask: #.00"
-              input-class="text-right"
-              clearable
-            >
-              <template #prepend> $ </template>
-            </q-input>
+            <PriceInput
+              currency-code="MNX"
+              v-model="editedFormItem.registro.importe"
+              :opcional="false"
+            ></PriceInput>
           </div>
         </div>
         <div class="">
-          <CuentaSelect
-            v-model="editedFormItem.detallesMovimiento[1].cuenta"
-          ></CuentaSelect>
+          <CuentaSelect v-model="editedFormItem.cuenta"></CuentaSelect>
         </div>
 
         <div>
@@ -93,10 +83,6 @@
         </div>
       </q-form>
     </q-card-section>
-    <!-- <q-card-section class="q-gutter-sm" align="right">
-      <q-btn color="primary" label="Cancelar" v-close-popup outline />
-      <q-btn color="primary" label="Guardar" @click="saveItem" />
-    </q-card-section> -->
   </q-card>
 </template>
 
@@ -108,6 +94,7 @@ import {
   MOVIMIENTO_CREATE,
   MOVIMIENTO_UPDATE
 } from '/src/graphql/movimientos'
+import { INGRESO_CREATE } from 'src/graphql/ingresos'
 
 import DateInput from '../formComponents/DateInput.vue'
 import CategoriaSelect from '../formComponents/CategoriaSelect.vue'
@@ -115,6 +102,7 @@ import CuentaSelect from '../formComponents/CuentaSelect.vue'
 import { useFormato } from 'src/composables/utils/useFormato'
 import { DateTime } from 'luxon'
 import { useSessionStore } from 'src/stores/sessionStore'
+import PriceInput from '../formComponents/PriceInput.vue'
 /**
  * composables
  */
@@ -124,24 +112,38 @@ const sessionStore = useSessionStore()
  * state
  */
 
+// const defaultItem = {
+//   numero: null,
+//   estadoMovimientoId: parseInt(2),
+//   tipoMovimientoId: '1',
+//   fecha: null,
+//   date: formato.formatoFecha(new Date()),
+//   observaciones: '',
+//   userId: sessionStore.getUserId(),
+//   detallesMovimiento: [
+//     {
+//       importe: ''
+//     },
+//     {
+//       cuenta: null
+//     }
+//   ]
+// }
 const defaultItem = {
-  numero: null,
-  estadoMovimientoId: parseInt(2),
-  tipoMovimientoId: '1',
-  fecha: null,
-  date: formato.formatoFecha(new Date()),
-  observaciones: '',
-  userId: sessionStore.getUserId(),
-  detallesMovimiento: [
-    {
-      importe: 0
-    },
-    {
-      cuenta: null
-    }
-  ]
+  categoria: {},
+  cuenta: {},
+  registro: {
+    estadoRegistroId: 2,
+    importe: '',
+    fecha: '',
+    date: formato.formatoFecha(new Date())
+  },
+  observaciones: ''
 }
+
 const formItem = ref({ ...defaultItem })
+const tipoMovimiento = ref('1')
+const cuentaOrigen = ref({})
 const cuentasContablesOptions = ref([])
 const categoria = ref(null)
 
@@ -207,15 +209,18 @@ const lblSubmit = computed({
     return !!editedFormItem.value.id ? 'Actualizar' : 'Guardar'
   }
 })
+const isTransferencia = computed({
+  get() {
+    return editedFormItem.value.tipoMovimientoId === '3'
+  }
+})
 
 /**
  * METHODS
  */
 
 function onChangeTipoMovimiento(value) {
-  console.log('cambio en el tipo de movimiento', value)
-
-  editedFormItem.value.detallesMovimiento[0].categoria = null
+  console.log('onChange tipo de movimiento:', value)
   // if (value === '1') {
   //   console.log('Cargar categorias de ingreso')
   //   // categorias
@@ -246,69 +251,94 @@ function formByTipoMovimiento(tipoMovimientoId) {
       break
   }
 }
+// function saveItem() {
+//   console.log('save item')
+
+//   const userId = sessionStore.getUserId()
+
+//   console.log('usuarioId', userId)
+
+//   const detallesInput = JSON.parse(
+//     JSON.stringify(editedFormItem.value.detallesMovimiento)
+//   )
+//   const importe = parseFloat(detallesInput[0].importe)
+//   console.log('importe', importe)
+//   const input = {
+//     ...editedFormItem.value,
+//     detallesMovimiento: undefined,
+//     numero: 0,
+//     tipoMovimientoId: parseInt(editedFormItem.value.tipoMovimientoId),
+//     fecha,
+//     date: undefined,
+
+//     // cuentaContableId: parseInt(cuenta_contable_id),
+//     // tipoMovimientoId: parseInt(editedFormItem.value.tipoMovimientoId),
+
+//     __typename: undefined
+//   }
+
+//   // const input = JSON.parse(JSON.stringify(editedFormItem.value))
+//   // input.numero = 0
+//   // input.tipoMovimientoId = parseInt(editedFormItem.value.tipoMovimientoId)
+//   // input.fecha = date
+//   // input.date = undefined
+
+//   detallesInput.forEach((detalle) => {
+//     ;(detalle.importe = parseFloat(importe)),
+//       (detalle.categoriaId = !!detalle.categoria
+//         ? parseInt(detalle.categoria.id)
+//         : null)
+//     detalle.categoria = undefined
+//     ;(detalle.cuentaId = !!detalle.cuenta ? parseInt(detalle.cuenta.id) : null),
+//       (detalle.cuenta = undefined)
+//   })
+
+//   console.log('input...... ', input)
+//   console.log('detallesinput...... ', detallesInput)
+
+//   if (!editedFormItem.value.id) {
+//     console.log('guardando movimiento nueva', input)
+//     createMovimiento({
+//       input,
+//       detallesInput
+//     })
+//   } else {
+//     const id = editedFormItem.value.id
+//     console.log('actualizando movimiento', id, input)
+//     updateMovimiento({
+//       id,
+//       input
+//     })
+//   }
+// }
+
 function saveItem() {
-  console.log('save item')
-  const date = !!editedFormItem.value.date
-    ? DateTime.fromFormat(editedFormItem.value.date, 'dd/MM/yyyy')
+  const input = { ...editedFormItem.value, fecha: obtenerFechaISO() }
+  console.log('saveItem input:', input)
+  console.log('saveItem tipoMovimiento:', tipoMovimiento.value)
+  return
+  switch (tipoMovimiento.value) {
+    case '1':
+      console.log('guardando ingreso')
+      createIngreso({ input })
+      break
+    case '2':
+      break
+    case '3':
+      break
+
+    default:
+      break
+  }
+}
+function obtenerFechaISO() {
+  console.log('Obteniendo fecha:', editedFormItem.value.registro.date)
+  const date = !!editedFormItem.value.registro.date
+    ? DateTime.fromFormat(editedFormItem.value.registro.date, 'dd/MM/yyyy')
     : null
-
-  const userId = sessionStore.getUserId()
-
-  console.log('usuarioId', userId)
-
-  const fecha = !!date ? date.toISODate() : null
-  const detallesInput = JSON.parse(
-    JSON.stringify(editedFormItem.value.detallesMovimiento)
-  )
-  const importe = parseFloat(detallesInput[0].importe)
-  console.log('importe', importe)
-  const input = {
-    ...editedFormItem.value,
-    detallesMovimiento: undefined,
-    numero: 0,
-    tipoMovimientoId: parseInt(editedFormItem.value.tipoMovimientoId),
-    fecha,
-    date: undefined,
-
-    // cuentaContableId: parseInt(cuenta_contable_id),
-    // tipoMovimientoId: parseInt(editedFormItem.value.tipoMovimientoId),
-
-    __typename: undefined
-  }
-
-  // const input = JSON.parse(JSON.stringify(editedFormItem.value))
-  // input.numero = 0
-  // input.tipoMovimientoId = parseInt(editedFormItem.value.tipoMovimientoId)
-  // input.fecha = date
-  // input.date = undefined
-
-  detallesInput.forEach((detalle) => {
-    ;(detalle.importe = parseFloat(importe)),
-      (detalle.categoriaId = !!detalle.categoria
-        ? parseInt(detalle.categoria.id)
-        : null)
-    detalle.categoria = undefined
-    ;(detalle.cuentaId = !!detalle.cuenta ? parseInt(detalle.cuenta.id) : null),
-      (detalle.cuenta = undefined)
-  })
-
-  console.log('input...... ', input)
-  console.log('detallesinput...... ', detallesInput)
-
-  if (!editedFormItem.value.id) {
-    console.log('guardando movimiento nueva', input)
-    createMovimiento({
-      input,
-      detallesInput
-    })
-  } else {
-    const id = editedFormItem.value.id
-    console.log('actualizando movimiento', id, input)
-    updateMovimiento({
-      id,
-      input
-    })
-  }
+  const fecha = date?.toISODate()
+  console.log('fecha regresada', fecha)
+  return fecha
 }
 
 function registrarCuentaContable() {
@@ -317,12 +347,13 @@ function registrarCuentaContable() {
 function onChangeCategoria() {
   console.log(
     'Cambio de categoria',
-    editedFormItem.value.detallesMovimiento[0].categoria
+    editedFormItem.value.categoria
+    // editedFormItem.value.detallesMovimiento[0].categoria
   )
-  const categoria = editedFormItem.value.detallesMovimiento[0].categoria
-  const importe = categoria?.importe || 0.0
-  console.log('importe', importe)
-  editedFormItem.value.detallesMovimiento[0].importe = importe
+  // const categoria = editedFormItem.value.detallesMovimiento[0].categoria
+  // const importe = categoria?.importe || ''
+  // console.log('importe', importe)
+  // editedFormItem.value.detallesMovimiento[0].importe = importe.toString()
 }
 /**
  * GRAPHQL
@@ -332,6 +363,12 @@ const options = ref({
 })
 const { onResult: onResultTiposMovimiento, result: resultTiposMovimiento } =
   useQuery(LISTA_TIPOS_MOVIMIENTO, null, options)
+
+const {
+  mutate: createIngreso,
+  onDone: onDoneCreateIngreso,
+  onError: onErrorCreateIngreso
+} = useMutation(INGRESO_CREATE)
 
 // const { load: cargarCuentasContables, onResult: onResultCuentasContables } =
 //   useLazyQuery(LISTA_CUENTAS_CONTABLES)
@@ -379,7 +416,13 @@ onDoneUpdateMovimiento(({ data }) => {
     emit('movimientoUpdated', itemUpdated)
   }
 })
+onDoneCreateIngreso(({ data }) => {
+  console.log('Ingreso creado data', data)
+})
 onErrorUpdateMovimiento((error) => {
+  console.error(error)
+})
+onErrorCreateIngreso((error) => {
   console.error(error)
 })
 </script>

@@ -13,6 +13,10 @@
       color="secondary"
       dense
       label="Precio"
+      lazy-rules
+      :rules="[
+        (val) => props.opcional || !!val || 'Favor de ingresar el precio.'
+      ]"
     >
       <template #append>
         <div class="text-subtitle1">{{ editingLabel }}</div>
@@ -34,7 +38,7 @@ const inputEditing = ref()
 
 const inputValue = computed({
   get() {
-    return editing.value ? localValue.value : formatMoney(localValue.value)
+    return editing.value ? props.modelValue : formatMoney(props.modelValue)
   },
   set(val) {
     localValue.value = val
@@ -60,6 +64,11 @@ const props = defineProps({
   debug: {
     type: Boolean,
     default: false
+  },
+  opcional: {
+    type: Boolean,
+    required: false,
+    default: true
   }
 })
 /**

@@ -162,7 +162,7 @@
                 </q-input> -->
                 <PriceInput
                   currency-code="MNX"
-                  v-model="precioMovimiento"
+                  v-model="editedFormItem.importe"
                 ></PriceInput>
               </div>
             </div>
@@ -249,7 +249,11 @@ const config = ref({
   masked: true,
   align: 'center'
 })
-const precioMovimiento = ref('1300')
+const precioMovimiento = computed({
+  get() {
+    return editedFormItem.value.importe
+  }
+})
 
 const example3 = ref({
   currencyFormat: ''
