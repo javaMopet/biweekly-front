@@ -14,70 +14,7 @@
       :filter="filter"
       :rows-per-page-options="[0]"
     >
-      <template #item="props">
-        <q-card class="my-card q-ma-sm" flat bordered>
-          <q-item
-            class="bg-dark text-white"
-            :style="`border-top: 6px solid ${props.row.color}`"
-          >
-            <q-item-section avatar>
-              <q-icon :name="props.row.icono" />
-            </q-item-section>
-
-            <q-item-section>
-              <div class="row items-center no-wrap">
-                <!-- <q-item-label>{{ props.row.color }}</q-item-label> -->
-                <!-- <div class="col">
-                  <q-item-label class="text-h6">{{
-                    props.row.nombre
-                  }}</q-item-label>
-                  <q-item-label class="text-accent-light text-subtitle2">
-                    {{ props.row.cuentaContable.nombreCompleto }}
-                  </q-item-label>
-                </div> -->
-                <div class="col-auto q-pl-md">
-                  <!-- <q-avatar
-                    size="30px"
-                    :class="{
-                      'text-white': true,
-                      'bg-positive': props.row.tipoMovimiento.id === '1',
-                      'bg-negative': props.row.tipoMovimiento.id === '2'
-                    }"
-                    >{{ props.row.tipoMovimiento.nombre[0] }}</q-avatar
-                  > -->
-                </div>
-              </div>
-            </q-item-section>
-          </q-item>
-
-          <q-card-section>
-            {{ props.row.descripcion }}
-          </q-card-section>
-
-          <q-separator inset />
-
-          <q-card-actions style="border: 0px solid red">
-            <q-btn round flat icon="edit" @click="editRow(props)" />
-            <!-- color="primary" -->
-            <q-btn
-              round
-              flat
-              icon="delete"
-              class="q-ml-sm"
-              @click="deleteRow(props)"
-            />
-            <!-- color="negative" -->
-          </q-card-actions>
-        </q-card>
-      </template>
       <template v-slot:top-left>
-        <!-- <q-btn
-          label="Nueva movimiento"
-          color="primary"
-          class=""
-          @click="addRow()"
-          icon="queue"
-        /> -->
         <div class="row q-pa-md q-gutter-x-lg">
           <q-btn-dropdown
             split
@@ -110,7 +47,6 @@
                 </q-item-section>
                 <q-item-section>
                   <q-item-label>Ingreso</q-item-label>
-                  <!-- <q-item-label caption>February 22, 2016</q-item-label> -->
                 </q-item-section>
               </q-item>
 
@@ -145,82 +81,7 @@
             dense
           />
         </div>
-        <!-- <div class="q-pa-md">
-          <q-btn-dropdown
-            split
-            color="primary"
-            glossy
-            no-caps
-            label="Nuevo"
-            v-model="btnElement"
-          >
-            <q-list>
-              <q-item clickable v-close-popup @click="addIngreso">
-                <q-item-section avatar>
-                  <q-avatar color="accent" text-color="white">I</q-avatar>
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label>Ingreso</q-item-label>
-                </q-item-section>
-              </q-item>
-
-              <q-item clickable v-close-popup @click="addEgreso">
-                <q-item-section avatar>
-                  <q-avatar color="secondary" text-color="white">E</q-avatar>
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label>Egreso</q-item-label>
-                </q-item-section>
-              </q-item>
-            </q-list>
-          </q-btn-dropdown>
-        </div> -->
-        <!-- <div class="q-mt-md">
-          <q-page-sticky position="bottom-left" :offset="[18, 18]">
-            <q-fab
-              v-model="fab2"
-              label="Acciones"
-              label-class="bg-secondary white"
-              vertical-actions-align="left"
-              color="primary"
-              icon="add"
-              direction="up"
-              label-position="left"
-              external-label
-              :hide-label="true"
-            >
-              <q-fab-action
-                label-class="bg-secondary white"
-                external-label
-                color="positive-pastel"
-                @click="addRow"
-                icon="arrow_upward"
-                label="Ingreso"
-                label-position="right"
-              />
-              <q-fab-action
-                label-class="bg-secondary white"
-                external-label
-                color="negative-pastel"
-                @click="addRow"
-                icon="arrow_downward"
-                label="Egreso"
-                label-position="right"
-              />
-              <q-fab-action
-                label-class="bg-secondary white"
-                external-label
-                color="blue-6"
-                @click="addRow"
-                icon="sync_alt"
-                label="Transferencia"
-                label-position="right"
-              />
-            </q-fab>
-          </q-page-sticky>
-        </div> -->
       </template>
-
       <template v-slot:top-right>
         <q-input
           outlined
@@ -266,15 +127,15 @@
 </template>
 
 <script setup>
-import { useMutation, useQuery } from '@vue/apollo-composable'
+import { useMutation } from '@vue/apollo-composable'
 import { ref, onMounted } from 'vue'
-import { LISTA_MOVIMIENTOS, MOVIMIENTO_DELETE } from '/src/graphql/movimientos'
+import { MOVIMIENTO_DELETE } from '/src/graphql/movimientos'
 import RegistroMovimiento from 'src/components/movimientos/RegistroMovimiento.vue'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { useQuasar } from 'quasar'
 import { DateTime } from 'luxon'
 import { useFormato } from 'src/composables/utils/useFormato'
-import { useSessionStore } from 'src/stores/sessionStore'
+import { api } from 'src/boot/axios'
 
 /**
  * composables
@@ -282,7 +143,6 @@ import { useSessionStore } from 'src/stores/sessionStore'
 const notificacion = useNotificacion()
 const $q = useQuasar()
 const formato = useFormato()
-const sessionStore = useSessionStore()
 
 /**
  * state
@@ -320,80 +180,52 @@ const mesOptions = ref([
   { id: 11, nombre: 'Noviembre' },
   { id: 12, nombre: 'Diciembre' }
 ])
-const mes = ref(mesOptions.value[0])
 
+const mes = ref(mesOptions.value[0])
 const listaMovimientos = ref([])
 const filter = ref()
 const editedItem = ref({ ...defaultItem })
 const editedIndex = ref(null)
 const rowIndexDelete = ref(null)
 const showFormItem = ref(false)
-const fab2 = ref(false)
-const btnElement = ref(null)
 
-const columns = [
-  { name: 'id', label: 'Id', field: 'id', sortable: true, align: 'left' },
-  {
-    name: 'nombre',
-    label: 'Nombre',
-    field: (row) =>
-      !!row.detallesMovimiento[0]
-        ? row.detallesMovimiento[0].categoria.nombre
-        : '',
-    sortable: true,
-    align: 'left'
-  },
-  {
-    name: 'descripcion',
-    label: 'Descripción',
-    field: 'observaciones',
-    sortable: true,
-    align: 'left'
-  },
-
-  {
-    name: 'importe',
-    label: 'Importe',
-    field: (row) =>
-      !!row.detallesMovimiento[0]
-        ? formato.toCurrency(row.detallesMovimiento[0].importe)
-        : '',
-    sortable: true,
-    align: 'left'
-  },
-  {
-    name: 'fecha',
-    label: 'Fecha',
-    field: 'fecha_campo',
-    sortable: true,
-    align: 'left'
-  },
-  {
-    name: 'tipo_movimiento',
-    label: 'Tipo Movimiento',
-    field: (row) => row.tipoMovimiento.nombre,
-    sortable: true,
-    align: 'left'
-  },
-  {
-    name: 'estado',
-    label: 'Estado',
-    field: 'estadoMovimientoId',
-    sortable: true,
-    align: 'left'
-  },
-  {
-    name: 'acciones',
-    label: 'Acciones',
-    field: 'action',
-    sortable: false,
-    align: 'center'
-  }
-]
+const columns = ref([
+  // {
+  //   name: 'categoria_id',
+  //   label: 'Id',
+  //   field: 'categoria_id',
+  //   sortable: true,
+  //   align: 'left'
+  // },
+  // {
+  //   name: 'nombre_categoria',
+  //   label: 'Nombre',
+  //   field: 'nombre_categoria',
+  //   sortable: true,
+  //   align: 'left'
+  // },
+  // {
+  //   name: 'columna_8',
+  //   label: 'Columna_8',
+  //   field: '8',
+  //   sortable: true,
+  //   align: 'left'
+  // },
+  // {
+  //   name: 'columna_9',
+  //   label: 'Columna_9',
+  //   field: '9',
+  //   sortable: true,
+  //   align: 'left'
+  // }
+])
 /**
  * onMount
  */
-onMounted(() => {})
+onMounted(() => {
+  obtenerColumnas()
+  obtenerMovimientos()
+})
 /**
  * METHODS
  */
@@ -408,6 +240,36 @@ function editRow(item) {
   editedIndex.value = item.rowIndex
   console.log('Editar elemento...', editedItem.value, editedIndex.value)
   showFormItem.value = true
+}
+function obtenerColumnas() {
+  api
+    .get('/columnas')
+    .then(({ data }) => {
+      console.log('response data', data.data)
+      columns.value = JSON.parse(JSON.stringify(data.data))
+      columns.value.forEach((column) => {
+        if (column.name != 'nombre_categoria') {
+          column.format = (val, row) =>
+            !!val ? `${formato.toCurrency(val)}` : ''
+        } else {
+          column.style = 'background-color: #d9e4ee'
+        }
+      })
+    })
+    .catch((error) => {
+      console.log('error', error)
+    })
+}
+function obtenerMovimientos() {
+  api
+    .get('/movimientos')
+    .then(({ data }) => {
+      // console.log('response data', data.data)
+      listaMovimientos.value = JSON.parse(JSON.stringify(data.data))
+    })
+    .catch((error) => {
+      console.log('error', error)
+    })
 }
 
 function deleteRow(item) {
@@ -454,39 +316,9 @@ function mostrarNotificacion(action, cuenta) {
     2500
   )
 }
-function onMainClick(val) {
-  console.log('val', val)
-}
-function onItemClick(item) {
-  console.log('item', item)
-}
 /**
  * GRAPHQL
  */
-const options = ref({
-  fetchPolicy: 'network-only'
-})
-
-const { onResult: onResultMovimientos, onError: onErrorListaMovimientos } =
-  useQuery(LISTA_MOVIMIENTOS, null, options)
-
-onResultMovimientos(({ data }) => {
-  if (!!data) {
-    console.log('data', data.listaMovimientos[0])
-    listaMovimientos.value = JSON.parse(JSON.stringify(data.listaMovimientos))
-    listaMovimientos.value.forEach((element) => {
-      console.log('element', element.observaciones)
-      element.date = DateTime.fromISO(element.fecha)
-      element.fecha_campo = DateTime.fromISO(element.fecha).toFormat(
-        'dd/MM/yyyy'
-      )
-    })
-  }
-})
-onErrorListaMovimientos((error) => {
-  console.error(error)
-})
-
 const {
   mutate: deleteMovimiento,
   onDone: onDoneDeleteMovimiento,
