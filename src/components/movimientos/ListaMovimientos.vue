@@ -1,49 +1,55 @@
 <template>
   <q-card class="my-card">
-    <q-card-section avatar>
-      <q-icon name="print" size="35px" />
+    <q-card-section class="bg-dark text-white">
+      <q-btn
+        round
+        flat
+        dense
+        icon="close"
+        class="float-right"
+        color="accent"
+        v-close-popup
+        vertical-top
+      ></q-btn>
+      <div class="row items-center">
+        <q-icon name="print" size="35px" />
+        <div class="q-ml-md text-h6">{{ categoria.nombre_categoria }}</div>
+      </div>
     </q-card-section>
-    <q-card-section>
-      <div class="text-h6">{{ categoria.nombre_categoria }}</div>
-      <div class="text-subtitle2">by John Doe</div>
-    </q-card-section>
-    <q-card-section>
-      <q-table
-        title="Table Title"
-        :rows="listaIngresos"
-        :columns="columns"
-        row-key="name"
-      />
-    </q-card-section>
+
     <q-card-section>
       <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-md">
         <div class="">
-          <DateInput v-model="fecha" lbl_field="Precio"></DateInput>
+          <DateInput
+            v-model="dateForm"
+            lbl_field="Fecha"
+            :opcional="false"
+          ></DateInput>
+          <PriceInput v-model="importe" :opcional="false"></PriceInput>
         </div>
         <div class="">
           <!-- <PriceInput v-model="importe"></PriceInput> -->
         </div>
-        <div>
-          <q-btn label="Submit" type="submit" color="primary" />
-          <q-btn
-            label="Reset"
-            type="reset"
-            color="primary"
-            flat
-            class="q-ml-sm"
-          />
+        <div align="center">
+          <q-btn label="Agregar" type="submit" color="accent" />
         </div>
       </q-form>
     </q-card-section>
     <q-card-section>
-      {{ categoria }}
+      <q-table
+        :rows="listaIngresos"
+        :columns="columns"
+        row-key="name"
+        :rows-per-page-options="[0]"
+        hide-pagination
+        dense
+      />
     </q-card-section>
-
-    <q-card-section>
-      <q-btn color="primary" icon="check" label="OK" v-close-popup />
-    </q-card-section>
-    <pre>  {{ listaIngresos }}</pre>
-    <pre>  {{ listaEgresos }}</pre>
+    <pre>  {{ categoria.fecha_inicio }}</pre>
+    <!-- <pre>  {{ listaEgresos }}</pre> -->
+    <!-- <q-card-section align="center">
+      <q-btn color="positive" outline label="Cerrar" v-close-popup />
+    </q-card-section> -->
   </q-card>
 </template>
 
@@ -54,11 +60,23 @@ import { DateTime } from 'luxon'
 import { OBTENER_INGRESOS } from 'src/graphql/ingresos'
 import { OBTENER_EGRESOS } from 'src/graphql/egresos'
 import { useQuery } from '@vue/apollo-composable'
+import PriceInput from '../formComponents/PriceInput.vue'
 
 /**
  * state
  */
-const fecha = ref('')
+const dateForm = ref('')
+
+// const fecha = computed({
+//   get() {
+//     return !!dateForm.value && dateForm.value != ''
+//       ? dateForm.value
+//       : props.categoria.fecha_inicio
+//   },
+//   set(val) {
+//     dateForm.value = val
+//   }
+// })
 const importe = ref('')
 
 const props = defineProps({
@@ -72,6 +90,7 @@ const props = defineProps({
 })
 onMounted(() => {
   buscarMovimientos()
+  dateForm.value = props.categoria.fecha_inicio
 })
 
 const columns = [
@@ -168,7 +187,9 @@ function buscarMovimientos() {
 /**
  * Methods
  */
-function onSubmit() {}
+function onSubmit() {
+  console.log('agregar nuevo movimiento')
+}
 function onReset() {}
 </script>
 
