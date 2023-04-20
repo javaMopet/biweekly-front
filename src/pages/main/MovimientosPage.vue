@@ -4,114 +4,219 @@
     <q-btn flat round dense icon="arrow_back" @click="$router.back()" />
   </q-toolbar>
   <q-space style="height: 10px" />
-  <div class="row fit" style="border: 0px solid red">
-    <q-table
-      style="width: 100%"
-      dense
-      :rows="listaMovimientos"
-      :columns="columns"
-      row-key="id"
-      :filter="filter"
-      :rows-per-page-options="[0]"
-    >
-      <template v-slot:top-left>
-        <div class="row q-pa-md q-gutter-x-lg">
-          <q-btn-dropdown
-            split
-            icon="add"
-            color="primary"
-            label="AGREGAR"
-            @click="addItem('2')"
-            dense
-          >
-            <q-list>
-              <q-item clickable v-close-popup @click="addItem('2')">
-                <q-item-section avatar>
-                  <q-avatar
-                    color="negative"
-                    text-color="white"
-                    icon="arrow_downward"
-                  ></q-avatar>
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label>Gasto</q-item-label>
-                </q-item-section>
-              </q-item>
-              <q-item clickable v-close-popup @click="addItem('1')">
-                <q-item-section avatar>
-                  <q-avatar
-                    color="positive"
-                    text-color="white"
-                    icon="arrow_upward"
-                  ></q-avatar>
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label>Ingreso</q-item-label>
-                </q-item-section>
-              </q-item>
+  <div class="column">
+    <div class="column">
+      <q-table
+        class="my-sticky-header-table-ingreso"
+        style="width: 100%"
+        dense
+        :rows="listaMovimientosIngreso"
+        :columns="columns"
+        row-key="id"
+        :filter="filter"
+        :rows-per-page-options="[0]"
+        separator="cell"
+        hide-pagination
+      >
+        <template v-slot:header="props">
+          <q-tr :props="props">
+            <q-th
+              v-for="col in props.cols"
+              :key="col.name"
+              :props="props"
+              class="text-dark"
+            >
+              {{ col.label }}
+            </q-th>
+          </q-tr>
+        </template>
+        <template v-slot:top-left>
+          <div class="row q-pa-md q-gutter-x-lg">
+            <q-btn-dropdown
+              split
+              icon="add"
+              color="primary"
+              label="AGREGAR"
+              @click="addItem('2')"
+              dense
+            >
+              <q-list>
+                <q-item clickable v-close-popup @click="addItem('2')">
+                  <q-item-section avatar>
+                    <q-avatar
+                      color="negative"
+                      text-color="white"
+                      icon="arrow_downward"
+                    ></q-avatar>
+                  </q-item-section>
+                  <q-item-section>
+                    <q-item-label>Gasto</q-item-label>
+                  </q-item-section>
+                </q-item>
+                <q-item clickable v-close-popup @click="addItem('1')">
+                  <q-item-section avatar>
+                    <q-avatar
+                      color="positive"
+                      text-color="white"
+                      icon="arrow_upward"
+                    ></q-avatar>
+                  </q-item-section>
+                  <q-item-section>
+                    <q-item-label>Ingreso</q-item-label>
+                  </q-item-section>
+                </q-item>
 
-              <q-item clickable v-close-popup @click="addItem('3')">
-                <q-item-section avatar>
-                  <q-avatar
-                    color="blue-5"
-                    text-color="white"
-                    icon="sync_alt"
-                  ></q-avatar>
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label>Transferencia</q-item-label>
-                </q-item-section>
-              </q-item>
-            </q-list>
-          </q-btn-dropdown>
-          <q-select
-            v-model="periodo"
-            :options="periodoOptions"
-            option-label="nombre"
-            label="Periodo"
+                <q-item clickable v-close-popup @click="addItem('3')">
+                  <q-item-section avatar>
+                    <q-avatar
+                      color="blue-5"
+                      text-color="white"
+                      icon="sync_alt"
+                    ></q-avatar>
+                  </q-item-section>
+                  <q-item-section>
+                    <q-item-label>Transferencia</q-item-label>
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </q-btn-dropdown>
+            <q-select
+              v-model="periodo"
+              :options="periodoOptions"
+              option-label="nombre"
+              label="Periodo"
+              outlined
+              dense
+            />
+            <q-select
+              v-model="mes"
+              :options="mesOptions"
+              option-label="nombre"
+              label="Mes"
+              outlined
+              dense
+            />
+          </div>
+        </template>
+        <template v-slot:top-right>
+          <q-input
             outlined
             dense
-          />
-          <q-select
-            v-model="mes"
-            :options="mesOptions"
-            option-label="nombre"
-            label="Mes"
+            debounce="300"
+            v-model="filter"
+            placeholder="Buscar"
+          >
+            <template v-slot:append>
+              <q-icon name="search" />
+            </template>
+          </q-input>
+        </template>
+        <!-- <template #body-cell-icono="props">
+          <q-td style="width: 30px"> </q-td>
+        </template> -->
+        <template v-slot:body-cell="props">
+          <q-td dense :props="props" clickable @click="addItem2(props)">
+            <span v-if="props.col.name === 'nombre_categoria'">
+              <q-icon :name="props.row.icono" size="22px" color="dark" />
+              {{ props.value }}
+            </span>
+            <span dense v-else class="">
+              {{ props.value }}
+            </span>
+
+            <!-- <q-badge v-else color="blue" :label="props.value" /> -->
+            <!-- <PriceInput v-else></PriceInput> -->
+          </q-td>
+        </template>
+        <!-- <template v-slot:body-cell-acciones="props">
+          <q-td :props="props" fit>
+            <q-btn icon="edit" size="sm" flat dense @click="editRow(props)" />
+            <q-btn
+              icon="delete"
+              size="sm"
+              class="q-ml-sm text-negative"
+              flat
+              dense
+              @click="deleteRow(props)"
+            />
+          </q-td>
+        </template> -->
+      </q-table>
+    </div>
+    <div class="row fit" style="border: 0px solid red">
+      <q-table
+        class="my-sticky-header-table"
+        style="width: 100%"
+        flat
+        bordered
+        v-model:pagination="pagination"
+        :rows-per-page-options="[0]"
+        dense
+        :rows="listaMovimientos"
+        :columns="columns"
+        row-key="id"
+        :filter="filter"
+        separator="cell"
+      >
+        <template v-slot:header="props">
+          <q-tr :props="props">
+            <q-th
+              v-for="col in props.cols"
+              :key="col.name"
+              :props="props"
+              class="text-dark"
+            >
+              {{ col.label }}
+            </q-th>
+          </q-tr>
+        </template>
+        <template v-slot:top-right>
+          <q-input
             outlined
             dense
-          />
-        </div>
-      </template>
-      <template v-slot:top-right>
-        <q-input
-          outlined
-          dense
-          debounce="300"
-          v-model="filter"
-          placeholder="Buscar"
-        >
-          <template v-slot:append>
-            <q-icon name="search" />
-          </template>
-        </q-input>
-      </template>
-      <template #body-cell-icono="props">
-        <q-icon :name="props.row.icono" size="35px" color="cyan" />
-      </template>
-      <template v-slot:body-cell-acciones="props">
-        <q-td :props="props" fit>
-          <q-btn icon="edit" size="sm" flat dense @click="editRow(props)" />
-          <q-btn
-            icon="delete"
-            size="sm"
-            class="q-ml-sm text-negative"
-            flat
-            dense
-            @click="deleteRow(props)"
-          />
-        </q-td>
-      </template>
-    </q-table>
+            debounce="300"
+            v-model="filter"
+            placeholder="Buscar"
+          >
+            <template v-slot:append>
+              <q-icon name="search" />
+            </template>
+          </q-input>
+        </template>
+        <template v-slot:body-cell="props">
+          <q-td dense :props="props" clickable @click="addItem2(props)">
+            <span v-if="props.col.name === 'nombre_categoria'">
+              <q-icon :name="props.row.icono" size="22px" color="dark" />
+              {{ props.value }}
+            </span>
+            <span dense v-else class="">
+              {{ props.value }}
+            </span>
+
+            <!-- <q-badge v-else color="blue" :label="props.value" /> -->
+            <!-- <PriceInput v-else></PriceInput> -->
+          </q-td>
+        </template>
+        <!-- <template #body-cell-icono="props">
+          <q-td style="width: 30px" class="bg-categoria-light">
+            <q-icon :name="props.row.icono" size="22px" color="dark" />
+          </q-td>
+        </template> -->
+        <!-- <template v-slot:body-cell-acciones="props">
+          <q-td :props="props" fit>
+            <q-btn icon="edit" size="sm" flat dense @click="editRow(props)" />
+            <q-btn
+              icon="delete"
+              size="sm"
+              class="q-ml-sm text-negative"
+              flat
+              dense
+              @click="deleteRow(props)"
+            />
+          </q-td>
+        </template> -->
+      </q-table>
+    </div>
   </div>
 
   <Teleport to="#modal">
@@ -122,6 +227,11 @@
         @movimientoSaved="movimientoSaved"
         @movimientoUpdated="movimientoUpdated"
       ></RegistroMovimiento>
+    </q-dialog>
+  </Teleport>
+  <Teleport to="#modal">
+    <q-dialog v-model="show_movimientos" persistent>
+      <ListaMovimientos :categoria="categoria_movimientos"></ListaMovimientos>
     </q-dialog>
   </Teleport>
 </template>
@@ -136,6 +246,8 @@ import { useQuasar } from 'quasar'
 import { DateTime } from 'luxon'
 import { useFormato } from 'src/composables/utils/useFormato'
 import { api } from 'src/boot/axios'
+import PriceInput from 'src/components/formComponents/PriceInput.vue'
+import ListaMovimientos from 'src/components/movimientos/ListaMovimientos.vue'
 
 /**
  * composables
@@ -158,7 +270,9 @@ const defaultItem = {
   },
   observaciones: ''
 }
-
+const pagination = ref({
+  rowsPerPage: 0
+})
 const periodoOptions = ref([
   { id: 1, nombre: 'Quincenal' },
   { id: 2, nombre: 'Mensual' }
@@ -183,11 +297,14 @@ const mesOptions = ref([
 
 const mes = ref(mesOptions.value[0])
 const listaMovimientos = ref([])
+const listaMovimientosIngreso = ref([])
 const filter = ref()
 const editedItem = ref({ ...defaultItem })
 const editedIndex = ref(null)
 const rowIndexDelete = ref(null)
 const showFormItem = ref(false)
+const show_movimientos = ref(false)
+const categoria_movimientos = ref({})
 
 const columns = ref([
   // {
@@ -235,6 +352,24 @@ function addItem(tipo_movimiento) {
   editedIndex.value = null
   showFormItem.value = true
 }
+function addItem2(props) {
+  console.log('props', props)
+  console.log('categoria', props.row.categoria_id)
+  console.log('id', props.col.id)
+  console.log('props', props.col.name)
+  console.log('props', props.col.label)
+  const tipo_movimiento = '1'
+  categoria_movimientos.value = {
+    id: props.row.categoria_id,
+    nombre_categoria: props.row.nombre_categoria,
+    periodo_id: props.col.periodo_id,
+    fecha_inicio: props.col.fecha_inicio,
+    fecha_fin: props.col.fecha_fin
+  }
+  if (!!categoria_movimientos.value.periodo_id) {
+    show_movimientos.value = true
+  }
+}
 function editRow(item) {
   editedItem.value = JSON.parse(JSON.stringify(item.row))
   editedIndex.value = item.rowIndex
@@ -245,7 +380,6 @@ function obtenerColumnas() {
   api
     .get('/columnas')
     .then(({ data }) => {
-      console.log('response data', data.data)
       columns.value = JSON.parse(JSON.stringify(data.data))
       columns.value.forEach((column) => {
         if (column.name != 'nombre_categoria') {
@@ -253,8 +387,10 @@ function obtenerColumnas() {
             !!val ? `${formato.toCurrency(val)}` : ''
         } else {
           column.style = 'background-color: #d9e4ee'
+          // (column.classes = 'mi-clase')
         }
       })
+      console.log('columnas ', columns.value)
     })
     .catch((error) => {
       console.log('error', error)
@@ -262,10 +398,30 @@ function obtenerColumnas() {
 }
 function obtenerMovimientos() {
   api
-    .get('/movimientos')
+    .get('/movimientos', {
+      params: {
+        tipoMovimientoId: 2
+      }
+    })
     .then(({ data }) => {
       // console.log('response data', data.data)
       listaMovimientos.value = JSON.parse(JSON.stringify(data.data))
+      console.log('response data', listaMovimientos.value)
+    })
+    .catch((error) => {
+      console.log('error', error)
+    })
+  api
+    .get('/movimientos', {
+      params: {
+        tipoMovimientoId: 1
+      }
+    })
+    .then(({ data }) => {
+      // console.log('response data', data.data)
+      listaMovimientosIngreso.value = JSON.parse(JSON.stringify(data.data))
+
+      // console.log('ingresos data', listaMovimientosIngreso.value)
     })
     .catch((error) => {
       console.log('error', error)
@@ -348,4 +504,92 @@ onErrorDeleteMovimiento((error) => {
     @return rgb(217, 163, 230);
   }
 }
+.tabla-columna-importe {
+  background-color: #fafcfd !important;
+  &:hover {
+    background-color: #d9e4ee !important;
+    border: 1.6px solid rgb(179, 179, 190) !important;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s;
+  }
+}
+.my-sticky-header-table-ingreso {
+  /* height or max-height is important */
+  height: 250px;
+
+  .q-table__top,
+  .q-table__bottom,
+  thead tr:first-child th {
+    /* bg color is important for th; just specify one */
+    background-color: #dfe2e9;
+  }
+  thead tr th {
+    position: sticky;
+    z-index: 1;
+  }
+  thead tr:first-child th {
+    top: 0;
+  }
+
+  /* this is when the loading indicator appears */
+  &.q-table--loading thead tr:last-child th {
+    /* height of all previous header rows */
+    top: 48px;
+  }
+}
+.my-sticky-header-table {
+  /* height or max-height is important */
+  height: calc(100vh - 375px);
+
+  .q-table__top,
+  .q-table__bottom,
+  thead tr:first-child th {
+    /* bg color is important for th; just specify one */
+    background-color: #dfe2e9;
+  }
+  thead tr th {
+    position: sticky;
+    z-index: 1;
+  }
+  thead tr:first-child th {
+    top: 0;
+  }
+
+  /* this is when the loading indicator appears */
+  &.q-table--loading thead tr:last-child th {
+    /* height of all previous header rows */
+    top: 48px;
+  }
+}
+
+// .my-sticky-virtscroll-table {
+//   /* height or max-height is important */
+//   height: 410px;
+
+//   .q-table__top,
+//   .q-table__bottom,
+//   thead tr:first-child th {
+//     /* bg color is important for th; just specify one */
+//     background-color: #00b4ff;
+//   }
+//   thead tr th {
+//     position: sticky;
+//     z-index: 1;
+//   }
+//   /* this will be the loading indicator */
+//   thead tr:last-child th {
+//     /* height of all previous header rows */
+//     top: 48px;
+//   }
+//   thead tr:first-child th {
+//     top: 0;
+//   }
+
+//   /* prevent scrolling behind sticky top row on focus */
+//   tbody {
+//     /* height of all previous header rows */
+//     scroll-margin-top: 48px;
+//   }
+// }
 </style>

@@ -10,3 +10,28 @@ export const EGRESO_CREATE = gql`
     }
   }
 `
+export const OBTENER_EGRESOS = gql`
+  query obtenerEgresos(
+    $categoriaId: ID!
+    $fechaInicio: ISO8601Date!
+    $fechaFin: ISO8601Date!
+  ) {
+    obtenerEgresos(
+      categoriaId: $categoriaId
+      fechaInicio: $fechaInicio
+      fechaFin: $fechaFin
+    ) {
+      id
+      categoriaId
+      cuentaId
+      observaciones
+      registro {
+        fecha
+        importe
+        registrableId
+        registrableType
+        estadoRegistroId
+      }
+    }
+  }
+`
