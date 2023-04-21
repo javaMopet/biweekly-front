@@ -28,6 +28,7 @@ export const OBTENER_INGRESOS = gql`
       registro {
         fecha
         importe
+        importeString
         registrableId
         registrableType
         estadoRegistroId

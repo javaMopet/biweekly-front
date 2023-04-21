@@ -1,6 +1,6 @@
 <template>
-  <q-card class="my-card" style="width: 400px">
-    <q-card-section class="bg-primary text-accent-light text-subtitle1">
+  <q-card class="my-card" style="width: 500px">
+    <q-card-section class="bg-primary text-accent-light">
       <q-btn
         round
         flat
@@ -11,8 +11,7 @@
         v-close-popup
         vertical-top
       ></q-btn>
-      <div class="text-subtitle1 text-accent-light">{{ actionName }}</div>
-      <!-- <pre>{{ editedFormItem }}</pre> -->
+      <div class="text-h5 text-accent-light">{{ actionName }}</div>
     </q-card-section>
 
     <q-card-section class="">
@@ -74,9 +73,9 @@
             <div class="col">
               <CuentaContableSelect
                 v-model="editedFormItem.cuentaContable"
-                :subnivel="cuentaContableSubnivel"
-                clasificacion=""
-                tipo-afectacion="C"
+                :subnivel="cuentaContableOptions.cuentaContableSubnivel"
+                :clasificacion="cuentaContableOptions.clasificacion"
+                :tipo-afectacion="cuentaContableOptions.tipoAfectacion"
               ></CuentaContableSelect>
             </div>
           </div>
@@ -183,7 +182,7 @@
 
 <script setup>
 import { useQuery, useMutation } from '@vue/apollo-composable'
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { CATEGORIA_CREATE, CATEGORIA_UPDATE } from '/src/graphql/categorias'
 import { LISTA_TIPOS_MOVIMIENTO } from 'src/graphql/movimientos'
 import IconPicker from '/src/components/IconPicker.vue'
@@ -205,27 +204,13 @@ const defaultItem = {
   cuentaContable: null
 }
 const formItem = ref({ ...defaultItem })
-const cuentaContableSubnivel = ref(0)
+// const cuentaContableSubnivel = ref(0)
 const ppproxy = ref(null)
-const amount = ref(123.45)
-const config = ref({
-  spinner: true,
-  step: 10,
-  min: -10,
-  max: 200,
-  prefix: '$ ',
-  suffix: ' MXN',
-  precision: 2,
-  decimal: '.',
-  thousands: ',',
-  template: 'bootstrap',
-  masked: true,
-  align: 'center'
-})
-const precioMovimiento = computed({
-  get() {
-    return editedFormItem.value.importe
-  }
+
+const cuentaContableOptions = ref({
+  cuentaContableSubnivel: 0,
+  clasificacion: '',
+  tipoAfectacion: 'C'
 })
 
 /**
@@ -257,13 +242,13 @@ const emit = defineEmits(['categoriaSaved', 'categoriaUpdated'])
 const tiposMovimientoOptions = computed({
   get() {
     return (resultTipoMovimiento.value?.listaTiposMovimiento ?? []).filter(
-      (tipoMovimiento) => tipoMovimiento.id === '1' || tipoMovimiento.id === '2'
+      (tipoMovimiento) => tipoMovimiento.id != '3'
     )
   }
 })
 const editedFormItem = computed({
   get() {
-    return !!props.editedItem.id ? props.editedItem : formItem.value
+    return !!props.editedItem ? props.editedItem : formItem.value
   },
   set(val) {
     formItem.value = val
@@ -286,27 +271,26 @@ const lblSubmit = computed({
  * METHODS
  */
 
-function tipoMovimientoChange(value) {
-  console.log('cambio en el tipo de categoria', value)
+function onChangeTipoMovimiento(tipoMovimientoId) {
+  console.log('cambio en el tipo de categoria', tipoMovimientoId)
   editedFormItem.value.cuentaContable = null
-  if (value === '1') {
-    console.log('cargarcuentas de ingreso')
-    cargarCuentasContables(null, {
-      subnivel: 0,
-      clasificacion: '4'
-    })
-  } else if (value === '2') {
-    console.log('cargarcuentas de egreso')
-    cargarCuentasContables(null, {
-      subnivel: 0,
-      clasificacion: '5'
-    })
-  } else {
-    console.log('cargar todas las cuentas ')
-    cargarCuentasContables(null, {
-      subnivel: 0,
-      clasificacion: ''
-    })
+  obtenerCuentasContables(tipoMovimientoId)
+}
+function obtenerCuentasContables(tipoMovimientoId) {
+  switch (tipoMovimientoId) {
+    case '1': //Ingreso
+      cuentaContableOptions.value.tipoAfectacion = 'A'
+      break
+    case '2': //Gasto
+      cuentaContableOptions.value.tipoAfectacion = 'C'
+      break
+    case '3':
+      break
+    case '4': //Inversion
+      cuentaContableOptions.value.tipoAfectacion = 'A'
+      break
+    default:
+      break
   }
 }
 function saveItem() {
@@ -315,7 +299,7 @@ function saveItem() {
   const cuenta_id = editedFormItem.value.cuenta?.id
   const input = {
     ...editedFormItem.value,
-    importe: parseFloat(editedFormItem.value.importe),
+    importe: parseFloat(editedFormItem.value.importe ?? '0'),
     cuentaContableId: parseInt(cuenta_contable_id),
     cuentaId: parseInt(cuenta_id),
     tipoMovimientoId: parseInt(editedFormItem.value.tipoMovimientoId),
@@ -339,9 +323,12 @@ function saveItem() {
     })
   }
 }
-function onChangeTipoMovimiento(value) {
-  console.log('tipoMovimeinto', value)
-}
+/**
+ * onMounted
+ */
+onMounted(() => {
+  obtenerCuentasContables(editedFormItem.value.tipoMovimientoId)
+})
 
 /**
  * GRAPHQL
@@ -357,6 +344,7 @@ const {
   onDone: onDoneCreateCategoria,
   onError: onErrorCreateCategoria
 } = useMutation(CATEGORIA_CREATE)
+
 const {
   mutate: updateCategoria,
   onDone: onDoneUpdateCategoria,

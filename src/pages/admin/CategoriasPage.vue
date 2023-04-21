@@ -1,30 +1,37 @@
 <template>
   <div class="row text-h5 text-secondary q-pa-md font-subtitle">CATEGORIAS</div>
+  <!-- <pre>{{ listaCategoriasInversiones }}</pre> -->
   <q-toolbar class="text-dark">
     <q-btn-dropdown
       split
       icon="add"
       label="AGREGAR"
       color="primary"
-      @click="addRow"
+      @click="addRow('2')"
     >
       <q-list>
-        <q-item clickable v-close-popup @click="addRow">
+        <q-item
+          v-for="tipoMovimiento in listaTiposMovimiento"
+          v-bind:key="tipoMovimiento.id"
+          clickable
+          v-close-popup
+          @click="addRow(tipoMovimiento.id)"
+        >
           <q-item-section avatar>
-            <q-icon name="fa-solid fa-hand-holding-dollar" />
+            <q-icon :name="tipoMovimiento.icono" />
           </q-item-section>
           <q-item-section>
-            <q-item-label>Ingreso</q-item-label>
+            <q-item-label>{{ tipoMovimiento.nombre }}</q-item-label>
           </q-item-section>
         </q-item>
-        <q-item clickable v-close-popup @click="addRow">
+        <!-- <q-item clickable v-close-popup @click="addRow">
           <q-item-section avatar>
             <q-icon name="fa-solid fa-file-invoice-dollar" />
           </q-item-section>
           <q-item-section>
             <q-item-label>Gasto</q-item-label>
           </q-item-section>
-        </q-item>
+        </q-item>-->
       </q-list>
     </q-btn-dropdown>
     <q-toolbar-title> </q-toolbar-title>
@@ -53,6 +60,96 @@
             debounce="300"
             v-model="filterIngresos"
             placeholder="Buscar Ingresos"
+          >
+            <template v-slot:append>
+              <q-icon name="search" />
+            </template>
+          </q-input>
+        </template>
+
+        <template #body-cell-icono="props">
+          <q-td
+            class="bg-primary-light text-primary"
+            :props="props"
+            fit
+            style="width: 20px"
+          >
+            <q-icon :name="props.row.icono" size="35px" />
+          </q-td>
+        </template>
+        <template v-slot:body-cell-nombre="props">
+          <q-td
+            class="bg-primary-light text-dark"
+            :props="props"
+            fit
+            :style="`border-left: 3px solid ${props.row.color}`"
+          >
+            <div class="column">
+              <div class="">
+                <span class="text-subtitle1">{{ props.row.nombre }} </span>
+                &nbsp;
+                <span class="text-accent text-caption">{{
+                  props.row.cuentaContable.nombreCompleto
+                }}</span>
+              </div>
+              <span class="text-positive text-subtitle2">{{
+                props.row.descripcion
+              }}</span>
+            </div>
+          </q-td>
+        </template>
+        <!-- <template #body-cell-cuentaContable="props">
+          <q-td class="bg-primary-light text-dark">
+            <div class="column">
+              <span class="text-accent text-caption">{{
+                props.row.cuentaContable.nombreCompleto
+              }}</span>
+            </div>
+          </q-td>
+        </template> -->
+        <template v-slot:body-cell-acciones="props">
+          <q-td :props="props" fit class="bg-primary-light text-dark">
+            <q-btn
+              icon="edit"
+              size="md"
+              dense
+              @click="editRow(props)"
+              rounded
+              color="dark"
+              flat
+            />
+            <q-btn
+              icon="delete"
+              size="md"
+              class="q-ml-sm"
+              color="accent"
+              rounded
+              dense
+              @click="deleteRow(props)"
+              flat
+            />
+          </q-td>
+        </template>
+      </q-table>
+      <q-table
+        dense
+        :rows="listaCategoriasInversiones"
+        :columns="columns"
+        row-key="id"
+        :filter="filterInversiones"
+        :rows-per-page-options="[0]"
+        hide-header
+      >
+        <template #top-left>
+          <div class="text-h6 text-">Inversiones</div>
+        </template>
+        <template v-slot:top-right>
+          <q-input
+            outlined
+            dense
+            debounce="300"
+            v-model="filterInversiones"
+            placeholder="Buscar Inversiones"
           >
             <template v-slot:append>
               <q-icon name="search" />
@@ -234,7 +331,7 @@
 import { useMutation, useQuery } from '@vue/apollo-composable'
 import { ref, computed, onMounted } from 'vue'
 import { LISTA_CATEGORIAS, CATEGORIA_DELETE } from '/src/graphql/categorias'
-// import { LISTA_CUENTAS_CONTABLES } from '/src/graphql/cuentasContableGql'
+import { LISTA_TIPOS_MOVIMIENTO } from 'src/graphql/movimientos'
 import RegistroCategoria from 'src/components/categorias/RegistroCategoria.vue'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { useQuasar } from 'quasar'
@@ -250,9 +347,9 @@ const $q = useQuasar()
 const defaultItem = {
   id: null,
   nombre: null,
-  icono: null,
+  icono: 'insert_emoticon',
   descripcion: null,
-  color: null,
+  color: '#019a9d',
   tipoMovimiento: null,
   tipoMovimientoId: '1',
   cuentaContable: null
@@ -260,6 +357,7 @@ const defaultItem = {
 const listaCategorias = ref([])
 const filterIngresos = ref()
 const filterGastos = ref()
+const filterInversiones = ref()
 const editedItem = ref({ ...defaultItem })
 const editedIndex = ref(-1)
 const rowIndexDelete = ref(null)
@@ -282,6 +380,22 @@ const listaCategoriasEgresos = computed({
     )
   }
 })
+const listaCategoriasInversiones = computed({
+  get() {
+    return listaCategorias.value.filter(
+      (categoria) => categoria.tipoMovimientoId === '4'
+    )
+  }
+})
+const listaTiposMovimiento = computed({
+  get() {
+    return (
+      resultListaTiposMovimientos.value?.listaTiposMovimiento.filter(
+        (tipoMovimiento) => tipoMovimiento.id != '3'
+      ) ?? []
+    )
+  }
+})
 /**
  * onMount
  */
@@ -290,8 +404,10 @@ onMounted(() => {})
  * METHODS
  */
 
-function addRow() {
-  editedItem.value = { ...defaultItem }
+function addRow(tipoMovimientoId) {
+  console.log('tipoMovimientoId', tipoMovimientoId)
+  editedItem.value = { ...defaultItem, tipoMovimientoId: tipoMovimientoId }
+  console.log('editeditem', editedItem.value)
   editedIndex.value = null
   showFormItem.value = true
 }
@@ -351,6 +467,7 @@ function mostrarNotificacion(action, cuenta) {
     2500
   )
 }
+
 /**
  * GRAPHQL
  */
@@ -361,10 +478,18 @@ const options = ref({
 const { onResult: onResultCategorias, onError: onErrorListaCategorias } =
   useQuery(LISTA_CATEGORIAS, null, options)
 
+const {
+  result: resultListaTiposMovimientos,
+  onError: onErrorListaTiposMovimiento
+} = useQuery(LISTA_TIPOS_MOVIMIENTO, null, options)
+
 onResultCategorias(({ data }) => {
   listaCategorias.value = JSON.parse(JSON.stringify(data.listaCategorias))
 })
 onErrorListaCategorias((error) => {
+  console.error(error)
+})
+onErrorListaTiposMovimiento((error) => {
   console.error(error)
 })
 

@@ -66,6 +66,13 @@ const props = defineProps({
     required: false,
     default: true
   }
+  // optionsFn: {
+  //   type: Function,
+  //   required: false,
+  //   default: (date) => {
+  //     return date >= '1900/01/01' && date <= '2024/02/15'
+  //   }
+  // }
 })
 /**
  * computed

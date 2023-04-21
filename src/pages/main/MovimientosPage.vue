@@ -362,6 +362,7 @@ function addItem2(props) {
   categoria_movimientos.value = {
     id: props.row.categoria_id,
     nombre_categoria: props.row.nombre_categoria,
+    icono: props.row.icono,
     periodo_id: props.col.periodo_id,
     fecha_inicio: props.col.fecha_inicio,
     fecha_fin: props.col.fecha_fin
