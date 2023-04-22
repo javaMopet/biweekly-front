@@ -24,6 +24,11 @@ export const OBTENER_INGRESOS = gql`
       id
       categoriaId
       cuentaId
+      cuenta {
+        id
+        nombre
+        cuentaContableId
+      }
       observaciones
       registro {
         fecha

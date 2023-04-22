@@ -1,3 +1,5 @@
+import { DateTime } from 'luxon'
+
 export function useFormato() {
   function toCurrency(val) {
     return new Intl.NumberFormat('es-MX', {
@@ -31,10 +33,22 @@ export function useFormato() {
     return strTime
   }
 
+  function fromISOtoDate(date) {
+    return DateTime.fromISO(date)
+  }
+  function formatoFechaFromISO(date) {
+    return DateTime.fromISO(date).toFormat('dd/MM/yyyy')
+  }
+  function toFormatoInputDateFromISO(date) {
+    return DateTime.fromISO(date).toFormat('yyyy/MM/dd')
+  }
+
   return {
     toCurrency,
     toPercentage,
     formatoFecha,
-    formatoHoraAMPM
+    formatoHoraAMPM,
+    formatoFechaFromISO,
+    toFormatoInputDateFromISO
   }
 }

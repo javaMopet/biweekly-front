@@ -17,6 +17,7 @@
       :rules="[
         (val) => props.opcional || !!val || 'Favor de ingresar el precio.'
       ]"
+      :readonly="readonly"
     >
       <template #append>
         <div class="text-subtitle1">{{ editingLabel }}</div>
@@ -69,6 +70,11 @@ const props = defineProps({
     type: Boolean,
     required: false,
     default: true
+  },
+  readonly: {
+    type: Boolean,
+    required: false,
+    default: false
   }
 })
 /**

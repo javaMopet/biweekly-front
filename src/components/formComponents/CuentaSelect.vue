@@ -19,6 +19,7 @@
         lazyRules
         dense
         :hint="props.hint"
+        :readonly="readonly"
       >
         <template v-slot:no-option>
           <q-item>
@@ -27,7 +28,7 @@
         </template>
       </q-select>
     </div>
-    <div class="q-mt-xs" style="border: 0px solid red">
+    <div v-if="agregar" class="q-mt-xs" style="border: 0px solid red">
       <q-btn color="accent" outline icon="add" dense @click="registrarCuenta" />
     </div>
   </div>
@@ -75,13 +76,13 @@ const props = defineProps({
     type: String,
     required: false,
     default: ''
+  },
+  agregar: { type: Boolean, required: false, default: true },
+  readonly: {
+    type: Boolean,
+    required: false,
+    default: false
   }
-
-  // tipoMovimientoId: {
-  //   type: Number,
-  //   required: false,
-  //   default: null
-  // }
 })
 /**
  * emits

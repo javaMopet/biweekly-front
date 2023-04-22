@@ -231,7 +231,7 @@
   </Teleport>
   <Teleport to="#modal">
     <q-dialog v-model="show_movimientos" persistent>
-      <ListaMovimientos :categoria="categoria_movimientos"></ListaMovimientos>
+      <ListaMovimientos :categoria="cellData"></ListaMovimientos>
     </q-dialog>
   </Teleport>
 </template>
@@ -304,7 +304,7 @@ const editedIndex = ref(null)
 const rowIndexDelete = ref(null)
 const showFormItem = ref(false)
 const show_movimientos = ref(false)
-const categoria_movimientos = ref({})
+const cellData = ref({})
 
 const columns = ref([
   // {
@@ -353,21 +353,29 @@ function addItem(tipo_movimiento) {
   showFormItem.value = true
 }
 function addItem2(props) {
-  console.log('props', props)
-  console.log('categoria', props.row.categoria_id)
-  console.log('id', props.col.id)
-  console.log('props', props.col.name)
-  console.log('props', props.col.label)
-  const tipo_movimiento = '1'
-  categoria_movimientos.value = {
-    id: props.row.categoria_id,
-    nombre_categoria: props.row.nombre_categoria,
-    icono: props.row.icono,
-    periodo_id: props.col.periodo_id,
-    fecha_inicio: props.col.fecha_inicio,
-    fecha_fin: props.col.fecha_fin
+  const row = { ...props.row }
+  const col = { ...props.col }
+  console.log('row', row)
+  console.log('col', col)
+  // console.log('categoria', props.row.categoria_id)
+  // console.log('id', props.col.id)
+  // console.log('props', props.col.name)
+  // console.log('props', props.col.label)
+  // const tipo_movimiento = '1'
+
+  // const fecha_inicio = props.row
+  cellData.value = {
+    id: row.categoria_id,
+    nombre_categoria: row.nombre_categoria,
+    tipo_movimiento_id: row.tipo_movimiento_id.toString(),
+    icono: row.icono,
+    fecha_inicio: col.fecha_inicio,
+    fecha_fin: col.fecha_fin,
+    fecha_inicio_formato: formato.toFormatoInputDateFromISO(col.fecha_inicio),
+    fecha_fin_formato: formato.toFormatoInputDateFromISO(col.fecha_fin),
+    periodo_id: col.periodo_id
   }
-  if (!!categoria_movimientos.value.periodo_id) {
+  if (!!cellData.value.periodo_id) {
     show_movimientos.value = true
   }
 }

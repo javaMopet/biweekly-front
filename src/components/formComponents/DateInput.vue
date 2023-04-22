@@ -7,6 +7,8 @@
     :label="lbl_field"
     lazy-rules
     :rules="[(val) => props.opcional || !!val || 'Favor de ingresar la fecha.']"
+    :readonly="readonly"
+    :autofocus="autofocus"
   >
     <template v-slot:append>
       <q-icon name="event" class="cursor-pointer">
@@ -22,6 +24,8 @@
             dense
             mask="DD/MM/YYYY"
             @update:model-value="dateSelected"
+            :options="optionsFn"
+            :readonly="readonly"
           >
             <div class="row items-center justify-end">
               <q-btn v-close-popup label="Hecho" color="primary" flat />
@@ -34,8 +38,13 @@
 </template>
 
 <script setup>
+import { useFormato } from 'src/composables/utils/useFormato'
 import { ref, computed, defineProps, defineEmits } from 'vue'
 
+/**
+ * composables
+ */
+const formato = useFormato()
 /**
  * state
  */
@@ -58,21 +67,34 @@ const props = defineProps({
   },
   lbl_field: {
     type: String,
-    default: '',
-    required: true
+    required: false,
+    default: 'Fecha'
   },
   optional: {
     type: Boolean,
     required: false,
     default: true
+  },
+  rangoFechaInicio: {
+    type: String,
+    required: false,
+    default: ''
+  },
+  rangoFechaFin: {
+    type: String,
+    required: false,
+    default: ''
+  },
+  readonly: {
+    type: Boolean,
+    required: false,
+    default: false
+  },
+  autofocus: {
+    type: Boolean,
+    required: false,
+    default: false
   }
-  // optionsFn: {
-  //   type: Function,
-  //   required: false,
-  //   default: (date) => {
-  //     return date >= '1900/01/01' && date <= '2024/02/15'
-  //   }
-  // }
 })
 /**
  * computed
@@ -89,6 +111,16 @@ function dateSelected(value, reason, details) {
   console.log('seleccionado', value, reason, details)
   if (!!value) {
     popUpDate.value.hide()
+  }
+}
+/**
+ * methods
+ */
+function optionsFn(date) {
+  if (!!props.rangoFechaInicio && !!props.rangoFechaFin) {
+    return date >= props.rangoFechaInicio && date <= props.rangoFechaFin
+  } else {
+    return true
   }
 }
 </script>
