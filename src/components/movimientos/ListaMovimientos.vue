@@ -19,8 +19,12 @@
       ></q-btn>
       <div class="row items-center text-accent-contrast">
         <q-icon :name="categoria.icono" size="35px" />
-        <div class="q-ml-md text-h6">{{ categoria.nombre_categoria }}</div>
+        <div class="column q-ml-md text-h6">
+          <div class="">{{ categoria.nombre_categoria }}</div>
+          <div class="">{{ categoria.col.label }}</div>
+        </div>
       </div>
+      <!-- <pre>{{ categoria }}</pre> -->
     </q-card-section>
     <q-card-section style="border: 0px solid red">
       <q-table
