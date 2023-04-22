@@ -92,8 +92,6 @@
               type="text"
               label="observaciones"
               dense
-              lazy-rules
-              :rules="[(val) => !!val || 'Favor de ingresar el precio.']"
               outlined
               color="secondary"
               :readonly="props.row.saved"
@@ -175,12 +173,13 @@ import { useLazyQuery } from '@vue/apollo-composable'
 import PriceInput from '../formComponents/PriceInput.vue'
 import { useFormato } from 'src/composables/utils/useFormato'
 import CuentaSelect from '../formComponents/CuentaSelect.vue'
+import { useRegistrosCrud } from 'src/composables/useRegistrosCrud.js'
 
 /**
  * composables
  */
 const formato = useFormato()
-
+const registrosCrud = useRegistrosCrud()
 /**
  * state
  */
@@ -404,10 +403,33 @@ function onSubmit() {
   console.log('agregar nuevo movimiento')
 }
 function onReset() {}
+
 function saveItem(row) {
   console.log('Saving item', row)
+
+  const input = {
+    categoriaId: parseInt(props.categoria.id),
+    cuentaId: parseInt(row.cuenta.id),
+    observaciones: row.observaciones,
+    registro: {
+      importe: parseFloat(row.registro.importe),
+      fecha: obtenerFechaISO(row.registro.fecha_formato)
+    }
+  }
+  console.log('saveItem input:', input)
+  console.log('saveItem tipoMovimiento:', tipoMovimiento.value)
+  return
+  registrosCrud.createIngreso({ input })
   row.saved = true
 }
+
+registrosCrud.onDoneCreateIngreso((response) => {
+  console.log('guardado', response)
+})
+registrosCrud.onErrorCreateIngreso((error) => {
+  console.error('error', error)
+})
+
 function editItem(row) {
   row.saved = false
 }
