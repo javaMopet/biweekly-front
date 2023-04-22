@@ -373,7 +373,8 @@ function addItem2(props) {
     fecha_fin: col.fecha_fin,
     fecha_inicio_formato: formato.toFormatoInputDateFromISO(col.fecha_inicio),
     fecha_fin_formato: formato.toFormatoInputDateFromISO(col.fecha_fin),
-    periodo_id: col.periodo_id
+    periodo_id: col.periodo_id,
+    label: col.label
   }
   if (!!cellData.value.periodo_id) {
     show_movimientos.value = true
