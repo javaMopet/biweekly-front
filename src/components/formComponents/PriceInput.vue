@@ -1,5 +1,4 @@
 <template>
-  <!-- Pricing Component -->
   <div>
     <q-input
       v-model="inputValue"
@@ -13,15 +12,13 @@
       color="secondary"
       dense
       label="Precio"
-      lazy-rules
-      :rules="[
-        (val) => props.opcional || !!val || 'Favor de ingresar el precio.'
-      ]"
+      :error="!isValid"
       :readonly="readonly"
     >
       <template #append>
         <div class="text-subtitle1">{{ editingLabel }}</div>
       </template>
+      <template #error> Favor de ingresar el importe </template>
     </q-input>
   </div>
 </template>
@@ -75,6 +72,11 @@ const props = defineProps({
     type: Boolean,
     required: false,
     default: false
+  },
+  isValid: {
+    type: Boolean,
+    required: false,
+    default: true
   }
 })
 /**

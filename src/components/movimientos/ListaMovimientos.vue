@@ -19,12 +19,8 @@
       ></q-btn>
       <div class="row items-center text-accent-contrast">
         <q-icon :name="categoria.icono" size="35px" />
-        <div class="column q-ml-md text-h6">
-          <div class="">{{ categoria.nombre_categoria }}</div>
-          <div class="text-accent-light">{{ categoria.label }}</div>
-        </div>
+        <div class="q-ml-md text-h6">{{ categoria.nombre_categoria }}</div>
       </div>
-      <!-- <pre>{{ categoria }}</pre> -->
     </q-card-section>
     <q-card-section style="border: 0px solid red">
       <q-table
@@ -82,6 +78,7 @@
               :opcional="true"
               :readonly="props.row.saved"
               autofocus
+              :is-valid="isImporteValido(props.row.registro.importeString)"
             ></PriceInput>
           </q-td>
         </template>
@@ -92,6 +89,8 @@
               type="text"
               label="observaciones"
               dense
+              lazy-rules
+              :rules="[(val) => !!val || 'Favor de ingresar el precio.']"
               outlined
               color="secondary"
               :readonly="props.row.saved"
@@ -173,13 +172,12 @@ import { useLazyQuery } from '@vue/apollo-composable'
 import PriceInput from '../formComponents/PriceInput.vue'
 import { useFormato } from 'src/composables/utils/useFormato'
 import CuentaSelect from '../formComponents/CuentaSelect.vue'
-import { useRegistrosCrud } from 'src/composables/useRegistrosCrud.js'
 
 /**
  * composables
  */
 const formato = useFormato()
-const registrosCrud = useRegistrosCrud()
+
 /**
  * state
  */
@@ -353,6 +351,11 @@ onErrorListaEgresos((error) => {
 /**
  * computed
  */
+const isImporteValido = (importe) => {
+  console.log('importe', importe)
+  return !!importe
+}
+
 // const listaRegistros = computed({
 //   get() {
 //     const listaRetorno =
@@ -403,39 +406,19 @@ function onSubmit() {
   console.log('agregar nuevo movimiento')
 }
 function onReset() {}
-
 function saveItem(row) {
   console.log('Saving item', row)
-
-  const input = {
-    categoriaId: parseInt(props.categoria.id),
-    cuentaId: parseInt(row.cuenta.id),
-    observaciones: row.observaciones,
-    registro: {
-      importe: parseFloat(row.registro.importe),
-      fecha: obtenerFechaISO(row.registro.fecha_formato)
-    }
-  }
-  console.log('saveItem input:', input)
-  console.log('saveItem tipoMovimiento:', tipoMovimiento.value)
-  return
-  registrosCrud.createIngreso({ input })
   row.saved = true
 }
-
-registrosCrud.onDoneCreateIngreso((response) => {
-  console.log('guardado', response)
-})
-registrosCrud.onErrorCreateIngreso((error) => {
-  console.error('error', error)
-})
-
 function editItem(row) {
   row.saved = false
 }
 function deleteItem(item) {
   console.log('item', item)
   console.log('item index', item.rowIndex)
+}
+function validarPrecio() {
+  console.log('validar precio')
 }
 </script>
 
