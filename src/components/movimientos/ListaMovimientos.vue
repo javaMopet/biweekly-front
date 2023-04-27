@@ -4,8 +4,7 @@
     flat
     style="width: 920px; min-width: 980px; border: 0px solid red"
   >
-    <!-- <pre>{{ listaRegistros }}</pre> -->
-    <pre>{{ categoriaResultado }}</pre>
+    <!-- <pre>{{ categoria }}</pre> -->
     <q-card-section class="bg-dark text-white">
       <q-btn
         round
@@ -19,7 +18,7 @@
       ></q-btn>
       <div class="row items-center text-accent-contrast">
         <q-icon :name="categoria.icono" size="35px" />
-        <div class="q-ml-md text-h6">{{ categoria.nombre_categoria }}</div>
+        <div class="q-ml-md text-h6">{{ categoria.nombre }}</div>
       </div>
     </q-card-section>
     <q-card-section style="border: 0px solid red">
@@ -34,6 +33,7 @@
         dense
         separator="none"
         flat
+        table-class="myClass"
       >
         <template #body-cell-estatus="props">
           <q-td class="" style="border: 0px solid red">
@@ -47,7 +47,7 @@
           </q-td>
         </template>
         <template #body-cell-fecha="props">
-          <q-td style="width: 150px">
+          <q-td style="width: 150px" class="bg-white">
             <DateInput
               v-model="props.row.registro.fecha_formato"
               lbl_field="Fecha"
@@ -71,7 +71,7 @@
           </q-td>
         </template>
         <template #body-cell-cuenta="props">
-          <q-td style="width: 250px">
+          <q-td class="bg-white" style="width: 250px">
             <CuentaSelect
               v-model="props.row.cuenta"
               :agregar="false"
@@ -81,17 +81,20 @@
           </q-td>
         </template>
         <template #body-cell-observaciones="props">
-          <q-td>
+          <q-td
+            align="top"
+            class="column items-start full-height"
+            style="border: 0px solid red; height: 70px !important"
+          >
             <q-input
               v-model="props.row.observaciones"
-              type="text"
+              type="textarea"
               label="observaciones"
               dense
-              lazy-rules
-              :rules="[(val) => !!val || 'Favor de ingresar el precio.']"
               outlined
               color="secondary"
               :readonly="props.row.saved"
+              rows="1"
             />
           </q-td>
         </template>
@@ -142,12 +145,6 @@
         </template>
       </q-table>
     </q-card-section>
-
-    <!-- <pre>  {{ categoria.fecha_inicio }}</pre> -->
-    <!-- <pre>  {{ listaEgresos }}</pre> -->
-    <!-- <q-card-section align="center">
-      <q-btn color="positive" outline label="Cerrar" v-close-popup />
-    </q-card-section> -->
   </q-card>
 </template>
 
@@ -163,6 +160,7 @@ import PriceInput from '../formComponents/PriceInput.vue'
 import { useFormato } from 'src/composables/utils/useFormato'
 import CuentaSelect from '../formComponents/CuentaSelect.vue'
 import { useRegistrosCrud } from 'src/composables/useRegistrosCrud'
+import { routerViewLocationKey } from 'vue-router'
 
 /**
  * composables
@@ -173,23 +171,11 @@ const registrosCrud = useRegistrosCrud()
 /**
  * state
  */
-const dateForm = ref('')
+const categoria = ref({})
 const listaRegistros = ref([])
 
-// const fecha = computed({
-//   get() {
-//     return !!dateForm.value && dateForm.value != ''
-//       ? dateForm.value
-//       : props.categoria.fecha_inicio
-//   },
-//   set(val) {
-//     dateForm.value = val
-//   }
-// })
-const importe = ref('')
-
 const props = defineProps({
-  categoria: {
+  cellData: {
     type: Object,
     required: true,
     default: () => {
@@ -197,26 +183,9 @@ const props = defineProps({
     }
   }
 })
-onMounted(() => {
-  buscarMovimientos()
-  dateForm.value = props.categoria.fecha_inicio
-})
+onMounted(() => {})
 
 const columns = [
-  // {
-  //   name: 'categoria_id',
-  //   label: 'Id',
-  //   field: 'id',
-  //   sortable: true,
-  //   align: 'left'
-  // },
-  // {
-  //   name: 'categoria_id',
-  //   label: 'Id',
-  //   field: 'categoriaId',
-  //   sortable: true,
-  //   align: 'left'
-  // },
   {
     name: 'estatus',
     label: '',
@@ -262,17 +231,12 @@ const columns = [
 ]
 
 function addItem(props_row) {
-  const fechaInicio = DateTime.fromISO(props.categoria.fecha_inicio)
-  const fechaFin = DateTime.fromISO(props.categoria.fecha_fin)
+  row_to_insert.value = null
+  const fechaInicio = DateTime.fromISO(props.cellData.fecha_inicio)
+  const fechaFin = DateTime.fromISO(props.cellData.fecha_fin)
   const now = DateTime.now()
   const diff1 = now.diff(fechaInicio, ['days'])
   const diff2 = fechaFin.diff(now, ['days'])
-  // const diff2 = now.diff(fechaFin, ['days'])
-  console.log('now', now.toISODate())
-  console.log('fechaInicio', fechaInicio.toISODate())
-  console.log('fechaFin', fechaFin.toISODate())
-  console.log('diff1', diff1.toObject())
-  console.log('diff2', diff2.toObject())
   let fecha_formato = null
   if (diff1 > 0 && diff2 > 0) {
     fecha_formato = now.toFormat('dd/MM/yyyy')
@@ -281,13 +245,13 @@ function addItem(props_row) {
   }
 
   const item = {
-    categoriaId: props.categoria.id,
-    cuenta: null,
+    categoriaId: props.cellData.categoriaId,
+    cuenta: categoria.value.cuenta,
     cuentaValida: true,
     observaciones: '',
     registro: {
-      importe: null,
-      importeString: '',
+      importeString:
+        categoria.value.importe === 0 ? '' : categoria.value.importe.toString(),
       fecha_formato,
       importeValido: true
     }
@@ -298,16 +262,13 @@ function addItem(props_row) {
 /**
  * Methods
  */
+const row_to_insert = ref(null)
 function saveItem(row) {
-  console.log('Saving item', row)
-  console.log('importe', row.registro.importeString)
-  console.log('cuenta', row.cuenta)
   const fecha = row.registro.fecha_formato
   const cuenta = row.cuenta ?? null
   row.registro.importeValido = !!row.registro.importeString
   row.cuentaValida = !!cuenta
   if (row.registro.importeValido && !!cuenta && !!fecha) {
-    console.log('Guardando item', row)
     const input = {
       categoriaId: row.categoriaId,
       cuentaId: parseInt(cuenta.id),
@@ -318,13 +279,33 @@ function saveItem(row) {
         fecha: obtenerFechaISO(fecha)
       }
     }
-    registrosCrud.createIngreso({ input })
-    row.saved = true
+    row_to_insert.value = row
+    saveByTipoMovimiento(input)
+  }
+}
+function saveByTipoMovimiento(input) {
+  switch (props.cellData.tipo_movimiento_id) {
+    case '1':
+      registrosCrud.createIngreso({ input })
+      break
+    case '2':
+      registrosCrud.createEgreso({ input })
+      break
+    case '3':
+      registrosCrud.createTransferencia({ input })
+      break
+    default:
+      break
   }
 }
 
 registrosCrud.onDoneCreateIngreso((response) => {
   console.log('saved', response)
+  row_to_insert.value.saved = true
+})
+registrosCrud.onDoneCreateEgreso((response) => {
+  console.log('saved', response)
+  row_to_insert.value.saved = true
 })
 registrosCrud.onErrorCreateIngreso((error) => {
   console.error(error)
@@ -354,10 +335,14 @@ const graphql_options = ref({
   fetchPolicy: 'network-only'
 })
 
-const { result: resultCategoria, onError: onErrorCategoriaById } = useQuery(
+const {
+  result: resultCategoria,
+  onError: onErrorCategoriaById,
+  onResult: onResultCategoriaById
+} = useQuery(
   CATEGORIA_BY_ID,
   {
-    id: props.categoria.id
+    id: props.cellData.categoriaId
   },
   graphql_options
 )
@@ -369,9 +354,9 @@ const {
 } = useLazyQuery(
   OBTENER_INGRESOS,
   {
-    categoriaId: props.categoria.id,
-    fechaInicio: props.categoria.fecha_inicio,
-    fechaFin: props.categoria.fecha_fin
+    categoriaId: props.cellData.categoriaId,
+    fechaInicio: props.cellData.fecha_inicio,
+    fechaFin: props.cellData.fecha_fin
   },
   graphql_options
 )
@@ -382,9 +367,9 @@ const {
 } = useLazyQuery(
   OBTENER_EGRESOS,
   {
-    categoriaId: props.categoria.id,
-    fechaInicio: props.categoria.fecha_inicio,
-    fechaFin: props.categoria.fecha_fin
+    categoriaId: props.cellData.categoriaId,
+    fechaInicio: props.cellData.fecha_inicio,
+    fechaFin: props.cellData.fecha_fin
   },
   graphql_options
 )
@@ -404,13 +389,22 @@ onResultListaIngresos(({ data }) => {
 })
 onResultListaEgresos(({ data }) => {
   console.log('data egresos', data.obtenerEgresos)
-  listaRegistros.value = JSON.parse(JSON.stringify(data.obtenerEgresos))
-  listaRegistros.value.forEach((element) => {
-    element.registro.fecha_formato = formato.formatoFechaFromISO(
-      element.registro.fecha
-    )
-    element.saved = true
-  })
+  if (data.obtenerEgresos.length > 0) {
+    listaRegistros.value = JSON.parse(JSON.stringify(data.obtenerEgresos))
+    listaRegistros.value.forEach((element) => {
+      element.registro.fecha_formato = formato.formatoFechaFromISO(
+        element.registro.fecha
+      )
+      element.saved = true
+    })
+  } else {
+    addItem()
+  }
+})
+onResultCategoriaById(({ data }) => {
+  console.log('data', data)
+  categoria.value = data.categoriaById
+  buscarMovimientos()
 })
 
 onErrorListaIngresos((error) => {
@@ -433,12 +427,6 @@ const isImporteValido = (importeValido) => {
 const isCuentaValida = (cuentaValida) => {
   return cuentaValida
 }
-
-const categoriaResultado = computed({
-  get() {
-    return resultCategoria.value?.categoriaById
-  }
-})
 
 // const listaRegistros = computed({
 //   get() {
@@ -467,8 +455,7 @@ const categoriaResultado = computed({
  * Buscar movimientos de acuerdo a la categoria y perido ingresados como propiedades
  */
 function buscarMovimientos() {
-  console.log('buscando movimientos', props.categoria.tipo_movimiento_id)
-  switch (props.categoria.tipo_movimiento_id) {
+  switch (props.cellData.tipo_movimiento_id) {
     case '1':
       cargaListaIngresos()
       break
@@ -481,4 +468,10 @@ function buscarMovimientos() {
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.myClass {
+  &:hover {
+    background-color: white;
+  }
+}
+</style>

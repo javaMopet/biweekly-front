@@ -231,7 +231,7 @@
   </Teleport>
   <Teleport to="#modal">
     <q-dialog v-model="show_movimientos" persistent>
-      <ListaMovimientos :categoria="cellData"></ListaMovimientos>
+      <ListaMovimientos :cell-data="cellData"></ListaMovimientos>
     </q-dialog>
   </Teleport>
 </template>
@@ -358,7 +358,7 @@ function addItem2(props) {
   console.log('row', row)
   console.log('col', col)
   cellData.value = {
-    id: row.categoria_id,
+    categoriaId: row.categoria_id,
     nombre_categoria: row.nombre_categoria,
     tipo_movimiento_id: row.tipo_movimiento_id.toString(),
     icono: row.icono,
