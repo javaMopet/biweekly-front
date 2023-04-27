@@ -7,8 +7,8 @@
   <div class="column">
     <div class="column">
       <q-table
-        class="my-sticky-header-table-ingreso"
-        style="width: 100%"
+        class="my-sticky-header-table"
+        style="width: 100%; height: 280px !important"
         dense
         :rows="listaMovimientosIngreso"
         :columns="columns"
@@ -357,13 +357,6 @@ function addItem2(props) {
   const col = { ...props.col }
   console.log('row', row)
   console.log('col', col)
-  // console.log('categoria', props.row.categoria_id)
-  // console.log('id', props.col.id)
-  // console.log('props', props.col.name)
-  // console.log('props', props.col.label)
-  // const tipo_movimiento = '1'
-
-  // const fecha_inicio = props.row
   cellData.value = {
     id: row.categoria_id,
     nombre_categoria: row.nombre_categoria,
@@ -396,8 +389,8 @@ function obtenerColumnas() {
           column.format = (val, row) =>
             !!val ? `${formato.toCurrency(val)}` : ''
         } else {
-          column.style = 'background-color: #d9e4ee'
-          // (column.classes = 'mi-clase')
+          // column.style = 'background-color: #d9e4ee'
+          column.style = 'background-color: #c8d7ca'
         }
       })
       console.log('columnas ', columns.value)
@@ -524,30 +517,7 @@ onErrorDeleteMovimiento((error) => {
     transition: all 0.3s;
   }
 }
-.my-sticky-header-table-ingreso {
-  /* height or max-height is important */
-  height: 250px;
 
-  .q-table__top,
-  .q-table__bottom,
-  thead tr:first-child th {
-    /* bg color is important for th; just specify one */
-    background-color: #dfe2e9;
-  }
-  thead tr th {
-    position: sticky;
-    z-index: 1;
-  }
-  thead tr:first-child th {
-    top: 0;
-  }
-
-  /* this is when the loading indicator appears */
-  &.q-table--loading thead tr:last-child th {
-    /* height of all previous header rows */
-    top: 48px;
-  }
-}
 .my-sticky-header-table {
   /* height or max-height is important */
   height: calc(100vh - 375px);
@@ -556,7 +526,7 @@ onErrorDeleteMovimiento((error) => {
   .q-table__bottom,
   thead tr:first-child th {
     /* bg color is important for th; just specify one */
-    background-color: #dfe2e9;
+    background-color: $table-header;
   }
   thead tr th {
     position: sticky;

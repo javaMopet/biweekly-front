@@ -14,6 +14,7 @@
       label="Precio"
       :error="!isValid"
       :readonly="readonly"
+      :autofocus="autofocus"
     >
       <template #append>
         <div class="text-subtitle1">{{ editingLabel }}</div>
@@ -47,7 +48,7 @@ const inputValue = computed({
 /**
  * emits
  */
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue', 'blur'])
 
 const props = defineProps({
   modelValue: {
@@ -77,6 +78,11 @@ const props = defineProps({
     type: Boolean,
     required: false,
     default: true
+  },
+  autofocus: {
+    type: Boolean,
+    required: false,
+    default: false
   }
 })
 /**
@@ -105,6 +111,7 @@ onMounted(() => {
 })
 function onBlur(e) {
   editing.value = false
+  emit('blur')
 }
 function onFocus() {
   editing.value = true

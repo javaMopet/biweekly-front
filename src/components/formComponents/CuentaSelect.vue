@@ -13,9 +13,8 @@
         @filter="filterFn"
         behavior="menu"
         clearable=""
-        :rules="[
-          (val) => opcional || !!val || 'Favor de ingresar la categoria'
-        ]"
+        error-message="Favor de ingresar la cuenta"
+        :error="!isValid"
         lazyRules
         dense
         :hint="props.hint"
@@ -82,6 +81,11 @@ const props = defineProps({
     type: Boolean,
     required: false,
     default: false
+  },
+  isValid: {
+    type: Boolean,
+    required: false,
+    default: true
   }
 })
 /**

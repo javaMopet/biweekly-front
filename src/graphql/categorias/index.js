@@ -27,6 +27,30 @@ export const LISTA_CATEGORIAS = gql`
     }
   }
 `
+export const CATEGORIA_BY_ID = gql`
+  query categoriaById($id: ID!) {
+    categoriaById(id: $id) {
+      id
+      nombre
+      descripcion
+      color
+      icono
+      importe
+      tipoMovimiento {
+        id
+        nombre
+      }
+      cuentaContable {
+        id
+        nombre
+      }
+      cuenta {
+        id
+        nombre
+      }
+    }
+  }
+`
 
 export const CATEGORIA_CREATE = gql`
   mutation categoriaCreate($input: CategoriaInput!) {

@@ -5,7 +5,7 @@
     style="width: 920px; min-width: 980px; border: 0px solid red"
   >
     <!-- <pre>{{ listaRegistros }}</pre> -->
-    <!-- <pre>{{ categoria }}</pre> -->
+    <pre>{{ categoriaResultado }}</pre>
     <q-card-section class="bg-dark text-white">
       <q-btn
         round
@@ -35,21 +35,8 @@
         separator="none"
         flat
       >
-        <!-- <template #top="props">
-          <q-th>
-            {{ props.row }}
-            <q-btn
-              color="secondary"
-              rounded
-              icon="add"
-              @click="addItem(props)"
-              dense
-              push
-            />
-          </q-th>
-        </template> -->
         <template #body-cell-estatus="props">
-          <q-td class="row inline" style="border: 0px solid red">
+          <q-td class="" style="border: 0px solid red">
             <q-icon
               v-if="props.row.saved"
               name="done"
@@ -77,9 +64,20 @@
               v-model="props.row.registro.importeString"
               :opcional="true"
               :readonly="props.row.saved"
-              autofocus
-              :is-valid="isImporteValido(props.row.registro.importeString)"
+              :autofocus="true"
+              :is-valid="isImporteValido(props.row.registro.importeValido)"
+              @blur="validarPrecio"
             ></PriceInput>
+          </q-td>
+        </template>
+        <template #body-cell-cuenta="props">
+          <q-td style="width: 250px">
+            <CuentaSelect
+              v-model="props.row.cuenta"
+              :agregar="false"
+              :readonly="props.row.saved"
+              :is-valid="isCuentaValida(props.row.cuentaValida)"
+            ></CuentaSelect>
           </q-td>
         </template>
         <template #body-cell-observaciones="props">
@@ -97,18 +95,9 @@
             />
           </q-td>
         </template>
-        <template #body-cell-cuenta="props">
-          <q-td style="width: 250px">
-            <CuentaSelect
-              v-model="props.row.cuenta"
-              :agregar="false"
-              :readonly="props.row.saved"
-            ></CuentaSelect>
-          </q-td>
-        </template>
         <template #body-cell-acciones="props">
           <q-td
-            class="row items-top justify-center"
+            class=""
             style="width: 110px; height: 50px; border: 0px solid green"
           >
             <div class="row inline">
@@ -168,15 +157,18 @@ import DateInput from '../formComponents/DateInput.vue'
 import { DateTime } from 'luxon'
 import { OBTENER_INGRESOS } from 'src/graphql/ingresos'
 import { OBTENER_EGRESOS } from 'src/graphql/egresos'
-import { useLazyQuery } from '@vue/apollo-composable'
+import { CATEGORIA_BY_ID } from 'src/graphql/categorias'
+import { useLazyQuery, useQuery } from '@vue/apollo-composable'
 import PriceInput from '../formComponents/PriceInput.vue'
 import { useFormato } from 'src/composables/utils/useFormato'
 import CuentaSelect from '../formComponents/CuentaSelect.vue'
+import { useRegistrosCrud } from 'src/composables/useRegistrosCrud'
 
 /**
  * composables
  */
 const formato = useFormato()
+const registrosCrud = useRegistrosCrud()
 
 /**
  * state
@@ -270,20 +262,90 @@ const columns = [
 ]
 
 function addItem(props_row) {
-  console.log('props', props_row)
+  const fechaInicio = DateTime.fromISO(props.categoria.fecha_inicio)
+  const fechaFin = DateTime.fromISO(props.categoria.fecha_fin)
+  const now = DateTime.now()
+  const diff1 = now.diff(fechaInicio, ['days'])
+  const diff2 = fechaFin.diff(now, ['days'])
+  // const diff2 = now.diff(fechaFin, ['days'])
+  console.log('now', now.toISODate())
+  console.log('fechaInicio', fechaInicio.toISODate())
+  console.log('fechaFin', fechaFin.toISODate())
+  console.log('diff1', diff1.toObject())
+  console.log('diff2', diff2.toObject())
+  let fecha_formato = null
+  if (diff1 > 0 && diff2 > 0) {
+    fecha_formato = now.toFormat('dd/MM/yyyy')
+  } else {
+    fecha_formato = fechaInicio.toFormat('dd/MM/yyyy')
+  }
+
   const item = {
     categoriaId: props.categoria.id,
     cuenta: null,
+    cuentaValida: true,
     observaciones: '',
     registro: {
       importe: null,
       importeString: '',
-      fecha: '18/04/2023',
-      fecha_formato: formato.formatoFechaFromISO(props.categoria.fecha_inicio)
+      fecha_formato,
+      importeValido: true
     }
   }
   console.log('adding item0', item)
   listaRegistros.value.push(item)
+}
+/**
+ * Methods
+ */
+function saveItem(row) {
+  console.log('Saving item', row)
+  console.log('importe', row.registro.importeString)
+  console.log('cuenta', row.cuenta)
+  const fecha = row.registro.fecha_formato
+  const cuenta = row.cuenta ?? null
+  row.registro.importeValido = !!row.registro.importeString
+  row.cuentaValida = !!cuenta
+  if (row.registro.importeValido && !!cuenta && !!fecha) {
+    console.log('Guardando item', row)
+    const input = {
+      categoriaId: row.categoriaId,
+      cuentaId: parseInt(cuenta.id),
+      observaciones: row.observaciones,
+      registro: {
+        estadoRegistroId: 2,
+        importe: parseFloat(row.registro.importeString),
+        fecha: obtenerFechaISO(fecha)
+      }
+    }
+    registrosCrud.createIngreso({ input })
+    row.saved = true
+  }
+}
+
+registrosCrud.onDoneCreateIngreso((response) => {
+  console.log('saved', response)
+})
+registrosCrud.onErrorCreateIngreso((error) => {
+  console.error(error)
+})
+function obtenerFechaISO(fecha_formato) {
+  const date = !!fecha_formato
+    ? DateTime.fromFormat(fecha_formato, 'dd/MM/yyyy')
+    : null
+  return date?.toISODate()
+}
+function editItem(row) {
+  row.saved = false
+}
+
+function deleteItem(item) {
+  console.log('item', item)
+  console.log('item index', item.rowIndex)
+}
+
+function validarPrecio(value) {
+  console.log('validar precio', value)
 }
 /**
  * graphql
@@ -291,6 +353,15 @@ function addItem(props_row) {
 const graphql_options = ref({
   fetchPolicy: 'network-only'
 })
+
+const { result: resultCategoria, onError: onErrorCategoriaById } = useQuery(
+  CATEGORIA_BY_ID,
+  {
+    id: props.categoria.id
+  },
+  graphql_options
+)
+
 const {
   onError: onErrorListaIngresos,
   onResult: onResultListaIngresos,
@@ -348,13 +419,26 @@ onErrorListaIngresos((error) => {
 onErrorListaEgresos((error) => {
   console.error('error', error)
 })
+onErrorCategoriaById((error) => {
+  console.error('error', error)
+})
 /**
  * computed
  */
-const isImporteValido = (importe) => {
-  console.log('importe', importe)
-  return !!importe
+// const importeValido = ref(true)
+
+const isImporteValido = (importeValido) => {
+  return importeValido
 }
+const isCuentaValida = (cuentaValida) => {
+  return cuentaValida
+}
+
+const categoriaResultado = computed({
+  get() {
+    return resultCategoria.value?.categoriaById
+  }
+})
 
 // const listaRegistros = computed({
 //   get() {
@@ -394,31 +478,6 @@ function buscarMovimientos() {
     default:
       break
   }
-}
-
-/**
- * Methods
- */
-function fechaOptionsFn(date) {
-  return date >= '2023/04/15' && date <= '2023/04/30'
-}
-function onSubmit() {
-  console.log('agregar nuevo movimiento')
-}
-function onReset() {}
-function saveItem(row) {
-  console.log('Saving item', row)
-  row.saved = true
-}
-function editItem(row) {
-  row.saved = false
-}
-function deleteItem(item) {
-  console.log('item', item)
-  console.log('item index', item.rowIndex)
-}
-function validarPrecio() {
-  console.log('validar precio')
 }
 </script>
 
