@@ -146,13 +146,87 @@
     <div class="row fit" style="border: 0px solid red">
       <q-table
         class="my-sticky-header-table"
-        style="width: 100%"
+        style="width: 100%; height: 380px !important"
         flat
         bordered
         v-model:pagination="pagination"
         :rows-per-page-options="[0]"
         dense
         :rows="listaMovimientos"
+        :columns="columns"
+        row-key="id"
+        :filter="filter"
+        separator="cell"
+      >
+        <template v-slot:header="props">
+          <q-tr :props="props">
+            <q-th
+              v-for="col in props.cols"
+              :key="col.name"
+              :props="props"
+              class="text-dark"
+            >
+              {{ col.label }}
+            </q-th>
+          </q-tr>
+        </template>
+        <template v-slot:top-right>
+          <q-input
+            outlined
+            dense
+            debounce="300"
+            v-model="filter"
+            placeholder="Buscar"
+          >
+            <template v-slot:append>
+              <q-icon name="search" />
+            </template>
+          </q-input>
+        </template>
+        <template v-slot:body-cell="props">
+          <q-td dense :props="props" clickable @click="addItem2(props)">
+            <span v-if="props.col.name === 'nombre_categoria'">
+              <q-icon :name="props.row.icono" size="22px" color="dark" />
+              {{ props.value }}
+            </span>
+            <span dense v-else class="">
+              {{ props.value }}
+            </span>
+
+            <!-- <q-badge v-else color="blue" :label="props.value" /> -->
+            <!-- <PriceInput v-else></PriceInput> -->
+          </q-td>
+        </template>
+        <!-- <template #body-cell-icono="props">
+          <q-td style="width: 30px" class="bg-categoria-light">
+            <q-icon :name="props.row.icono" size="22px" color="dark" />
+          </q-td>
+        </template> -->
+        <!-- <template v-slot:body-cell-acciones="props">
+          <q-td :props="props" fit>
+            <q-btn icon="edit" size="sm" flat dense @click="editRow(props)" />
+            <q-btn
+              icon="delete"
+              size="sm"
+              class="q-ml-sm text-negative"
+              flat
+              dense
+              @click="deleteRow(props)"
+            />
+          </q-td>
+        </template> -->
+      </q-table>
+    </div>
+    <div class="row fit" style="border: 0px solid red">
+      <q-table
+        class="my-sticky-header-table"
+        style="width: 100%; height: 200px !important"
+        flat
+        bordered
+        v-model:pagination="pagination"
+        :rows-per-page-options="[0]"
+        dense
+        :rows="listaSaldosCuentas"
         :columns="columns"
         row-key="id"
         :filter="filter"
@@ -231,7 +305,10 @@
   </Teleport>
   <Teleport to="#modal">
     <q-dialog v-model="show_movimientos" persistent>
-      <ListaMovimientos :cell-data="cellData"></ListaMovimientos>
+      <ListaMovimientos
+        :cell-data="cellData"
+        @registro-created="onRegistroCreated"
+      ></ListaMovimientos>
     </q-dialog>
   </Teleport>
 </template>
@@ -298,6 +375,7 @@ const mesOptions = ref([
 const mes = ref(mesOptions.value[0])
 const listaMovimientos = ref([])
 const listaMovimientosIngreso = ref([])
+const listaSaldosCuentas = ref([])
 const filter = ref()
 const editedItem = ref({ ...defaultItem })
 const editedIndex = ref(null)
@@ -342,6 +420,7 @@ const columns = ref([
 onMounted(() => {
   obtenerColumnas()
   obtenerMovimientos()
+  obtenerSaldosCuentas()
 })
 /**
  * METHODS
@@ -355,8 +434,8 @@ function addItem(tipo_movimiento) {
 function addItem2(props) {
   const row = { ...props.row }
   const col = { ...props.col }
-  console.log('row', row)
-  console.log('col', col)
+  // console.log('row', row)
+  // console.log('col', col)
   cellData.value = {
     categoriaId: row.categoria_id,
     nombre_categoria: row.nombre_categoria,
@@ -430,6 +509,23 @@ function obtenerMovimientos() {
       console.log('error', error)
     })
 }
+function obtenerSaldosCuentas() {
+  api
+    .get('/saldos_cuentas', {
+      params: {
+        ejercicio_fiscal_id: 2023
+      }
+    })
+    .then(({ data }) => {
+      console.log('response data', data.data)
+      listaSaldosCuentas.value = JSON.parse(JSON.stringify(data.data))
+
+      // console.log('ingresos data', listaMovimientosIngreso.value)
+    })
+    .catch((error) => {
+      console.log('error', error)
+    })
+}
 
 function deleteRow(item) {
   rowIndexDelete.value = item.rowIndex
@@ -474,6 +570,10 @@ function mostrarNotificacion(action, cuenta) {
     `La movimiento "${cuenta.nombre}" se ${action} correctamente`,
     2500
   )
+}
+function onRegistroCreated(itemCreated) {
+  console.log('El registro fue creado', itemCreated)
+  obtenerMovimientos()
 }
 /**
  * GRAPHQL

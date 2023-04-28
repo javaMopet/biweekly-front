@@ -5,7 +5,7 @@ export function useNotificacion() {
 
   const mostrarNotificacionPositiva = (message, timeout) => {
     $q.notify({
-      position: 'top',
+      position: 'center',
       type: 'positive',
       message,
       timeout,

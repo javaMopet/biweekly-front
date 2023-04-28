@@ -149,7 +149,7 @@
 </template>
 
 <script setup>
-import { ref, computed, defineProps, onMounted } from 'vue'
+import { ref, computed, defineProps, defineEmits, onMounted } from 'vue'
 import DateInput from '../formComponents/DateInput.vue'
 import { DateTime } from 'luxon'
 import { OBTENER_INGRESOS } from 'src/graphql/ingresos'
@@ -161,12 +161,14 @@ import { useFormato } from 'src/composables/utils/useFormato'
 import CuentaSelect from '../formComponents/CuentaSelect.vue'
 import { useRegistrosCrud } from 'src/composables/useRegistrosCrud'
 import { routerViewLocationKey } from 'vue-router'
+import { useNotificacion } from 'src/composables/utils/useNotificacion'
 
 /**
  * composables
  */
 const formato = useFormato()
 const registrosCrud = useRegistrosCrud()
+const notificacion = useNotificacion()
 
 /**
  * state
@@ -183,6 +185,9 @@ const props = defineProps({
     }
   }
 })
+
+const emit = defineEmits(['registroCreated'])
+
 onMounted(() => {})
 
 const columns = [
@@ -256,7 +261,6 @@ function addItem(props_row) {
       importeValido: true
     }
   }
-  console.log('adding item0', item)
   listaRegistros.value.push(item)
 }
 /**
@@ -299,14 +303,18 @@ function saveByTipoMovimiento(input) {
   }
 }
 
-registrosCrud.onDoneCreateIngreso((response) => {
-  console.log('saved', response)
-  row_to_insert.value.saved = true
+registrosCrud.onDoneCreateIngreso(({ data }) => {
+  afterSaveItem('Ingreso', data.ingresoCreate)
 })
-registrosCrud.onDoneCreateEgreso((response) => {
-  console.log('saved', response)
-  row_to_insert.value.saved = true
+registrosCrud.onDoneCreateEgreso(({ data }) => {
+  afterSaveItem('Egreso', data.egresoCreate)
 })
+function afterSaveItem(tipoRegistro, itemSaved) {
+  row_to_insert.value.saved = true
+  notificacion.mostrarNotificacionPositiva(`${tipoRegistro} guardado.`, 1000)
+  emit('registroCreated', itemSaved)
+}
+
 registrosCrud.onErrorCreateIngreso((error) => {
   console.error(error)
 })
@@ -321,12 +329,12 @@ function editItem(row) {
 }
 
 function deleteItem(item) {
-  console.log('item', item)
-  console.log('item index', item.rowIndex)
+  // console.log('item', item)
+  // console.log('item index', item.rowIndex)
 }
 
 function validarPrecio(value) {
-  console.log('validar precio', value)
+  // console.log('validar precio', value)
 }
 /**
  * graphql
@@ -374,7 +382,7 @@ const {
   graphql_options
 )
 onResultListaIngresos(({ data }) => {
-  console.log('data ingresos', data.obtenerIngresos)
+  // console.log('data ingresos', data.obtenerIngresos)
   if (data.obtenerIngresos.length > 0) {
     listaRegistros.value = JSON.parse(JSON.stringify(data.obtenerIngresos))
     listaRegistros.value.forEach((element) => {
@@ -395,6 +403,7 @@ onResultListaEgresos(({ data }) => {
       element.registro.fecha_formato = formato.formatoFechaFromISO(
         element.registro.fecha
       )
+      element.registro.importeString = element.registro.importe.toString()
       element.saved = true
     })
   } else {
@@ -402,7 +411,7 @@ onResultListaEgresos(({ data }) => {
   }
 })
 onResultCategoriaById(({ data }) => {
-  console.log('data', data)
+  // console.log('data', data)
   categoria.value = data.categoriaById
   buscarMovimientos()
 })
