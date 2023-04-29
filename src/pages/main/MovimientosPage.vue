@@ -1,14 +1,14 @@
 <template>
-  <q-toolbar class="text-dark">
+  <!-- <q-toolbar class="text-dark">
     <q-toolbar-title> Movimientos </q-toolbar-title>
     <q-btn flat round dense icon="arrow_back" @click="$router.back()" />
-  </q-toolbar>
-  <q-space style="height: 10px" />
+  </q-toolbar> -->
+  <!-- <q-space style="height: 10px" /> -->
   <div class="column">
     <div class="column">
+      <!-- class="my-sticky-header-table" -->
+      <!-- style="width: 100%; height: 280px !important" -->
       <q-table
-        class="my-sticky-header-table"
-        style="width: 100%; height: 280px !important"
         dense
         :rows="listaMovimientosIngreso"
         :columns="columns"
@@ -143,6 +143,17 @@
         </template> -->
       </q-table>
     </div>
+    <div class="">
+      <q-table
+        :rows="saldosIngreso"
+        :columns="columns"
+        row-key="name"
+        hide-header
+        hide-bottom
+        separator="cell"
+        dense
+      />
+    </div>
     <div class="row fit" style="border: 0px solid red">
       <q-table
         class="my-sticky-header-table"
@@ -157,6 +168,8 @@
         row-key="id"
         :filter="filter"
         separator="cell"
+        hide-botton
+        hide-pagination
       >
         <template v-slot:header="props">
           <q-tr :props="props">
@@ -217,6 +230,17 @@
         </template> -->
       </q-table>
     </div>
+    <div class="">
+      <q-table
+        :rows="saldosEgreso"
+        :columns="columns"
+        row-key="name"
+        hide-header
+        hide-bottom
+        separator="cell"
+        dense
+      />
+    </div>
     <div class="row fit" style="border: 0px solid red">
       <q-table
         class="my-sticky-header-table"
@@ -231,6 +255,8 @@
         row-key="id"
         :filter="filter"
         separator="cell"
+        hide-pagination
+        hide-bottom
       >
         <template v-slot:header="props">
           <q-tr :props="props">
@@ -290,6 +316,17 @@
           </q-td>
         </template> -->
       </q-table>
+    </div>
+    <div class="">
+      <q-table
+        :rows="saldosCuentas"
+        :columns="columns"
+        row-key="name"
+        hide-header
+        hide-bottom
+        separator="cell"
+        dense
+      />
     </div>
   </div>
 
@@ -375,7 +412,10 @@ const mesOptions = ref([
 const mes = ref(mesOptions.value[0])
 const listaMovimientos = ref([])
 const listaMovimientosIngreso = ref([])
+const saldosIngreso = ref([])
+const saldosEgreso = ref([])
 const listaSaldosCuentas = ref([])
+const saldosCuentas = ref([])
 const filter = ref()
 const editedItem = ref({ ...defaultItem })
 const editedIndex = ref(null)
@@ -482,7 +522,8 @@ function obtenerMovimientos() {
   api
     .get('/movimientos', {
       params: {
-        tipoMovimientoId: 2
+        tipoMovimientoId: 2,
+        isSaldos: 0
       }
     })
     .then(({ data }) => {
@@ -496,7 +537,23 @@ function obtenerMovimientos() {
   api
     .get('/movimientos', {
       params: {
-        tipoMovimientoId: 1
+        tipoMovimientoId: 2,
+        isSaldos: 1
+      }
+    })
+    .then(({ data }) => {
+      // console.log('response data', data.data)
+      saldosEgreso.value = JSON.parse(JSON.stringify(data.data))
+      console.log('response data', listaMovimientos.value)
+    })
+    .catch((error) => {
+      console.log('error', error)
+    })
+  api
+    .get('/movimientos', {
+      params: {
+        tipoMovimientoId: 1,
+        isSaldos: 0
       }
     })
     .then(({ data }) => {
@@ -508,12 +565,29 @@ function obtenerMovimientos() {
     .catch((error) => {
       console.log('error', error)
     })
+  api
+    .get('/movimientos', {
+      params: {
+        tipoMovimientoId: 1,
+        isSaldos: 1
+      }
+    })
+    .then(({ data }) => {
+      // console.log('response data', data.data)
+      saldosIngreso.value = JSON.parse(JSON.stringify(data.data))
+
+      // console.log('ingresos data', listaMovimientosIngreso.value)
+    })
+    .catch((error) => {
+      console.log('error', error)
+    })
 }
 function obtenerSaldosCuentas() {
   api
     .get('/saldos_cuentas', {
       params: {
-        ejercicio_fiscal_id: 2023
+        ejercicio_fiscal_id: 2023,
+        isSaldos: 0
       }
     })
     .then(({ data }) => {
@@ -521,6 +595,20 @@ function obtenerSaldosCuentas() {
       listaSaldosCuentas.value = JSON.parse(JSON.stringify(data.data))
 
       // console.log('ingresos data', listaMovimientosIngreso.value)
+    })
+    .catch((error) => {
+      console.log('error', error)
+    })
+  api
+    .get('/saldos_cuentas', {
+      params: {
+        ejercicio_fiscal_id: 2023,
+        isSaldos: 1
+      }
+    })
+    .then(({ data }) => {
+      console.log('response data', data.data)
+      saldosCuentas.value = JSON.parse(JSON.stringify(data.data))
     })
     .catch((error) => {
       console.log('error', error)

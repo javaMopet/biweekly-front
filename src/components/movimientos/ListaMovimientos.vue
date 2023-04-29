@@ -381,6 +381,7 @@ const {
   },
   graphql_options
 )
+
 onResultListaIngresos(({ data }) => {
   // console.log('data ingresos', data.obtenerIngresos)
   if (data.obtenerIngresos.length > 0) {
@@ -395,6 +396,7 @@ onResultListaIngresos(({ data }) => {
     addItem()
   }
 })
+
 onResultListaEgresos(({ data }) => {
   console.log('data egresos', data.obtenerEgresos)
   if (data.obtenerEgresos.length > 0) {
@@ -410,6 +412,7 @@ onResultListaEgresos(({ data }) => {
     addItem()
   }
 })
+
 onResultCategoriaById(({ data }) => {
   // console.log('data', data)
   categoria.value = data.categoriaById
@@ -419,12 +422,15 @@ onResultCategoriaById(({ data }) => {
 onErrorListaIngresos((error) => {
   console.error('error', error)
 })
+
 onErrorListaEgresos((error) => {
   console.error('error', error)
 })
+
 onErrorCategoriaById((error) => {
   console.error('error', error)
 })
+
 /**
  * computed
  */
