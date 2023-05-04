@@ -157,7 +157,7 @@
     <div class="row fit" style="border: 0px solid red">
       <q-table
         class="my-sticky-header-table"
-        style="width: 100%; height: 380px !important"
+        style="width: 100%; height: 330px !important"
         flat
         bordered
         v-model:pagination="pagination"
@@ -241,6 +241,17 @@
         dense
       />
     </div>
+    <div class="">
+      <q-table
+        :rows="listaSaldosMovimientos"
+        :columns="columns"
+        row-key="name"
+        hide-header
+        hide-bottom
+        separator="cell"
+        dense
+      />
+    </div>
     <div class="row fit" style="border: 0px solid red">
       <q-table
         class="my-sticky-header-table"
@@ -270,7 +281,7 @@
             </q-th>
           </q-tr>
         </template>
-        <template v-slot:top-right>
+        <!-- <template v-slot:top-right>
           <q-input
             outlined
             dense
@@ -282,7 +293,7 @@
               <q-icon name="search" />
             </template>
           </q-input>
-        </template>
+        </template> -->
         <template v-slot:body-cell="props">
           <q-td dense :props="props" clickable @click="addItem2(props)">
             <span v-if="props.col.name === 'nombre_categoria'">
@@ -415,6 +426,7 @@ const listaMovimientosIngreso = ref([])
 const saldosIngreso = ref([])
 const saldosEgreso = ref([])
 const listaSaldosCuentas = ref([])
+const listaSaldosMovimientos = ref([])
 const saldosCuentas = ref([])
 const filter = ref()
 const editedItem = ref({ ...defaultItem })
@@ -460,6 +472,7 @@ const columns = ref([
 onMounted(() => {
   obtenerColumnas()
   obtenerMovimientos()
+  obtenerSaldosMovimientos()
   obtenerSaldosCuentas()
 })
 /**
@@ -508,8 +521,8 @@ function obtenerColumnas() {
           column.format = (val, row) =>
             !!val ? `${formato.toCurrency(val)}` : ''
         } else {
-          // column.style = 'background-color: #d9e4ee'
-          column.style = 'background-color: #c8d7ca'
+          column.style = 'background-color: #aebbc7'
+          // column.style = 'background-color: #c8d7ca'
         }
       })
       console.log('columnas ', columns.value)
@@ -582,6 +595,25 @@ function obtenerMovimientos() {
       console.log('error', error)
     })
 }
+function obtenerSaldosMovimientos() {
+  api
+    .get('/saldos_movimientos', {
+      params: {
+        ejercicio_fiscal_id: 2023,
+        isSaldos: 0
+      }
+    })
+    .then(({ data }) => {
+      console.log('response data', data.data)
+      listaSaldosMovimientos.value = JSON.parse(JSON.stringify(data.data))
+
+      // console.log('ingresos data', listaMovimientosIngreso.value)
+    })
+    .catch((error) => {
+      console.log('error', error)
+    })
+}
+
 function obtenerSaldosCuentas() {
   api
     .get('/saldos_cuentas', {
