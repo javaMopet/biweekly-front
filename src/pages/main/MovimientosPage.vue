@@ -478,7 +478,6 @@ onMounted(() => {
 /**
  * METHODS
  */
-
 function addItem(tipo_movimiento) {
   editedItem.value = { ...defaultItem, tipoMovimientoId: tipo_movimiento }
   editedIndex.value = null
