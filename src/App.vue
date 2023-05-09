@@ -14,17 +14,18 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-// html,
-// body {
-//   // font-family: 'Assistant', sans-serif;
-//   // font-family: 'Lobster Two', cursive;
-//   // font-family: 'Montserrat Alternates', sans-serif;
-//   // font-family: 'Sen', sans-serif;
-//   // font-family: 'IBM Plex Sans Condensed', sans-serif;
-//   font-family: 'Roboto Flex', sans-serif;
-//   // font-family: 'Chivo Mono', monospace;
-//   font-size: 100%;
-//   // background-color: #e5e8f0 !important;
-//   color: primary;
-// }
+html,
+body {
+  //   // font-family: 'Assistant', sans-serif;
+  //   // font-family: 'Lobster Two', cursive;
+  //   // font-family: 'Montserrat Alternates', sans-serif;
+  //   // font-family: 'Sen', sans-serif;
+  //   // font-family: 'IBM Plex Sans Condensed', sans-serif;
+  //   font-family: 'Roboto Flex', sans-serif;
+  //   // font-family: 'Chivo Mono', monospace;
+  //   font-size: 100%;
+  //   // background-color: #e5e8f0 !important;
+  //   color: primary;
+  // font-size: 0.6rem !important;
+}
 </style>

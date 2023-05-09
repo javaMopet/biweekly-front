@@ -12,7 +12,6 @@ const api = axios.create({ baseURL: process.env.API_URL })
 
 api.interceptors.request.use(
   async (config) => {
-    console.log('config', config.url)
     if (SessionStorage.getItem('auth_token')) {
       const token = SessionStorage.getItem('auth_token')
       config.headers = {

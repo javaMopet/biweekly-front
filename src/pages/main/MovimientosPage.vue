@@ -19,13 +19,8 @@
         hide-pagination
       >
         <template v-slot:header="props">
-          <q-tr :props="props">
-            <q-th
-              v-for="col in props.cols"
-              :key="col.name"
-              :props="props"
-              class="text-dark"
-            >
+          <q-tr :props="props" class="bg-green-2 text-contrast-light">
+            <q-th v-for="col in props.cols" :key="col.name" :props="props">
               {{ col.label }}
             </q-th>
           </q-tr>
@@ -111,42 +106,27 @@
             </template>
           </q-input>
         </template>
-        <!-- <template #body-cell-icono="props">
-          <q-td style="width: 30px"> </q-td>
-        </template> -->
-        <template v-slot:body-cell="props">
-          <q-td dense :props="props" clickable @click="addItem2(props)">
-            <span v-if="props.col.name === 'nombre_categoria'">
-              <q-icon :name="props.row.icono" size="22px" color="dark" />
-              {{ props.value }}
-            </span>
-            <span dense v-else class="">
-              {{ props.value }}
-            </span>
-
-            <!-- <q-badge v-else color="blue" :label="props.value" /> -->
-            <!-- <PriceInput v-else></PriceInput> -->
+        <template v-slot:body-cell-nombre_categoria="props">
+          <q-td
+            dense
+            :props="props"
+            :style="`border-left: 5px solid ${props.row.color}`"
+          >
+            <q-icon :name="props.row.icono" size="22px" color="dark" />
+            {{ props.value }}
           </q-td>
         </template>
-        <!-- <template v-slot:body-cell-acciones="props">
-          <q-td :props="props" fit>
-            <q-btn icon="edit" size="sm" flat dense @click="editRow(props)" />
-            <q-btn
-              icon="delete"
-              size="sm"
-              class="q-ml-sm text-negative"
-              flat
-              dense
-              @click="deleteRow(props)"
-            />
+        <template v-slot:body-cell="props">
+          <q-td dense :props="props" clickable @click="addItem2(props)">
+            {{ props.value }}
           </q-td>
-        </template> -->
+        </template>
       </q-table>
     </div>
     <div class="">
       <q-table
         :rows="saldosIngreso"
-        :columns="columns"
+        :columns="columnsSaldos"
         row-key="name"
         hide-header
         hide-bottom
@@ -172,68 +152,48 @@
         hide-pagination
       >
         <template v-slot:header="props">
-          <q-tr :props="props">
-            <q-th
-              v-for="col in props.cols"
-              :key="col.name"
-              :props="props"
-              class="text-dark"
-            >
+          <q-tr :props="props" class="bg-green-2 text-contrast-light">
+            <q-th v-for="col in props.cols" :key="col.name" :props="props">
               {{ col.label }}
             </q-th>
           </q-tr>
         </template>
         <template v-slot:top-right>
-          <q-input
-            outlined
+          <div class="bg-white">
+            <q-input
+              outlined
+              dense
+              debounce="300"
+              v-model="filter"
+              placeholder="Buscar"
+            >
+              <template v-slot:append>
+                <q-icon name="search" />
+              </template>
+            </q-input>
+          </div>
+        </template>
+        <template v-slot:body-cell-nombre_categoria="props">
+          <q-td
             dense
-            debounce="300"
-            v-model="filter"
-            placeholder="Buscar"
+            :props="props"
+            :style="`border-left: 5px solid ${props.row.color}`"
           >
-            <template v-slot:append>
-              <q-icon name="search" />
-            </template>
-          </q-input>
+            <q-icon :name="props.row.icono" size="22px" color="dark" />
+            {{ props.value }}
+          </q-td>
         </template>
         <template v-slot:body-cell="props">
           <q-td dense :props="props" clickable @click="addItem2(props)">
-            <span v-if="props.col.name === 'nombre_categoria'">
-              <q-icon :name="props.row.icono" size="22px" color="dark" />
-              {{ props.value }}
-            </span>
-            <span dense v-else class="">
-              {{ props.value }}
-            </span>
-
-            <!-- <q-badge v-else color="blue" :label="props.value" /> -->
-            <!-- <PriceInput v-else></PriceInput> -->
+            {{ props.value }}
           </q-td>
         </template>
-        <!-- <template #body-cell-icono="props">
-          <q-td style="width: 30px" class="bg-categoria-light">
-            <q-icon :name="props.row.icono" size="22px" color="dark" />
-          </q-td>
-        </template> -->
-        <!-- <template v-slot:body-cell-acciones="props">
-          <q-td :props="props" fit>
-            <q-btn icon="edit" size="sm" flat dense @click="editRow(props)" />
-            <q-btn
-              icon="delete"
-              size="sm"
-              class="q-ml-sm text-negative"
-              flat
-              dense
-              @click="deleteRow(props)"
-            />
-          </q-td>
-        </template> -->
       </q-table>
     </div>
     <div class="">
       <q-table
         :rows="saldosEgreso"
-        :columns="columns"
+        :columns="columnsSaldos"
         row-key="name"
         hide-header
         hide-bottom
@@ -250,7 +210,20 @@
         hide-bottom
         separator="cell"
         dense
-      />
+      >
+        <template #body-cell="props">
+          <q-td
+            dense
+            :props="props"
+            :class="{
+              'table__body-totals': props.row.categoria_id === 1,
+              'table__body-preBalance': props.row.categoria_id === 2
+            }"
+          >
+            {{ props.value }}
+          </q-td>
+        </template>
+      </q-table>
     </div>
     <div class="row fit" style="border: 0px solid red">
       <q-table
@@ -270,74 +243,52 @@
         hide-bottom
       >
         <template v-slot:header="props">
-          <q-tr :props="props">
-            <q-th
-              v-for="col in props.cols"
-              :key="col.name"
-              :props="props"
-              class="text-dark"
-            >
+          <q-tr :props="props" class="bg-green-2 text-contrast-light">
+            <q-th v-for="col in props.cols" :key="col.name" :props="props">
               {{ col.label }}
             </q-th>
           </q-tr>
         </template>
-        <!-- <template v-slot:top-right>
-          <q-input
-            outlined
+        <template v-slot:body-cell-nombre_categoria="props">
+          <q-td
             dense
-            debounce="300"
-            v-model="filter"
-            placeholder="Buscar"
+            :props="props"
+            :style="`border-left: 5px solid ${props.row.color}`"
           >
-            <template v-slot:append>
-              <q-icon name="search" />
-            </template>
-          </q-input>
-        </template> -->
-        <template v-slot:body-cell="props">
-          <q-td dense :props="props" clickable @click="addItem2(props)">
-            <span v-if="props.col.name === 'nombre_categoria'">
-              <q-icon :name="props.row.icono" size="22px" color="dark" />
-              {{ props.value }}
-            </span>
-            <span dense v-else class="">
-              {{ props.value }}
-            </span>
-
-            <!-- <q-badge v-else color="blue" :label="props.value" /> -->
-            <!-- <PriceInput v-else></PriceInput> -->
+            <q-icon :name="props.row.icono" size="22px" color="dark" />
+            {{ props.value }}
           </q-td>
         </template>
-        <!-- <template #body-cell-icono="props">
-          <q-td style="width: 30px" class="bg-categoria-light">
-            <q-icon :name="props.row.icono" size="22px" color="dark" />
+        <template v-slot:body-cell="props">
+          <q-td dense :props="props" clickable @click="addItem2(props)">
+            {{ props.value }}
           </q-td>
-        </template> -->
-        <!-- <template v-slot:body-cell-acciones="props">
-          <q-td :props="props" fit>
-            <q-btn icon="edit" size="sm" flat dense @click="editRow(props)" />
-            <q-btn
-              icon="delete"
-              size="sm"
-              class="q-ml-sm text-negative"
-              flat
-              dense
-              @click="deleteRow(props)"
-            />
-          </q-td>
-        </template> -->
+        </template>
       </q-table>
     </div>
     <div class="">
       <q-table
-        :rows="saldosCuentas"
+        :rows="listaSaldosFinales"
         :columns="columns"
         row-key="name"
         hide-header
         hide-bottom
         separator="cell"
         dense
-      />
+      >
+        <template #body-cell="props">
+          <q-td
+            dense
+            :props="props"
+            :class="{
+              'table__body-netBalance': props.row.categoria_id === 2,
+              'table__body-preBalance': props.row.categoria_id === 1
+            }"
+          >
+            {{ props.value }}
+          </q-td>
+        </template>
+      </q-table>
     </div>
   </div>
 
@@ -426,6 +377,7 @@ const listaMovimientosIngreso = ref([])
 const saldosIngreso = ref([])
 const saldosEgreso = ref([])
 const listaSaldosCuentas = ref([])
+const listaSaldosFinales = ref([])
 const listaSaldosMovimientos = ref([])
 const saldosCuentas = ref([])
 const filter = ref()
@@ -436,44 +388,18 @@ const showFormItem = ref(false)
 const show_movimientos = ref(false)
 const cellData = ref({})
 
-const columns = ref([
-  // {
-  //   name: 'categoria_id',
-  //   label: 'Id',
-  //   field: 'categoria_id',
-  //   sortable: true,
-  //   align: 'left'
-  // },
-  // {
-  //   name: 'nombre_categoria',
-  //   label: 'Nombre',
-  //   field: 'nombre_categoria',
-  //   sortable: true,
-  //   align: 'left'
-  // },
-  // {
-  //   name: 'columna_8',
-  //   label: 'Columna_8',
-  //   field: '8',
-  //   sortable: true,
-  //   align: 'left'
-  // },
-  // {
-  //   name: 'columna_9',
-  //   label: 'Columna_9',
-  //   field: '9',
-  //   sortable: true,
-  //   align: 'left'
-  // }
-])
+const columns = ref([])
+const columnsSaldos = ref([])
 /**
  * onMount
  */
 onMounted(() => {
   obtenerColumnas()
   obtenerMovimientos()
+  obtenerIngresosEgresosSaldos()
   obtenerSaldosMovimientos()
   obtenerSaldosCuentas()
+  obtenerSaldosFinales()
 })
 /**
  * METHODS
@@ -515,16 +441,24 @@ function obtenerColumnas() {
     .get('/columnas')
     .then(({ data }) => {
       columns.value = JSON.parse(JSON.stringify(data.data))
+      columnsSaldos.value = JSON.parse(JSON.stringify(data.data))
       columns.value.forEach((column) => {
         if (column.name != 'nombre_categoria') {
           column.format = (val, row) =>
             !!val ? `${formato.toCurrency(val)}` : ''
         } else {
-          column.style = 'background-color: #aebbc7'
+          // column.style = 'background-color: #aebbc7'
           // column.style = 'background-color: #c8d7ca'
         }
       })
-      console.log('columnas ', columns.value)
+      columnsSaldos.value.forEach((element) => {
+        if (element.name != 'nombre_categoria') {
+          element.format = (val, row) =>
+            !!val ? `${formato.toCurrency(val)}` : ''
+        }
+        element.classes = 'table__body-totals'
+      })
+      console.log('columnas saldos', columnsSaldos.value)
     })
     .catch((error) => {
       console.log('error', error)
@@ -539,9 +473,37 @@ function obtenerMovimientos() {
       }
     })
     .then(({ data }) => {
-      // console.log('response data', data.data)
       listaMovimientos.value = JSON.parse(JSON.stringify(data.data))
-      console.log('response data', listaMovimientos.value)
+    })
+    .catch((error) => {
+      console.log('error', error)
+    })
+
+  api
+    .get('/movimientos', {
+      params: {
+        tipoMovimientoId: 1,
+        isSaldos: 0
+      }
+    })
+    .then(({ data }) => {
+      listaMovimientosIngreso.value = JSON.parse(JSON.stringify(data.data))
+    })
+    .catch((error) => {
+      console.log('error', error)
+    })
+}
+function obtenerIngresosEgresosSaldos() {
+  api
+    .get('/movimientos', {
+      params: {
+        tipoMovimientoId: 1,
+        isSaldos: 1
+      }
+    })
+    .then(({ data }) => {
+      saldosIngreso.value = JSON.parse(JSON.stringify(data.data))
+      console.log('saldos de ingresos obtenidos', saldosIngreso.value)
     })
     .catch((error) => {
       console.log('error', error)
@@ -554,46 +516,13 @@ function obtenerMovimientos() {
       }
     })
     .then(({ data }) => {
-      // console.log('response data', data.data)
       saldosEgreso.value = JSON.parse(JSON.stringify(data.data))
-      console.log('response data', listaMovimientos.value)
-    })
-    .catch((error) => {
-      console.log('error', error)
-    })
-  api
-    .get('/movimientos', {
-      params: {
-        tipoMovimientoId: 1,
-        isSaldos: 0
-      }
-    })
-    .then(({ data }) => {
-      // console.log('response data', data.data)
-      listaMovimientosIngreso.value = JSON.parse(JSON.stringify(data.data))
-
-      // console.log('ingresos data', listaMovimientosIngreso.value)
-    })
-    .catch((error) => {
-      console.log('error', error)
-    })
-  api
-    .get('/movimientos', {
-      params: {
-        tipoMovimientoId: 1,
-        isSaldos: 1
-      }
-    })
-    .then(({ data }) => {
-      // console.log('response data', data.data)
-      saldosIngreso.value = JSON.parse(JSON.stringify(data.data))
-
-      // console.log('ingresos data', listaMovimientosIngreso.value)
     })
     .catch((error) => {
       console.log('error', error)
     })
 }
+
 function obtenerSaldosMovimientos() {
   api
     .get('/saldos_movimientos', {
@@ -640,6 +569,22 @@ function obtenerSaldosCuentas() {
     .then(({ data }) => {
       console.log('response data', data.data)
       saldosCuentas.value = JSON.parse(JSON.stringify(data.data))
+    })
+    .catch((error) => {
+      console.log('error', error)
+    })
+}
+
+function obtenerSaldosFinales() {
+  api
+    .get('/saldos_finales', {
+      params: {
+        ejercicio_fiscal_id: 2023,
+        isSaldos: 0
+      }
+    })
+    .then(({ data }) => {
+      listaSaldosFinales.value = JSON.parse(JSON.stringify(data.data))
     })
     .catch((error) => {
       console.log('error', error)
@@ -718,7 +663,7 @@ onErrorDeleteMovimiento((error) => {
 })
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @function color-texto($color) {
   @if (lightness($color) > 50) {
     @return rgb(51, 149, 162);
@@ -745,7 +690,7 @@ onErrorDeleteMovimiento((error) => {
   .q-table__bottom,
   thead tr:first-child th {
     /* bg color is important for th; just specify one */
-    background-color: $table-header;
+    // background-color: $accent-light;
   }
   thead tr th {
     position: sticky;
@@ -761,34 +706,17 @@ onErrorDeleteMovimiento((error) => {
     top: 48px;
   }
 }
+.table__body-preBalance {
+  background-color: rgb(230, 200, 230) !important;
+  font-weight: bold;
+}
+.table__body-netBalance {
+  background-color: rgb(230, 218, 179) !important;
+}
 
-// .my-sticky-virtscroll-table {
-//   /* height or max-height is important */
-//   height: 410px;
-
-//   .q-table__top,
-//   .q-table__bottom,
-//   thead tr:first-child th {
-//     /* bg color is important for th; just specify one */
-//     background-color: #00b4ff;
-//   }
-//   thead tr th {
-//     position: sticky;
-//     z-index: 1;
-//   }
-//   /* this will be the loading indicator */
-//   thead tr:last-child th {
-//     /* height of all previous header rows */
-//     top: 48px;
-//   }
-//   thead tr:first-child th {
-//     top: 0;
-//   }
-
-//   /* prevent scrolling behind sticky top row on focus */
-//   tbody {
-//     /* height of all previous header rows */
-//     scroll-margin-top: 48px;
-//   }
-// }
+.table__body-totals {
+  background-color: rgb(202, 225, 255) !important;
+  font-weight: bold;
+  font-size: 11px !important;
+}
 </style>
