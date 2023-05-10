@@ -18,16 +18,9 @@
         separator="none"
         hide-pagination
       >
-        <template v-slot:header="props">
-          <q-tr :props="props" class="bg-grey-1">
-            <q-th v-for="col in props.cols" :key="col.name" :props="props">
-              <span class="table__headers"> {{ col.label }}</span>
-            </q-th>
-          </q-tr>
-        </template>
         <template v-slot:top-left>
           <div class="row q-pa-md q-gutter-x-lg">
-            <q-btn-dropdown
+            <!-- <q-btn-dropdown
               split
               icon="add"
               color="primary"
@@ -74,7 +67,7 @@
                   </q-item-section>
                 </q-item>
               </q-list>
-            </q-btn-dropdown>
+            </q-btn-dropdown> -->
             <q-select
               v-model="periodo"
               :options="periodoOptions"
@@ -115,6 +108,13 @@
               <q-icon name="search" />
             </template>
           </q-input>
+        </template>
+        <template #header="props">
+          <q-tr :props="props" class="bg-grey-1">
+            <q-th v-for="col in props.cols" :key="col.name" :props="props">
+              <span class="table__headers"> {{ col.label }}</span>
+            </q-th>
+          </q-tr>
         </template>
         <template v-slot:body-cell-nombre_categoria="props">
           <q-td
@@ -160,45 +160,47 @@
         :columns="columns"
         row-key="id"
         :filter="filter"
-        separator="cell"
+        separator="none"
         hide-botton
         hide-pagination
       >
-        <template v-slot:header="props">
-          <q-tr :props="props" class="bg-green-2 text-contrast-light">
-            <q-th v-for="col in props.cols" :key="col.name" :props="props">
-              {{ col.label }}
-            </q-th>
-          </q-tr>
-        </template>
-        <template v-slot:top-right>
+        <template #top-right>
           <div class="bg-white">
             <q-input
               outlined
               dense
               debounce="300"
               v-model="filter"
-              placeholder="Buscar"
+              placeholder="Buscar Gasto"
             >
-              <template v-slot:append>
+              <template #append>
                 <q-icon name="search" />
               </template>
             </q-input>
           </div>
         </template>
-        <template v-slot:body-cell-nombre_categoria="props">
+        <template #header="props">
+          <q-tr :props="props" class="bg-grey-1">
+            <q-th v-for="col in props.cols" :key="col.name" :props="props">
+              <span class="table__headers"> {{ col.label }}</span>
+            </q-th>
+          </q-tr>
+        </template>
+        <template #body-cell-nombre_categoria="props">
           <q-td
             dense
             :props="props"
             :style="`border-left: 5px solid ${props.row.color}`"
           >
             <q-icon :name="props.row.icono" size="22px" color="dark" />
-            {{ props.value }}
+            <span class="q-pl-sm table__cell-nombreCategoria">
+              {{ props.value }}</span
+            >
           </q-td>
         </template>
         <template v-slot:body-cell="props">
           <q-td dense :props="props" clickable @click="addItem2(props)">
-            {{ props.value }}
+            <span class="table__cell-importes"> {{ props.value }}</span>
           </q-td>
         </template>
       </q-table>
@@ -210,18 +212,19 @@
         row-key="name"
         hide-header
         hide-bottom
-        separator="cell"
+        separator="none"
         dense
       />
     </div>
     <div class="">
+      <!-- NET CASH PROCEDS - FINAL CASH BALANCE -->
       <q-table
         :rows="listaSaldosMovimientos"
         :columns="columns"
         row-key="name"
         hide-header
         hide-bottom
-        separator="cell"
+        separator="none"
         dense
       >
         <template #body-cell="props">
@@ -240,8 +243,7 @@
     </div>
     <div class="row fit" style="border: 0px solid red">
       <q-table
-        class="my-sticky-header-table"
-        style="width: 100%; height: 200px !important"
+        style="width: 100%"
         flat
         bordered
         v-model:pagination="pagination"
@@ -251,14 +253,14 @@
         :columns="columns"
         row-key="id"
         :filter="filter"
-        separator="cell"
+        separator="none"
         hide-pagination
         hide-bottom
       >
-        <template v-slot:header="props">
-          <q-tr :props="props" class="bg-green-2 text-contrast-light">
+        <template #header="props">
+          <q-tr :props="props" class="bg-grey-1">
             <q-th v-for="col in props.cols" :key="col.name" :props="props">
-              {{ col.label }}
+              <span class="table__headers"> {{ col.label }}</span>
             </q-th>
           </q-tr>
         </template>
@@ -269,12 +271,14 @@
             :style="`border-left: 5px solid ${props.row.color}`"
           >
             <q-icon :name="props.row.icono" size="22px" color="dark" />
-            {{ props.value }}
+            <span class="q-pl-sm table__cell-nombreCategoria">
+              {{ props.value }}</span
+            >
           </q-td>
         </template>
         <template v-slot:body-cell="props">
-          <q-td dense :props="props" clickable @click="addItem2(props)">
-            {{ props.value }}
+          <q-td dense :props="props">
+            <span class="table__cell-importes"> {{ props.value }}</span>
           </q-td>
         </template>
       </q-table>
@@ -685,12 +689,13 @@ onErrorDeleteMovimiento((error) => {
   }
 }
 .tabla-columna-importe {
-  background-color: #fafcfd !important;
+  background-color: #ffffff !important;
   &:hover {
-    background-color: #d9e4ee !important;
-    border: 1.6px solid rgb(179, 179, 190) !important;
+    background-color: #78a0ce4b !important;
+    // border: 0.2px solid rgb(179, 179, 190) !important;
     cursor: pointer;
-    font-weight: bold;
+    font-weight: 600 !important;
+    font-size: inherit;
     transition: all 0.3s;
   }
 }
@@ -721,10 +726,11 @@ onErrorDeleteMovimiento((error) => {
 }
 .table__body-preBalance {
   background-color: rgb(230, 200, 230) !important;
-  font-weight: bold;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
 }
 .table__body-netBalance {
-  background-color: rgb(230, 218, 179) !important;
+  background-color: rgb(245, 231, 209) !important;
 }
 
 .table__body-totals {
@@ -735,17 +741,17 @@ onErrorDeleteMovimiento((error) => {
 
 .table__cell-nombreCategoria {
   font-weight: 600 !important;
-  color: #67748e;
+  color: #495a7e;
 }
 .table__cell-importes {
-  font-weight: 600 !important;
-  color: #404e6a;
+  font-weight: 400 !important;
+  color: #3a6421;
+  font-size: 0.9rem;
 }
 .table__headers {
-  font-size: 0.5rem;
+  font-size: 0.7rem;
   color: #8392ab !important;
   font-weight: bold !important;
-
-  //   text-transform: uppercase !important;
+  text-transform: uppercase !important;
 }
 </style>
