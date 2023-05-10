@@ -16,16 +16,14 @@ export default defineComponent({
 <style lang="scss">
 html,
 body {
-  //   // font-family: 'Assistant', sans-serif;
-  //   // font-family: 'Lobster Two', cursive;
-  //   // font-family: 'Montserrat Alternates', sans-serif;
-  //   // font-family: 'Sen', sans-serif;
-  //   // font-family: 'IBM Plex Sans Condensed', sans-serif;
-  //   font-family: 'Roboto Flex', sans-serif;
-  //   // font-family: 'Chivo Mono', monospace;
-  //   font-size: 100%;
-  //   // background-color: #e5e8f0 !important;
-  //   color: primary;
-  // font-size: 0.6rem !important;
+  margin: 0;
+  font-family: Open Sans;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #67748e;
+  background-color: #fff;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 </style>

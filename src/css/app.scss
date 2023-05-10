@@ -1,12 +1,14 @@
 // app global css in SCSS form
-@font-face {
-  font-family: 'Noto Serif';
-  src: url(./fonts/NotoSerif-Regular.ttf);
-}
+// @font-face {
+//   font-family: 'Noto Serif';
+//   src: url(./fonts/NotoSerif-Regular.ttf);
+// }
 
 @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@300;400&display=swap');
 
 @import url('https://fonts.googleapis.com/css2?family=Chivo+Mono:ital@0;1&family=Lobster+Two&family=Montserrat+Alternates:wght@300&family=Mulish:ital,wght@0,400;0,500;1,400;1,500&family=Roboto+Flex:wght@200;300;400&family=Roboto+Slab:wght@500&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap');
 
 .text-accent-light {
   color: $accent-light !important;

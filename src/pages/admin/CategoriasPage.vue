@@ -24,14 +24,6 @@
             <q-item-label>{{ tipoMovimiento.nombre }}</q-item-label>
           </q-item-section>
         </q-item>
-        <!-- <q-item clickable v-close-popup @click="addRow">
-          <q-item-section avatar>
-            <q-icon name="fa-solid fa-file-invoice-dollar" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>Gasto</q-item-label>
-          </q-item-section>
-        </q-item>-->
       </q-list>
     </q-btn-dropdown>
     <q-toolbar-title> </q-toolbar-title>
@@ -40,7 +32,7 @@
   </q-toolbar>
   <q-space style="height: 10px" />
   <div class="row fit q-gutter-sm" style="border: 0px solid red">
-    <div class="col">
+    <div class="col q-pl-xs">
       <q-table
         dense
         :rows="listaCategoriasIngresos"
@@ -49,9 +41,10 @@
         :filter="filterIngresos"
         :rows-per-page-options="[0]"
         hide-header
+        class="bg-primary-light"
       >
         <template #top-left>
-          <div class="text-h6 text-">Ingresos</div>
+          <div class="text-h5 text-bold text-accent">Ingresos</div>
         </template>
         <template v-slot:top-right>
           <q-input
@@ -66,27 +59,24 @@
             </template>
           </q-input>
         </template>
-
         <template #body-cell-icono="props">
           <q-td
-            class="bg-primary-light text-primary"
             :props="props"
-            fit
-            style="width: 20px"
+            :style="`border-left: 3px solid ${props.row.color}`"
+            class="bg-white"
           >
-            <q-icon :name="props.row.icono" size="35px" />
+            <div class="row justify-around text-white bg-hight-contrast">
+              <q-icon :name="props.row.icono" size="20px" />
+            </div>
           </q-td>
         </template>
-        <template v-slot:body-cell-nombre="props">
-          <q-td
-            class="bg-primary-light text-dark"
-            :props="props"
-            fit
-            :style="`border-left: 3px solid ${props.row.color}`"
-          >
+        <template #body-cell-nombre="props">
+          <q-td :props="props" class="bg-white">
             <div class="column">
-              <div class="">
-                <span class="text-subtitle1">{{ props.row.nombre }} </span>
+              <div>
+                <span class="categoria-nombre text-blue-grey-8"
+                  >{{ props.row.nombre }}
+                </span>
                 &nbsp;
                 <span class="text-accent text-caption">{{
                   props.row.cuentaContable.nombreCompleto
@@ -98,17 +88,8 @@
             </div>
           </q-td>
         </template>
-        <!-- <template #body-cell-cuentaContable="props">
-          <q-td class="bg-primary-light text-dark">
-            <div class="column">
-              <span class="text-accent text-caption">{{
-                props.row.cuentaContable.nombreCompleto
-              }}</span>
-            </div>
-          </q-td>
-        </template> -->
-        <template v-slot:body-cell-acciones="props">
-          <q-td :props="props" fit class="bg-primary-light text-dark">
+        <template #body-cell-acciones="props">
+          <q-td :props="props" fit class="bg-white">
             <q-btn
               icon="edit"
               size="md"
@@ -139,9 +120,10 @@
         :filter="filterInversiones"
         :rows-per-page-options="[0]"
         hide-header
+        class="bg-primary-light"
       >
         <template #top-left>
-          <div class="text-h6 text-">Inversiones</div>
+          <div class="text-h5 text-bold text-accent">Inversiones</div>
         </template>
         <template v-slot:top-right>
           <q-input
@@ -156,27 +138,24 @@
             </template>
           </q-input>
         </template>
-
         <template #body-cell-icono="props">
           <q-td
-            class="bg-primary-light text-primary"
             :props="props"
-            fit
-            style="width: 20px"
+            :style="`border-left: 3px solid ${props.row.color}`"
+            class="bg-white"
           >
-            <q-icon :name="props.row.icono" size="35px" />
+            <div class="row justify-around text-white bg-hight-contrast">
+              <q-icon :name="props.row.icono" size="20px" />
+            </div>
           </q-td>
         </template>
-        <template v-slot:body-cell-nombre="props">
-          <q-td
-            class="bg-primary-light text-dark"
-            :props="props"
-            fit
-            :style="`border-left: 3px solid ${props.row.color}`"
-          >
+        <template #body-cell-nombre="props">
+          <q-td :props="props" class="bg-white">
             <div class="column">
-              <div class="">
-                <span class="text-subtitle1">{{ props.row.nombre }} </span>
+              <div>
+                <span class="categoria-nombre text-blue-grey-8"
+                  >{{ props.row.nombre }}
+                </span>
                 &nbsp;
                 <span class="text-accent text-caption">{{
                   props.row.cuentaContable.nombreCompleto
@@ -188,17 +167,8 @@
             </div>
           </q-td>
         </template>
-        <!-- <template #body-cell-cuentaContable="props">
-          <q-td class="bg-primary-light text-dark">
-            <div class="column">
-              <span class="text-accent text-caption">{{
-                props.row.cuentaContable.nombreCompleto
-              }}</span>
-            </div>
-          </q-td>
-        </template> -->
-        <template v-slot:body-cell-acciones="props">
-          <q-td :props="props" fit class="bg-primary-light text-dark">
+        <template #body-cell-acciones="props">
+          <q-td :props="props" fit class="bg-white">
             <q-btn
               icon="edit"
               size="md"
@@ -231,9 +201,10 @@
         :filter="filterGastos"
         :rows-per-page-options="[0]"
         hide-header
+        class="bg-primary-light"
       >
         <template #top-left>
-          <div class="text-h6 text-">Gastos</div>
+          <div class="text-h5 text-bold text-accent">Gastos</div>
         </template>
         <template v-slot:top-right>
           <q-input
@@ -248,16 +219,24 @@
             </template>
           </q-input>
         </template>
-        <template v-slot:body-cell-nombre="props">
+        <template #body-cell-icono="props">
           <q-td
-            class="bg-primary-light text-dark"
             :props="props"
-            fit
             :style="`border-left: 3px solid ${props.row.color}`"
+            class="bg-white"
           >
+            <div class="row justify-around text-white bg-hight-contrast">
+              <q-icon :name="props.row.icono" size="20px" />
+            </div>
+          </q-td>
+        </template>
+        <template #body-cell-nombre="props">
+          <q-td :props="props" class="bg-white">
             <div class="column">
-              <div class="">
-                <span class="text-subtitle1">{{ props.row.nombre }} </span>
+              <div>
+                <span class="categoria-nombre text-blue-grey-8"
+                  >{{ props.row.nombre }}
+                </span>
                 &nbsp;
                 <span class="text-accent text-caption">{{
                   props.row.cuentaContable.nombreCompleto
@@ -269,27 +248,8 @@
             </div>
           </q-td>
         </template>
-        <template #body-cell-icono="props">
-          <q-td
-            class="bg-primary-light text-primary"
-            :props="props"
-            fit
-            style="width: 20px"
-          >
-            <q-icon :name="props.row.icono" size="35px" />
-          </q-td>
-        </template>
-        <!-- <template #body-cell-cuentaContable="props">
-          <q-td class="bg-primary-light text-dark">
-            <div class="column">
-              <span class="text-accent text-caption">{{
-                props.row.cuentaContable.nombreCompleto
-              }}</span>
-            </div>
-          </q-td>
-        </template> -->
-        <template v-slot:body-cell-acciones="props">
-          <q-td :props="props" fit class="bg-primary-light text-dark">
+        <template #body-cell-acciones="props">
+          <q-td :props="props" fit class="bg-white">
             <q-btn
               icon="edit"
               size="md"
@@ -575,12 +535,22 @@ const columns = [
 ]
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @function color-texto($color) {
   @if (lightness($color) > 50) {
     @return rgb(51, 149, 162);
   } @else {
     @return rgb(217, 163, 230);
   }
+}
+.categoria-nombre {
+  font-weight: bold;
+  font-size: 1rem;
+}
+.bg-hight-contrast {
+  background-image: linear-gradient(310deg, #7928ca 0%, #ff0080 100%);
+  padding: 10px;
+  border-radius: 0.5rem !important;
+  width: 40px;
 }
 </style>

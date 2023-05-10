@@ -1,14 +1,17 @@
 <template>
-  <q-layout view="hHh LpR lFr">
+  <q-layout view="lHh LpR lFr">
     <q-header bordered class="bg-primary text-white">
-      <q-toolbar class="text-h6">
-        <q-btn dense flat round icon="menu" @click="toggleLeftDrawer" />
-
-        <q-toolbar-title class="font-title">
-          <span class="font-title-letter text-secondary">B</span>iweekly
-          Application
-        </q-toolbar-title>
-        <span class="q-pr-sm" v-if="user">{{ user.email }}</span>
+      <q-toolbar>
+        <q-btn
+          dense
+          flat
+          round
+          icon="menu"
+          @click="toggleLeftDrawer"
+          class="float-right"
+        />
+        <q-toolbar-title class="font-title"> </q-toolbar-title>
+        <span class="q-pr-sm text-bold" v-if="user">{{ user.email }}</span>
         <q-btn
           icon="account_circle"
           @click="onClickAccount"
@@ -38,7 +41,14 @@
       elevated
       class="bg-menu shadow-10"
     >
-      <q-space split />
+      <div class="" style="border: 0px solid red">
+        <div class="application-title q-pa-lg" align="center">
+          <span class="font-title-letter text-secondary">B</span>iweekly
+          Application
+        </div>
+      </div>
+      <q-separator spaced inset horizontal color="blue-grey-5" />
+
       <q-list class="no-shadow q-mt-lg">
         <EssentialLink
           v-for="link in essentialLinks"
@@ -136,9 +146,9 @@ function onClickAccount() {}
 // });
 </script>
 <style lang="scss">
-.font-title {
+.application-title {
   font-family: 'Lobster Two', cursive;
-  font-size: 1.8rem;
+  font-size: 2rem;
 }
 .font-title-letter {
   font-family: 'Lobster Two', cursive;
@@ -148,7 +158,7 @@ function onClickAccount() {}
   //   font-family: 'Lobster Two', cursive;
   // font-family: 'Montserrat Alternates', sans-serif;
   // font-family: 'Roboto Flex', sans-serif;
-  font-family: 'Roboto Slab', serif;
+  // font-family: 'Roboto Slab', serif;
   font-size: 1.5rem;
 }
 .bg-menu {

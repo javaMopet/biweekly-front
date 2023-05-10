@@ -7,7 +7,8 @@
         :inset-level="nivel / 2"
         dense
         :to="'/' + ruta"
-        active-class="text-secondary"
+        active-class="text-primary bg-grey-2 text-bold q-py-sm q-mx-xs rounded-borders"
+        class="text-accent q-py-sm q-mx-xs"
       >
         <q-item-section avatar>
           <q-icon :name="icono" />
@@ -26,6 +27,7 @@
           :header-inset-level="nivel / 2"
           :content-inset-level="0.1"
           default-closed
+          class="q-mx-xs q-py-sm"
         >
           <EssentialLink v-for="child in children" :key="child" v-bind="child">
           </EssentialLink>

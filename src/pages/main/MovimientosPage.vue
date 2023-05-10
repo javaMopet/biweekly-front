@@ -15,13 +15,13 @@
         row-key="id"
         :filter="filter"
         :rows-per-page-options="[0]"
-        separator="cell"
+        separator="none"
         hide-pagination
       >
         <template v-slot:header="props">
-          <q-tr :props="props" class="bg-green-2 text-contrast-light">
+          <q-tr :props="props" class="bg-grey-1">
             <q-th v-for="col in props.cols" :key="col.name" :props="props">
-              {{ col.label }}
+              <span class="table__headers"> {{ col.label }}</span>
             </q-th>
           </q-tr>
         </template>
@@ -80,26 +80,36 @@
               :options="periodoOptions"
               option-label="nombre"
               label="Periodo"
-              outlined
+              standout
+              rounded
               dense
-            />
+            >
+              <template #prepend>
+                <q-icon name="calendar_view_week" />
+              </template>
+            </q-select>
             <q-select
               v-model="mes"
               :options="mesOptions"
               option-label="nombre"
               label="Mes"
-              outlined
               dense
-            />
+              standout
+              rounded
+            >
+              <template #prepend>
+                <q-icon name="calendar_month" />
+              </template>
+            </q-select>
           </div>
         </template>
-        <template v-slot:top-right>
+        <template #top-right>
           <q-input
             outlined
             dense
             debounce="300"
             v-model="filter"
-            placeholder="Buscar"
+            placeholder="Buscar Ingreso"
           >
             <template v-slot:append>
               <q-icon name="search" />
@@ -112,13 +122,16 @@
             :props="props"
             :style="`border-left: 5px solid ${props.row.color}`"
           >
-            <q-icon :name="props.row.icono" size="22px" color="dark" />
-            {{ props.value }}
+            <q-icon :name="props.row.icono" size="22px" color="accent" />
+
+            <span class="q-pl-sm table__cell-nombreCategoria">
+              {{ props.value }}</span
+            >
           </q-td>
         </template>
         <template v-slot:body-cell="props">
           <q-td dense :props="props" clickable @click="addItem2(props)">
-            {{ props.value }}
+            <span class="table__cell-importes"> {{ props.value }}</span>
           </q-td>
         </template>
       </q-table>
@@ -718,5 +731,21 @@ onErrorDeleteMovimiento((error) => {
   background-color: rgb(202, 225, 255) !important;
   font-weight: bold;
   font-size: 11px !important;
+}
+
+.table__cell-nombreCategoria {
+  font-weight: 600 !important;
+  color: #67748e;
+}
+.table__cell-importes {
+  font-weight: 600 !important;
+  color: #404e6a;
+}
+.table__headers {
+  font-size: 0.5rem;
+  color: #8392ab !important;
+  font-weight: bold !important;
+
+  //   text-transform: uppercase !important;
 }
 </style>
