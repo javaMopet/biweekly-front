@@ -66,7 +66,7 @@
             class="bg-white"
           >
             <div class="row justify-around text-white bg-hight-contrast">
-              <q-icon :name="props.row.icono" size="20px" />
+              <q-icon :name="props.row.icono" size="22px" />
             </div>
           </q-td>
         </template>
@@ -145,7 +145,7 @@
             class="bg-white"
           >
             <div class="row justify-around text-white bg-hight-contrast">
-              <q-icon :name="props.row.icono" size="20px" />
+              <q-icon :name="props.row.icono" size="22px" />
             </div>
           </q-td>
         </template>
@@ -226,7 +226,7 @@
             class="bg-white"
           >
             <div class="row justify-around text-white bg-hight-contrast">
-              <q-icon :name="props.row.icono" size="20px" />
+              <q-icon :name="props.row.icono" size="22px" />
             </div>
           </q-td>
         </template>

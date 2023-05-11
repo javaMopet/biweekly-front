@@ -42,10 +42,10 @@
       class="bg-menu shadow-10"
     >
       <div class="" style="border: 0px solid red">
-        <div class="application-title q-pa-lg" align="center">
+        <!-- <div class="application-title q-pa-lg" align="center">
           <span class="font-title-letter text-secondary">B</span>iweekly
           Application
-        </div>
+        </div> -->
       </div>
       <q-separator spaced inset horizontal color="blue-grey-5" />
 

@@ -76,9 +76,28 @@
               standout
               rounded
               dense
+              bg-color="categoria"
+              color="dark"
+              label-color="dark"
             >
               <template #prepend>
                 <q-icon name="calendar_view_week" />
+              </template>
+            </q-select>
+            <q-select
+              v-model="ejercicio_fiscal"
+              :options="ejercicioFiscalOptions"
+              option-label="nombre"
+              label="Año"
+              dense
+              standout
+              rounded
+              bg-color="categoria"
+              color="dark"
+              label-color="dark"
+            >
+              <template #prepend>
+                <q-icon name="calendar_month" />
               </template>
             </q-select>
             <q-select
@@ -89,6 +108,9 @@
               dense
               standout
               rounded
+              bg-color="categoria"
+              color="dark"
+              label-color="dark"
             >
               <template #prepend>
                 <q-icon name="calendar_month" />
@@ -150,7 +172,7 @@
     <div class="row fit" style="border: 0px solid red">
       <q-table
         class="my-sticky-header-table"
-        style="width: 100%; height: 330px !important"
+        style="width: 100%"
         flat
         bordered
         v-model:pagination="pagination"
@@ -387,8 +409,10 @@ const mesOptions = ref([
   { id: 11, nombre: 'Noviembre' },
   { id: 12, nombre: 'Diciembre' }
 ])
+const ejercicioFiscalOptions = ref([2021, 2022, 2023])
 
 const mes = ref(mesOptions.value[0])
+const ejercicio_fiscal = ref(2023)
 const listaMovimientos = ref([])
 const listaMovimientosIngreso = ref([])
 const saldosIngreso = ref([])
@@ -412,12 +436,16 @@ const columnsSaldos = ref([])
  */
 onMounted(() => {
   obtenerColumnas()
+  cargarDatos()
+})
+
+function cargarDatos() {
   obtenerMovimientos()
   obtenerIngresosEgresosSaldos()
   obtenerSaldosMovimientos()
   obtenerSaldosCuentas()
   obtenerSaldosFinales()
-})
+}
 /**
  * METHODS
  */
@@ -654,7 +682,8 @@ function mostrarNotificacion(action, cuenta) {
 }
 function onRegistroCreated(itemCreated) {
   console.log('El registro fue creado', itemCreated)
-  obtenerMovimientos()
+  show_movimientos.value = false
+  cargarDatos()
 }
 /**
  * GRAPHQL
@@ -702,7 +731,7 @@ onErrorDeleteMovimiento((error) => {
 
 .my-sticky-header-table {
   /* height or max-height is important */
-  height: calc(100vh - 375px);
+  height: calc(100vh - 550px);
 
   .q-table__top,
   .q-table__bottom,
