@@ -65,7 +65,7 @@
             :style="`border-left: 3px solid ${props.row.color}`"
             class="bg-white"
           >
-            <div class="row justify-around text-white bg-hight-contrast">
+            <div class="row justify-around text-white bg-high-contrast">
               <q-icon :name="props.row.icono" size="22px" />
             </div>
           </q-td>
@@ -144,7 +144,7 @@
             :style="`border-left: 3px solid ${props.row.color}`"
             class="bg-white"
           >
-            <div class="row justify-around text-white bg-hight-contrast">
+            <div class="row justify-around text-white bg-high-contrast">
               <q-icon :name="props.row.icono" size="22px" />
             </div>
           </q-td>
@@ -225,7 +225,7 @@
             :style="`border-left: 3px solid ${props.row.color}`"
             class="bg-white"
           >
-            <div class="row justify-around text-white bg-hight-contrast">
+            <div class="row justify-around text-white bg-high-contrast">
               <q-icon :name="props.row.icono" size="22px" />
             </div>
           </q-td>
@@ -547,7 +547,7 @@ const columns = [
   font-weight: bold;
   font-size: 1rem;
 }
-.bg-hight-contrast {
+.bg-high-contrast {
   background-image: linear-gradient(310deg, #7928ca 0%, #ff0080 100%);
   padding: 10px;
   border-radius: 0.5rem !important;

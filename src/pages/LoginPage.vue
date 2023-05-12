@@ -11,7 +11,9 @@
           "
         >
           <q-card-section>
-            <div class="row inline full-width justify-center text-h4 q-pt-lg">
+            <div
+              class="row inline full-width justify-center text-h4 q-pt-lg text-secondary"
+            >
               Iniciar Sesión
             </div>
           </q-card-section>
@@ -21,7 +23,9 @@
               v-model="loginAction"
               class="my-custom-toggle"
               spread
-              toggle-color="accent"
+              toggle-color="secondary"
+              toggle-text-color="white"
+              text-color="grey-6"
               :options="[
                 { label: 'Entrar', value: 'one' },
                 { label: 'Registrar', value: 'two' }
@@ -53,9 +57,9 @@
               <q-input
                 v-model="form.email"
                 label="Correo"
-                input-class="text-accent"
-                class="text-accent"
-                label-color="accent"
+                input-class="grey"
+                class="text-accent-light"
+                label-color="accent-light"
                 lazy-rules
                 type="email"
                 dark
@@ -71,8 +75,8 @@
                 dark
                 v-model="form.password"
                 label="Contraseña"
-                input-class="text-accent border-accent bordered"
-                label-color="accent"
+                input-class="grey"
+                label-color="accent-light"
                 class="border-accent"
                 lazy-rules
                 :rules="[(val) => !!val || 'Contraseña es requerida']"
@@ -101,7 +105,7 @@
                   :label="btnLabel"
                   type="submit"
                   color="primary"
-                  text-color="accent"
+                  text-color="grey"
                   outline
                 />
               </div>

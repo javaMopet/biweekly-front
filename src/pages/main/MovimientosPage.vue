@@ -1,13 +1,6 @@
 <template>
-  <!-- <q-toolbar class="text-dark">
-    <q-toolbar-title> Movimientos </q-toolbar-title>
-    <q-btn flat round dense icon="arrow_back" @click="$router.back()" />
-  </q-toolbar> -->
-  <!-- <q-space style="height: 10px" /> -->
   <div class="column">
     <div class="column">
-      <!-- class="my-sticky-header-table" -->
-      <!-- style="width: 100%; height: 280px !important" -->
       <q-table
         dense
         :rows="listaMovimientosIngreso"
@@ -19,66 +12,17 @@
         hide-pagination
       >
         <template v-slot:top-left>
-          <div class="row q-pa-md q-gutter-x-lg">
-            <!-- <q-btn-dropdown
-              split
-              icon="add"
-              color="primary"
-              label="AGREGAR"
-              @click="addItem('2')"
-              dense
-            >
-              <q-list>
-                <q-item clickable v-close-popup @click="addItem('2')">
-                  <q-item-section avatar>
-                    <q-avatar
-                      color="negative"
-                      text-color="white"
-                      icon="arrow_downward"
-                    ></q-avatar>
-                  </q-item-section>
-                  <q-item-section>
-                    <q-item-label>Gasto</q-item-label>
-                  </q-item-section>
-                </q-item>
-                <q-item clickable v-close-popup @click="addItem('1')">
-                  <q-item-section avatar>
-                    <q-avatar
-                      color="positive"
-                      text-color="white"
-                      icon="arrow_upward"
-                    ></q-avatar>
-                  </q-item-section>
-                  <q-item-section>
-                    <q-item-label>Ingreso</q-item-label>
-                  </q-item-section>
-                </q-item>
-
-                <q-item clickable v-close-popup @click="addItem('3')">
-                  <q-item-section avatar>
-                    <q-avatar
-                      color="blue-5"
-                      text-color="white"
-                      icon="sync_alt"
-                    ></q-avatar>
-                  </q-item-section>
-                  <q-item-section>
-                    <q-item-label>Transferencia</q-item-label>
-                  </q-item-section>
-                </q-item>
-              </q-list>
-            </q-btn-dropdown> -->
+          <div class="row q-pa-md q-gutter-x-md">
             <q-select
               v-model="periodo"
               :options="periodoOptions"
               option-label="nombre"
               label="Periodo"
-              standout
-              rounded
+              filled
               dense
               bg-color="categoria"
-              color="dark"
-              label-color="dark"
+              color="secondary"
+              label-color="primary"
             >
               <template #prepend>
                 <q-icon name="calendar_view_week" />
@@ -90,10 +34,9 @@
               option-label="nombre"
               label="Año"
               dense
-              standout
-              rounded
+              filled
               bg-color="categoria"
-              color="dark"
+              color="secondary"
               label-color="dark"
             >
               <template #prepend>
@@ -106,11 +49,11 @@
               option-label="nombre"
               label="Mes"
               dense
-              standout
-              rounded
+              filled
               bg-color="categoria"
-              color="dark"
+              color="secondary"
               label-color="dark"
+              @update:model-value="onChangeMes"
             >
               <template #prepend>
                 <q-icon name="calendar_month" />
@@ -435,7 +378,14 @@ const columnsSaldos = ref([])
  * onMount
  */
 onMounted(() => {
-  obtenerColumnas()
+  const dateNow = DateTime.now()
+  ejercicio_fiscal.value = dateNow.year
+  const mes_id = dateNow.month
+  const mes_value = mesOptions.value.find(
+    (mesOption) => mesOption.id === mes_id
+  )
+  mes.value = mes_value
+  obtenerColumnas(ejercicio_fiscal.value, mes.value.id)
   cargarDatos()
 })
 
@@ -481,9 +431,15 @@ function editRow(item) {
   console.log('Editar elemento...', editedItem.value, editedIndex.value)
   showFormItem.value = true
 }
-function obtenerColumnas() {
+function obtenerColumnas(ejercicio_fiscal, mes) {
+  console.log('Obteniendo columnas del ejercicio y mes', ejercicio_fiscal, mes)
   api
-    .get('/columnas')
+    .get('/columnas', {
+      params: {
+        ejercicio_fiscal,
+        mes
+      }
+    })
     .then(({ data }) => {
       columns.value = JSON.parse(JSON.stringify(data.data))
       columnsSaldos.value = JSON.parse(JSON.stringify(data.data))
@@ -684,6 +640,9 @@ function onRegistroCreated(itemCreated) {
   console.log('El registro fue creado', itemCreated)
   show_movimientos.value = false
   cargarDatos()
+}
+function onChangeMes(value) {
+  obtenerColumnas(ejercicio_fiscal.value, value.id)
 }
 /**
  * GRAPHQL

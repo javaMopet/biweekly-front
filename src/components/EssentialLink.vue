@@ -7,18 +7,21 @@
         :inset-level="nivel / 2"
         dense
         :to="'/' + ruta"
-        active-class="text-primary bg-grey-2 text-bold q-py-sm q-mx-xs rounded-borders"
+        active-class="bg-white q-py-sm q-mx-xs rounded-borders text-pink-6"
         class="text-accent q-py-sm q-mx-xs"
       >
         <q-item-section avatar>
-          <q-icon :name="icono" />
+          <!-- <div class="menu__icon--background text-white" align="center"> -->
+          <q-icon :name="icono" size="27px" />
+          <!-- </div> -->
         </q-item-section>
-        <q-item-section>{{ nombre }}</q-item-section>
+        <q-item-section class="menu__link--name">{{ nombre }}</q-item-section>
       </q-item>
     </div>
     <div v-else>
       <div v-if="children.length > 0">
         <!-- {{children}} -->
+
         <q-expansion-item
           expand-separator
           :icon="icono"
@@ -29,8 +32,26 @@
           default-closed
           class="q-mx-xs q-py-sm"
         >
-          <EssentialLink v-for="child in children" :key="child" v-bind="child">
-          </EssentialLink>
+          <template v-slot:header>
+            <q-item-section avatar>
+              <!-- <div class="menu__icon--background text-white"> -->
+              <q-icon :name="icono" size="27px" />
+              <!-- </div> -->
+            </q-item-section>
+            <q-item-section>
+              {{ nombre }}
+            </q-item-section>
+          </template>
+          <q-card>
+            <q-card-section>
+              <EssentialLink
+                v-for="child in children"
+                :key="child"
+                v-bind="child"
+              >
+              </EssentialLink>
+            </q-card-section>
+          </q-card>
         </q-expansion-item>
       </div>
       <!--div v-else>
@@ -77,4 +98,18 @@ export default {
   }
 }
 </script>
-<style lang="scss" scoped></style>
+<style lang="scss">
+.menu__icon--background {
+  background-image: linear-gradient(310deg, #ff8f6d 0%, #6f2fb4 100%);
+  padding: 10px;
+  border-radius: 0.5rem !important;
+  // width: 20px;
+  // height: 30px;
+}
+.menu__link--name {
+  font-size: 0.8rem !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.025rem;
+  // color: #252f40;
+}
+</style>

@@ -162,7 +162,7 @@ function onClickAccount() {}
   font-size: 1.5rem;
 }
 .bg-menu {
-  background-color: #e9e8eb !important;
+  background-color: #f8f9fa !important;
   color: #14153f;
   font-size: 0.95rem;
 }
