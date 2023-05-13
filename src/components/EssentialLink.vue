@@ -38,11 +38,11 @@
               <q-icon :name="icono" size="27px" />
               <!-- </div> -->
             </q-item-section>
-            <q-item-section>
+            <q-item-section class="menu__link--name text-accent">
               {{ nombre }}
             </q-item-section>
           </template>
-          <q-card>
+          <q-card class="bg-menu">
             <q-card-section>
               <EssentialLink
                 v-for="child in children"

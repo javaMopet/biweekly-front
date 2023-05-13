@@ -1,6 +1,6 @@
 <template>
   <q-layout view="lHh LpR lFr">
-    <q-header bordered class="bg-primary text-white">
+    <q-header bordered class="bg-primary-light text-primary">
       <q-toolbar>
         <q-btn
           dense
@@ -162,7 +162,7 @@ function onClickAccount() {}
   font-size: 1.5rem;
 }
 .bg-menu {
-  background-color: #f8f9fa !important;
+  background-color: #e5eaee !important;
   color: #14153f;
   font-size: 0.95rem;
 }

@@ -8,11 +8,11 @@
         row-key="id"
         :filter="filter"
         :rows-per-page-options="[0]"
-        separator="none"
+        separator="horizontal"
         hide-pagination
       >
-        <template v-slot:top-left>
-          <div class="row q-pa-md q-gutter-x-md">
+        <template #top-left>
+          <div class="row inline q-gutter-x-md" style="border: 0px solid red">
             <q-select
               v-model="periodo"
               :options="periodoOptions"
@@ -62,22 +62,24 @@
           </div>
         </template>
         <template #top-right>
-          <q-input
-            outlined
-            dense
-            debounce="300"
-            v-model="filter"
-            placeholder="Buscar Ingreso"
-          >
-            <template v-slot:append>
-              <q-icon name="search" />
-            </template>
-          </q-input>
+          <div class="row" style="border: 0px solid red">
+            <q-input
+              outlined
+              dense
+              debounce="400"
+              v-model="filter"
+              placeholder="Buscar Ingreso"
+            >
+              <template v-slot:append>
+                <q-icon name="search" />
+              </template>
+            </q-input>
+          </div>
         </template>
         <template #header="props">
-          <q-tr :props="props" class="bg-grey-1">
+          <q-tr :props="props" class="movimientos__headers-background">
             <q-th v-for="col in props.cols" :key="col.name" :props="props">
-              <span class="table__headers"> {{ col.label }}</span>
+              <span class="movimientos__headers-font"> {{ col.label }}</span>
             </q-th>
           </q-tr>
         </template>
@@ -89,14 +91,14 @@
           >
             <q-icon :name="props.row.icono" size="22px" color="accent" />
 
-            <span class="q-pl-sm table__cell-nombreCategoria">
+            <span class="q-pl-sm movimientos__columna-categoria">
               {{ props.value }}</span
             >
           </q-td>
         </template>
         <template v-slot:body-cell="props">
           <q-td dense :props="props" clickable @click="addItem2(props)">
-            <span class="table__cell-importes"> {{ props.value }}</span>
+            <span class="movimientos__celda--importe"> {{ props.value }}</span>
           </q-td>
         </template>
       </q-table>
@@ -125,7 +127,7 @@
         :columns="columns"
         row-key="id"
         :filter="filter"
-        separator="none"
+        separator="horizontal"
         hide-botton
         hide-pagination
       >
@@ -145,27 +147,30 @@
           </div>
         </template>
         <template #header="props">
-          <q-tr :props="props" class="bg-grey-1">
+          <q-tr :props="props" class="movimientos__headers-background">
             <q-th v-for="col in props.cols" :key="col.name" :props="props">
-              <span class="table__headers"> {{ col.label }}</span>
+              <span class="movimientos__headers-font"> {{ col.label }}</span>
             </q-th>
           </q-tr>
         </template>
         <template #body-cell-nombre_categoria="props">
-          <q-td
-            dense
-            :props="props"
-            :style="`border-left: 5px solid ${props.row.color}`"
-          >
-            <q-icon :name="props.row.icono" size="22px" color="dark" />
-            <span class="q-pl-sm table__cell-nombreCategoria">
-              {{ props.value }}</span
-            >
+          <q-td dense :props="props">
+            <div class="row items-center">
+              <div
+                class="row inline q-pa-xs rounded-borders"
+                :style="`background-color: ${props.row.color}`"
+              >
+                <q-icon :name="props.row.icono" size="22px" color="white" />
+              </div>
+              <span class="q-pl-sm movimientos__columna-categoria">
+                {{ props.value }}</span
+              >
+            </div>
           </q-td>
         </template>
         <template v-slot:body-cell="props">
           <q-td dense :props="props" clickable @click="addItem2(props)">
-            <span class="table__cell-importes"> {{ props.value }}</span>
+            <span class="movimientos__celda--importe"> {{ props.value }}</span>
           </q-td>
         </template>
       </q-table>
@@ -223,9 +228,9 @@
         hide-bottom
       >
         <template #header="props">
-          <q-tr :props="props" class="bg-grey-1">
+          <q-tr :props="props" class="movimientos__headers-background">
             <q-th v-for="col in props.cols" :key="col.name" :props="props">
-              <span class="table__headers"> {{ col.label }}</span>
+              <span class="movimientos__headers-font"> {{ col.label }}</span>
             </q-th>
           </q-tr>
         </template>
@@ -236,14 +241,14 @@
             :style="`border-left: 5px solid ${props.row.color}`"
           >
             <q-icon :name="props.row.icono" size="22px" color="dark" />
-            <span class="q-pl-sm table__cell-nombreCategoria">
+            <span class="q-pl-sm movimientos__columna-categoria">
               {{ props.value }}</span
             >
           </q-td>
         </template>
         <template v-slot:body-cell="props">
           <q-td dense :props="props">
-            <span class="table__cell-importes"> {{ props.value }}</span>
+            <span class="movimientos__celda--importe"> {{ props.value }}</span>
           </q-td>
         </template>
       </q-table>
@@ -450,6 +455,7 @@ function obtenerColumnas(ejercicio_fiscal, mes) {
         } else {
           // column.style = 'background-color: #aebbc7'
           // column.style = 'background-color: #c8d7ca'
+          // column.classes = 'categoria_background'
         }
       })
       columnsSaldos.value.forEach((element) => {
@@ -682,8 +688,8 @@ onErrorDeleteMovimiento((error) => {
     background-color: #78a0ce4b !important;
     // border: 0.2px solid rgb(179, 179, 190) !important;
     cursor: pointer;
-    font-weight: 600 !important;
-    font-size: inherit;
+    // font-weight: 600 !important;
+    // font-size: inherit;
     transition: all 0.3s;
   }
 }
@@ -722,24 +728,35 @@ onErrorDeleteMovimiento((error) => {
 }
 
 .table__body-totals {
-  background-color: rgb(202, 225, 255) !important;
-  font-weight: bold;
-  font-size: 11px !important;
+  background-color: #cae1ff !important;
+  font-weight: 600 !important;
+  font-size: 0.8rem !important;
+  font-style: italic;
 }
 
-.table__cell-nombreCategoria {
+.movimientos__celda--importe {
+  font-size: 0.78rem !important;
   font-weight: 600 !important;
-  color: #495a7e;
+  color: #212364;
 }
-.table__cell-importes {
-  font-weight: 400 !important;
-  color: #3a6421;
-  font-size: 0.9rem;
-}
-.table__headers {
-  font-size: 0.7rem;
-  color: #8392ab !important;
+.movimientos__headers-font {
+  font-size: 0.65rem;
+  color: #626d81 !important;
   font-weight: bold !important;
   text-transform: uppercase !important;
+}
+.movimientos__headers-background {
+  background-color: #e3f2e7 !important;
+}
+.movimientos__columna-categoria {
+  font-weight: 600 !important;
+  font-size: 0.78rem;
+  color: #705404;
+  // color: #f8cb77;
+  letter-spacing: -0.025rem;
+}
+.categoria_background {
+  background-color: #f3f6f9 !important;
+  border: 1px solid red;
 }
 </style>
