@@ -1,6 +1,8 @@
 <template>
   <div class="column q-ma-md" style="border: 0px solid red">
-    <div class="row text-h5 text-secondary q-pa-md font-subtitle">CUENTAS</div>
+    <div class="row text-h5 text-secondary q-pa-md font-subtitle">
+      TARJETAS DE CRÉDITO
+    </div>
     <div class="row fit" style="border: 0px solid red">
       <q-table
         grid
@@ -19,31 +21,15 @@
             icon="add"
             label="AGREGAR"
             color="primary"
-            @click="addRow(1)"
+            @click="addRow(3)"
           >
             <q-list>
-              <q-item clickable v-close-popup @click="addRow(1)">
-                <q-item-section avatar>
-                  <q-icon name="account_balance" />
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label>Ahorros</q-item-label>
-                </q-item-section>
-              </q-item>
               <q-item clickable v-close-popup @click="addRow(3)">
                 <q-item-section avatar>
                   <q-icon name="credit_card" />
                 </q-item-section>
                 <q-item-section>
                   <q-item-label>Tarjeta Crédito</q-item-label>
-                </q-item-section>
-              </q-item>
-              <q-item clickable v-close-popup @click="addRow(2)">
-                <q-item-section avatar>
-                  <q-icon name="payments" />
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label>Efectivo</q-item-label>
                 </q-item-section>
               </q-item>
             </q-list>
@@ -64,55 +50,84 @@
           </q-input>
         </template>
         <template #item="props">
-          <q-card class="my-card text-primary q-ma-sm" style="width: 350px">
-            <q-card-section
-              :class="{
-                'bg-dark': props.row.tipoCuenta.id === '1',
-                'bg-accent ': props.row.tipoCuenta.id === '2',
-                'bg-accent': props.row.tipoCuenta.id === '3',
-                'text-white': true
-              }"
-            >
-              <div class="row">
-                <div class="column col">
-                  <div class="text-h6">{{ props.row.nombre }}</div>
-                </div>
-                <div
-                  class=""
-                  :class="{
-                    'text-accent-contrast': props.row.tipoCuenta.id === '1',
-                    'text-yellow-3': props.row.tipoCuenta.id === '2',
-                    'text-accent-contrast': props.row.tipoCuenta.id === '3',
-                    'col-auto column items-center q-mx-md': true
-                  }"
+          <q-card class="q-ma-sm shadow-5" outlined>
+            <!-- style="
+              background: radial-gradient(circle, #215e70 0%, #043e50 100%);
+            " -->
+            <q-item class="text-primary">
+              <q-item-section center avatar>
+                <q-icon name="credit_card" size="30px" color="secondary" />
+              </q-item-section>
+              <q-item-section align="left">
+                <q-item-label class="text-bolder">
+                  <RouterLink
+                    class="text-primary"
+                    :to="`/tarjetas_credito/${props.row.id}`"
+                    >{{ props.row.nombre }}</RouterLink
+                  >
+                </q-item-label>
+                <!-- <q-separator
+                  spaced
+                  inset
+                  color="grey-5"
+                  style="width: 100%; margin-left: 0px !important"
+                /> -->
+                <q-item-label caption lines="2" class="text-grey-7">{{
+                  props.row.descripcion
+                }}</q-item-label>
+                <q-item-label
+                  caption
+                  lines="2"
+                  class="text-blue-grey-5 text-bold"
+                  >$ 1,800.00</q-item-label
                 >
-                  <q-icon :name="props.row.tipoCuenta.icon" size="30px" />
-                  <span>{{ props.row.tipoCuenta.nombre }}</span>
-                </div>
-              </div>
-            </q-card-section>
+              </q-item-section>
+              <q-item-section
+                side
+                center
+                cursor-pointer
+                @click="movimientosTarjeta"
+                class="q-ml-md"
+              >
+                <!-- <q-icon
+                  name="more_vert"
+                  color="contrast"
+                  cursor-pointer
+                  clickable
+                /> -->
+                <!-- <q-btn color="contrast" flat icon="menu" style="width: 18px">
+                  <q-menu>
+                    <q-list style="min-width: 100px">
+                      <q-item clickable v-close-popup>
+                        <q-item-section>Movimientos</q-item-section>
+                      </q-item>
+                      <q-separator inset horizontal spaced />
+                      <q-item clickable v-close-popup>
+                        <q-item-section>Modificar</q-item-section>
+                      </q-item>
+                      <q-item clickable v-close-popup>
+                        <q-item-section>Eliminar</q-item-section>
+                      </q-item>
+                    </q-list>
+                  </q-menu>
+                </q-btn> -->
+              </q-item-section>
+            </q-item>
 
-            <q-card-section>
-              <div class="text-caption text-accent">
-                {{ props.row.cuentaContable.nombreCompleto }}
-              </div>
-              {{ props.row.descripcion }}
-            </q-card-section>
-
-            <q-separator inset />
-
-            <q-card-actions>
+            <!-- <q-separator inset color="grey-7" /> -->
+            <q-card-actions align="right">
               <q-btn
                 round
-                color="primary"
                 flat
                 icon="edit"
                 @click="editRow(props)"
+                color="info"
               />
               <q-btn
                 round
                 flat
                 icon="delete"
+                color="negative-pastel"
                 class="q-ml-sm"
                 @click="deleteRow(props)"
               />
@@ -140,7 +155,7 @@
 </template>
 
 <script setup>
-import { useLazyQuery, useQuery, useMutation } from '@vue/apollo-composable'
+import { useQuery, useMutation } from '@vue/apollo-composable'
 import { ref, computed, onMounted } from 'vue'
 import { LISTA_CUENTAS, CUENTA_DELETE } from '/src/graphql/cuentas'
 import RegistroCuenta from 'src/components/cuentas/RegistroCuenta.vue'
@@ -174,15 +189,19 @@ const {
 
 onDoneDeleteCuenta(({ data }) => {
   if (!!data) {
-    console.log('item deleted ', data)
+    console.log('item deleted ', rowIndexDelete.value)
     const deletedItem = data.cuentaDelete.cuenta
-    listaCuentas.value.splice(rowIndexDelete.value, 1)
+    resultCuentas.value?.listaCuentas.splice(rowIndexDelete.value, 1)
     rowIndexDelete.value = null
     mostrarNotificacion('elminó', deletedItem)
   }
 })
 onErrorDeleteCuenta((error) => {
   console.error(error)
+  notificacion.mostrarNotificacionNegativa(
+    'No es posible eliminar esta tarjeta de crédito debido a que tiene movimientos',
+    1500
+  )
 })
 onErrorListaCuentas((error) => {
   console.error(error)
@@ -213,7 +232,7 @@ const listaCuentas = computed({
   get() {
     return (
       resultCuentas.value?.listaCuentas.filter(
-        (cuenta) => cuenta.tipoCuenta.id === '1'
+        (cuenta) => cuenta.tipoCuenta.id === '3'
       ) ?? []
     )
   }
@@ -310,8 +329,9 @@ function deleteRow(item) {
 }
 
 function cuentaSaved(itemSaved) {
+  console.log('tarjetaSaved', itemSaved)
   showFormItem.value = false
-  listaCuentas.value.push(itemSaved)
+  resultCuentas.value?.listaCuentas.push(itemSaved)
   mostrarNotificacion('guardó', itemSaved)
 }
 function cuentaUpdated(itemUpdated) {
@@ -326,6 +346,9 @@ function mostrarNotificacion(action, cuenta) {
     `La cuenta "${cuenta.nombre}" se ${action} correctamente`,
     2500
   )
+}
+function movimientosTarjeta() {
+  console.log('movimientostarjta')
 }
 </script>
 

@@ -18,6 +18,14 @@ const routes = [
         component: () => import('src/pages/main/MovimientosPage.vue')
       },
       {
+        path: '/tarjetas_credito',
+        component: () => import('src/pages/main/TarjetasCreditoPage.vue')
+      },
+      {
+        path: '/tarjetas_credito/:id',
+        component: () => import('src/pages/main/TarjetaCreditoPage.vue')
+      },
+      {
         path: '/system_options',
         component: () => import('src/pages/admin/SystemOptionsPage.vue')
       },
