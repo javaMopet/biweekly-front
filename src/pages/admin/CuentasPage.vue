@@ -30,14 +30,14 @@
                   <q-item-label>Ahorros</q-item-label>
                 </q-item-section>
               </q-item>
-              <q-item clickable v-close-popup @click="addRow(3)">
+              <!-- <q-item clickable v-close-popup @click="addRow(3)">
                 <q-item-section avatar>
                   <q-icon name="credit_card" />
                 </q-item-section>
                 <q-item-section>
                   <q-item-label>Tarjeta Crédito</q-item-label>
                 </q-item-section>
-              </q-item>
+              </q-item> -->
               <q-item clickable v-close-popup @click="addRow(2)">
                 <q-item-section avatar>
                   <q-icon name="payments" />

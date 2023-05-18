@@ -1,8 +1,8 @@
 <template>
   <div class="column q-ma-md" style="border: 0px solid red">
-    <div class="row text-h5 text-secondary q-pa-md font-subtitle">
+    <!-- <div class="row text-h5 text-secondary q-pa-md font-subtitle">
       TARJETAS DE CRÉDITO
-    </div>
+    </div> -->
     <div class="row fit" style="border: 0px solid red">
       <q-table
         grid
@@ -15,8 +15,16 @@
         :rows-per-page-options="[0]"
         hide-pagination
       >
-        <template v-slot:top-left>
-          <q-btn-dropdown
+        <template #top-left>
+          <q-btn
+            color="primary"
+            icon="add"
+            rounded
+            @click="addRow(3)"
+            outline
+            label="Nueva Tarjeta"
+          />
+          <!-- <q-btn-dropdown
             split
             icon="add"
             label="AGREGAR"
@@ -33,7 +41,7 @@
                 </q-item-section>
               </q-item>
             </q-list>
-          </q-btn-dropdown>
+          </q-btn-dropdown> -->
         </template>
 
         <template v-slot:top-right>
@@ -42,7 +50,7 @@
             dense
             debounce="300"
             v-model="filter"
-            placeholder="Buscar Cuenta"
+            placeholder="Buscar"
           >
             <template v-slot:append>
               <q-icon name="search" />
@@ -50,21 +58,19 @@
           </q-input>
         </template>
         <template #item="props">
-          <q-card class="q-ma-sm shadow-5" outlined>
-            <!-- style="
-              background: radial-gradient(circle, #215e70 0%, #043e50 100%);
-            " -->
+          <q-card
+            class="q-ma-sm tarjeta__cuenta"
+            outlined
+            style="border: 0px solid red"
+            @click="mostrarMovimientos(props.row.id)"
+          >
             <q-item class="text-primary">
-              <q-item-section center avatar>
-                <q-icon name="credit_card" size="30px" color="secondary" />
+              <q-item-section avatar top>
+                <q-icon name="credit_card" size="30px" color="primary" />
               </q-item-section>
               <q-item-section align="left">
-                <q-item-label class="text-bolder">
-                  <RouterLink
-                    class="text-primary"
-                    :to="`/tarjetas_credito/${props.row.id}`"
-                    >{{ props.row.nombre }}</RouterLink
-                  >
+                <q-item-label class="text-bolder text-h6">
+                  {{ props.row.nombre }}
                 </q-item-label>
                 <!-- <q-separator
                   spaced
@@ -75,12 +81,14 @@
                 <q-item-label caption lines="2" class="text-grey-7">{{
                   props.row.descripcion
                 }}</q-item-label>
+                <q-separator spaced inset vertical dark />
                 <q-item-label
+                  align="right"
                   caption
                   lines="2"
-                  class="text-blue-grey-5 text-bold"
-                  >$ 1,800.00</q-item-label
-                >
+                  class="text-blue-grey-6 text-bold text-h3"
+                  ><span class="text-h6">$ 1,800.00</span>
+                </q-item-label>
               </q-item-section>
               <q-item-section
                 side
@@ -114,8 +122,8 @@
               </q-item-section>
             </q-item>
 
-            <!-- <q-separator inset color="grey-7" /> -->
-            <q-card-actions align="right">
+            <q-separator inset color="grey-7" />
+            <q-card-actions align="left">
               <q-btn
                 round
                 flat
@@ -161,12 +169,14 @@ import { LISTA_CUENTAS, CUENTA_DELETE } from '/src/graphql/cuentas'
 import RegistroCuenta from 'src/components/cuentas/RegistroCuenta.vue'
 import { useQuasar } from 'quasar'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
+import { useRouter } from 'vue-router'
 
 /**
  * composables
  */
 const $q = useQuasar()
 const notificacion = useNotificacion()
+const router = useRouter()
 
 /**
  * GRAPHQL
@@ -350,6 +360,31 @@ function mostrarNotificacion(action, cuenta) {
 function movimientosTarjeta() {
   console.log('movimientostarjta')
 }
+function mostrarMovimientos(value) {
+  console.log('movimientos tarjeta', value)
+  router.push(`/tarjetas_credito/${value}`)
+}
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.tarjeta__credito--link {
+  font-size: 1.3rem;
+  text-decoration: none !important;
+  color: $dark;
+  &:hover {
+    text-decoration: underline !important;
+    color: #c4477b !important;
+  }
+}
+.tarjeta__cuenta {
+  // border: 1px solid white !important;
+  &:hover {
+    // border: 1px solid red !important;
+    cursor: pointer;
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 14px 28px,
+      rgba(0, 0, 0, 0.22) 0px 10px 10px;
+    transform: translate(-1px, -2px);
+    transition: all 0.25s;
+  }
+}
+</style>

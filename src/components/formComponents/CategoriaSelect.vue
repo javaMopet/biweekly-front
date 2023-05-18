@@ -25,7 +25,7 @@
         </template>
       </q-select>
     </div>
-    <div class="col-auto">
+    <div class="col-auto" v-if="!props.readonly">
       <q-btn color="accent" icon="add" @click="agregarCategoria" />
     </div>
   </div>
@@ -63,6 +63,11 @@ const props = defineProps({
     type: String,
     required: false,
     default: ''
+  },
+  readonly: {
+    type: Boolean,
+    required: false,
+    default: false
   }
 })
 /**

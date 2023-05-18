@@ -1,6 +1,7 @@
 <template>
   <q-card class="my-card" style="width: 550px">
-    <q-card-section class="bg-primary text-accent-light">
+    <!-- <pre>{{ editedFormItem }}</pre> -->
+    <q-card-section class="bg-primary text-accent-contrast">
       <q-btn
         round
         flat
@@ -11,13 +12,13 @@
         v-close-popup
         vertical-top
       ></q-btn>
-      <div class="text-subtitle1 text-accent-light">{{ actionName }}</div>
+      <div class="text-subtitle1 text-accent-contrast">{{ actionName }}</div>
     </q-card-section>
 
     <q-card-section class="">
       <q-form @submit="saveItem" class="q-gutter-md">
         <div class="q-gutter-md">
-          <div class="">
+          <div class="" v-if="tiposCuentaOptions.length > 1">
             <q-btn-toggle
               v-model="editedFormItem.tipoCuenta.id"
               spread
@@ -207,7 +208,13 @@ const emit = defineEmits(['cuentaSaved', 'cuentaUpdated'])
  */
 const tiposCuentaOptions = computed({
   get() {
-    return resultTiposCuenta.value?.listaTiposCuenta ?? []
+    return editedFormItem.value.tipoCuenta.id === '3'
+      ? resultTiposCuenta.value?.listaTiposCuenta.filter(
+          (tipoCuenta) => tipoCuenta.id === editedFormItem.value.tipoCuenta.id
+        ) ?? []
+      : resultTiposCuenta.value?.listaTiposCuenta.filter(
+          (tipoCuenta) => tipoCuenta.id != '3'
+        ) ?? []
   }
 })
 const editedFormItem = computed({
@@ -220,7 +227,11 @@ const editedFormItem = computed({
 })
 const actionName = computed({
   get() {
-    return !!editedFormItem.value.id ? 'Actualizar la Cuenta' : 'Nueva Cuenta'
+    return !!editedFormItem.value.id
+      ? 'Actualizar la Cuenta'
+      : editedFormItem.value.tipoCuenta.id === '3'
+      ? 'Nueva tarjeta'
+      : 'Nueva Cuenta'
   }
 })
 const lblSubmit = computed({
