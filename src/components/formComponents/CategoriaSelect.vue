@@ -40,7 +40,7 @@
 <script setup>
 import { useQuery } from '@vue/apollo-composable'
 import { LISTA_CATEGORIAS } from 'src/graphql/categorias'
-import { ref, computed, defineProps, defineEmits, Teleport } from 'vue'
+import { ref, computed, Teleport } from 'vue'
 import RegistroCategoria from '../categorias/RegistroCategoria.vue'
 
 /**

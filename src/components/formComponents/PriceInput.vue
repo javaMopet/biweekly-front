@@ -25,7 +25,7 @@
 </template>
 
 <script setup>
-import { ref, computed, defineProps, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { formatMoney } from 'accounting-js'
 /**
  * state

@@ -39,7 +39,7 @@
 
 <script setup>
 import { useFormato } from 'src/composables/utils/useFormato'
-import { ref, computed, defineProps, defineEmits } from 'vue'
+import { ref, computed } from 'vue'
 
 /**
  * composables

@@ -149,7 +149,7 @@
 </template>
 
 <script setup>
-import { ref, computed, defineProps, defineEmits, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import DateInput from '../formComponents/DateInput.vue'
 import { DateTime } from 'luxon'
 import { OBTENER_INGRESOS } from 'src/graphql/ingresos'

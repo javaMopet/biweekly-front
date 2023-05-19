@@ -235,7 +235,7 @@ function resetUserInfo() {
   // background-image: url('../../public/images/3968744.jpg');
   // background-repeat: no-repeat;
   // background-size: cover;
-  background: url('/public/images/1.jpg') 0 / cover fixed;
+  background: url('/images/3968744.jpg') 0 / cover fixed;
   // -webkit-filter: blur(5px); /* Safari 6.0 - 9.0 */
   // filter: blur(5px);
   z-index: 2 !important;

@@ -49,7 +49,7 @@
 <script setup>
 import { useQuery } from '@vue/apollo-composable'
 import { LISTA_CUENTAS_CONTABLES } from 'src/graphql/cuentasContableGql'
-import { ref, computed, defineProps, defineEmits } from 'vue'
+import { ref, computed } from 'vue'
 import RegistroCuentaContable from '../cuentasContables/RegistroCuentaContable.vue'
 
 /**

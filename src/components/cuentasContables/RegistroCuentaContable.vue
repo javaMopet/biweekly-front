@@ -115,7 +115,7 @@
 
 <script setup>
 // import { useLazyQuery } from '@vue/apollo-composable'
-import { ref, defineProps, defineEmits, computed, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 
 import {
   CUENTA_CONTABLE_CREATE,

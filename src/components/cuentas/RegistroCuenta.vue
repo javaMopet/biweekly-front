@@ -99,14 +99,7 @@
 
 <script setup>
 import { useQuery, useMutation } from '@vue/apollo-composable'
-import {
-  ref,
-  reactive,
-  computed,
-  defineProps,
-  defineEmits,
-  onMounted
-} from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import {
   CUENTA_CREATE,
   CUENTA_UPDATE,

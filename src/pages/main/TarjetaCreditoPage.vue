@@ -102,8 +102,10 @@
         :rows="listaRegistrosTarjeta"
         :columns="columns"
         :rows-per-page-options="[0]"
-        row-key="name"
+        row-key="consecutivo"
         dense
+        selection="multiple"
+        v-model:selected="registrosSelected"
       >
         <!-- <template #top-left>
           <q-btn
@@ -185,6 +187,7 @@ const route = useRoute()
  * state
  */
 const archivoExcel = ref(null)
+const registrosSelected = ref()
 const registroEditedItem = ref([
   {
     concepto: 'mi concepto',
