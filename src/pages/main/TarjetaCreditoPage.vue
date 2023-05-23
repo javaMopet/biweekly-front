@@ -1,50 +1,5 @@
 <template>
   <q-card class="my-card">
-    <!-- <q-toolbar class="bg-purple text-white">
-      <q-btn-dropdown stretch flat label="Dropdown">
-        <q-list>
-          <q-item-label header>Folders</q-item-label>
-          <q-item
-            v-for="n in 3"
-            :key="`x.${n}`"
-            clickable
-            v-close-popup
-            tabindex="0"
-          >
-            <q-item-section avatar>
-              <q-avatar icon="folder" color="secondary" text-color="white" />
-            </q-item-section>
-            <q-item-section>
-              <q-item-label>Photos</q-item-label>
-              <q-item-label caption>February 22, 2016</q-item-label>
-            </q-item-section>
-            <q-item-section side>
-              <q-icon name="info" />
-            </q-item-section>
-          </q-item>
-          <q-separator inset spaced />
-          <q-item-label header>Files</q-item-label>
-          <q-item
-            v-for="n in 3"
-            :key="`y.${n}`"
-            clickable
-            v-close-popup
-            tabindex="0"
-          >
-            <q-item-section avatar>
-              <q-avatar icon="assignment" color="primary" text-color="white" />
-            </q-item-section>
-            <q-item-section>
-              <q-item-label>Vacation</q-item-label>
-              <q-item-label caption>February 22, 2016</q-item-label>
-            </q-item-section>
-            <q-item-section side>
-              <q-icon name="info" />
-            </q-item-section>
-          </q-item>
-        </q-list>
-      </q-btn-dropdown>
-    </q-toolbar> -->
     <q-card-section>
       <q-btn
         color="primary"
@@ -55,68 +10,6 @@
       <div>tarjeta id: {{ route.params.id }}</div>
 
       <!-- @update:model-value="cargarExcel" -->
-      <!-- <q-form @submit="onSubmit" class="q-gutter-md">
-        <div>
-          <q-table
-            :rows="registroEditedItem"
-            :columns="columns"
-            row-key="name"
-            dense
-            hide-bottom
-            hide-header
-            hide-no-data
-            class="no-border"
-            flat
-          >
-            <template #body-cell-fecha="props">
-              <q-td :props="props">
-                <DateInput v-model="props.row.fecha"></DateInput>
-              </q-td>
-            </template>
-            <template #body-cell-concepto="props">
-              <q-td :props="props">
-                <q-input
-                  v-model="props.row.concepto"
-                  type="textarea"
-                  label="Concepto"
-                  rows="1"
-                  outlined
-                  dense
-                  lazy-rules
-                  :rules="[(val) => !!val || 'Favor de ingresar el concepto']"
-                />
-              </q-td>
-            </template>
-            <template #body-cell-categoria="props">
-              <q-td :props="props">
-                <CategoriaSelect
-                  v-model="props.row.categoria"
-                  :readonly="true"
-                ></CategoriaSelect>
-              </q-td>
-            </template>
-            <template #body-cell-importe="props">
-              <q-td :props="props">
-                <PriceInput v-model="props.row.importe"></PriceInput>
-              </q-td>
-            </template>
-            <template #body-cell-acciones="props">
-              <q-td :props="props" fit class="bg-white">
-                <q-btn icon="add" type="submit" color="primary" outline round />
-              </q-td>
-            </template>
-          </q-table>
-        </div>
-        <div>
-          <q-btn
-            label="Reset"
-            type="reset"
-            color="primary"
-            flat
-            class="q-ml-sm"
-          />
-        </div>
-      </q-form> -->
     </q-card-section>
   </q-card>
 
