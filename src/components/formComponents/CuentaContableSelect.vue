@@ -18,7 +18,7 @@
         hide-selected
         fill-input
         lazy-rules
-        :rules="[(val) => !!val || 'requerido']"
+        :rules="rules"
         :readonly="props.readonly"
       >
         <template v-slot:no-option>
@@ -97,6 +97,13 @@ const props = defineProps({
     type: Boolean,
     required: false,
     default: false
+  },
+  rules: {
+    type: Array,
+    required: false,
+    default: () => {
+      return []
+    }
   }
 })
 /**

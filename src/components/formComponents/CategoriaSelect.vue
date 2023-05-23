@@ -14,7 +14,7 @@
         @filter="filterFn"
         behavior="menu"
         clearable=""
-        :rules="[(val) => !!val || 'Favor de ingresar la categoria']"
+        :rules="rules"
         lazyRules
         dense
       >
@@ -68,6 +68,13 @@ const props = defineProps({
     type: Boolean,
     required: false,
     default: false
+  },
+  rules: {
+    type: Array,
+    required: false,
+    default: () => {
+      return []
+    }
   }
 })
 /**

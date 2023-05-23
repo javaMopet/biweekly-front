@@ -3,6 +3,7 @@
     <!-- <div class="row text-h5 text-secondary q-pa-md font-subtitle">
       TARJETAS DE CRÉDITO
     </div> -->
+
     <div class="row fit" style="border: 0px solid red">
       <q-table
         grid
