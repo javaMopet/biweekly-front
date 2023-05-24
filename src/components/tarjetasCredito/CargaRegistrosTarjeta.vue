@@ -83,8 +83,10 @@
     </q-card-section>
 
     <q-card-actions align="right">
-      <q-btn flat label="Decline" color="primary" v-close-porup />
-      <q-btn label="Guardar" color="primary" />
+      <div class="row">
+        <q-btn flat label="Cancelar" color="primary" v-close-popup />
+        <q-btn label="Guardar" color="primary" />
+      </div>
     </q-card-actions>
   </q-card>
 </template>
@@ -230,7 +232,7 @@ const columns = [
     field: 'importe',
     sortable: true,
     align: 'right',
-    format: (val, row) => `${formato.toCurrency(val)}`,
+    format: (val, row) => `${formato.toCurrency(parseFloat(val))}`,
     style: 'width:200px'
   },
   {
