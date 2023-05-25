@@ -10,13 +10,16 @@
         option-label="nombre"
         label="Categoria"
         use-input
-        input-debounce="0"
+        fill-input
+        hide-selected
+        input-debounce="2"
         @filter="filterFn"
         behavior="menu"
         clearable=""
         :rules="rules"
         lazyRules
         dense
+        map-options
       >
         <template v-slot:no-option>
           <q-item>

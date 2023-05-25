@@ -14,22 +14,27 @@
       </div>
     </q-card-section>
     <q-card-section>
-      <div class="row justify-between">
+      <div class="column justify-between q-gutter-y-sm">
         <q-file
           v-model="archivoExcel"
-          label="Selecciona archivo Excel"
+          label="Selecciona archivo excel con los movimientos"
           color="primary"
           accept=".xlsx,.xls"
           @input="updateFile"
           dense
           stack-label
-          clearable
           style="width: 400px"
-        />
+          max-files="1"
+          use-chips
+        >
+          <template #prepend>
+            <q-icon name="attach_file" />
+          </template>
+        </q-file>
         <q-btn
           color="negative"
           icon="delete"
-          label="Eliminar"
+          label="Eliminar SELECCIONADOS"
           dense
           outline
           @click="eliminarSeleccionados"
@@ -74,7 +79,7 @@
     <q-card-actions align="right">
       <div class="row">
         <q-btn flat label="Cancelar" color="primary" v-close-popup />
-        <q-btn label="Guardar" color="primary" />
+        <q-btn label="Guardar" color="primary" @click="guardarMovimientos" />
       </div>
     </q-card-actions>
   </q-card>
@@ -168,10 +173,16 @@ async function updateFile(v) {
 }
 
 function guardarMovimientos() {
-  console.log('guardando los movimeintos')
+  console.log('guardando los movimeintos', listaRegistrosTarjeta.value)
 }
 function eliminarSeleccionados() {
-  console.log('eliminar seleccionados')
+  console.log('eliminar seleccionados', registrosSelected.value)
+  registrosSelected.value.forEach((item) => {
+    var index = listaRegistrosTarjeta.value.indexOf(item)
+    if (index !== -1) {
+      listaRegistrosTarjeta.value.splice(index, 1)
+    }
+  })
 }
 
 function deleteRow(props) {
@@ -183,15 +194,6 @@ function deleteRow(props) {
 const columns = [
   // { name: 'id', label: 'Id', field: 'id', sortable: true, align: 'left' },
   {
-    name: 'fecha',
-    label: 'Fecha',
-    field: 'fecha',
-    sortable: true,
-    align: 'left',
-    filter: false,
-    style: 'width:120px'
-  },
-  {
     name: 'consecutivo',
     label: 'Consecutivo',
     field: 'consecutivo',
@@ -199,6 +201,15 @@ const columns = [
     align: 'left',
     filter: true,
     style: 'width:100px'
+  },
+  {
+    name: 'fecha',
+    label: 'Fecha',
+    field: 'fecha',
+    sortable: true,
+    align: 'left',
+    filter: false,
+    style: 'width:120px'
   },
   {
     name: 'concepto',
@@ -213,7 +224,8 @@ const columns = [
     label: 'Categoria',
     field: 'categoria',
     sortable: true,
-    align: 'left'
+    align: 'left',
+    style: 'width:250px;max-width:250px'
   },
   {
     name: 'importe',
