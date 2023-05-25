@@ -1,40 +1,30 @@
 <template>
-  <q-card class="my-card" style="width: 80vw; min-width: 80vw">
-    <q-card-section class="bg-primary text-accent-light float">
-      <q-btn
-        round
-        flat
-        dense
-        icon="close"
-        class="float-right"
-        color="accent"
-        v-close-popup
-        vertical-top
-      ></q-btn>
-      <div class="text-h6 text-accent-light">Movimientos</div>
+  <q-card class="my-card" dense style="width: 80vw; min-width: 80vw">
+    <q-card-section class="bg-primary row inline fit q-py-sm justify-between">
+      <div class="text-h6 text-contrast">Movimientos de la tarjeta</div>
+      <div class="">
+        <q-btn
+          round
+          flat
+          dense
+          icon="close"
+          v-close-popup
+          color="accent-light"
+        ></q-btn>
+      </div>
     </q-card-section>
     <q-card-section>
-      <q-file
-        class="q-py-sm"
-        v-model="archivoExcel"
-        label="Selecciona archivo Excel"
-        color="primary"
-        outlined
-        standout="bg-teal text-white"
-        accept=".xlsx,.xls"
-        @input="updateFile"
-        dense
-        flat
-        clearable
-        style="width: 350px"
-      />
-      <div class="row q-gutter-x-sm">
-        <q-btn
+      <div class="row justify-between">
+        <q-file
+          v-model="archivoExcel"
+          label="Selecciona archivo Excel"
           color="primary"
-          icon="save"
-          label="Guardar"
-          @click="guardarMovimientos"
+          accept=".xlsx,.xls"
+          @input="updateFile"
           dense
+          stack-label
+          clearable
+          style="width: 400px"
         />
         <q-btn
           color="negative"
@@ -48,7 +38,6 @@
     </q-card-section>
     <q-card-section style="max-height: 70vh; height: 70vh" class="scroll">
       <q-table
-        title="Movimientos de la tarjeta"
         :rows="listaRegistrosTarjeta"
         :columns="columns"
         :rows-per-page-options="[0]"
