@@ -1,14 +1,63 @@
 <template>
   <q-card class="my-card">
-    <q-card-section>
+    <q-toolbar class="bg-whiet text-primary q-gutter-x-md">
+      <q-btn icon="arrow_back_ios" flat square />
       <q-btn
-        color="primary"
+        color="toolbar-button"
+        text-color="white"
         label="Cargar movimientos"
         @click="cargarMovimientos"
-        flat
+        icon="upload"
+        dense
       />
-      <div>tarjeta id: {{ route.params.id }}</div>
+      <q-toolbar-title>
+        <!-- Tarjeta de crédito {{ route.params.id }} -->
+      </q-toolbar-title>
 
+      <!-- <q-btn flat round dense icon="apps" class="q-mr-xs" /> -->
+      <q-btn outline dense icon="more_vert" flat>
+        <q-menu>
+          <q-list dense style="min-width: 100px">
+            <q-item clickable v-close-popup>
+              <q-item-section>Open...</q-item-section>
+            </q-item>
+            <q-item clickable v-close-popup>
+              <q-item-section>New</q-item-section>
+            </q-item>
+            <q-separator />
+            <q-item clickable>
+              <q-item-section>Preferences</q-item-section>
+              <q-item-section side>
+                <q-icon name="keyboard_arrow_right" />
+              </q-item-section>
+
+              <q-menu anchor="top end" self="top start">
+                <q-list>
+                  <q-item v-for="n in 3" :key="n" dense clickable>
+                    <q-item-section>Submenu Label</q-item-section>
+                    <q-item-section side>
+                      <q-icon name="keyboard_arrow_right" />
+                    </q-item-section>
+                    <q-menu auto-close anchor="top end" self="top start">
+                      <q-list>
+                        <q-item v-for="n in 3" :key="n" dense clickable>
+                          <q-item-section>3rd level Label</q-item-section>
+                        </q-item>
+                      </q-list>
+                    </q-menu>
+                  </q-item>
+                </q-list>
+              </q-menu>
+            </q-item>
+            <q-separator />
+            <q-item clickable v-close-popup>
+              <q-item-section>Quit</q-item-section>
+            </q-item>
+          </q-list>
+        </q-menu>
+      </q-btn>
+    </q-toolbar>
+    <q-card-section>
       <!-- @update:model-value="cargarExcel" -->
     </q-card-section>
   </q-card>

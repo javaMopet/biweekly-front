@@ -7,8 +7,8 @@
         :inset-level="nivel / 2"
         dense
         :to="'/' + ruta"
-        active-class="bg-white q-py-sm q-mx-xs rounded-borders text-pink-6"
-        class="text-accent q-py-sm q-mx-xs"
+        active-class="bg-white q-py-sm q-mx-xs rounded-borders main-menu__active"
+        class="text-main-menu q-py-sm q-mx-xs"
       >
         <q-item-section avatar>
           <!-- <div class="menu__icon--background text-white" align="center"> -->
@@ -30,15 +30,15 @@
           :header-inset-level="nivel / 2"
           :content-inset-level="0.1"
           default-closed
-          class="q-mx-xs q-py-sm"
+          class="q-mx-xs q-pb-xs"
         >
           <template v-slot:header>
             <q-item-section avatar>
               <!-- <div class="menu__icon--background text-white"> -->
-              <q-icon :name="icono" size="27px" />
+              <q-icon :name="icono" size="27px" color="main-menu" />
               <!-- </div> -->
             </q-item-section>
-            <q-item-section class="menu__link--name text-accent">
+            <q-item-section class="menu__link--name text-main-menu">
               {{ nombre }}
             </q-item-section>
           </template>
@@ -111,5 +111,8 @@ export default {
   font-weight: 600 !important;
   letter-spacing: -0.025rem;
   // color: #252f40;
+}
+.main-menu__active {
+  color: $secondary !important;
 }
 </style>

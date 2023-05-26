@@ -1,7 +1,7 @@
 <template>
   <q-card class="my-card" dense style="width: 80vw; min-width: 80vw">
     <q-card-section class="bg-primary row inline fit q-py-sm justify-between">
-      <div class="text-h6 text-contrast">Movimientos de la tarjeta</div>
+      <div class="text-h6 text-accent">Movimientos de la tarjeta</div>
       <div class="">
         <q-btn
           round
@@ -9,36 +9,74 @@
           dense
           icon="close"
           v-close-popup
-          color="accent-light"
+          color="accent"
+          class="btn-close"
         ></q-btn>
       </div>
     </q-card-section>
     <q-card-section>
       <div class="column justify-between q-gutter-y-sm">
-        <q-file
-          v-model="archivoExcel"
-          label="Selecciona archivo excel con los movimientos"
-          color="primary"
-          accept=".xlsx,.xls"
-          @input="updateFile"
-          dense
-          stack-label
-          style="width: 400px"
-          max-files="1"
-          use-chips
-        >
-          <template #prepend>
-            <q-icon name="attach_file" />
-          </template>
-        </q-file>
-        <q-btn
-          color="negative"
-          icon="delete"
-          label="Eliminar SELECCIONADOS"
-          dense
-          outline
-          @click="eliminarSeleccionados"
-        />
+        <!-- <div class="row items-center q-gutter-x-sm">
+          <span> Carga tu archivo con movimientos: </span>
+        </div> -->
+        <div class="row">
+          <q-toolbar class="q-gutter-x-md">
+            <q-file
+              v-model="archivoExcel"
+              label="CARGAR"
+              accept=".xlsx,.xls"
+              @input="updateFile"
+              dense
+              style="width: 250px"
+              max-files="1"
+              outlined
+              label-color="accent"
+              clearable
+              bg-color="primary"
+              dark
+            >
+              <template #prepend>
+                <!-- <q-icon color="white" name="attach_file" /> -->
+                <q-icon color="white" name="cloud_upload" />
+                <q-separator spaced inset vertical dark />
+              </template>
+            </q-file>
+            <q-btn
+              v-if="isSelected"
+              label="Eliminar"
+              @click="eliminarSeleccionados"
+              outline
+              color="primary"
+            />
+          </q-toolbar>
+        </div>
+        <transition name="fade">
+          <div class="row bg-pink-1" v-if="isErrors">
+            <div class="column">
+              <div class="row q-gutter-x-md q-pl-sm q-pt-sm">
+                <q-icon name="warning" size="1.5rem" color="negative" />
+                <span class="text-caption text-dark"
+                  >El formulario contiene los siguientes errores:</span
+                >
+              </div>
+              <q-list dense>
+                <q-item :inset-level="0.5" dense>
+                  <q-item-section
+                    avatar
+                    dense
+                    style="min-width: 25px !important; width: 25px !important"
+                  >
+                    <q-icon color="primary" name="arrow_right" />
+                  </q-item-section>
+                  <q-item-section class="text-subtitle2"
+                    >Debes seleccionar la categoría en todos los
+                    movimientos</q-item-section
+                  >
+                </q-item>
+              </q-list>
+            </div>
+          </div>
+        </transition>
       </div>
     </q-card-section>
     <q-card-section style="max-height: 70vh; height: 70vh" class="scroll">
@@ -89,7 +127,7 @@
 /**
  * imports
  */
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { read, utils } from 'xlsx'
 import CategoriaSelect from '../formComponents/CategoriaSelect.vue'
 import { useFormato } from 'src/composables/utils/useFormato'
@@ -98,9 +136,10 @@ import { useFormato } from 'src/composables/utils/useFormato'
  * state
  */
 const archivoExcel = ref(null)
-const registrosSelected = ref()
+const registrosSelected = ref([])
 const listaRegistrosTarjeta = ref([])
 const todos = ref()
+const isErrors = ref(false)
 /**
  * composables
  */
@@ -174,6 +213,25 @@ async function updateFile(v) {
 
 function guardarMovimientos() {
   console.log('guardando los movimeintos', listaRegistrosTarjeta.value)
+  const containsErrors = validarMovimientos()
+  if (containsErrors) {
+    isErrors.value = true
+    setTimeout(() => {
+      isErrors.value = false
+    }, 3000)
+  } else {
+    console.log('items guardados')
+  }
+}
+function validarMovimientos() {
+  let containsErrors = false
+  containsErrors = listaRegistrosTarjeta.value.length <= 0
+  listaRegistrosTarjeta.value.forEach((item) => {
+    if (!item.categoria) {
+      containsErrors = true
+    }
+  })
+  return containsErrors
 }
 function eliminarSeleccionados() {
   console.log('eliminar seleccionados', registrosSelected.value)
@@ -190,6 +248,14 @@ function deleteRow(props) {
 
   listaRegistrosTarjeta.value.splice(rowIndex, 1)
 }
+/**
+ * computed
+ */
+const isSelected = computed({
+  get() {
+    return registrosSelected.value.length > 0
+  }
+})
 
 const columns = [
   // { name: 'id', label: 'Id', field: 'id', sortable: true, align: 'left' },
@@ -247,4 +313,29 @@ const columns = [
 ]
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss">
+.btn-close {
+  &:hover {
+    color: $accent-light !important;
+    transition: all ease-in 0.15s;
+  }
+}
+.fade-enter-from {
+  opacity: 0;
+}
+.fade-enter-to {
+  opacity: 1;
+}
+.fade-enter-active {
+  transition: all 2s ease;
+}
+.fade-leave-from {
+  opacity: 1;
+}
+.fade-leave-to {
+  opacity: 0;
+}
+.fade-leave-active {
+  transition: all 0.5s ease-out;
+}
+</style>
