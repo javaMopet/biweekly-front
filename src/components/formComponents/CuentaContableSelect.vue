@@ -28,7 +28,7 @@
         </template>
       </q-select>
     </div>
-    <div class="q-mt-xs" style="border: 0px solid red" v-if="!props.readonly">
+    <div class="q-mt-xs" style="border: 0px solid red" v-if="props.isAlta">
       <q-btn
         color="accent"
         outline
@@ -94,6 +94,11 @@ const props = defineProps({
     default: 'Cuenta Contable'
   },
   readonly: {
+    type: Boolean,
+    required: false,
+    default: false
+  },
+  isAlta: {
     type: Boolean,
     required: false,
     default: false

@@ -60,12 +60,14 @@
                   :subnivel="cuentaContableProps.subnivel"
                   :clasificacion="cuentaContableProps.clasificacion"
                   :tipo-afectacion="cuentaContableProps.tipoAfectacion"
+                  :rules="[(val) => !!val || 'Required']"
+                  :is-alta="false"
                 ></CuentaContableSelect>
               </div>
               <div>
                 <q-input
                   v-model="editedFormItem.descripcion"
-                  type="text"
+                  type="textarea"
                   label="Descripcion"
                   dense
                   outlined
@@ -76,6 +78,17 @@
                       (val && val.length > 0) ||
                       'Favor de ingresar la descripción de la Cuenta'
                   ]"
+                  rows="2"
+                />
+              </div>
+              <div>
+                <q-input
+                  v-model="editedFormItem.dia_corte"
+                  type="number"
+                  label="Día de Corte"
+                  dense
+                  lazy-rules
+                  :rules="[(val) => (!!val && val > 0) || 'Requerido']"
                 />
               </div>
             </div>

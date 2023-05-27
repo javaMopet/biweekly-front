@@ -218,11 +218,12 @@ function guardarMovimientos() {
     isErrors.value = true
     setTimeout(() => {
       isErrors.value = false
-    }, 3000)
+    }, 6000)
   } else {
     console.log('items guardados')
   }
 }
+
 function validarMovimientos() {
   let containsErrors = false
   containsErrors = listaRegistrosTarjeta.value.length <= 0

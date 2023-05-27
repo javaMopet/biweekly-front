@@ -19,7 +19,7 @@
         <template #top-left>
           <q-btn
             color="primary"
-            icon="add"
+            icon="add_card"
             rounded
             @click="addRow(3)"
             outline
@@ -59,12 +59,9 @@
           </q-input>
         </template>
         <template #item="props">
-          <q-card
-            class="q-ma-sm tarjeta__cuenta"
-            outlined
-            style="border: 0px solid red"
-            @click="mostrarMovimientos(props.row.id)"
-          >
+          <!--clase: tarjeta__cuenta -->
+          <q-card class="q-ma-sm" outlined style="border: 0px solid red">
+            <!-- @click="mostrarMovimientos(props.row.id)" -->
             <q-item class="text-primary">
               <q-item-section avatar top>
                 <q-icon name="credit_card" size="30px" color="primary" />
@@ -93,16 +90,46 @@
               </q-item-section>
               <q-item-section
                 side
-                center
+                top
                 cursor-pointer
-                @click="movimientosTarjeta"
                 class="q-ml-md"
+                @click.prevent
               >
+                <q-btn color="dark" icon="more_horiz" flat dense>
+                  <q-menu>
+                    <q-list style="min-width: 100px">
+                      <q-item
+                        clickable
+                        @click="mostrarMovimientos(props.row.id)"
+                        v-close-popup
+                      >
+                        <q-item-section avatar>
+                          <q-icon name="receipt" />
+                        </q-item-section>
+                        <q-item-section>Movimientos</q-item-section>
+                      </q-item>
+                      <q-item clickable @click="editRow(props)" v-close-popup>
+                        <q-item-section avatar>
+                          <q-icon name="edit" color="info"
+                        /></q-item-section>
+                        <q-item-section>Editar</q-item-section>
+                      </q-item>
+                      <q-separator />
+                      <q-item clickable @click="deleteRow(props)" v-close-popup>
+                        <q-item-section avatar>
+                          <q-icon name="delete" color="negative"
+                        /></q-item-section>
+                        <q-item-section>Eliminar</q-item-section>
+                      </q-item>
+                    </q-list>
+                  </q-menu>
+                </q-btn>
                 <!-- <q-icon
-                  name="more_vert"
-                  color="contrast"
+                  name="more_horiz"
+                  color="dark"
                   cursor-pointer
                   clickable
+                  outlined
                 /> -->
                 <!-- <q-btn color="contrast" flat icon="menu" style="width: 18px">
                   <q-menu>
@@ -123,7 +150,7 @@
               </q-item-section>
             </q-item>
 
-            <q-separator inset color="grey-7" />
+            <!-- <q-separator inset color="grey-7" />
             <q-card-actions align="left">
               <q-btn
                 round
@@ -140,7 +167,7 @@
                 class="q-ml-sm"
                 @click="deleteRow(props)"
               />
-            </q-card-actions>
+            </q-card-actions> -->
           </q-card>
         </template>
         <template #body-cell-icono="props">
@@ -180,17 +207,21 @@ const notificacion = useNotificacion()
 const router = useRouter()
 
 /**
+ * state
+ */
+
+/**
  * GRAPHQL
  */
 const graphql_options = ref({
   fetchPolicy: 'cache-and-network'
   // fetchPolicy: 'cache-only'
 })
-const { onError: onErrorListaCuentas, result: resultCuentas } = useQuery(
-  LISTA_CUENTAS,
-  null,
-  graphql_options
-)
+const {
+  onError: onErrorListaCuentas,
+  result: resultCuentas,
+  refetch: refetchListaCuentas
+} = useQuery(LISTA_CUENTAS, null, graphql_options)
 
 const {
   mutate: deleteCuenta,
@@ -200,10 +231,8 @@ const {
 
 onDoneDeleteCuenta(({ data }) => {
   if (!!data) {
-    console.log('item deleted ', rowIndexDelete.value)
+    refetchListaCuentas()
     const deletedItem = data.cuentaDelete.cuenta
-    resultCuentas.value?.listaCuentas.splice(rowIndexDelete.value, 1)
-    rowIndexDelete.value = null
     mostrarNotificacion('elminó', deletedItem)
   }
 })
@@ -234,7 +263,6 @@ const filter = ref()
 const showFormItem = ref(false)
 const editedItem = ref({ ...defaultItem })
 const editedIndex = ref(null)
-const rowIndexDelete = ref(null)
 
 /**
  * computed
@@ -275,14 +303,14 @@ const columns = [
     field: (row) => `${row.cuentaContable.id} - ${row.cuentaContable.nombre}`,
     sortable: true,
     align: 'left'
-  },
-  {
-    name: 'acciones',
-    label: 'Acciones',
-    field: 'action',
-    sortable: false,
-    align: 'center'
   }
+  // {
+  //   name: 'acciones',
+  //   label: 'Acciones',
+  //   field: 'action',
+  //   sortable: false,
+  //   align: 'center'
+  // }
 ]
 /**
  * onMounted
@@ -314,7 +342,6 @@ function editRow(item) {
 }
 
 function deleteRow(item) {
-  rowIndexDelete.value = item.rowIndex
   $q.dialog({
     title: 'Confirmar',
     style: 'width:500px',
