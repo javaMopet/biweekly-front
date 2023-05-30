@@ -1,7 +1,12 @@
 <template>
   <q-card class="my-card">
     <q-toolbar class="bg-whiet text-primary q-gutter-x-md">
-      <q-btn icon="arrow_back_ios" flat square />
+      <q-btn
+        icon="arrow_back_ios"
+        flat
+        square
+        @click="router.push('/tarjetas_credito')"
+      />
       <q-btn
         color="toolbar-button"
         text-color="white"
@@ -75,7 +80,7 @@
 </template>
 
 <script setup>
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { ref, computed } from 'vue'
 import { DateTime } from 'luxon'
 import RegistroMovimientoTarjeta from 'src/components/tarjetasCredito/RegistroMovimientoTarjeta.vue'
@@ -86,6 +91,7 @@ import PriceInput from 'src/components/formComponents/PriceInput.vue'
 import CargaRegistrosTarjeta from 'src/components/tarjetasCredito/CargaRegistrosTarjeta.vue'
 
 const route = useRoute()
+const router = useRouter()
 
 /**
  * state

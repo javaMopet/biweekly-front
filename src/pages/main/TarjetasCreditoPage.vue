@@ -60,7 +60,11 @@
         </template>
         <template #item="props">
           <!--clase: tarjeta__cuenta -->
-          <q-card class="q-ma-sm" outlined style="border: 0px solid red">
+          <q-card
+            class="q-ma-sm tarjeta__cuenta"
+            outlined
+            style="border: 0px solid red"
+          >
             <!-- @click="mostrarMovimientos(props.row.id)" -->
             <q-item class="text-primary">
               <q-item-section avatar top>
@@ -76,9 +80,12 @@
                   color="grey-5"
                   style="width: 100%; margin-left: 0px !important"
                 /> -->
-                <q-item-label caption lines="2" class="text-grey-7">{{
-                  props.row.descripcion
-                }}</q-item-label>
+                <!-- <q-item-label caption lines="2" class="text-grey-7"></q-item-label> -->
+                <router-link
+                  :to="{ name: 'tarjetaCredito', params: { id: props.row.id } }"
+                  class="tarjeta__credito--link"
+                  >{{ props.row.descripcion }}</router-link
+                >
                 <q-separator spaced inset vertical dark />
                 <q-item-label
                   align="right"
@@ -98,7 +105,7 @@
                 <q-btn color="dark" icon="more_horiz" flat dense>
                   <q-menu>
                     <q-list style="min-width: 100px">
-                      <q-item
+                      <!-- <q-item
                         clickable
                         @click="mostrarMovimientos(props.row.id)"
                         v-close-popup
@@ -107,7 +114,7 @@
                           <q-icon name="receipt" />
                         </q-item-section>
                         <q-item-section>Movimientos</q-item-section>
-                      </q-item>
+                      </q-item> -->
                       <q-item clickable @click="editRow(props)" v-close-popup>
                         <q-item-section avatar>
                           <q-icon name="edit" color="info"
@@ -396,12 +403,13 @@ function mostrarMovimientos(value) {
 
 <style lang="scss" scoped>
 .tarjeta__credito--link {
-  font-size: 1.3rem;
-  text-decoration: none !important;
+  font-size: 0.65rem;
+  color: #a19ba9 !important;
+  text-decoration: underline !important;
   color: $dark;
   &:hover {
-    text-decoration: underline !important;
-    color: #c4477b !important;
+    text-decoration: none !important;
+    color: $secondary !important;
   }
 }
 .tarjeta__cuenta {

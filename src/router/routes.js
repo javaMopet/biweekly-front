@@ -23,6 +23,7 @@ const routes = [
       },
       {
         path: '/tarjetas_credito/:id',
+        name: 'tarjetaCredito',
         component: () => import('src/pages/main/TarjetaCreditoPage.vue')
       },
       {

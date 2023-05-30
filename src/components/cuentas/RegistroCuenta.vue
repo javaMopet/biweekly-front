@@ -83,12 +83,10 @@
               </div>
               <div>
                 <q-input
-                  v-model="editedFormItem.dia_corte"
+                  v-model="editedFormItem.diaCorte"
                   type="number"
                   label="Día de Corte"
                   dense
-                  lazy-rules
-                  :rules="[(val) => (!!val && val > 0) || 'Requerido']"
                 />
               </div>
             </div>
@@ -265,6 +263,7 @@ function saveItem() {
     cuentaContableId: parseInt(cuenta_contable_id),
     cuentaContable: undefined,
     tipoCuentaId: parseInt(tipo_cuenta_id),
+    diaCorte: parseInt(editedFormItem.value.diaCorte),
     tipoCuenta: undefined,
     __typename: undefined
   }

@@ -16,10 +16,12 @@
         <template v-slot:top-left>
           <q-btn-dropdown
             split
-            icon="add"
-            label="AGREGAR"
+            outline
+            icon="add_circle"
+            label="AGREGAR CUENTA"
             color="primary"
             @click="addRow(1)"
+            rounded
           >
             <q-list>
               <q-item clickable v-close-popup @click="addRow(1)">
@@ -73,7 +75,8 @@
                 'text-white': true
               }"
             >
-              <div class="row">
+              <div class="row q-gutter-x-lg">
+                <q-icon :name="props.row.tipoCuenta.icon" size="30px" />
                 <div class="column col">
                   <div class="text-h6">{{ props.row.nombre }}</div>
                 </div>
@@ -86,22 +89,54 @@
                     'col-auto column items-center q-mx-md': true
                   }"
                 >
-                  <q-icon :name="props.row.tipoCuenta.icon" size="30px" />
-                  <span>{{ props.row.tipoCuenta.nombre }}</span>
+                  <q-btn color="accent-light" flat icon="more_vert" round dense>
+                    <q-menu>
+                      <q-list style="min-width: 100px">
+                        <!-- <q-item
+                        clickable
+                        @click="mostrarMovimientos(props.row.id)"
+                        v-close-popup
+                      >
+                        <q-item-section avatar>
+                          <q-icon name="receipt" />
+                        </q-item-section>
+                        <q-item-section>Movimientos</q-item-section>
+                      </q-item> -->
+                        <q-item clickable @click="editRow(props)" v-close-popup>
+                          <q-item-section avatar>
+                            <q-icon name="edit" color="info"
+                          /></q-item-section>
+                          <q-item-section>Editar</q-item-section>
+                        </q-item>
+                        <q-separator />
+                        <q-item
+                          clickable
+                          @click="deleteRow(props)"
+                          v-close-popup
+                        >
+                          <q-item-section avatar>
+                            <q-icon name="delete" color="negative"
+                          /></q-item-section>
+                          <q-item-section>Eliminar</q-item-section>
+                        </q-item>
+                      </q-list>
+                    </q-menu>
+                  </q-btn>
+                  <!-- <span>{{ props.row.tipoCuenta.nombre }}</span> -->
                 </div>
               </div>
             </q-card-section>
 
             <q-card-section>
-              <div class="text-caption text-accent">
+              <div class="text-caption text-grey-8">
                 {{ props.row.cuentaContable.nombreCompleto }}
               </div>
               {{ props.row.descripcion }}
             </q-card-section>
 
-            <q-separator inset />
+            <!-- <q-separator inset /> -->
 
-            <q-card-actions>
+            <!-- <q-card-actions>
               <q-btn
                 round
                 color="primary"
@@ -116,7 +151,7 @@
                 class="q-ml-sm"
                 @click="deleteRow(props)"
               />
-            </q-card-actions>
+            </q-card-actions> -->
           </q-card>
         </template>
         <template #body-cell-icono="props">
