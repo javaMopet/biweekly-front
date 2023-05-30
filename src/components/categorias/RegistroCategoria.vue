@@ -134,14 +134,14 @@
               <div class="col q-ml-xs">
                 <PriceInput
                   currency-code="MNX"
-                  v-model="editedFormItem.importe"
+                  v-model="editedFormItem.importeDefault"
                 ></PriceInput>
               </div>
             </div>
           </div>
           <div class="">
             <CuentaSelect
-              v-model="editedFormItem.cuenta"
+              v-model="editedFormItem.cuentaDefault"
               :opcional="true"
               label="Cuenta Bancaria por Defecto"
               hint="Esta cuenta se tomará por defecto al agregar un movimiento"

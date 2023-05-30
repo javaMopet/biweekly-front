@@ -8,7 +8,7 @@ export const LISTA_CATEGORIAS = gql`
       descripcion
       color
       icono
-      importe
+      importeDefault
       cuentaContable {
         id
         nombre
@@ -20,7 +20,7 @@ export const LISTA_CATEGORIAS = gql`
         nombre
         value
       }
-      cuenta {
+      cuentaDefault {
         id
         nombre
       }

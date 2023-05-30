@@ -140,8 +140,8 @@ const sessionStore = useSessionStore()
 const form = reactive({
   fullname: 'Horacio Peña Mendoza',
   email: 'hpenam@uaemex.mx',
-  password: '123456',
-  password_confirmation: '1234856'
+  password: 'Pqt:72i_9,0c',
+  password_confirmation: 'Pqt:72i_9,0c'
 })
 const loginAction = ref('one')
 // const btnLabel = ref("Entrar");

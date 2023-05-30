@@ -1,7 +1,6 @@
 <template>
   <q-card class="my-card" style="width: 550px">
-    <!-- <pre>{{ editedFormItem }}</pre> -->
-    <q-card-section class="bg-primary text-accent-contrast">
+    <q-card-section class="bg-grey-9">
       <q-btn
         round
         flat
@@ -12,7 +11,7 @@
         v-close-popup
         vertical-top
       ></q-btn>
-      <div class="text-subtitle1 text-accent-contrast">{{ actionName }}</div>
+      <div class="text-subtitle1 text-white">{{ actionName }}</div>
     </q-card-section>
 
     <q-card-section class="">
@@ -23,9 +22,10 @@
               v-model="editedFormItem.tipoCuenta.id"
               spread
               no-caps
-              color="primary"
-              toggle-color="accent"
-              toggle-text-color="accent-contrast"
+              color="grey-4"
+              text-color="grey-7"
+              toggle-color="green-4"
+              toggle-text-color="white"
               :options="tiposCuentaOptions"
               @update:model-value="tipoCuentaUpdated"
               push
@@ -96,11 +96,12 @@
           <q-btn
             label="Cancelar"
             v-close-popup
-            color="negative"
+            color=""
             flat
             class="q-ml-sm"
+            dense
           />
-          <q-btn :label="lblSubmit" type="submit" color="positive" />
+          <q-btn :label="lblSubmit" type="submit" dense color="green-4" />
         </div>
       </q-form>
     </q-card-section>
