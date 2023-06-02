@@ -1,6 +1,6 @@
 <template>
-  <q-card class="my-card" style="width: 550px">
-    <q-card-section class="bg-grey-9">
+  <q-card class="my-card" style="width: 550px" dense>
+    <q-card-section class="bg-grey-9" dense>
       <q-btn
         round
         flat
@@ -34,10 +34,11 @@
           </div>
           <div class="column items-center" style="border: 0px solid red">
             <div
-              class="q-gutter-lg q-mt-md"
+              class="q-gutter-xs q-mt-sm"
               style="width: 70%; border: 0px solid red"
             >
               <div>
+                <div class="row item-label">Nombre de la tarjeta:</div>
                 <q-input
                   v-model="editedFormItem.nombre"
                   type="text"
@@ -55,6 +56,7 @@
                 />
               </div>
               <div>
+                <div class="row item-label">Número de cuenta:</div>
                 <q-input
                   v-model="editedFormItem.identificador"
                   type="text"
@@ -66,11 +68,12 @@
                   :rules="[
                     (val) =>
                       (val && val.length > 0) ||
-                      'Favor de ingresar la descripción de la Cuenta'
+                      'Favor de ingresar un número que identifique la cuenta'
                   ]"
                 />
               </div>
               <div class="">
+                <div class="row item-label">Cuenta Contable:</div>
                 <CuentaContableSelect
                   v-model="editedFormItem.cuentaContable"
                   :subnivel="cuentaContableProps.subnivel"
@@ -82,12 +85,20 @@
               </div>
 
               <div>
-                <q-input
-                  v-model="editedFormItem.diaCorte"
-                  type="number"
-                  label="Día de Corte"
-                  dense
-                />
+                <div class="row inline items-center q-gutter-x-lg">
+                  <div class="row item-label">Día de corte:</div>
+                  <q-input
+                    v-model="editedFormItem.diaCorte"
+                    type="number"
+                    label="Día del mes"
+                    dense
+                    :rules="[
+                      (val) =>
+                        (!!val && val > 0 && val < 31) ||
+                        'Ingresar un día de mes válido'
+                    ]"
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -124,7 +135,7 @@ import CuentaContableSelect from '../formComponents/CuentaContableSelect.vue'
  */
 const formItem = ref({
   nombre: '',
-  descripcion: '',
+  identificador: '',
   cuentaContable: null,
   tipoCuenta: {
     id: '1'
@@ -256,7 +267,7 @@ onMounted(() => {
  * methods
  */
 function saveItem() {
-  console.log('save item')
+  console.log('save item', editedFormItem.value)
   const cuenta_contable_id = editedFormItem.value.cuentaContable.id
   const tipo_cuenta_id = editedFormItem.value.tipoCuenta.id
   const input = {
@@ -306,7 +317,11 @@ function obtenerCuentasContables(value) {
 }
 </script>
 
-<style lang="sass" scoped>
-.my-input
-  max-width: 250px
+<style lang="scss">
+.item-label {
+  font-weight: 600 !important;
+  font-size: 0.8rem !important;
+  color: #444 !important;
+  letter-spacing: -0.025rem;
+}
 </style>

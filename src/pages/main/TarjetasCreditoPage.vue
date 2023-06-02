@@ -265,7 +265,7 @@ onErrorListaCuentas((error) => {
 const defaultItem = {
   id: null,
   nombre: null,
-  descripcion: null,
+  identificador: null,
   tipoCuenta: {
     id: null
   },
