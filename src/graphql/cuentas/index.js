@@ -5,7 +5,8 @@ export const LISTA_CUENTAS = gql`
     listaCuentas {
       id
       nombre
-      descripcion
+      identificador
+      diaCorte
       cuentaContableId
       cuentaContable {
         id
@@ -40,7 +41,7 @@ export const CUENTA_CREATE = gql`
       cuenta {
         id
         nombre
-        descripcion
+        identificador
         cuentaContableId
         cuentaContable {
           id
@@ -64,7 +65,7 @@ export const CUENTA_UPDATE = gql`
       cuenta {
         id
         nombre
-        descripcion
+        identificador
         cuentaContableId
         cuentaContable {
           id
@@ -89,7 +90,7 @@ export const CUENTA_DELETE = gql`
       cuenta {
         id
         nombre
-        descripcion
+        identificador
         cuentaContableId
         cuentaContable {
           id

@@ -1,6 +1,6 @@
 <template>
   <q-layout view="lHh LpR lFr">
-    <q-header bordered class="bg-primary text-primary-light">
+    <q-header bordered class="bg-primary text-primary-light" dense>
       <q-toolbar>
         <q-btn
           dense
@@ -11,12 +11,13 @@
           class="float-right"
         />
         <q-toolbar-title class="font-title"> </q-toolbar-title>
-        <span class="q-pr-sm text-bold" v-if="user">{{ user.email }}</span>
+        <span class="q-pr-sm text-bold" v-if="user">{{ user.name }}</span>
         <q-btn
           icon="account_circle"
           @click="onClickAccount"
           flat
           round
+          dense
           size="1.2rem"
         >
           <q-menu>

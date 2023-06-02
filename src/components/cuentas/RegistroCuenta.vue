@@ -54,6 +54,22 @@
                   ]"
                 />
               </div>
+              <div>
+                <q-input
+                  v-model="editedFormItem.identificador"
+                  type="text"
+                  label="Terminación del número de cuenta"
+                  dense
+                  outlined
+                  color="secondary"
+                  lazy-rules
+                  :rules="[
+                    (val) =>
+                      (val && val.length > 0) ||
+                      'Favor de ingresar la descripción de la Cuenta'
+                  ]"
+                />
+              </div>
               <div class="">
                 <CuentaContableSelect
                   v-model="editedFormItem.cuentaContable"
@@ -64,23 +80,7 @@
                   :is-alta="false"
                 ></CuentaContableSelect>
               </div>
-              <div>
-                <q-input
-                  v-model="editedFormItem.descripcion"
-                  type="textarea"
-                  label="Descripcion"
-                  dense
-                  outlined
-                  color="secondary"
-                  lazy-rules
-                  :rules="[
-                    (val) =>
-                      (val && val.length > 0) ||
-                      'Favor de ingresar la descripción de la Cuenta'
-                  ]"
-                  rows="2"
-                />
-              </div>
+
               <div>
                 <q-input
                   v-model="editedFormItem.diaCorte"

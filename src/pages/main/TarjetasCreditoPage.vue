@@ -68,10 +68,10 @@
             <!-- @click="mostrarMovimientos(props.row.id)" -->
             <q-item class="text-primary">
               <q-item-section avatar top>
-                <q-icon name="credit_card" size="30px" color="primary" />
+                <q-icon name="credit_card" size="40px" color="orange-6" />
               </q-item-section>
               <q-item-section align="left">
-                <q-item-label class="text-bolder text-h6">
+                <q-item-label class="text-dark text-bold text-h6">
                   {{ props.row.nombre }}
                 </q-item-label>
                 <!-- <q-separator
@@ -84,9 +84,15 @@
                 <router-link
                   :to="{ name: 'tarjetaCredito', params: { id: props.row.id } }"
                   class="tarjeta__credito--link"
-                  >{{ props.row.descripcion }}</router-link
                 >
-                <q-separator spaced inset vertical dark />
+                  <div
+                    class="fit flex flex-left text-left non-selectable q-py-sm"
+                  >
+                    **** **** {{ props.row.identificador }}
+                  </div>
+                  <q-tooltip> Abrir movimientos </q-tooltip>
+                </router-link>
+
                 <q-item-label
                   align="right"
                   caption
@@ -403,13 +409,13 @@ function mostrarMovimientos(value) {
 
 <style lang="scss" scoped>
 .tarjeta__credito--link {
-  font-size: 0.65rem;
+  font-size: 0.85rem;
   color: #a19ba9 !important;
   text-decoration: underline !important;
   color: $dark;
   &:hover {
-    text-decoration: none !important;
-    color: $secondary !important;
+    text-decoration: underline !important;
+    color: $dark !important;
   }
 }
 .tarjeta__cuenta {
