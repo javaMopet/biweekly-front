@@ -1,6 +1,6 @@
 <template>
-  <q-card class="my-card" style="width: 550px" dense>
-    <q-card-section class="bg-grey-9" dense>
+  <q-card class="my-card" style="width: 550px">
+    <q-card-section class="bg-main-menu">
       <q-btn
         round
         flat
@@ -42,7 +42,7 @@
                 <q-input
                   v-model="editedFormItem.nombre"
                   type="text"
-                  label="Nombre"
+                  label="Ingresa el nombre"
                   dense
                   outlined
                   color="secondary"
@@ -61,58 +61,67 @@
                   v-model="editedFormItem.identificador"
                   type="text"
                   label="Terminación del número de cuenta"
-                  dense
-                  outlined
-                  color="secondary"
-                  lazy-rules
-                  :rules="[
-                    (val) =>
-                      (val && val.length > 0) ||
-                      'Favor de ingresar un número que identifique la cuenta'
-                  ]"
-                />
-              </div>
-              <div class="">
-                <div class="row item-label">Cuenta Contable:</div>
-                <CuentaContableSelect
-                  v-model="editedFormItem.cuentaContable"
-                  :subnivel="cuentaContableProps.subnivel"
-                  :clasificacion="cuentaContableProps.clasificacion"
-                  :tipo-afectacion="cuentaContableProps.tipoAfectacion"
-                  :rules="[(val) => !!val || 'Required']"
-                  :is-alta="false"
-                ></CuentaContableSelect>
-              </div>
-
-              <div>
-                <div class="row inline items-center q-gutter-x-lg">
-                  <div class="row item-label">Día de corte:</div>
+                ></q-input>
+                <div class="">
+                  <div class="row input-label">Cuenta Contable:</div>
+                  <CuentaContableSelect
+                    v-model="editedFormItem.cuentaContable"
+                    :subnivel="cuentaContableProps.subnivel"
+                    :clasificacion="cuentaContableProps.clasificacion"
+                    :tipo-afectacion="cuentaContableProps.tipoAfectacion"
+                    :rules="[(val) => !!val || 'Required']"
+                    :is-alta="false"
+                    input-label="Seleccione una Cuenta Contable"
+                  ></CuentaContableSelect>
+                </div>
+                <div>
+                  <div class="row input-label">Descripción:</div>
                   <q-input
-                    v-model="editedFormItem.diaCorte"
-                    type="number"
-                    label="Día del mes"
+                    v-model="editedFormItem.descripcion"
+                    type="textarea"
+                    label="Ingresa una descripción"
                     dense
+                    outlined
+                    color="secondary"
+                    lazy-rules
                     :rules="[
                       (val) =>
-                        (!!val && val > 0 && val < 31) ||
-                        'Ingresar un día de mes válido'
+                        (val && val.length > 0) ||
+                        'Favor de ingresar un número que identifique la cuenta'
                     ]"
                   />
+                </div>
+                <div class="row inline items-center q-gutter-x-md fit">
+                  <div class="col-3 input-label">Día de corte:</div>
+                  <div class="">
+                    <q-input
+                      v-model="editedFormItem.diaCorte"
+                      type="number"
+                      label="Ingresa un día del mes"
+                      dense
+                      lazy-rules
+                      :rules="[
+                        (val) =>
+                          (!!val && val > 0 && val <= 31) ||
+                          'Ingresa un día del mes válido'
+                      ]"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-        <div align="right" class="q-gutter-x-sm">
-          <q-btn
-            label="Cancelar"
-            v-close-popup
-            color=""
-            flat
-            class="q-ml-sm"
-            dense
-          />
-          <q-btn :label="lblSubmit" type="submit" dense color="green-4" />
+          <div align="right" class="q-gutter-x-sm">
+            <q-btn
+              label="Cancelar"
+              v-close-popup
+              color=""
+              flat
+              class="q-ml-sm"
+              dense
+            />
+            <q-btn :label="lblSubmit" type="submit" dense color="green-4" />
+          </div>
         </div>
       </q-form>
     </q-card-section>
@@ -317,11 +326,10 @@ function obtenerCuentasContables(value) {
 }
 </script>
 
-<style lang="scss">
-.item-label {
-  font-weight: 600 !important;
-  font-size: 0.8rem !important;
-  color: #444 !important;
+<style lang="scss" scoped>
+.input-label {
+  font-size: 0.8rem;
+  font-weight: 600;
   letter-spacing: -0.025rem;
 }
 </style>

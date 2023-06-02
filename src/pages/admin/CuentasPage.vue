@@ -69,7 +69,7 @@
           <q-card class="my-card text-primary q-ma-sm" style="width: 350px">
             <q-card-section
               :class="{
-                'bg-dark': props.row.tipoCuenta.id === '1',
+                'bg-primary-grey': props.row.tipoCuenta.id === '1',
                 'bg-accent ': props.row.tipoCuenta.id === '2',
                 'bg-accent': props.row.tipoCuenta.id === '3',
                 'text-white': true
@@ -78,7 +78,10 @@
               <div class="row q-gutter-x-lg">
                 <q-icon :name="props.row.tipoCuenta.icon" size="30px" />
                 <div class="column col">
-                  <div class="text-h6">{{ props.row.nombre }}</div>
+                  <div class="text-h6 text-white">{{ props.row.nombre }}</div>
+                  <div class="text-condensed text-grey-5 q-mt-xs">
+                    {{ props.row.cuentaContable.nombreCompleto }}
+                  </div>
                 </div>
                 <div
                   class=""
@@ -126,12 +129,16 @@
                 </div>
               </div>
             </q-card-section>
-
             <q-card-section>
-              <div class="text-caption text-grey-8">
-                {{ props.row.cuentaContable.nombreCompleto }}
+              <div
+                class="text-subtitle text-grey-8 text-bold q-mt-xs"
+                align="right"
+              >
+                $ 1,500.00
               </div>
-              {{ props.row.descripcion }}
+              <span class="cuenta__card--descripcion">
+                {{ props.row.descripcion }}
+              </span>
             </q-card-section>
 
             <!-- <q-separator inset /> -->
@@ -364,4 +371,17 @@ function mostrarNotificacion(action, cuenta) {
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss">
+.cuenta__card--descripcion {
+  font-size: 0.8rem !important;
+  // color: rgb(85, 85, 103) !important;
+  color: rgb(27, 61, 33) !important;
+  letter-spacing: -0.025rem;
+  font-weight: 600;
+}
+.text-condensed {
+  letter-spacing: -0.025rem !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+}
+</style>
