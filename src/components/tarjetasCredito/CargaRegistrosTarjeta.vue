@@ -98,6 +98,17 @@
             ></CategoriaSelect>
           </q-td>
         </template>
+        <template #body-cell-importe="props">
+          <q-td :props="props">
+            <span
+              :class="[
+                props.row.importe > 0 ? 'importe_negativo' : 'importe_positivo'
+              ]"
+            >
+              {{ formato.toCurrency(parseFloat(props.row.importe)) }}
+            </span>
+          </q-td>
+        </template>
         <template #body-cell-acciones="props">
           <q-td :props="props" fit class="bg-white">
             <q-btn
@@ -131,6 +142,8 @@ import { ref, computed } from 'vue'
 import { read, utils } from 'xlsx'
 import CategoriaSelect from '../formComponents/CategoriaSelect.vue'
 import { useFormato } from 'src/composables/utils/useFormato'
+import { api } from 'src/boot/axios'
+import { DateTime } from 'luxon'
 
 /**
  * state
@@ -220,6 +233,39 @@ function guardarMovimientos() {
       isErrors.value = false
     }, 6000)
   } else {
+    var lista_egresos = []
+
+    listaRegistrosTarjeta.value.forEach((item) => {
+      console.log('item', item)
+      console.log('fecha', item.fecha)
+      const fecha = DateTime.now()
+      const registro = {
+        estado_registro_id: 1, //abierto
+        importe: parseFloat(item.importe),
+        fecha,
+        observaciones: item.concepto
+      }
+      const egreso = {
+        registro,
+        categoria_id: item.categoria.id,
+        cuenta_id: item.cuenta.id
+      }
+      lista_egresos.push(egreso)
+    })
+
+    api
+      .post('/create_list', {
+        params: {
+          lista_egresos
+        }
+      })
+      .then((response) => {
+        console.log('guardado correctamente')
+        console.log('response', response)
+      })
+      .catch((error) => {
+        console.error(error)
+      })
     console.log('items guardados')
   }
 }
@@ -300,7 +346,7 @@ const columns = [
     field: 'importe',
     sortable: true,
     align: 'right',
-    format: (val, row) => `${formato.toCurrency(parseFloat(val))}`,
+    // format: (val, row) => `${formato.toCurrency(parseFloat(val))}`,
     style: 'width:200px'
   },
   {
@@ -338,5 +384,11 @@ const columns = [
 }
 .fade-leave-active {
   transition: all 0.5s ease-out;
+}
+.importe_negativo {
+  color: red;
+}
+.importe_positivo {
+  color: green;
 }
 </style>

@@ -63,7 +63,8 @@
           <q-card
             class="q-ma-sm tarjeta__cuenta"
             outlined
-            style="border: 0px solid red"
+            bordered
+            style="width: 380px; min-width: 380px"
           >
             <!-- @click="mostrarMovimientos(props.row.id)" -->
             <q-item class="text-primary">
@@ -395,7 +396,7 @@ function cuentaUpdated(itemUpdated) {
 function mostrarNotificacion(action, cuenta) {
   notificacion.mostrarNotificacionPositiva(
     `La cuenta "${cuenta.nombre}" se ${action} correctamente`,
-    2500
+    1500
   )
 }
 function movimientosTarjeta() {

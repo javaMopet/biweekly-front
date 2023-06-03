@@ -5,16 +5,16 @@ export function useNotificacion() {
 
   const mostrarNotificacionPositiva = (message, timeout) => {
     $q.notify({
-      position: 'center',
+      position: 'top',
       type: 'positive',
       message,
       timeout,
-      progress: true,
       color: 'positive',
       textColor: 'white',
       classes: 'glossy'
     })
   }
+  // progress: true,
 
   const mostrarNotificacionNegativa = (message, timeout) => {
     $q.notify({

@@ -43,6 +43,7 @@ export const CUENTA_CREATE = gql`
         nombre
         identificador
         cuentaContableId
+        diaCorte
         cuentaContable {
           id
           nombre
@@ -67,6 +68,7 @@ export const CUENTA_UPDATE = gql`
         nombre
         identificador
         cuentaContableId
+        diaCorte
         cuentaContable {
           id
           nombre
@@ -92,6 +94,7 @@ export const CUENTA_DELETE = gql`
         nombre
         identificador
         cuentaContableId
+        diaCorte
         cuentaContable {
           id
           nombre

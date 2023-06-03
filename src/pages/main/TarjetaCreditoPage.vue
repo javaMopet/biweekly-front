@@ -1,20 +1,16 @@
 <template>
   <q-card class="my-card">
-    <q-toolbar class="bg-whiet text-primary q-gutter-x-md">
+    <q-toolbar class="bg-grey-2 text-primary" fit dense>
+      <!-- arrow_back_ios -->
       <q-btn
-        icon="arrow_back_ios"
+        icon="navigate_before"
         flat
-        square
+        round
         @click="router.push('/tarjetas_credito')"
-      />
-      <q-btn
-        color="toolbar-button"
-        text-color="white"
-        label="Cargar movimientos"
-        @click="cargarMovimientos"
-        icon="upload"
         dense
       />
+      {{ route.params.id }} - Santander Like U
+
       <q-toolbar-title>
         <!-- Tarjeta de crédito {{ route.params.id }} -->
       </q-toolbar-title>
@@ -62,6 +58,16 @@
         </q-menu>
       </q-btn>
     </q-toolbar>
+    <q-toolbar inset class="bg-grey-2" dense>
+      <q-btn
+        color="toolbar-button"
+        text-color="white"
+        label="Cargar movimientos"
+        @click="cargarMovimientos"
+        icon="upload"
+        dense
+      />
+    </q-toolbar>
     <q-card-section>
       <!-- @update:model-value="cargarExcel" -->
     </q-card-section>
@@ -80,8 +86,8 @@
 </template>
 
 <script setup>
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ref, computed } from 'vue'
 import { DateTime } from 'luxon'
 import RegistroMovimientoTarjeta from 'src/components/tarjetasCredito/RegistroMovimientoTarjeta.vue'
 import DateInput from 'src/components/formComponents/DateInput.vue'
@@ -92,6 +98,12 @@ import CargaRegistrosTarjeta from 'src/components/tarjetasCredito/CargaRegistros
 
 const route = useRoute()
 const router = useRouter()
+/**
+ * onMounted
+ */
+onMounted(() => {
+  console.log('buscando los datos de la tarjeta de crédito', route.params.id)
+})
 
 /**
  * state
