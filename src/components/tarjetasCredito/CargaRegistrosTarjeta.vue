@@ -265,6 +265,7 @@ function guardarMovimientos() {
       })
       .catch((error) => {
         console.error(error)
+        console.error('esto es un error')
       })
     console.log('items guardados')
   }
