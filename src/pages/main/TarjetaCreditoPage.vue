@@ -8,8 +8,9 @@
         round
         @click="router.push('/tarjetas_credito')"
         dense
+        size="1rem"
       />
-      {{ route.params.id }} - Santander Like U
+      <span class="text-h6">{{ cuenta.nombre }}</span>
 
       <q-toolbar-title>
         <!-- Tarjeta de crédito {{ route.params.id }} -->
@@ -80,7 +81,7 @@
   </Teleport>
   <Teleport to="#modal">
     <q-dialog v-model="showFormCarga" persistent>
-      <CargaRegistrosTarjeta></CargaRegistrosTarjeta>
+      <CargaRegistrosTarjeta :cuenta="cuenta"></CargaRegistrosTarjeta>
     </q-dialog>
   </Teleport>
 </template>
@@ -99,15 +100,6 @@ import CargaRegistrosTarjeta from 'src/components/tarjetasCredito/CargaRegistros
 
 const route = useRoute()
 const router = useRouter()
-/**
- * onMounted
- */
-onMounted(() => {
-  console.log('buscando los datos de la tarjeta de crédito', route.params.id)
-  api.get(`/cuentas/${route.params.id}`).then((response) => {
-    console.log('response', response.data)
-  })
-})
 
 /**
  * state
@@ -124,6 +116,17 @@ const registroEditedItem = ref([
 const categoriaOptions = ref([])
 const showForm = ref(false)
 const showFormCarga = ref(false)
+const cuenta = ref({})
+/**
+ * onMounted
+ */
+onMounted(() => {
+  console.log('buscando los datos de la tarjeta de crédito', route.params.id)
+  api.get(`/cuentas/${route.params.id}`).then((response) => {
+    console.log('response', response.data)
+    cuenta.value = response?.data ?? {}
+  })
+})
 
 /**
  * computed

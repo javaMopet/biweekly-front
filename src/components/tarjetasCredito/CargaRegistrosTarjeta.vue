@@ -1,7 +1,9 @@
 <template>
   <q-card class="my-card" dense style="width: 80vw; min-width: 80vw">
     <q-card-section class="bg-primary row inline fit q-py-sm justify-between">
-      <div class="text-h6 text-accent">Movimientos de la tarjeta</div>
+      <div class="text-h6 text-accent">
+        Movimientos de la tarjeta {{ cuenta.nombre }}
+      </div>
       <div class="">
         <q-btn
           round
@@ -158,6 +160,18 @@ const isErrors = ref(false)
  */
 const formato = useFormato()
 /**
+ * defProperties
+ */
+const props = defineProps({
+  cuenta: {
+    type: Object,
+    required: true,
+    default: () => {
+      return {}
+    }
+  }
+})
+/**
  *
  * @param {*} v
  */
@@ -248,16 +262,14 @@ function guardarMovimientos() {
       const egreso = {
         registro,
         categoria_id: item.categoria.id,
-        cuenta_id: item.cuenta.id
+        cuenta_id: props.cuenta.id
       }
       lista_egresos.push(egreso)
     })
 
     api
       .post('/create_list', {
-        params: {
-          lista_egresos
-        }
+        lista_egresos
       })
       .then((response) => {
         console.log('guardado correctamente')
