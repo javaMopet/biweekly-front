@@ -93,6 +93,7 @@ import RegistroMovimientoTarjeta from 'src/components/tarjetasCredito/RegistroMo
 import DateInput from 'src/components/formComponents/DateInput.vue'
 import CategoriaSelect from 'src/components/formComponents/CategoriaSelect.vue'
 import PriceInput from 'src/components/formComponents/PriceInput.vue'
+import { api } from 'src/boot/axios'
 
 import CargaRegistrosTarjeta from 'src/components/tarjetasCredito/CargaRegistrosTarjeta.vue'
 
@@ -103,6 +104,9 @@ const router = useRouter()
  */
 onMounted(() => {
   console.log('buscando los datos de la tarjeta de crédito', route.params.id)
+  api.get(`/cuentas/${route.params.id}`).then((response) => {
+    console.log('response', response.data)
+  })
 })
 
 /**
