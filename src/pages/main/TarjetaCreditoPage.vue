@@ -70,7 +70,7 @@
       />
     </q-toolbar>
     <q-card-section>
-      <!-- @update:model-value="cargarExcel" -->
+      <q-table :rows="listaRegistrosTarjeta"></q-table>
     </q-card-section>
   </q-card>
 
