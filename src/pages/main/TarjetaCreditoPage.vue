@@ -229,6 +229,10 @@ const {
   graphql_options
 )
 
+onErrorListaEgresos((error) => {
+  console.error('response', error)
+})
+
 /**
  * computed
  */

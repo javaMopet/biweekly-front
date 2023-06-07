@@ -28,11 +28,6 @@ export const OBTENER_EGRESOS = gql`
         id
         nombre
       }
-      cuenta {
-        id
-        nombre
-        identificador
-      }
       registro {
         estadoRegistroId
         registrableType
@@ -40,6 +35,11 @@ export const OBTENER_EGRESOS = gql`
         importe
         fecha
         observaciones
+        cuenta {
+          id
+          nombre
+          identificador
+        }
       }
     }
   }
