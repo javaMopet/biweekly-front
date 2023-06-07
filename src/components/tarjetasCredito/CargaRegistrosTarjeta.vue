@@ -257,12 +257,12 @@ function guardarMovimientos() {
         estado_registro_id: 1, //abierto
         importe: parseFloat(item.importe),
         fecha,
+        cuenta_id: props.cuenta.id,
         observaciones: item.concepto
       }
       const egreso = {
         registro,
-        categoria_id: item.categoria.id,
-        cuenta_id: props.cuenta.id
+        categoria_id: item.categoria.id
       }
       lista_egresos.push(egreso)
     })

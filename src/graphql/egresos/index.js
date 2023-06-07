@@ -12,29 +12,34 @@ export const EGRESO_CREATE = gql`
 `
 export const OBTENER_EGRESOS = gql`
   query obtenerEgresos(
-    $categoriaId: ID!
+    $categoriaId: ID
+    $cuentaId: ID
     $fechaInicio: ISO8601Date!
     $fechaFin: ISO8601Date!
   ) {
     obtenerEgresos(
       categoriaId: $categoriaId
+      cuentaId: $cuentaId
       fechaInicio: $fechaInicio
       fechaFin: $fechaFin
     ) {
       id
-      categoriaId
-      cuentaId
-      cuenta {
+      categoria {
         id
         nombre
       }
-      observaciones
+      cuenta {
+        id
+        nombre
+        identificador
+      }
       registro {
-        fecha
-        importe
-        registrableId
-        registrableType
         estadoRegistroId
+        registrableType
+        registrableId
+        importe
+        fecha
+        observaciones
       }
     }
   }
