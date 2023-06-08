@@ -186,7 +186,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { DateTime } from 'luxon'
 import RegistroMovimientoTarjeta from 'src/components/tarjetasCredito/RegistroMovimientoTarjeta.vue'
@@ -214,6 +214,8 @@ const registroCrud = useRegistrosCrud()
  * state
  */
 const fecha_inicio = ref('1900-01-01')
+const fecha_fin = ref('1900-01-01')
+const dia_corte = ref(0)
 
 const listaRegistros = ref([])
 
@@ -236,6 +238,11 @@ const graphql_options = ref({
   fetchPolicy: 'network-only'
 })
 
+// const variables = reactive({
+//   cuentaId: route.params.id,
+//   fechaInicio: '',
+//   fechaFin: ''
+// })
 /**
  * onMounted
  */
@@ -248,17 +255,24 @@ onMounted(() => {
     (mesOption) => mesOption.id === mes_id
   )
   mes.value = mes_value
-  obtener_fecha_inicio()
+
   api.get(`/cuentas/${route.params.id}`).then((response) => {
-    console.log('response', response.data)
     cuenta.value = response?.data ?? {}
+    dia_corte.value = cuenta.value.dia_corte
     obtenerSaldoAnterior()
-  })
-  cargaListaRegistros(null, {
-    // categoriaId: null,
-    cuentaId: route.params.id,
-    fechaInicio: '2023-05-12',
-    fechaFin: '2023-06-12'
+    obtener_fecha_inicio()
+    obtener_fecha_fin()
+    // variables.fechaInicio = fecha_inicio.value
+    // variables.fechaFin = fecha_fin.value
+    cargaListaRegistros(
+      null,
+      {
+        cuentaId: route.params.id,
+        fechaInicio: fecha_inicio.value,
+        fechaFin: fecha_fin.value
+      },
+      graphqlOptions
+    )
   })
 })
 
@@ -268,27 +282,28 @@ onMounted(() => {
 
 const sumaMovimientos = computed({
   get() {
-    // return listaRegistros.value.reduce((accumulator, registro) => {
-    //   return accumulator + registro.importe
-    // }, 0)
-    return 0
+    return listaRegistros.value.reduce((accumulator, registro) => {
+      return accumulator + registro.importe
+    }, 0)
   }
 })
 const saldo_final = computed({
   get() {
-    // return parseFloat(saldo_anterior.value) + parseFloat(sumaMovimientos.value)
-    return 0
+    return parseFloat(saldo_anterior.value) + parseFloat(sumaMovimientos.value)
   }
 })
 /**
  * graphql
  */
-
+const graphqlOptions = reactive({
+  // fetchPolicy: 'network-only'
+  fetchPolicy: 'no-cache'
+})
 const {
   onError: onErrorListaRegistros,
   onResult: onResultListaRegistros,
   load: cargaListaRegistros
-} = useLazyQuery(LISTA_REGISTROS_TARJETA, null, graphql_options)
+} = useLazyQuery(LISTA_REGISTROS_TARJETA)
 
 onResultListaRegistros(({ data }) => {
   console.log('lista de registros', data)
@@ -301,9 +316,15 @@ onErrorListaRegistros((error) => {
  * functions
  */
 function obtener_fecha_inicio() {
-  fecha_inicio.value = `${ejercicio_fiscal.value}-${mes.value.id - 1}-${
-    cuenta.value.dia_corte
-  }`
+  fecha_inicio.value = `${ejercicio_fiscal.value}-${(
+    '0' +
+    (mes.value.id - 1)
+  ).slice(-2)}-${cuenta.value.dia_corte}`
+}
+function obtener_fecha_fin() {
+  fecha_fin.value = `${ejercicio_fiscal.value}-${('0' + mes.value.id).slice(
+    -2
+  )}-${cuenta.value.dia_corte}`
 }
 
 function obtenerSaldoAnterior() {
@@ -325,6 +346,23 @@ function obtenerSaldoAnterior() {
     .catch((error) => {
       console.error(error)
     })
+}
+function onChangeMes() {
+  // listaRegistros.value = []
+  const fecha_inicio = `2023-0${mes.value.id - 1}-12`
+  const fecha_fin = `2023-0${mes.value.id}-12`
+  // const fecha_inicio = '2023-04-12'
+  // const fecha_fin = '2023-05-12'
+  cargaListaRegistros(
+    null,
+    {
+      cuentaId: route.params.id,
+      fechaInicio: fecha_inicio,
+      fechaFin: fecha_fin
+    },
+    graphqlOptions
+  )
+  console.log('Cambiando mes', mes.value.id)
 }
 function addRow() {
   const item = { ...registroEditedItem.value[0] }
@@ -363,9 +401,7 @@ function cargarExcel() {
 function cargarMovimientos() {
   showFormCarga.value = true
 }
-function onChangeMes() {
-  console.log('onchange mes')
-}
+
 function deleteItem(item) {
   item.rowIndex
   const registro = item.row

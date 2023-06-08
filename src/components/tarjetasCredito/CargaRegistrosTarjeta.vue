@@ -209,6 +209,13 @@ async function updateFile(v) {
     monthsMap.set('Mar', '03')
     monthsMap.set('Abr', '04')
     monthsMap.set('May', '05')
+    monthsMap.set('Jun', '06')
+    monthsMap.set('Jul', '07')
+    monthsMap.set('Ago', '08')
+    monthsMap.set('Sep', '09')
+    monthsMap.set('Oct', '10')
+    monthsMap.set('Nov', '11')
+    monthsMap.set('Dic', '12')
 
     todos.value = data.map((row) => ({
       fecha: row.A,

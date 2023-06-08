@@ -182,7 +182,7 @@
 </template>
 
 <script setup>
-import { useLazyQuery, useQuery, useMutation } from '@vue/apollo-composable'
+import { useQuery, useMutation } from '@vue/apollo-composable'
 import { ref, computed, onMounted } from 'vue'
 import { LISTA_CUENTAS, CUENTA_DELETE } from '/src/graphql/cuentas'
 import RegistroCuenta from 'src/components/cuentas/RegistroCuenta.vue'

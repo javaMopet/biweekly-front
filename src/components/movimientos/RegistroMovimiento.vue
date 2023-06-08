@@ -398,9 +398,6 @@ const {
   onError: onErrorCreateTransferencia
 } = useMutation(TRANSFERENCIA_CREATE)
 
-// const { load: cargarCuentasContables, onResult: onResultCuentasContables } =
-//   useLazyQuery(LISTA_CUENTAS_CONTABLES)
-
 // onResultTiposMovimiento(({ data }) => {
 //   if (!!data) {
 //     console.log('data', data.listaTiposMovimiento)
