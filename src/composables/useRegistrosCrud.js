@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { INGRESO_CREATE } from 'src/graphql/ingresos'
 import { EGRESO_CREATE } from 'src/graphql/egresos'
 import { TRANSFERENCIA_CREATE } from 'src/graphql/transferencias'
+import { REGISTRO_DELETE } from 'src/graphql/registros'
 
 export function useRegistrosCrud() {
   /**
@@ -28,6 +29,12 @@ export function useRegistrosCrud() {
     onError: onErrorCreateTransferencia
   } = useMutation(TRANSFERENCIA_CREATE)
 
+  const {
+    mutate: deleteRegistro,
+    onDone: onDoneDeleteRegistro,
+    onError: onErrorDeleteRegistro
+  } = useMutation(REGISTRO_DELETE)
+
   return {
     createIngreso,
     createEgreso,
@@ -35,6 +42,9 @@ export function useRegistrosCrud() {
     onDoneCreateIngreso,
     onDoneCreateEgreso,
     onDoneCreateTransferencia,
-    onErrorCreateIngreso
+    onErrorCreateIngreso,
+    deleteRegistro,
+    onDoneDeleteRegistro,
+    onErrorDeleteRegistro
   }
 }

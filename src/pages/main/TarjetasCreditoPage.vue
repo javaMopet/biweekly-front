@@ -212,6 +212,8 @@ import RegistroCuenta from 'src/components/cuentas/RegistroCuenta.vue'
 import { useQuasar } from 'quasar'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { useRouter } from 'vue-router'
+import { api } from 'src/boot/axios'
+import { route } from 'quasar/wrappers'
 
 /**
  * composables
@@ -329,9 +331,7 @@ const columns = [
 /**
  * onMounted
  */
-onMounted(() => {
-  // cargarCuentas()
-})
+onMounted(() => {})
 
 // onResultCuentas(({ data }) => {
 //   if (!!data) {
@@ -339,7 +339,14 @@ onMounted(() => {
 //     listaCuentas.value = JSON.parse(JSON.stringify(data.listaCuentas))
 //   }
 // })
+/**
+ * Methods
+ */
 
+/**
+ *
+ * @param {*} tipoCuentaId
+ */
 function addRow(tipoCuentaId) {
   console.log('tipo de cuenta', tipoCuentaId)
   editedItem.value = { ...defaultItem }

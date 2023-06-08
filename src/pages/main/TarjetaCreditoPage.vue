@@ -119,8 +119,15 @@
     <q-card-section>
       <div class="row">
         <div class="col column items-center">
+          <span class="tarjeta__resumen-etiqueta"> Periodo </span>
+          <span class="tarjeta__resumen-valor"> 12/May/2023 - 12/Jun/2023</span>
+        </div>
+        <q-separator spaced inset vertical />
+        <div class="col column items-center">
           <span class="tarjeta__resumen-etiqueta"> Saldo anterior </span>
-          <span class="tarjeta__resumen-valor"> $1352.25</span>
+          <span class="tarjeta__resumen-valor">
+            {{ formato.toCurrency(saldo_anterior) }}</span
+          >
         </div>
         <q-separator spaced inset vertical />
         <div class="col column items-center">
@@ -132,17 +139,36 @@
         <q-separator spaced inset vertical />
         <div class="col column items-center">
           <span class="tarjeta__resumen-etiqueta"> Saldo final </span>
-          <span class="tarjeta__resumen-valor"> $1000.00</span>
+          <span class="tarjeta__resumen-valor">
+            {{ formato.toCurrency(saldo_final) }}</span
+          >
         </div>
         <q-separator spaced inset vertical />
-        <div class="col column items-center">
-          <span class="tarjeta__resumen-etiqueta"> Periodo </span>
-          <span class="tarjeta__resumen-valor"> 12/May/2023 - 12/Jun/2023</span>
-        </div>
       </div>
     </q-card-section>
     <q-card-section>
-      <q-table :rows="listaEgresos" :columns="columns"></q-table>
+      <q-table
+        :rows="listaRegistros"
+        :columns="columns"
+        dense
+        :rows-per-page-options="[0]"
+      >
+        <template #body-cell-acciones="props">
+          <q-td :props="props" class="q-my-xs p-py-xs">
+            <div class="row">
+              <q-btn
+                color="primary"
+                icon="delete"
+                flat
+                @click="deleteItem(props)"
+                dense
+                size=".6rem"
+                round
+              />
+            </div>
+          </q-td>
+        </template>
+      </q-table>
     </q-card-section>
   </q-card>
   <pre>{{ cuenta }}</pre>
@@ -168,19 +194,28 @@ import DateInput from 'src/components/formComponents/DateInput.vue'
 import CategoriaSelect from 'src/components/formComponents/CategoriaSelect.vue'
 import PriceInput from 'src/components/formComponents/PriceInput.vue'
 import { api } from 'src/boot/axios'
-import { OBTENER_EGRESOS } from 'src/graphql/egresos'
+// import { OBTENER_EGRESOS } from 'src/graphql/egresos'
+import { LISTA_REGISTROS_TARJETA } from 'src/graphql/registrosTarjeta'
 
 import CargaRegistrosTarjeta from 'src/components/tarjetasCredito/CargaRegistrosTarjeta.vue'
-import { useQuery } from '@vue/apollo-composable'
+import { useLazyQuery, useQuery } from '@vue/apollo-composable'
 import { useFormato } from 'src/composables/utils/useFormato'
+import { useRegistrosCrud } from 'src/composables/useRegistrosCrud'
+import RegistroCuentaContable from 'src/components/cuentasContables/RegistroCuentaContable.vue'
+import { useNotificacion } from 'src/composables/utils/useNotificacion'
 
 const route = useRoute()
 const router = useRouter()
 const formato = useFormato()
+const notificacion = useNotificacion()
+const registroCrud = useRegistrosCrud()
 
 /**
  * state
  */
+const fecha_inicio = ref('1900-01-01')
+
+const listaRegistros = ref([])
 
 const registroEditedItem = ref([
   {
@@ -194,63 +229,103 @@ const categoriaOptions = ref([])
 const showForm = ref(false)
 const showFormCarga = ref(false)
 const cuenta = ref({})
-const ejercicio_fiscal = ref(2023)
-const mes = ref({ id: 6, nombre: 'Junio' })
+const ejercicio_fiscal = ref(0)
+const mes = ref({})
+const saldo_anterior = ref(0)
+const graphql_options = ref({
+  fetchPolicy: 'network-only'
+})
+
 /**
  * onMounted
  */
 onMounted(() => {
   console.log('buscando los datos de la tarjeta de crédito', route.params.id)
+  const dateNow = DateTime.now()
+  ejercicio_fiscal.value = dateNow.year
+  const mes_id = dateNow.month
+  const mes_value = mesOptions.value.find(
+    (mesOption) => mesOption.id === mes_id
+  )
+  mes.value = mes_value
+  obtener_fecha_inicio()
   api.get(`/cuentas/${route.params.id}`).then((response) => {
     console.log('response', response.data)
     cuenta.value = response?.data ?? {}
+    obtenerSaldoAnterior()
   })
-})
-/**
- * graphql
- */
-const graphql_options = ref({
-  fetchPolicy: 'network-only'
-})
-
-const {
-  onError: onErrorListaEgresos,
-  result: resultListaEgresos
-  // onResult: onResultListaEgresos,
-  // load: cargaListaEgresos
-} = useQuery(
-  OBTENER_EGRESOS,
-  {
-    categoriaId: null,
+  cargaListaRegistros(null, {
+    // categoriaId: null,
     cuentaId: route.params.id,
     fechaInicio: '2023-05-12',
     fechaFin: '2023-06-12'
-  },
-  graphql_options
-)
-
-onErrorListaEgresos((error) => {
-  console.error('response', error)
+  })
 })
 
 /**
  * computed
  */
-const listaEgresos = computed({
-  get() {
-    return resultListaEgresos.value?.obtenerEgresos ?? []
-  }
-})
+
 const sumaMovimientos = computed({
   get() {
-    return listaEgresos.value.reduce((accumulator, egreso) => {
-      return accumulator + egreso.registro.importe
-    }, 0)
+    // return listaRegistros.value.reduce((accumulator, registro) => {
+    //   return accumulator + registro.importe
+    // }, 0)
+    return 0
   }
+})
+const saldo_final = computed({
+  get() {
+    // return parseFloat(saldo_anterior.value) + parseFloat(sumaMovimientos.value)
+    return 0
+  }
+})
+/**
+ * graphql
+ */
+
+const {
+  onError: onErrorListaRegistros,
+  onResult: onResultListaRegistros,
+  load: cargaListaRegistros
+} = useLazyQuery(LISTA_REGISTROS_TARJETA, null, graphql_options)
+
+onResultListaRegistros(({ data }) => {
+  console.log('lista de registros', data)
+  listaRegistros.value = data?.listaRegistrosTarjeta
+})
+onErrorListaRegistros((error) => {
+  console.error('response', error)
 })
 /**
  * functions
  */
+function obtener_fecha_inicio() {
+  fecha_inicio.value = `${ejercicio_fiscal.value}-${mes.value.id - 1}-${
+    cuenta.value.dia_corte
+  }`
+}
+
+function obtenerSaldoAnterior() {
+  const fecha = `${ejercicio_fiscal.value}-${mes.value.id - 1}-${
+    cuenta.value.dia_corte
+  }`
+  console.log('fecha para obtener saldos', fecha)
+  api
+    .get('/cuentas/obtener_saldo_tarjeta', {
+      params: {
+        cuenta_id: route.params.id,
+        fecha
+      }
+    })
+    .then(({ data }) => {
+      // console.log('response', data.suma)
+      saldo_anterior.value = data.suma
+    })
+    .catch((error) => {
+      console.error(error)
+    })
+}
 function addRow() {
   const item = { ...registroEditedItem.value[0] }
   listaRegistrosTarjeta.value.push(item)
@@ -291,6 +366,19 @@ function cargarMovimientos() {
 function onChangeMes() {
   console.log('onchange mes')
 }
+function deleteItem(item) {
+  item.rowIndex
+  const registro = item.row
+  console.log('registro', registro)
+  registroCrud.deleteRegistro({
+    id: parseInt(registro.id)
+  })
+}
+
+registroCrud.onDoneDeleteRegistro((response) => {
+  notificacion.mostrarNotificacionInformativa('Registro eliminado')
+  console.log('response', response)
+})
 
 const mesOptions = ref([
   { id: 1, nombre: 'Enero' },
@@ -310,17 +398,23 @@ const ejercicioFiscalOptions = ref([2021, 2022, 2023])
 const columns = [
   { name: 'id', label: 'Id', field: 'id', sortable: true, align: 'left' },
   {
-    name: 'observaciones',
-    label: 'Concepto',
-    field: (row) => row.registro.observaciones,
+    name: 'fecha',
+    label: 'Fecha',
+    field: (row) => row.fecha,
     sortable: true,
     align: 'left'
   },
-
+  {
+    name: 'concepto',
+    label: 'Concepto',
+    field: (row) => row.concepto,
+    sortable: true,
+    align: 'left'
+  },
   {
     name: 'importe',
     label: 'Importe',
-    field: (row) => formato.toCurrency(row.registro.importe),
+    field: (row) => formato.toCurrency(row.importe),
     sortable: true,
     align: 'left'
   },

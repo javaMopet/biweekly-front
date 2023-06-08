@@ -247,29 +247,26 @@ function guardarMovimientos() {
       isErrors.value = false
     }, 6000)
   } else {
-    var lista_egresos = []
+    var lista_registros_tarjeta = []
 
     listaRegistrosTarjeta.value.forEach((item) => {
       console.log('item', item)
       console.log('fecha', item.fecha)
-      const fecha = DateTime.now()
+      const fecha = DateTime.fromFormat(item.fecha, 'dd/MM/yyyy')
       const registro = {
-        estado_registro_id: 1, //abierto
-        importe: parseFloat(item.importe),
-        fecha,
+        estado_registro_tarjeta_id: 1, //abierto
         cuenta_id: props.cuenta.id,
-        observaciones: item.concepto
+        categoria_id: item.categoria.id,
+        importe: parseFloat(item.importe),
+        fecha: fecha.toISODate(),
+        concepto: item.concepto
       }
-      const egreso = {
-        registro,
-        categoria_id: item.categoria.id
-      }
-      lista_egresos.push(egreso)
+      lista_registros_tarjeta.push(registro)
     })
 
     api
-      .post('/create_list', {
-        lista_egresos
+      .post('/create_multiple_registros_tarjeta', {
+        lista_registros_tarjeta
       })
       .then((response) => {
         console.log('guardado correctamente')
