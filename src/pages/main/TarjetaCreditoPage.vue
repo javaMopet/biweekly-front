@@ -80,6 +80,7 @@
           outlined
           color="secondary"
           label-color="dark"
+          @update:model-value="onChangeEjercicio"
         >
           <template #prepend>
             <q-icon name="calendar_month" />
@@ -153,25 +154,82 @@
         dense
         :rows-per-page-options="[0]"
       >
+        <template #top-left>
+          <q-tr>
+            <div class="row">
+              <q-btn
+                label="nuevo"
+                @click="addItem()"
+                dense
+                color="toolbar-button"
+              ></q-btn></div
+          ></q-tr>
+        </template>
         <template #body-cell-acciones="props">
           <q-td :props="props" class="q-my-xs p-py-xs">
             <div class="row">
               <q-btn
                 color="primary"
-                icon="delete"
+                icon="more_vert"
                 flat
-                @click="deleteItem(props)"
                 dense
                 size=".6rem"
                 round
-              />
+              >
+                <q-menu>
+                  <q-list dense style="min-width: 100px">
+                    <q-item clickable v-close-popup @click="editItem(props)">
+                      <q-item-section>Editar...</q-item-section>
+                    </q-item>
+                    <q-item clickable v-close-popup>
+                      <q-item-section>New</q-item-section>
+                    </q-item>
+                    <q-separator />
+                    <q-item clickable>
+                      <q-item-section>Preferences</q-item-section>
+                      <q-item-section side>
+                        <q-icon name="keyboard_arrow_right" />
+                      </q-item-section>
+
+                      <q-menu anchor="top end" self="top start">
+                        <q-list>
+                          <q-item v-for="n in 3" :key="n" dense clickable>
+                            <q-item-section>Submenu Label</q-item-section>
+                            <q-item-section side>
+                              <q-icon name="keyboard_arrow_right" />
+                            </q-item-section>
+                            <q-menu
+                              auto-close
+                              anchor="top end"
+                              self="top start"
+                            >
+                              <q-list>
+                                <q-item v-for="n in 3" :key="n" dense clickable>
+                                  <q-item-section
+                                    >3rd level Label</q-item-section
+                                  >
+                                </q-item>
+                              </q-list>
+                            </q-menu>
+                          </q-item>
+                        </q-list>
+                      </q-menu>
+                    </q-item>
+                    <q-separator />
+                    <q-item clickable v-close-popup>
+                      <q-item-section>Quit</q-item-section>
+                    </q-item>
+                  </q-list>
+                </q-menu>
+              </q-btn>
             </div>
           </q-td>
         </template>
       </q-table>
     </q-card-section>
   </q-card>
-  <pre>{{ cuenta }}</pre>
+  <pre>{{ mes }}</pre>
+  <pre>{{ ejercicio_fiscal }}</pre>
 
   <Teleport to="#modal">
     <q-dialog v-model="showForm" persistent>
@@ -315,6 +373,10 @@ onErrorListaRegistros((error) => {
 /**
  * functions
  */
+function editItem(item) {
+  console.log('editando item...', item.rowIndex, item.row)
+}
+
 function obtener_fecha_inicio() {
   fecha_inicio.value = `${ejercicio_fiscal.value}-${(
     '0' +
@@ -347,23 +409,41 @@ function obtenerSaldoAnterior() {
       console.error(error)
     })
 }
-function onChangeMes() {
-  // listaRegistros.value = []
-  const fecha_inicio = `2023-0${mes.value.id - 1}-12`
-  const fecha_fin = `2023-0${mes.value.id}-12`
-  // const fecha_inicio = '2023-04-12'
-  // const fecha_fin = '2023-05-12'
+function onChangeMes(mes) {
+  console.log('Cambiando mes', mes.id)
+  obtenerListaRegistros()
+}
+function onChangeEjercicio(ejercicio_fiscal) {
+  console.log('cambio de ejercicio', ejercicio_fiscal)
+  obtenerListaRegistros()
+}
+function obtenerListaRegistros() {
+  let ejercicio_inicial_id =
+    mes.value.id - 1 <= 0 ? ejercicio_fiscal.value - 1 : ejercicio_fiscal.value
+  let ejercicio_final_id = ejercicio_fiscal.value
+
+  let mes_inicial_id = mes.value.id - 1 <= 0 ? 12 : mes.value.id - 1
+  let mes_final_id = mes.value.id
+
+  let dia_corte_n = !!cuenta.value.dia_corte ? cuenta.value.dia_corte : 28
+
+  const fechaInicio = `${ejercicio_inicial_id}-${('0' + mes_inicial_id).slice(
+    -2
+  )}-12`
+  const fechaFin = `${ejercicio_final_id}-${('0' + mes_final_id).slice(-2)}-12`
+  console.log('fechaInicio', fechaInicio)
+  console.log('fechaFin', fechaFin)
   cargaListaRegistros(
     null,
     {
       cuentaId: route.params.id,
-      fechaInicio: fecha_inicio,
-      fechaFin: fecha_fin
+      fechaInicio,
+      fechaFin
     },
     graphqlOptions
   )
-  console.log('Cambiando mes', mes.value.id)
 }
+
 function addRow() {
   const item = { ...registroEditedItem.value[0] }
   listaRegistrosTarjeta.value.push(item)
@@ -400,6 +480,9 @@ function cargarExcel() {
 
 function cargarMovimientos() {
   showFormCarga.value = true
+}
+function addItem() {
+  showForm.value = true
 }
 
 function deleteItem(item) {
@@ -463,10 +546,11 @@ const columns = [
   },
   {
     name: 'acciones',
-    label: 'Acciones',
+
     field: 'action',
     sortable: false,
-    align: 'center'
+    align: 'center',
+    style: 'width: 100px'
   }
 ]
 </script>

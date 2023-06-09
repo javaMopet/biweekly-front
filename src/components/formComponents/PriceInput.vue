@@ -11,7 +11,7 @@
       outlined
       color="secondary"
       dense
-      label="Precio"
+      :label="label"
       :error="!isValid"
       :readonly="readonly"
       :autofocus="autofocus"
@@ -83,6 +83,11 @@ const props = defineProps({
     type: Boolean,
     required: false,
     default: false
+  },
+  label: {
+    type: String,
+    required: false,
+    default: 'Precio'
   }
 })
 /**

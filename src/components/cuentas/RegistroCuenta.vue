@@ -112,7 +112,7 @@
               class="q-ml-sm"
               dense
             />
-            <q-btn :label="lblSubmit" type="submit" dense color="green-4" />
+            <q-btn :label="lblSubmit" type="submit" dense color="secondary" />
           </div>
         </div>
       </q-form>
@@ -318,7 +318,7 @@ function obtenerCuentasContables(value) {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .input-label {
   font-size: 0.8rem;
   font-weight: 600;
