@@ -54,7 +54,7 @@
             />
           </div>
           <div
-            v-if="formEditedItem.msi"
+            v-if="formEditedItem.isMsi"
             class="row inline q-gutter-x-sm items-center"
           >
             <div class="input-label">Número de meses:</div>
@@ -106,7 +106,7 @@ onMounted(() => {
     concepto: '',
     importe: '',
     categoria: null,
-    msi: false,
+    isMsi: false,
     numero_msi: 3
   }
 })

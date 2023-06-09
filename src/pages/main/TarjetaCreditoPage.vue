@@ -181,8 +181,12 @@
                     <q-item clickable v-close-popup @click="editItem(props)">
                       <q-item-section>Editar...</q-item-section>
                     </q-item>
-                    <q-item clickable v-close-popup>
-                      <q-item-section>New</q-item-section>
+                    <q-item
+                      clickable
+                      v-close-popup
+                      @click="mesesSinInteres(props)"
+                    >
+                      <q-item-section>Meses Sin Int ...</q-item-section>
                     </q-item>
                     <q-separator />
                     <q-item clickable>
@@ -237,6 +241,14 @@
     </q-dialog>
   </Teleport>
   <Teleport to="#modal">
+    <q-dialog v-model="showFormMSI" persistent>
+      <RegistroMesesSinInteres
+        :registro-tarjeta="editRegistroItem"
+        @registroUpdated="registroUpdated"
+      ></RegistroMesesSinInteres>
+    </q-dialog>
+  </Teleport>
+  <Teleport to="#modal">
     <q-dialog v-model="showFormCarga" persistent>
       <CargaRegistrosTarjeta :cuenta="cuenta"></CargaRegistrosTarjeta>
     </q-dialog>
@@ -261,6 +273,7 @@ import { useFormato } from 'src/composables/utils/useFormato'
 import { useRegistrosCrud } from 'src/composables/useRegistrosCrud'
 import RegistroCuentaContable from 'src/components/cuentasContables/RegistroCuentaContable.vue'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
+import RegistroMesesSinInteres from 'src/components/tarjetasCredito/RegistroMesesSinInteres.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -287,11 +300,14 @@ const registroEditedItem = ref([
 
 const categoriaOptions = ref([])
 const showForm = ref(false)
+const showFormMSI = ref(false)
 const showFormCarga = ref(false)
 const cuenta = ref({})
 const ejercicio_fiscal = ref(0)
 const mes = ref({})
 const saldo_anterior = ref(0)
+const editRegistroItem = ref(null)
+
 const graphql_options = ref({
   fetchPolicy: 'network-only'
 })
@@ -498,6 +514,14 @@ registroCrud.onDoneDeleteRegistro((response) => {
   notificacion.mostrarNotificacionInformativa('Registro eliminado')
   console.log('response', response)
 })
+function mesesSinInteres(item) {
+  showFormMSI.value = true
+  editRegistroItem.value = item.row
+}
+function registroUpdated() {
+  showFormMSI.value = false
+  console.log('El registro fue modificado')
+}
 
 const mesOptions = ref([
   { id: 1, nombre: 'Enero' },
