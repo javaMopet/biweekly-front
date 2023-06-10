@@ -60,7 +60,7 @@
       </q-btn>
     </q-toolbar>
     <q-toolbar inset class="bg-grey-2">
-      <q-btn
+      <!-- <q-btn
         outline
         rounded
         dense
@@ -68,7 +68,31 @@
         label="Importar Movimimientos"
         color="toolbar-button"
         @click="cargarMovimientos"
-      />
+      /> -->
+      <q-btn-dropdown label="AGREGAR" color="toolbar-button" class="">
+        <q-list>
+          <q-item clickable v-close-popup @click="addItem()">
+            <q-item-section avatar>
+              <q-icon name="item" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Nuevo registro</q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-item clickable v-close-popup @click="addItem()" dense>
+            <q-item-section avatar>
+              <!-- <q-icon name="format_list_bulleted" /> -->
+              <q-img src="/icons/excel.png" width="24px" height="24px" />
+              <!-- spinner-color="primary"
+                spinner-size="82px"
+              :ratio="16 / 9"-->
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Importar Movimientos</q-item-label>
+            </q-item-section>
+          </q-item>
+        </q-list>
+      </q-btn-dropdown>
       <q-toolbar-title> </q-toolbar-title>
       <div class="row q-gutter-x-sm">
         <q-select
@@ -146,8 +170,103 @@
         </div>
         <q-separator spaced inset vertical />
       </div>
+      <div class="row">
+        <div class="col column items-center">
+          <span class="tarjeta__resumen-etiqueta"> Saldo Total </span>
+          <span class="tarjeta__resumen-valor">
+            {{ formato.toCurrency(saldo_total) }}
+          </span>
+        </div>
+      </div>
     </q-card-section>
     <q-card-section>
+      <q-table
+        v-if="listaRegistrosMsi.length > 0"
+        :rows="listaRegistrosMsi"
+        :columns="columns"
+        dense
+        :rows-per-page-options="[0]"
+      >
+        <template #top-left>
+          <q-tr class="">
+            <div class="column q-gutter-y-md">
+              <!-- <div class="row">
+                <q-btn
+                  label="nuevo"
+                  @click="addItem()"
+                  dense
+                  color="toolbar-button"
+                ></q-btn>
+              </div> -->
+              <span class="text-bold">Movimientos a meses sin intereses</span>
+            </div>
+          </q-tr>
+        </template>
+        <template #body-cell-acciones="props">
+          <q-td :props="props" class="q-my-xs p-py-xs">
+            <div class="row">
+              <q-btn
+                color="primary"
+                icon="more_vert"
+                flat
+                dense
+                size=".6rem"
+                round
+              >
+                <q-menu>
+                  <q-list dense style="min-width: 100px">
+                    <q-item clickable v-close-popup @click="editItem(props)">
+                      <q-item-section>Editar...</q-item-section>
+                    </q-item>
+                    <q-item
+                      clickable
+                      v-close-popup
+                      @click="mesesSinInteres(props)"
+                    >
+                      <q-item-section>Meses Sin Int ...</q-item-section>
+                    </q-item>
+                    <q-separator />
+                    <q-item clickable>
+                      <q-item-section>Preferences</q-item-section>
+                      <q-item-section side>
+                        <q-icon name="keyboard_arrow_right" />
+                      </q-item-section>
+
+                      <q-menu anchor="top end" self="top start">
+                        <q-list>
+                          <q-item v-for="n in 3" :key="n" dense clickable>
+                            <q-item-section>Submenu Label</q-item-section>
+                            <q-item-section side>
+                              <q-icon name="keyboard_arrow_right" />
+                            </q-item-section>
+                            <q-menu
+                              auto-close
+                              anchor="top end"
+                              self="top start"
+                            >
+                              <q-list>
+                                <q-item v-for="n in 3" :key="n" dense clickable>
+                                  <q-item-section
+                                    >3rd level Label</q-item-section
+                                  >
+                                </q-item>
+                              </q-list>
+                            </q-menu>
+                          </q-item>
+                        </q-list>
+                      </q-menu>
+                    </q-item>
+                    <q-separator />
+                    <q-item clickable v-close-popup>
+                      <q-item-section>Quit</q-item-section>
+                    </q-item>
+                  </q-list>
+                </q-menu>
+              </q-btn>
+            </div>
+          </q-td>
+        </template>
+      </q-table>
       <q-table
         :rows="listaRegistros"
         :columns="columns"
@@ -155,15 +274,17 @@
         :rows-per-page-options="[0]"
       >
         <template #top-left>
-          <q-tr>
-            <div class="row">
+          <q-tr class="text-bold">
+            <!-- <div class="row">
               <q-btn
                 label="nuevo"
                 @click="addItem()"
                 dense
                 color="toolbar-button"
               ></q-btn></div
-          ></q-tr>
+          > -->
+            Movimientos
+          </q-tr>
         </template>
         <template #body-cell-acciones="props">
           <q-td :props="props" class="q-my-xs p-py-xs">
@@ -288,6 +409,7 @@ const fecha_inicio = ref('1900-01-01')
 const fecha_fin = ref('1900-01-01')
 const dia_corte = ref(0)
 
+const listaRegistrosMsi = ref([])
 const listaRegistros = ref([])
 
 const registroEditedItem = ref([
@@ -306,6 +428,7 @@ const cuenta = ref({})
 const ejercicio_fiscal = ref(0)
 const mes = ref({})
 const saldo_anterior = ref(0)
+const saldo_total = ref(9000.25)
 const editRegistroItem = ref(null)
 
 const graphql_options = ref({
@@ -343,7 +466,8 @@ onMounted(() => {
       {
         cuentaId: route.params.id,
         fechaInicio: fecha_inicio.value,
-        fechaFin: fecha_fin.value
+        fechaFin: fecha_fin.value,
+        isMsi: null
       },
       graphqlOptions
     )
@@ -381,7 +505,12 @@ const {
 
 onResultListaRegistros(({ data }) => {
   console.log('lista de registros', data)
-  listaRegistros.value = data?.listaRegistrosTarjeta
+  listaRegistros.value = data?.listaRegistrosTarjeta.filter(
+    (registro) => !registro.isMsi
+  )
+  listaRegistrosMsi.value = data?.listaRegistrosTarjeta.filter(
+    (registro) => registro.isMsi
+  )
 })
 onErrorListaRegistros((error) => {
   console.error('response', error)
@@ -454,7 +583,8 @@ function obtenerListaRegistros() {
     {
       cuentaId: route.params.id,
       fechaInicio,
-      fechaFin
+      fechaFin,
+      isMsi: null
     },
     graphqlOptions
   )
