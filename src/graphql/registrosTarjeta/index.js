@@ -37,3 +37,33 @@ export const LISTA_REGISTROS_TARJETA = gql`
     }
   }
 `
+
+export const CREATE_REGISTRO_TARJETA = gql`
+  mutation registroTarjetaCreate($input: RegistroTarjetaInput!) {
+    registroTarjetaCreate(registroTarjetaInput: $input) {
+      registroTarjeta {
+        id
+        cuentaId
+        categoriaId
+        importe
+        fecha
+        concepto
+        isMsi
+        numeroMsi
+        estadoRegistroTarjeta {
+          id
+          nombre
+        }
+        cuenta {
+          id
+          nombre
+        }
+        categoria {
+          id
+          nombre
+          tipoMovimientoId
+        }
+      }
+    }
+  }
+`

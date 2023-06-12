@@ -12,7 +12,7 @@
         >
           <q-card-section>
             <div
-              class="row inline full-width justify-center text-h4 q-pt-lg text-secondary"
+              class="row inline full-width justify-center text-h4 q-pt-lg text-accent-light"
             >
               Iniciar Sesión
             </div>
@@ -23,7 +23,7 @@
               v-model="loginAction"
               class="my-custom-toggle"
               spread
-              toggle-color="secondary"
+              toggle-color="primary-button"
               toggle-text-color="white"
               text-color="grey-6"
               :options="[
@@ -104,9 +104,9 @@
                 <q-btn
                   :label="btnLabel"
                   type="submit"
-                  color="primary"
-                  text-color="grey"
                   outline
+                  color="secondary"
+                  class="text-bold"
                 />
               </div>
             </q-form>
@@ -235,7 +235,7 @@ function resetUserInfo() {
   // background-image: url('../../public/images/3968744.jpg');
   // background-repeat: no-repeat;
   // background-size: cover;
-  background: url('/images/3968744.jpg') 0 / cover fixed;
+  background: url('/images/1.jpg') 0 / cover fixed;
   // -webkit-filter: blur(5px); /* Safari 6.0 - 9.0 */
   // filter: blur(5px);
   z-index: 2 !important;

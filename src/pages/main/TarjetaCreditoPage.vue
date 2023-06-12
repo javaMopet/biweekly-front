@@ -1,6 +1,6 @@
 <template>
   <q-card class="my-card">
-    <q-toolbar class="bg-grey-2 text-primary" fit dense>
+    <q-toolbar class="bg-grey-1 text-primary" fit dense>
       <!-- arrow_back_ios -->
       <q-btn
         icon="navigate_before"
@@ -59,7 +59,7 @@
         </q-menu>
       </q-btn>
     </q-toolbar>
-    <q-toolbar inset class="bg-grey-2">
+    <q-toolbar inset class="bg-grey-1">
       <!-- <q-btn
         outline
         rounded
@@ -69,30 +69,47 @@
         color="toolbar-button"
         @click="cargarMovimientos"
       /> -->
-      <q-btn-dropdown label="AGREGAR" color="toolbar-button" class="">
-        <q-list>
-          <q-item clickable v-close-popup @click="addItem()">
-            <q-item-section avatar>
-              <q-icon name="item" />
-            </q-item-section>
-            <q-item-section>
-              <q-item-label>Nuevo registro</q-item-label>
-            </q-item-section>
-          </q-item>
-          <q-item clickable v-close-popup @click="addItem()" dense>
-            <q-item-section avatar>
-              <!-- <q-icon name="format_list_bulleted" /> -->
-              <q-img src="/icons/excel.png" width="24px" height="24px" />
-              <!-- spinner-color="primary"
+      <div class="row q-gutter-x-md">
+        <q-btn-dropdown label="AGREGAR" color="primary-button" class="">
+          <q-list dense>
+            <q-item clickable v-close-popup @click="addItem">
+              <q-item-section avatar>
+                <q-avatar
+                  icon="assignment"
+                  text-color="secondary"
+                  outlined
+                  font-size="32px"
+                />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>Nuevo registro</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-item clickable v-close-popup @click="cargarMovimientos" dense>
+              <q-item-section avatar>
+                <!-- <q-icon name="format_list_bulleted" /> -->
+
+                <q-avatar text-color="white">
+                  <q-img src="/icons/excel.png" width="28px" height="28px" />
+                </q-avatar>
+                <!-- spinner-color="primary"
                 spinner-size="82px"
               :ratio="16 / 9"-->
-            </q-item-section>
-            <q-item-section>
-              <q-item-label>Importar Movimientos</q-item-label>
-            </q-item-section>
-          </q-item>
-        </q-list>
-      </q-btn-dropdown>
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>Importar Movimientos</q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-btn-dropdown>
+        <q-btn
+          icon="payments"
+          color="toolbar-button"
+          label="pagos"
+          @click="registrarPago"
+          outline
+        />
+      </div>
       <q-toolbar-title> </q-toolbar-title>
       <div class="row q-gutter-x-sm">
         <q-select
@@ -161,16 +178,18 @@
             {{ formato.toCurrency(sumaMovimientos) }}</span
           >
         </div>
-        <q-separator spaced inset vertical />
+      </div>
+      <q-separator spaced inset horizontal />
+      <div class="row">
         <div class="col column items-center">
-          <span class="tarjeta__resumen-etiqueta"> Saldo final </span>
+          <span class="tarjeta__resumen-etiqueta">
+            Pago para no generar intereses
+          </span>
           <span class="tarjeta__resumen-valor">
             {{ formato.toCurrency(saldo_final) }}</span
           >
         </div>
         <q-separator spaced inset vertical />
-      </div>
-      <div class="row">
         <div class="col column items-center">
           <span class="tarjeta__resumen-etiqueta"> Saldo Total </span>
           <span class="tarjeta__resumen-valor">
@@ -353,12 +372,13 @@
       </q-table>
     </q-card-section>
   </q-card>
-  <pre>{{ mes }}</pre>
-  <pre>{{ ejercicio_fiscal }}</pre>
 
   <Teleport to="#modal">
     <q-dialog v-model="showForm" persistent>
-      <RegistroMovimientoTarjeta></RegistroMovimientoTarjeta>
+      <RegistroMovimientoTarjeta
+        :cuenta-id="cuenta.id"
+        @registro-created="registroCreated"
+      ></RegistroMovimientoTarjeta>
     </q-dialog>
   </Teleport>
   <Teleport to="#modal">
@@ -651,6 +671,16 @@ function mesesSinInteres(item) {
 function registroUpdated() {
   showFormMSI.value = false
   console.log('El registro fue modificado')
+}
+function registrarPago() {
+  console.log('pago registrado')
+}
+function registroCreated() {
+  notificacion.mostrarNotificacionPositiva(
+    'Se ha ingresado un nuevo registro.',
+    1200
+  )
+  showForm.value = false
 }
 
 const mesOptions = ref([
