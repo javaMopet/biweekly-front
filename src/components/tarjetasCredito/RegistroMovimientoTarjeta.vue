@@ -22,7 +22,7 @@
           <q-input
             autofocus
             color="secondary"
-            v-model="formEditedItem.concepto"
+            v-model="editedFormItem.concepto"
             type="textarea"
             label="Concepto"
             rows="3"
@@ -34,22 +34,21 @@
           <div class="row inline q-gutter-x-xs">
             <div class="col column">
               <div class="row input-label">Fecha de registro:</div>
-              <DateInput v-model="formEditedItem.fecha"></DateInput>
+              <DateInput v-model="editedFormItem.fecha"></DateInput>
             </div>
             <div class="col column">
               <div class="row input-label">Importe:</div>
               <PriceInput
                 label="Importe"
-                v-model="formEditedItem.importe"
+                v-model="editedFormItem.importe"
               ></PriceInput>
             </div>
           </div>
 
           <div class="row input-label">Categoría:</div>
           <CategoriaSelect
-            v-model="formEditedItem.categoria"
+            v-model="editedFormItem.categoria"
             :tipoMovimientoId="tipoMovimientoId"
-            @update:model-value="onChangeCategoria"
             :readonly="true"
             :rules="[(val) => !!val || 'Selecciona una categoría']"
           ></CategoriaSelect>
@@ -57,17 +56,17 @@
             <q-checkbox
               color="secondary"
               right-label
-              v-model="formEditedItem.isMsi"
+              v-model="editedFormItem.isMsi"
               label="Meses sin Intereses"
             />
           </div>
           <div
-            v-if="formEditedItem.isMsi"
+            v-if="editedFormItem.isMsi"
             class="row inline q-gutter-x-sm items-center"
           >
             <div class="input-label">Número de meses:</div>
             <q-input
-              v-model="formEditedItem.numero_msi"
+              v-model="editedFormItem.numero_msi"
               type="number"
               outlined
               dense
@@ -83,6 +82,7 @@
         </div>
       </q-form>
     </q-card-section>
+    <q-card-section> </q-card-section>
   </q-card>
 </template>
 
@@ -93,7 +93,10 @@ import PriceInput from '../formComponents/PriceInput.vue'
 import CategoriaSelect from '../formComponents/CategoriaSelect.vue'
 import { DateTime } from 'luxon'
 import { useFormato } from 'src/composables/utils/useFormato'
-import { CREATE_REGISTRO_TARJETA } from 'src/graphql/registrosTarjeta'
+import {
+  CREATE_REGISTRO_TARJETA,
+  UPDATE_REGISTRO_TARJETA
+} from 'src/graphql/registrosTarjeta'
 import { useMutation } from '@vue/apollo-composable'
 
 /**
@@ -101,23 +104,29 @@ import { useMutation } from '@vue/apollo-composable'
  */
 const formato = useFormato()
 
+/**
+ * state
+ */
 const tipoMovimientoId = ref('2')
-const formEditedItem = ref({ fecha: '10/05/2023' })
-
+const formItem = ref({ fecha: '10/05/2023' })
 /**
  * onMounted
  */
 onMounted(() => {
-  const now = DateTime.now()
-  const formatoFecha = formato.formatoFecha(now)
-  console.log('fecha', formatoFecha)
-  formEditedItem.value = {
-    fecha: formatoFecha,
-    concepto: '',
-    importe: '',
-    categoria: null,
-    isMsi: false,
-    numero_msi: 3
+  if (!!editedFormItem.value.id) {
+    console.log('is edicion')
+  } else {
+    const now = DateTime.now()
+    const formatoFecha = formato.formatoFecha(now)
+    console.log('fecha', formatoFecha)
+    formItem.value = {
+      fecha: formatoFecha,
+      concepto: '',
+      importe: '',
+      categoria: null,
+      isMsi: false,
+      numero_msi: 3
+    }
   }
 })
 
@@ -125,6 +134,15 @@ onMounted(() => {
  * props
  */
 const props = defineProps({
+  registroEditedItem: {
+    type: Object,
+    required: false,
+    default: () => {
+      return {
+        id: null
+      }
+    }
+  },
   cuentaId: {
     type: Number,
     required: true
@@ -133,7 +151,7 @@ const props = defineProps({
 /**
  * emits
  */
-const emit = defineEmits(['registroCreated'])
+const emit = defineEmits(['registroCreated', 'registroUpdated'])
 
 /**
  * grapqhl
@@ -145,57 +163,43 @@ const {
   onError: onErrorCreateRegistroTarjeta
 } = useMutation(CREATE_REGISTRO_TARJETA)
 
-// const {
-//   mutate: updateCategoria,
-//   onDone: onDoneUpdateCategoria,
-//   onError: onErrorUpdateCategoria
-// } = useMutation(CATEGORIA_UPDATE)
-// const formEditedItem = computed({
-//   get() {
-//     return {
-//       fecha: '10/11/2023',
-//       categoria: {}
-//     }
-//   },
-//   set(value) {
-//     formItem.value = value
-//   }
-// })
+const {
+  mutate: updateRegistroTarjeta,
+  onDone: onDoneUpdateRegistroTarjeta,
+  onError: onErrorUpdateRegistroTarjeta
+} = useMutation(UPDATE_REGISTRO_TARJETA)
 
 function onSubmit() {
-  console.log('onsubmit', formEditedItem.value)
-  const isMsi = formEditedItem.value.isMsi
-  const numero_msi = isMsi ? formEditedItem.value.numeroMsi : 0
+  console.log('onsubmit', editedFormItem.value)
+  const isMsi = editedFormItem.value.isMsi
+  const numero_msi = isMsi ? editedFormItem.value.numeroMsi : 0
   const input = {
     estadoRegistroTarjetaId: 1,
     cuentaId: props.cuentaId,
-    categoriaId: parseInt(formEditedItem.value.categoria.id),
-    importe: parseFloat(formEditedItem.value.importe), //convert
-    fecha: formato.convertDateFromInputToIso(formEditedItem.value.fecha), //conver
-    concepto: formEditedItem.value.concepto,
+    categoriaId: parseInt(editedFormItem.value.categoria.id),
+    importe: parseFloat(editedFormItem.value.importe), //convert
+    fecha: formato.convertDateFromInputToIso(editedFormItem.value.fecha), //convert
+    concepto: editedFormItem.value.concepto,
     isMsi,
     numeroMsi: numero_msi
   }
   console.log('item guardando...', input)
-  createRegistroTarjeta({ input })
+  if (!!editedFormItem.value.id) {
+    updateRegistroTarjeta({ id: editedFormItem.value.id, input })
+  } else {
+    createRegistroTarjeta({ input })
+  }
 }
 onDoneCreateRegistroTarjeta(({ data }) => {
   const item = data?.registroTarjetaCreate?.registroTarjeta
   console.log('item guardado', item)
   emit('registroCreated', item)
 })
-function onChangeCategoria() {
-  // console.log(
-  //   'Cambio de categoria',
-  //   editedFormItem.value.categoria
-  //   // editedFormItem.value.detallesMovimiento[0].categoria
-  // )
-  // const categoria = editedFormItem.value.categoria
-  // const importe = categoria?.importe || ''
-  // console.log('importe', importe)
-  // editedFormItem.value.registro.importe = importe.toString()
-  // editedFormItem.value.cuenta = categoria?.cuenta
-}
+onDoneUpdateRegistroTarjeta(({ data }) => {
+  const item = data?.registroTarjetaUpdate?.registroTarjeta
+  console.log('item guardado', item)
+  emit('registroUpdated', item)
+})
 /**
  * computed
  */
@@ -207,6 +211,16 @@ const actionName = computed({
 const lblSubmit = computed({
   get() {
     return 'Guardar'
+  }
+})
+const editedFormItem = computed({
+  get() {
+    return !!props.registroEditedItem?.id
+      ? props.registroEditedItem
+      : formItem.value
+  },
+  set(val) {
+    formItem.value = val
   }
 })
 </script>

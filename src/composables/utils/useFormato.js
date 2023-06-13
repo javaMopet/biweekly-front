@@ -47,6 +47,9 @@ export function useFormato() {
       ? DateTime.fromFormat(fecha_string, 'dd/MM/yyyy')?.toISODate()
       : null
   }
+  function convertDateFromIsoToInput(fecha_string) {
+    return DateTime.fromISO(fecha_string).toFormat('dd/MM/yyyy')
+  }
 
   return {
     toCurrency,
@@ -55,6 +58,7 @@ export function useFormato() {
     formatoHoraAMPM,
     formatoFechaFromISO,
     toFormatoInputDateFromISO,
+    convertDateFromIsoToInput,
     convertDateFromInputToIso
   }
 }

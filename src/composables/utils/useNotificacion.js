@@ -27,7 +27,7 @@ export function useNotificacion() {
 
   const mostrarNotificacionInformativa = (message, timeout) => {
     $q.notify({
-      position: 'center',
+      position: 'bottom',
       type: 'info',
       message,
       timeout,

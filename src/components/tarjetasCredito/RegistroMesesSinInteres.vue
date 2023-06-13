@@ -71,7 +71,7 @@ function cambiarMovimientoAMsi() {
       console.log('actualizado', data)
       notificacion.mostrarNotificacionInformativa(
         'Registro modificado a meses sin intereses.',
-        1200
+        1500
       )
       emit('registroUpdated', data)
     })

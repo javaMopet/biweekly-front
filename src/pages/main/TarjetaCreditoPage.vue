@@ -1,5 +1,5 @@
 <template>
-  <q-card class="my-card">
+  <q-card flat>
     <q-toolbar class="bg-grey-1 text-primary" fit dense>
       <!-- arrow_back_ios -->
       <q-btn
@@ -17,7 +17,7 @@
       </q-toolbar-title>
 
       <!-- <q-btn flat round dense icon="apps" class="q-mr-xs" /> -->
-      <q-btn outline dense icon="more_vert" flat>
+      <!-- <q-btn outline dense icon="more_vert" flat>
         <q-menu>
           <q-list dense style="min-width: 100px">
             <q-item clickable v-close-popup>
@@ -57,7 +57,7 @@
             </q-item>
           </q-list>
         </q-menu>
-      </q-btn>
+      </q-btn> -->
     </q-toolbar>
     <q-toolbar inset class="bg-grey-1">
       <!-- <q-btn
@@ -157,7 +157,7 @@
 
     </q-toolbar> -->
   </q-card>
-  <q-card class="my-card">
+  <q-card flat>
     <q-card-section>
       <div class="row">
         <div class="col column items-center">
@@ -202,27 +202,24 @@
       <q-table
         v-if="listaRegistrosMsi.length > 0"
         :rows="listaRegistrosMsi"
-        :columns="columns"
+        :columns="columnsMsi"
         dense
         :rows-per-page-options="[0]"
+        table-header-class="bg-accent text-dark"
+        separator="horizontal"
+        hide-bottom
       >
         <template #top-left>
           <q-tr class="">
             <div class="column q-gutter-y-md">
-              <!-- <div class="row">
-                <q-btn
-                  label="nuevo"
-                  @click="addItem()"
-                  dense
-                  color="toolbar-button"
-                ></q-btn>
-              </div> -->
-              <span class="text-bold">Movimientos a meses sin intereses</span>
+              <span class="cuenta__data-subtitle"
+                >Movimientos a meses sin intereses</span
+              >
             </div>
           </q-tr>
         </template>
         <template #body-cell-acciones="props">
-          <q-td :props="props" class="q-my-xs p-py-xs">
+          <q-td :props="props">
             <div class="row">
               <q-btn
                 color="primary"
@@ -232,52 +229,19 @@
                 size=".6rem"
                 round
               >
-                <q-menu>
-                  <q-list dense style="min-width: 100px">
+                <q-menu style="width: 150px">
+                  <q-list>
                     <q-item clickable v-close-popup @click="editItem(props)">
                       <q-item-section>Editar...</q-item-section>
                     </q-item>
-                    <q-item
-                      clickable
-                      v-close-popup
-                      @click="mesesSinInteres(props)"
-                    >
-                      <q-item-section>Meses Sin Int ...</q-item-section>
-                    </q-item>
-                    <q-separator />
-                    <q-item clickable>
-                      <q-item-section>Preferences</q-item-section>
-                      <q-item-section side>
-                        <q-icon name="keyboard_arrow_right" />
-                      </q-item-section>
-
-                      <q-menu anchor="top end" self="top start">
-                        <q-list>
-                          <q-item v-for="n in 3" :key="n" dense clickable>
-                            <q-item-section>Submenu Label</q-item-section>
-                            <q-item-section side>
-                              <q-icon name="keyboard_arrow_right" />
-                            </q-item-section>
-                            <q-menu
-                              auto-close
-                              anchor="top end"
-                              self="top start"
-                            >
-                              <q-list>
-                                <q-item v-for="n in 3" :key="n" dense clickable>
-                                  <q-item-section
-                                    >3rd level Label</q-item-section
-                                  >
-                                </q-item>
-                              </q-list>
-                            </q-menu>
-                          </q-item>
-                        </q-list>
-                      </q-menu>
+                    <q-item clickable v-close-popup @click="quitarMsi(props)">
+                      <q-item-section>Quitar MSI</q-item-section>
                     </q-item>
                     <q-separator />
                     <q-item clickable v-close-popup>
-                      <q-item-section>Quit</q-item-section>
+                      <q-item-section class="text-negative"
+                        >Eliminar</q-item-section
+                      >
                     </q-item>
                   </q-list>
                 </q-menu>
@@ -286,27 +250,21 @@
           </q-td>
         </template>
       </q-table>
+      <q-separator spaced inset vertical dark />
       <q-table
         :rows="listaRegistros"
         :columns="columns"
         dense
         :rows-per-page-options="[0]"
+        table-header-class="bg-accent text-dark"
+        separator="horizontal"
+        hide-bottom
       >
         <template #top-left>
-          <q-tr class="text-bold">
-            <!-- <div class="row">
-              <q-btn
-                label="nuevo"
-                @click="addItem()"
-                dense
-                color="toolbar-button"
-              ></q-btn></div
-          > -->
-            Movimientos
-          </q-tr>
+          <q-tr class="cuenta__data-subtitle"> Movimientos </q-tr>
         </template>
         <template #body-cell-acciones="props">
-          <q-td :props="props" class="q-my-xs p-py-xs">
+          <q-td :props="props">
             <div class="row">
               <q-btn
                 color="primary"
@@ -316,8 +274,8 @@
                 size=".6rem"
                 round
               >
-                <q-menu>
-                  <q-list dense style="min-width: 100px">
+                <q-menu style="width: 200px; min-width: 200px" dense>
+                  <q-list dense>
                     <q-item clickable v-close-popup @click="editItem(props)">
                       <q-item-section>Editar...</q-item-section>
                     </q-item>
@@ -326,42 +284,13 @@
                       v-close-popup
                       @click="mesesSinInteres(props)"
                     >
-                      <q-item-section>Meses Sin Int ...</q-item-section>
-                    </q-item>
-                    <q-separator />
-                    <q-item clickable>
-                      <q-item-section>Preferences</q-item-section>
-                      <q-item-section side>
-                        <q-icon name="keyboard_arrow_right" />
-                      </q-item-section>
-
-                      <q-menu anchor="top end" self="top start">
-                        <q-list>
-                          <q-item v-for="n in 3" :key="n" dense clickable>
-                            <q-item-section>Submenu Label</q-item-section>
-                            <q-item-section side>
-                              <q-icon name="keyboard_arrow_right" />
-                            </q-item-section>
-                            <q-menu
-                              auto-close
-                              anchor="top end"
-                              self="top start"
-                            >
-                              <q-list>
-                                <q-item v-for="n in 3" :key="n" dense clickable>
-                                  <q-item-section
-                                    >3rd level Label</q-item-section
-                                  >
-                                </q-item>
-                              </q-list>
-                            </q-menu>
-                          </q-item>
-                        </q-list>
-                      </q-menu>
+                      <q-item-section>Meses Sin Intereses</q-item-section>
                     </q-item>
                     <q-separator />
                     <q-item clickable v-close-popup>
-                      <q-item-section>Quit</q-item-section>
+                      <q-item-section class="text-negative"
+                        >Eliminar</q-item-section
+                      >
                     </q-item>
                   </q-list>
                 </q-menu>
@@ -377,7 +306,9 @@
     <q-dialog v-model="showForm" persistent>
       <RegistroMovimientoTarjeta
         :cuenta-id="cuenta.id"
+        :registro-edited-item="registroEditedItem"
         @registro-created="registroCreated"
+        @registro-updated="registroUpdated"
       ></RegistroMovimientoTarjeta>
     </q-dialog>
   </Teleport>
@@ -385,7 +316,7 @@
     <q-dialog v-model="showFormMSI" persistent>
       <RegistroMesesSinInteres
         :registro-tarjeta="editRegistroItem"
-        @registroUpdated="registroUpdated"
+        @registroUpdated="registroMsiUpdated"
       ></RegistroMesesSinInteres>
     </q-dialog>
   </Teleport>
@@ -401,26 +332,22 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { DateTime } from 'luxon'
 import RegistroMovimientoTarjeta from 'src/components/tarjetasCredito/RegistroMovimientoTarjeta.vue'
-import DateInput from 'src/components/formComponents/DateInput.vue'
-import CategoriaSelect from 'src/components/formComponents/CategoriaSelect.vue'
-import PriceInput from 'src/components/formComponents/PriceInput.vue'
 import { api } from 'src/boot/axios'
-// import { OBTENER_EGRESOS } from 'src/graphql/egresos'
 import { LISTA_REGISTROS_TARJETA } from 'src/graphql/registrosTarjeta'
-
 import CargaRegistrosTarjeta from 'src/components/tarjetasCredito/CargaRegistrosTarjeta.vue'
-import { useLazyQuery, useQuery } from '@vue/apollo-composable'
+import { useLazyQuery } from '@vue/apollo-composable'
 import { useFormato } from 'src/composables/utils/useFormato'
 import { useRegistrosCrud } from 'src/composables/useRegistrosCrud'
-import RegistroCuentaContable from 'src/components/cuentasContables/RegistroCuentaContable.vue'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import RegistroMesesSinInteres from 'src/components/tarjetasCredito/RegistroMesesSinInteres.vue'
+import { useQuasar } from 'quasar'
 
 const route = useRoute()
 const router = useRouter()
 const formato = useFormato()
 const notificacion = useNotificacion()
 const registroCrud = useRegistrosCrud()
+const $q = useQuasar()
 
 /**
  * state
@@ -431,6 +358,7 @@ const dia_corte = ref(0)
 
 const listaRegistrosMsi = ref([])
 const listaRegistros = ref([])
+const registroEditItem = ref(null)
 
 const registroEditedItem = ref([
   {
@@ -520,7 +448,8 @@ const graphqlOptions = reactive({
 const {
   onError: onErrorListaRegistros,
   onResult: onResultListaRegistros,
-  load: cargaListaRegistros
+  load: cargaListaRegistros,
+  refetch: refetchListaRegistros
 } = useLazyQuery(LISTA_REGISTROS_TARJETA)
 
 onResultListaRegistros(({ data }) => {
@@ -540,6 +469,13 @@ onErrorListaRegistros((error) => {
  */
 function editItem(item) {
   console.log('editando item...', item.rowIndex, item.row)
+  registroEditedItem.value = JSON.parse(JSON.stringify(item.row))
+  registroEditedItem.value.importe = registroEditedItem.value.importe.toString()
+  console.log('fecha', registroEditedItem.value.fecha)
+  registroEditedItem.value.fecha = formato.convertDateFromIsoToInput(
+    registroEditedItem.value.fecha
+  )
+  showForm.value = true
 }
 
 function obtener_fecha_inicio() {
@@ -648,6 +584,7 @@ function cargarMovimientos() {
   showFormCarga.value = true
 }
 function addItem() {
+  registroEditedItem.value = null
   showForm.value = true
 }
 
@@ -668,18 +605,74 @@ function mesesSinInteres(item) {
   showFormMSI.value = true
   editRegistroItem.value = item.row
 }
-function registroUpdated() {
+function quitarMsi(item) {
+  $q.dialog({
+    title: 'Confirmar',
+    style: 'width:500px',
+    message: `¿Está seguro que desea quitar el movimiento de meses sin intereses?`,
+    ok: {
+      push: true,
+      color: 'positive',
+      label: 'Continuar'
+    },
+    cancel: {
+      push: true,
+      color: 'negative',
+      flat: true,
+      label: 'cancelar'
+    },
+    persistent: true
+  })
+    .onOk(() => {
+      confirmQuitarMsi(item.row.id)
+    })
+    .onCancel(() => {})
+    .onDismiss(() => {})
+}
+function confirmQuitarMsi(id) {
+  api
+    .put(`/registros_tarjeta/${id}`, {
+      registro_tarjeta: {
+        is_msi: false,
+        numero_msi: 0
+      }
+    })
+    .then(({ data }) => {
+      console.log('actualizado', data)
+      notificacion.mostrarNotificacionInformativa(
+        'El registro se eliminó de Meses Sin Intereses',
+        1200
+      )
+      refetchListaRegistros()
+    })
+    .catch((error) => {
+      console.error(error)
+    })
+}
+
+function registroMsiUpdated() {
   showFormMSI.value = false
   console.log('El registro fue modificado')
+  refetchListaRegistros()
 }
 function registrarPago() {
   console.log('pago registrado')
 }
-function registroCreated() {
+function registroCreated(registro) {
   notificacion.mostrarNotificacionPositiva(
     'Se ha ingresado un nuevo registro.',
     1200
   )
+  refetchListaRegistros()
+  showForm.value = false
+}
+
+function registroUpdated() {
+  notificacion.mostrarNotificacionPositiva(
+    'Se ha actualizado el registro correctamente.',
+    1200
+  )
+  refetchListaRegistros()
   showForm.value = false
 }
 
@@ -699,42 +692,99 @@ const mesOptions = ref([
 ])
 const ejercicioFiscalOptions = ref([2021, 2022, 2023])
 const columns = [
-  { name: 'id', label: 'Id', field: 'id', sortable: true, align: 'left' },
+  // { name: 'id', label: 'Id', field: 'id', sortable: true, align: 'left' },
   {
     name: 'fecha',
     label: 'Fecha',
-    field: (row) => row.fecha,
+    field: 'fecha',
     sortable: true,
-    align: 'left'
+    align: 'left',
+    format: (val, row) => formato.formatoFechaFromISO(val),
+    style: 'width: 10%'
   },
   {
     name: 'concepto',
     label: 'Concepto',
     field: (row) => row.concepto,
     sortable: true,
-    align: 'left'
+    align: 'left',
+    style: 'width: 40%'
   },
   {
     name: 'importe',
     label: 'Importe',
-    field: (row) => formato.toCurrency(row.importe),
+    field: 'importe',
     sortable: true,
-    align: 'left'
+    align: 'right',
+    format: (val, row) => formato.toCurrency(val),
+    style: 'width:15%'
   },
   {
     name: 'categoria',
     label: 'Categoria',
     field: (row) => row.categoria.nombre,
     sortable: true,
-    align: 'left'
+    align: 'left',
+    style: 'width:30%'
   },
   {
     name: 'acciones',
-
     field: 'action',
     sortable: false,
     align: 'center',
-    style: 'width: 100px'
+    style: 'width: 5%'
+  }
+]
+const columnsMsi = [
+  // { name: 'id', label: 'Id', field: 'id', sortable: true, align: 'left' },
+  {
+    name: 'fecha',
+    label: 'Fecha',
+    field: 'fecha',
+    sortable: true,
+    align: 'left',
+    format: (val, row) => formato.formatoFechaFromISO(val),
+    style: 'width: 10%'
+  },
+  {
+    name: 'concepto',
+    label: 'Concepto',
+    field: (row) => row.concepto,
+    sortable: true,
+    align: 'left',
+    style: 'width: 30%'
+  },
+  {
+    name: 'importe',
+    label: 'Importe',
+    field: 'importe',
+    sortable: true,
+    align: 'right',
+    format: (val, row) => formato.toCurrency(val),
+    style: 'width:15%'
+  },
+  {
+    name: 'categoria',
+    label: 'Categoria',
+    field: (row) => row.categoria.nombre,
+    sortable: true,
+    align: 'left',
+    style: 'width:30%'
+  },
+  {
+    name: 'numeroMsi',
+    label: 'Número de MSI',
+    field: 'numeroMsi',
+    sortable: true,
+    align: 'left',
+    style: 'width:10%'
+  },
+  {
+    name: 'acciones',
+    field: 'action',
+    sortable: false,
+    align: 'center',
+    style: 'width: 5%'
   }
 ]
 </script>
@@ -750,5 +800,11 @@ const columns = [
   font-size: 0.85rem;
   font-weight: 400;
   color: #888585;
+}
+.cuenta__data-subtitle {
+  letter-spacing: -0.045rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #7b6992;
 }
 </style>
