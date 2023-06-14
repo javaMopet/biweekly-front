@@ -17,13 +17,25 @@
     </q-card-section>
     <q-card-section>
       <div class="row">
-        <span>Importe pagado:</span>
-        <span>$ 19020.25</span>
+        <span>Periodo:</span>
+        <span>{{ saldoPeriodoAnterior }}</span>
       </div>
-      <q-form @submit="generarPago" class="q-gutter-md">
+      <div class="row">
+        <span>Importe pagado:</span>
+        <span>{{ props.sumaMovimientos }}</span>
+      </div>
+      <q-separator spaced inset horizontal />
+      <q-form @submit="generarPago" class="q-gutter-xs">
+        <div class="col column">
+          <div class="row input-label">Fecha de pago:</div>
+          <DateInput
+            v-model="formItem.fecha"
+            label="Introduce una fecha válida"
+          ></DateInput>
+        </div>
         <div class="col column">
           <div class="row input-label">Cuenta:</div>
-          <CuentaSelect v-model="cuenta_egreso"></CuentaSelect>
+          <CuentaSelect v-model="formItem.cuenta_egreso"></CuentaSelect>
         </div>
         <div align="right">
           <q-btn
@@ -43,17 +55,28 @@
 <script setup>
 import { ref } from 'vue'
 import CuentaSelect from '../formComponents/CuentaSelect.vue'
+import DateInput from '../formComponents/DateInput.vue'
 
 /**
  * state
  */
-const cuenta_egreso = ref(null)
+const formItem = ref({
+  fecha: '13/06/2023'
+})
 /**
  * props
  */
 const props = defineProps({
   cuenta: {
     type: Object,
+    required: true
+  },
+  saldoPeriodoAnterior: {
+    type: Number,
+    required: true
+  },
+  sumaMovimientos: {
+    type: Number,
     required: true
   }
 })

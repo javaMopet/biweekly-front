@@ -365,7 +365,11 @@
   </Teleport>
   <Teleport to="#modal">
     <q-dialog v-model="showPagosTarjeta" persistent>
-      <PagosTarjeta :cuenta="cuenta"></PagosTarjeta>
+      <PagosTarjeta
+        :cuenta="cuenta"
+        :saldo-periodo-anterior="parseFloat(saldo_anterior)"
+        :suma-movimientos="parseFloat(sumaMovimientos)"
+      ></PagosTarjeta>
     </q-dialog>
   </Teleport>
 </template>
