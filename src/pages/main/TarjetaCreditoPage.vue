@@ -16,7 +16,7 @@
         <!-- Tarjeta de crédito {{ route.params.id }} -->
       </q-toolbar-title>
 
-      <!-- <q-btn flat round dense icon="apps" class="q-mr-xs" /> -->
+      <q-btn flat round dense icon="apps" class="q-mr-xs" />
       <!-- <q-btn outline dense icon="more_vert" flat>
         <q-menu>
           <q-list dense style="min-width: 100px">
@@ -70,15 +70,25 @@
         @click="cargarMovimientos"
       /> -->
       <div class="row q-gutter-x-md">
-        <q-btn-dropdown label="AGREGAR" color="primary-button" class="">
-          <q-list dense>
+        <q-btn-dropdown
+          label="AGREGAR"
+          color="primary-button"
+          class=""
+          no-caps
+          icon="add_circle"
+        >
+          <q-list>
             <q-item clickable v-close-popup @click="addItem">
-              <q-item-section avatar>
+              <q-item-section
+                avatar
+                style="min-width: 45px !important; width: 45px !important"
+                class="items-start"
+              >
                 <q-avatar
                   icon="assignment"
                   text-color="secondary"
                   outlined
-                  font-size="32px"
+                  font-size="40px"
                 />
               </q-item-section>
               <q-item-section>
@@ -86,11 +96,14 @@
               </q-item-section>
             </q-item>
             <q-item clickable v-close-popup @click="cargarMovimientos" dense>
-              <q-item-section avatar>
+              <q-item-section
+                avatar
+                style="min-width: 45px !important; width: 45px !important"
+              >
                 <!-- <q-icon name="format_list_bulleted" /> -->
 
-                <q-avatar text-color="white">
-                  <q-img src="/icons/excel.png" width="28px" height="28px" />
+                <q-avatar text-color="white" square>
+                  <q-img src="/icons/excel.png" width="35px" height="35px" />
                 </q-avatar>
                 <!-- spinner-color="primary"
                 spinner-size="82px"
@@ -106,8 +119,8 @@
           icon="payments"
           color="toolbar-button"
           label="pagos"
-          @click="registrarPago"
-          outline
+          @click="pagosTarjeta"
+          push
         />
       </div>
       <q-toolbar-title> </q-toolbar-title>
@@ -161,33 +174,58 @@
     <q-card-section>
       <div class="row">
         <div class="col column items-center">
-          <span class="tarjeta__resumen-etiqueta"> Periodo </span>
-          <span class="tarjeta__resumen-valor"> 12/May/2023 - 12/Jun/2023</span>
+          <span class="tarjeta__resumen-etiqueta"> Día de corte </span>
+          <span class="tarjeta__resumen-valor"> {{ cuenta.dia_corte }}</span>
         </div>
         <q-separator spaced inset vertical />
         <div class="col column items-center">
-          <span class="tarjeta__resumen-etiqueta"> Saldo anterior </span>
+          <span class="tarjeta__resumen-etiqueta"> Periodo </span>
+          <span class="tarjeta__resumen-valor">
+            {{ periodoInicio }} - {{ periodoFin }}</span
+          >
+        </div>
+        <q-separator spaced inset vertical />
+        <div class="col column items-center">
+          <span class="tarjeta__resumen-etiqueta">
+            Saldo del periodo anterior
+          </span>
           <span class="tarjeta__resumen-valor">
             {{ formato.toCurrency(saldo_anterior) }}</span
           >
         </div>
-        <q-separator spaced inset vertical />
+        <!-- <q-separator spaced inset vertical />
         <div class="col column items-center">
           <span class="tarjeta__resumen-etiqueta"> Suma movimientos </span>
           <span class="tarjeta__resumen-valor">
             {{ formato.toCurrency(sumaMovimientos) }}</span
           >
-        </div>
+        </div> -->
       </div>
       <q-separator spaced inset horizontal />
       <div class="row">
         <div class="col column items-center">
           <span class="tarjeta__resumen-etiqueta">
-            Pago para no generar intereses
+            Suma de movimientos de meses sin intereses
           </span>
           <span class="tarjeta__resumen-valor">
-            {{ formato.toCurrency(saldo_final) }}</span
+            {{ formato.toCurrency(suma_msi) }}</span
           >
+        </div>
+        <q-separator spaced inset vertical />
+        <div class="col column items-center">
+          <span class="tarjeta__resumen-etiqueta">
+            Suma de movimientos del periodo
+          </span>
+          <span class="tarjeta__resumen-valor-importante">
+            {{ formato.toCurrency(sumaMovimientos) }}</span
+          >
+        </div>
+        <q-separator spaced inset vertical />
+        <div class="col column items-center">
+          <span class="tarjeta__resumen-etiqueta"> Saldo Final </span>
+          <span class="tarjeta__resumen-valor">
+            {{ formato.toCurrency(saldo_final) }}
+          </span>
         </div>
         <q-separator spaced inset vertical />
         <div class="col column items-center">
@@ -325,6 +363,11 @@
       <CargaRegistrosTarjeta :cuenta="cuenta"></CargaRegistrosTarjeta>
     </q-dialog>
   </Teleport>
+  <Teleport to="#modal">
+    <q-dialog v-model="showPagosTarjeta" persistent>
+      <PagosTarjeta :cuenta="cuenta"></PagosTarjeta>
+    </q-dialog>
+  </Teleport>
 </template>
 
 <script setup>
@@ -341,6 +384,7 @@ import { useRegistrosCrud } from 'src/composables/useRegistrosCrud'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import RegistroMesesSinInteres from 'src/components/tarjetasCredito/RegistroMesesSinInteres.vue'
 import { useQuasar } from 'quasar'
+import PagosTarjeta from 'src/components/tarjetasCredito/PagosTarjeta.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -358,7 +402,6 @@ const dia_corte = ref(0)
 
 const listaRegistrosMsi = ref([])
 const listaRegistros = ref([])
-const registroEditItem = ref(null)
 
 const registroEditedItem = ref([
   {
@@ -368,15 +411,14 @@ const registroEditedItem = ref([
   }
 ])
 
-const categoriaOptions = ref([])
 const showForm = ref(false)
 const showFormMSI = ref(false)
 const showFormCarga = ref(false)
+const showPagosTarjeta = ref(false)
 const cuenta = ref({})
 const ejercicio_fiscal = ref(0)
 const mes = ref({})
 const saldo_anterior = ref(0)
-const saldo_total = ref(9000.25)
 const editRegistroItem = ref(null)
 
 const graphql_options = ref({
@@ -433,9 +475,80 @@ const sumaMovimientos = computed({
     }, 0)
   }
 })
+const suma_msi = computed({
+  get() {
+    return listaRegistrosMsi.value.reduce((accumulator, registro) => {
+      return accumulator + registro.importe
+    }, 0)
+  }
+})
 const saldo_final = computed({
   get() {
     return parseFloat(saldo_anterior.value) + parseFloat(sumaMovimientos.value)
+  }
+})
+const saldo_total = computed({
+  get() {
+    return 0
+  }
+})
+const ejercicio_inicial_id = computed({
+  get() {
+    return mes.value.id - 1 <= 0
+      ? ejercicio_fiscal.value - 1
+      : ejercicio_fiscal.value
+  }
+})
+const mes_inicial_id = computed({
+  get() {
+    return mes.value.id - 1 <= 0 ? 12 : mes.value.id - 1
+  }
+})
+
+const ejercicio_final_id = computed({
+  get() {
+    return ejercicio_fiscal.value
+  }
+})
+const dia_corte_inicial = computed({
+  get() {
+    return !!cuenta.value.dia_corte ? cuenta.value.dia_corte + 1 : 28
+  }
+})
+const dia_corte_final = computed({
+  get() {
+    return !!cuenta.value.dia_corte ? cuenta.value.dia_corte : 28
+  }
+})
+const mes_final_id = computed({
+  get() {
+    return mes.value.id
+  }
+})
+const periodoInicio = computed({
+  get() {
+    const mes = mesOptions.value.find(
+      (option) => option.id === mes_inicial_id.value
+    )
+    if (!!mes) {
+      return `${dia_corte_inicial.value}/${mes.nombre.substring(0, 3)}/${
+        ejercicio_inicial_id.value
+      }`
+    }
+    return ''
+  }
+})
+const periodoFin = computed({
+  get() {
+    const mes = mesOptions.value.find(
+      (option) => option.id === mes_final_id.value
+    )
+    if (!!mes) {
+      return `${dia_corte_final.value}/${mes.nombre.substring(0, 3)}/${
+        ejercicio_final_id.value
+      }`
+    }
+    return ''
   }
 })
 /**
@@ -491,9 +604,9 @@ function obtener_fecha_fin() {
 }
 
 function obtenerSaldoAnterior() {
-  const fecha = `${ejercicio_fiscal.value}-${mes.value.id - 1}-${
-    cuenta.value.dia_corte
-  }`
+  const fecha = `${ejercicio_inicial_id.value}-${(
+    '0' + mes_inicial_id.value
+  ).slice(-2)}-${cuenta.value.dia_corte}`
   console.log('fecha para obtener saldos', fecha)
   api
     .get('/cuentas/obtener_saldo_tarjeta', {
@@ -513,25 +626,22 @@ function obtenerSaldoAnterior() {
 function onChangeMes(mes) {
   console.log('Cambiando mes', mes.id)
   obtenerListaRegistros()
+  obtenerSaldoAnterior()
 }
 function onChangeEjercicio(ejercicio_fiscal) {
   console.log('cambio de ejercicio', ejercicio_fiscal)
   obtenerListaRegistros()
 }
+/**
+ * Lista de registros de la tarjeta
+ */
 function obtenerListaRegistros() {
-  let ejercicio_inicial_id =
-    mes.value.id - 1 <= 0 ? ejercicio_fiscal.value - 1 : ejercicio_fiscal.value
-  let ejercicio_final_id = ejercicio_fiscal.value
-
-  let mes_inicial_id = mes.value.id - 1 <= 0 ? 12 : mes.value.id - 1
-  let mes_final_id = mes.value.id
-
-  let dia_corte_n = !!cuenta.value.dia_corte ? cuenta.value.dia_corte : 28
-
-  const fechaInicio = `${ejercicio_inicial_id}-${('0' + mes_inicial_id).slice(
-    -2
-  )}-12`
-  const fechaFin = `${ejercicio_final_id}-${('0' + mes_final_id).slice(-2)}-12`
+  const fechaInicio = `${ejercicio_inicial_id.value}-${(
+    '0' + mes_inicial_id.value
+  ).slice(-2)}-${dia_corte_inicial.value}`
+  const fechaFin = `${ejercicio_final_id.value}-${(
+    '0' + mes_final_id.value
+  ).slice(-2)}-${dia_corte_final.value}`
   console.log('fechaInicio', fechaInicio)
   console.log('fechaFin', fechaFin)
   cargaListaRegistros(
@@ -546,55 +656,12 @@ function obtenerListaRegistros() {
   )
 }
 
-function addRow() {
-  const item = { ...registroEditedItem.value[0] }
-  listaRegistrosTarjeta.value.push(item)
-}
-
-function onSubmit() {}
-
-const defaultItem = {
-  fecha: DateTime.now,
-  concepto: '',
-  categoria: {},
-  importe: 0.0
-}
-
-function cargarExcel() {
-  archivoExcel.value
-  console.log('excel cargado', archivoExcel.value)
-  const reader = new FileReader()
-
-  reader.onload = (event) => {
-    const data = event.target.result
-    const workbook = read(data, { type: 'array' })
-    const firstSheedName = workbook.SheetNames[0]
-    const worksheet = workbook.Sheets[firstSheedName]
-    const rows = XLSX.utils.sheet_to_json(worksheet)
-    for (const row of rows) {
-      for (const key in row) {
-        console.log('data cell', row[key])
-      }
-    }
-  }
-  reader.readAsArrayBuffer(archivoExcel.value)
-}
-
 function cargarMovimientos() {
   showFormCarga.value = true
 }
 function addItem() {
   registroEditedItem.value = null
   showForm.value = true
-}
-
-function deleteItem(item) {
-  item.rowIndex
-  const registro = item.row
-  console.log('registro', registro)
-  registroCrud.deleteRegistro({
-    id: parseInt(registro.id)
-  })
 }
 
 registroCrud.onDoneDeleteRegistro((response) => {
@@ -655,8 +722,9 @@ function registroMsiUpdated() {
   console.log('El registro fue modificado')
   refetchListaRegistros()
 }
-function registrarPago() {
-  console.log('pago registrado')
+function pagosTarjeta() {
+  console.log('registrando el pago')
+  showPagosTarjeta.value = true
 }
 function registroCreated(registro) {
   notificacion.mostrarNotificacionPositiva(
@@ -800,6 +868,12 @@ const columnsMsi = [
   font-size: 0.85rem;
   font-weight: 400;
   color: #888585;
+  &-importante {
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: -0.035rem;
+    color: #476d59 !important;
+  }
 }
 .cuenta__data-subtitle {
   letter-spacing: -0.045rem;
