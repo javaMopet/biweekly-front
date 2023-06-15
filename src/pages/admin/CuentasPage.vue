@@ -1,6 +1,5 @@
 <template>
   <div class="column q-ma-md" style="border: 0px solid red">
-    <div class="row text-h5 text-secondary q-pa-md font-subtitle">CUENTAS</div>
     <div class="row fit" style="border: 0px solid red">
       <q-table
         grid
@@ -16,20 +15,26 @@
         <template v-slot:top-left>
           <q-btn-dropdown
             split
-            outline
+            push
             icon="add_circle"
-            label="AGREGAR CUENTA"
-            color="primary"
+            label="AGREGAR"
+            color="primary-button"
             @click="addRow(1)"
-            rounded
           >
             <q-list>
               <q-item clickable v-close-popup @click="addRow(1)">
                 <q-item-section avatar>
-                  <q-icon name="account_balance" />
+                  <!-- <q-icon name="account_balance" /> -->
+                  <q-avatar
+                    size="30px"
+                    font-size="32px"
+                    icon="account_balance"
+                    square
+                    text-color="secondary"
+                  />
                 </q-item-section>
                 <q-item-section>
-                  <q-item-label>Ahorros</q-item-label>
+                  <q-item-label>Cuenta de Ahorros</q-item-label>
                 </q-item-section>
               </q-item>
               <!-- <q-item clickable v-close-popup @click="addRow(3)">
@@ -42,10 +47,17 @@
               </q-item> -->
               <q-item clickable v-close-popup @click="addRow(2)">
                 <q-item-section avatar>
-                  <q-icon name="payments" />
+                  <!-- <q-icon name="payments" /> -->
+                  <q-avatar
+                    size="30px"
+                    font-size="32px"
+                    icon="payments"
+                    square
+                    text-color="secondary"
+                  />
                 </q-item-section>
                 <q-item-section>
-                  <q-item-label>Efectivo</q-item-label>
+                  <q-item-label>Cuenta de Efectivo</q-item-label>
                 </q-item-section>
               </q-item>
             </q-list>
@@ -66,33 +78,34 @@
           </q-input>
         </template>
         <template #item="props">
-          <q-card class="my-card text-primary q-ma-sm" style="width: 350px">
-            <q-card-section
-              :class="{
+          <q-card
+            class="tarjeta__cuenta text-primary q-ma-sm"
+            style="width: 350px"
+          >
+            <q-card-section>
+              <!--  :class="{
                 'bg-primary-grey': props.row.tipoCuenta.id === '1',
                 'bg-accent ': props.row.tipoCuenta.id === '2',
                 'bg-accent': props.row.tipoCuenta.id === '3',
                 'text-white': true
-              }"
-            >
+              }" -->
               <div class="row q-gutter-x-lg">
-                <q-icon :name="props.row.tipoCuenta.icon" size="30px" />
+                <!-- <q-icon :name="props.row.tipoCuenta.icon" size="30px" /> -->
+                <q-img src="/icons/bbva1.png" width="40px" height="40px" />
                 <div class="column col">
-                  <div class="text-h6 text-white">{{ props.row.nombre }}</div>
+                  <div class="text-h6">{{ props.row.nombre }}</div>
                   <div class="text-condensed text-grey-5 q-mt-xs">
                     {{ props.row.cuentaContable.nombreCompleto }}
                   </div>
                 </div>
-                <div
-                  class=""
-                  :class="{
+                <div class="">
+                  <!--  :class="{
                     'text-accent-contrast': props.row.tipoCuenta.id === '1',
                     'text-yellow-3': props.row.tipoCuenta.id === '2',
                     'text-accent-contrast': props.row.tipoCuenta.id === '3',
                     'col-auto column items-center q-mx-md': true
-                  }"
-                >
-                  <q-btn color="accent-light" flat icon="more_vert" round dense>
+                  }" -->
+                  <q-btn color="accent" flat icon="more_vert" round dense>
                     <q-menu>
                       <q-list style="min-width: 100px">
                         <!-- <q-item

@@ -188,7 +188,8 @@ body {
     border-radius: 4px;
     z-index: 3;
     margin-bottom: 2px;
-    opacity: 0.5 !important;
+    opacity: 0.8;
+    color: #9aa5c0;
 
     &:first-child {
       margin-left: 0;
@@ -288,7 +289,8 @@ h1 {
 
 .active {
   background-color: #e1e4ec !important;
-  color: $primary;
+  color: #011724 !important;
+  font-weight: 600 !important;
   opacity: 1 !important;
   box-shadow: rgba(152, 136, 161, 0.25) 2px 7px 14px,
     rgba(158, 137, 185, 0.22) 2px 15px 15px !important;
