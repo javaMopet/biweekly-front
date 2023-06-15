@@ -61,6 +61,10 @@ const routes = [
       {
         path: 'cuentas_contables',
         component: () => import('src/pages/admin/CuentasContablesPage.vue')
+      },
+      {
+        path: 'carousel_cards',
+        component: () => import('src/pages/admin/CarouselPage.vue')
       }
 
       // Always leave this as last one,

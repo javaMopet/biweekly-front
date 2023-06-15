@@ -415,7 +415,7 @@ function mostrarMovimientos(value) {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .tarjeta__credito--link {
   font-size: 0.85rem;
   color: #a19ba9 !important;

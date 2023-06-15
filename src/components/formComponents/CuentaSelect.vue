@@ -13,8 +13,7 @@
         @filter="filterFn"
         behavior="menu"
         clearable=""
-        error-message="Favor de ingresar la cuenta"
-        :error="!isValid"
+        :rules="props.rules"
         lazyRules
         dense
         :hint="props.hint"
@@ -76,7 +75,7 @@ const props = defineProps({
     required: false,
     default: ''
   },
-  agregar: { type: Boolean, required: false, default: true },
+  agregar: { type: Boolean, required: false, default: false },
   readonly: {
     type: Boolean,
     required: false,
@@ -86,6 +85,13 @@ const props = defineProps({
     type: Boolean,
     required: false,
     default: true
+  },
+  rules: {
+    type: Array,
+    required: false,
+    default: () => {
+      return []
+    }
   }
 })
 /**
