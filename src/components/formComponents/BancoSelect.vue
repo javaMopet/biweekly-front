@@ -19,6 +19,33 @@
         :hint="props.hint"
         :readonly="readonly"
       >
+        <template #selected-item="scope">
+          <q-img
+            class="q-mx-md"
+            :src="`/icons/${scope.opt.icono}`"
+            width="20px"
+            height="20px"
+          />
+          <q-item-label>
+            {{ scope.opt.nombre }}
+          </q-item-label>
+        </template>
+        <template v-slot:option="scope">
+          <q-item v-bind="scope.itemProps">
+            <q-item-section avatar>
+              <!-- <q-icon :name="scope.opt.icon" /> -->
+              <q-img
+                :src="`/icons/${scope.opt.icono}`"
+                width="30px"
+                height="30px"
+              />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>{{ scope.opt.nombre }}</q-item-label>
+              <!-- <q-item-label caption>{{ scope.opt.nombre }}</q-item-label> -->
+            </q-item-section>
+          </q-item>
+        </template>
         <template v-slot:no-option>
           <q-item>
             <q-item-section class="text-grey"> No results </q-item-section>
@@ -104,8 +131,8 @@ const emit = defineEmits(['update:modelValue'])
 const graphql_options = ref({
   fetchPolicy: 'network-only'
 })
-const { result: resultadoLista, onError: onErrorListaCuentas } = useQuery(
-  LISTA_CUENTAS,
+const { result: resultadoLista, onError: onErrorListar } = useQuery(
+  LISTA_BANCOS,
   null, //arguments
   graphql_options
 )
@@ -122,10 +149,10 @@ const cuenta = computed({
 })
 const options = computed({
   get() {
-    return resultadoLista.value?.listaCuentas ?? []
+    return resultadoLista.value?.listaBancos ?? []
   }
 })
-onErrorListaCuentas((error) => {
+onErrorListar((error) => {
   console.log('error', error)
 })
 /**

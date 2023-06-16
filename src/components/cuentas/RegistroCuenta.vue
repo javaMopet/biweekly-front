@@ -41,10 +41,6 @@
               style="width: 85%; border: 0px solid red"
             >
               <div>
-                <div class="row input-label">Banco:</div>
-                <BancoSelect></BancoSelect>
-              </div>
-              <div>
                 <div class="row input-label">Nombre de la tarjeta:</div>
                 <q-input
                   v-model="editedFormItem.nombre"
@@ -61,6 +57,10 @@
                       'Favor de ingresar el nombre de la Cuenta'
                   ]"
                 />
+              </div>
+              <div>
+                <div class="row input-label">Banco:</div>
+                <BancoSelect v-model="editedFormItem.banco"></BancoSelect>
               </div>
               <div>
                 <div class="row input-label">Número de cuenta:</div>

@@ -78,50 +78,45 @@
           </q-input>
         </template>
         <template #item="props">
-          <q-card
-            class="tarjeta__cuenta text-primary q-ma-sm"
-            style="width: 350px"
-          >
+          <q-card class="text-primary q-ma-sm">
             <q-card-section>
-              <!--  :class="{
-                'bg-primary-grey': props.row.tipoCuenta.id === '1',
-                'bg-accent ': props.row.tipoCuenta.id === '2',
-                'bg-accent': props.row.tipoCuenta.id === '3',
-                'text-white': true
-              }" -->
               <div class="row q-gutter-x-lg">
-                <!-- <q-icon :name="props.row.tipoCuenta.icon" size="30px" /> -->
-                <q-img
-                  :src="`/icons/${props.row.banco.icono}`"
-                  width="40px"
-                  height="40px"
-                />
-                <div class="column col">
-                  <div class="text-h6">{{ props.row.nombre }}</div>
-                  <div class="text-condensed text-grey-5 q-mt-xs">
+                <div class="column">
+                  <q-avatar size="60px" color="white">
+                    <q-img
+                      :src="`/icons/${props.row.banco.icono}`"
+                      width="50px"
+                      height="50px"
+                    />
+                  </q-avatar>
+                </div>
+                <div class="column">
+                  <div class="row cuenta__title">
+                    {{ props.row.nombre }}
+                  </div>
+                  <div class="row cuenta__subtitle">
+                    <!-- **** **** **** {{ props.row.identificador }} -->
+                    <router-link
+                      :to="{
+                        name: 'tarjetaCredito',
+                        params: { id: props.row.id }
+                      }"
+                      class="tarjeta__credito--link cuenta__subtitle"
+                    >
+                      <div class="fit flex flex-left text-left non-selectable">
+                        **** **** **** {{ props.row.identificador }}
+                      </div>
+                      <q-tooltip> Abrir movimientos </q-tooltip>
+                    </router-link>
+                  </div>
+                  <div class="row text-condensed text-blue-grey-4">
                     {{ props.row.cuentaContable.nombreCompleto }}
                   </div>
                 </div>
-                <div class="">
-                  <!--  :class="{
-                    'text-accent-contrast': props.row.tipoCuenta.id === '1',
-                    'text-yellow-3': props.row.tipoCuenta.id === '2',
-                    'text-accent-contrast': props.row.tipoCuenta.id === '3',
-                    'col-auto column items-center q-mx-md': true
-                  }" -->
-                  <q-btn color="accent" flat icon="more_vert" round dense>
+                <div class="column">
+                  <q-btn color="more-button" flat icon="more_vert" round dense>
                     <q-menu>
                       <q-list style="min-width: 100px">
-                        <!-- <q-item
-                        clickable
-                        @click="mostrarMovimientos(props.row.id)"
-                        v-close-popup
-                      >
-                        <q-item-section avatar>
-                          <q-icon name="receipt" />
-                        </q-item-section>
-                        <q-item-section>Movimientos</q-item-section>
-                      </q-item> -->
                         <q-item clickable @click="editRow(props)" v-close-popup>
                           <q-item-section avatar>
                             <q-icon name="edit" color="info"
@@ -142,21 +137,32 @@
                       </q-list>
                     </q-menu>
                   </q-btn>
-                  <!-- <span>{{ props.row.tipoCuenta.nombre }}</span> -->
                 </div>
               </div>
+              <div
+                class="row inline"
+                style="border: 0px solid red; width: 100%"
+              >
+                <q-item-label
+                  style="border: 0px solid red; width: 100%"
+                  caption
+                  class="text-blue-grey-6 text-bold"
+                  align="right"
+                >
+                  <span class="text-h6">
+                    {{ formato.toCurrency(props.row.saldo) }}
+                  </span>
+                </q-item-label>
+              </div>
             </q-card-section>
-            <q-card-section>
+
+            <!-- <q-card-section>
               <div
                 class="text-subtitle text-grey-8 text-bold q-mt-xs"
                 align="right"
-              >
-                {{ formato.toCurrency(props.row.saldo) }}
-              </div>
-              <span class="cuenta__card--descripcion">
-                {{ props.row.descripcion }}
-              </span>
-            </q-card-section>
+              ></div>
+              <span class="cuenta__card--descripcion"> </span>
+            </q-card-section> -->
 
             <!-- <q-separator inset /> -->
 
@@ -402,5 +408,17 @@ function mostrarNotificacion(action, cuenta) {
   letter-spacing: -0.025rem !important;
   font-size: 0.75rem !important;
   font-weight: 600 !important;
+}
+.cuenta__title {
+  letter-spacing: -0.025rem !important;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+.cuenta__subtitle {
+  letter-spacing: -0.025rem !important;
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: $positive !important;
+  // background-color: $primary;
 }
 </style>
