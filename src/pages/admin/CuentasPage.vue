@@ -13,55 +13,55 @@
         hide-pagination
       >
         <template v-slot:top-left>
-          <q-btn-dropdown
-            split
-            push
-            icon="add_circle"
-            label="AGREGAR"
-            color="primary-button"
-            @click="addRow(1)"
-          >
-            <q-list>
-              <q-item clickable v-close-popup @click="addRow(1)">
-                <q-item-section avatar>
-                  <!-- <q-icon name="account_balance" /> -->
-                  <q-avatar
-                    size="30px"
-                    font-size="32px"
-                    icon="account_balance"
-                    square
-                    text-color="secondary"
-                  />
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label>Cuenta de Ahorros</q-item-label>
-                </q-item-section>
-              </q-item>
-              <!-- <q-item clickable v-close-popup @click="addRow(3)">
-                <q-item-section avatar>
-                  <q-icon name="credit_card" />
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label>Tarjeta Crédito</q-item-label>
-                </q-item-section>
-              </q-item> -->
-              <q-item clickable v-close-popup @click="addRow(2)">
-                <q-item-section avatar>
-                  <!-- <q-icon name="payments" /> -->
-                  <q-avatar
-                    size="30px"
-                    font-size="32px"
-                    icon="payments"
-                    square
-                    text-color="secondary"
-                  />
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label>Cuenta de Efectivo</q-item-label>
-                </q-item-section>
-              </q-item>
-            </q-list>
-          </q-btn-dropdown>
+          <div class="q-pa-md">
+            <q-btn-dropdown
+              split
+              icon="add_circle"
+              color="primary-button"
+              push
+              glossy
+              no-caps
+              label="agregar"
+              @click="addRow(1)"
+              text-color="accent-light"
+            >
+              <q-list>
+                <q-item clickable v-close-popup @click="addRow(1)">
+                  <q-item-section avatar>
+                    <q-avatar
+                      icon="account_balance"
+                      color="primary"
+                      text-color="white"
+                    />
+                  </q-item-section>
+                  <q-item-section>
+                    <q-item-label>Ahorros</q-item-label>
+                    <!-- <q-item-label caption>February 22, 2016</q-item-label> -->
+                  </q-item-section>
+                  <!-- <q-item-section side>
+                    <q-icon name="info" color="amber" />
+                  </q-item-section> -->
+                </q-item>
+
+                <q-item clickable v-close-popup @click="addRow(2)">
+                  <q-item-section avatar>
+                    <q-avatar
+                      icon="payments"
+                      color="secondary"
+                      text-color="white"
+                    />
+                  </q-item-section>
+                  <q-item-section>
+                    <q-item-label>Efectivo</q-item-label>
+                    <!-- <q-item-label caption>February 22, 2016</q-item-label> -->
+                  </q-item-section>
+                  <!-- <q-item-section side>
+                    <q-icon name="info" color="amber" />
+                  </q-item-section> -->
+                </q-item>
+              </q-list>
+            </q-btn-dropdown>
+          </div>
         </template>
 
         <template v-slot:top-right>
@@ -91,7 +91,11 @@
               }" -->
               <div class="row q-gutter-x-lg">
                 <!-- <q-icon :name="props.row.tipoCuenta.icon" size="30px" /> -->
-                <q-img src="/icons/bbva1.png" width="40px" height="40px" />
+                <q-img
+                  :src="`/icons/${props.row.banco.icono}`"
+                  width="40px"
+                  height="40px"
+                />
                 <div class="column col">
                   <div class="text-h6">{{ props.row.nombre }}</div>
                   <div class="text-condensed text-grey-5 q-mt-xs">
@@ -147,7 +151,7 @@
                 class="text-subtitle text-grey-8 text-bold q-mt-xs"
                 align="right"
               >
-                $ 1,500.00
+                {{ formato.toCurrency(props.row.saldo) }}
               </div>
               <span class="cuenta__card--descripcion">
                 {{ props.row.descripcion }}
@@ -201,12 +205,14 @@ import { LISTA_CUENTAS, CUENTA_DELETE } from '/src/graphql/cuentas'
 import RegistroCuenta from 'src/components/cuentas/RegistroCuenta.vue'
 import { useQuasar } from 'quasar'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
+import { useFormato } from 'src/composables/utils/useFormato'
 
 /**
  * composables
  */
 const $q = useQuasar()
 const notificacion = useNotificacion()
+const formato = useFormato()
 
 /**
  * GRAPHQL

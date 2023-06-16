@@ -20,6 +20,12 @@ export const LISTA_CUENTAS = gql`
         value
         icon
       }
+      banco {
+        id
+        nombre
+        icono
+      }
+      saldo
     }
   }
 `

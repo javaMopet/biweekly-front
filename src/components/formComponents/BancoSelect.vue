@@ -3,23 +3,21 @@
     <div class="col">
       <q-select
         outlined
-        color="positive"
-        v-model="cuentaContable"
+        color="secondary"
+        v-model="cuenta"
         :options="filteredOptions"
-        option-label="nombreCompleto"
-        :label="props.inputLabel"
+        option-label="nombre"
+        :label="props.label"
         use-input
         input-debounce="0"
         @filter="filterFn"
         behavior="menu"
         clearable=""
+        :rules="props.rules"
+        lazyRules
         dense
-        map-options
-        hide-selected
-        fill-input
-        lazy-rules
-        :rules="rules"
-        :readonly="props.readonly"
+        :hint="props.hint"
+        :readonly="readonly"
       >
         <template v-slot:no-option>
           <q-item>
@@ -28,35 +26,29 @@
         </template>
       </q-select>
     </div>
-    <div class="q-mt-xs" style="border: 0px solid red" v-if="props.isAlta">
-      <q-btn
-        color="accent"
-        outline
-        icon="add"
-        dense
-        @click="registrarCuentaContable"
-      />
+    <div v-if="agregar" class="q-mt-xs" style="border: 0px solid red">
+      <q-btn color="accent" outline icon="add" dense @click="registrarCuenta" />
     </div>
   </div>
 
   <Teleport to="#modal">
-    <q-dialog v-model="form_cuentaContable_show" persistent>
-      <RegistroCuentaContable></RegistroCuentaContable>
+    <q-dialog v-model="form_cuenta_show" persistent>
+      <RegistroCuenta></RegistroCuenta>
     </q-dialog>
   </Teleport>
 </template>
 
 <script setup>
 import { useQuery } from '@vue/apollo-composable'
-import { LISTA_CUENTAS_CONTABLES } from 'src/graphql/cuentasContableGql'
+import { LISTA_BANCOS } from 'src/graphql/bancos'
 import { ref, computed } from 'vue'
-import RegistroCuentaContable from '../cuentasContables/RegistroCuentaContable.vue'
+import RegistroCuenta from '../cuentas/RegistroCuenta.vue'
 
 /**
  * state
  */
 const filteredOptions = ref([])
-const form_cuentaContable_show = ref(false)
+const form_cuenta_show = ref(false)
 /**
  * props
  */
@@ -65,43 +57,34 @@ const props = defineProps({
     type: Object,
     required: false,
     default: () => {
-      return {
-        id: 500,
-        nombre: 'mi nombre'
-      }
+      return null
     }
   },
-  subnivel: {
-    type: Number,
+  opcional: {
+    type: Boolean,
     required: false,
-    default: 0
+    default: false
   },
-  clasificacion: {
+  label: {
+    type: String,
+    required: false,
+    default: 'Cuenta Bancaria'
+  },
+  hint: {
     type: String,
     required: false,
     default: ''
   },
-  tipoAfectacion: {
-    type: String,
-    required: false,
-    default: () => {
-      return null
-    }
-  },
-  inputLabel: {
-    type: String,
-    required: false,
-    default: 'Cuenta Contable'
-  },
+  agregar: { type: Boolean, required: false, default: false },
   readonly: {
     type: Boolean,
     required: false,
     default: false
   },
-  isAlta: {
+  isValid: {
     type: Boolean,
     required: false,
-    default: false
+    default: true
   },
   rules: {
     type: Array,
@@ -122,18 +105,14 @@ const graphql_options = ref({
   fetchPolicy: 'network-only'
 })
 const { result: resultadoLista, onError: onErrorListaCuentas } = useQuery(
-  LISTA_CUENTAS_CONTABLES,
-  {
-    subnivel: null, //parseInt(props.subnivel),
-    clasificacion: null, // props.clasificacion,
-    tipoAfectacion: null //props.tipoAfectacion
-  },
+  LISTA_CUENTAS,
+  null, //arguments
   graphql_options
 )
 /**
  * computed
  */
-const cuentaContable = computed({
+const cuenta = computed({
   get() {
     return props.modelValue
   },
@@ -143,12 +122,7 @@ const cuentaContable = computed({
 })
 const options = computed({
   get() {
-    return (resultadoLista.value?.listaCuentasContables ?? []).filter(
-      (cc) =>
-        cc.subnivel === props.subnivel &&
-        cc.tipoAfectacion === props.tipoAfectacion &&
-        cc.id.toString().startsWith(props.clasificacion)
-    )
+    return resultadoLista.value?.listaCuentas ?? []
   }
 })
 onErrorListaCuentas((error) => {
@@ -168,13 +142,12 @@ function filterFn(val, update) {
   update(() => {
     const needle = val.toLowerCase()
     filteredOptions.value = options.value.filter(
-      (v) => v.nombreCompleto.toLowerCase().indexOf(needle) > -1
+      (v) => v.nombre.toLowerCase().indexOf(needle) > -1
     )
   })
 }
-function registrarCuentaContable() {
-  console.log('registrar una cuenta contable')
-  form_cuentaContable_show.value = true
+function registrarCuenta() {
+  form_cuenta_show.value = true
 }
 </script>
 

@@ -1,7 +1,9 @@
 <template>
-  <q-card class="my-card" style="width: 40vw">
-    <q-card-section class="bg-main-menu row inline fit q-py-sm justify-between">
-      <div class="text-h6 text-accent-light">{{ actionName }}</div>
+  <q-card class="my-card" style="width: 450px">
+    <q-card-section
+      class="bg-main-menu row inline fit q-py-sm justify-between items-center"
+    >
+      <div class="text-subtitle1 text-accent-light">{{ actionName }}</div>
       <div class="">
         <q-btn
           round
@@ -16,16 +18,16 @@
       </div>
     </q-card-section>
     <q-card-section class="">
-      <q-form @submit="saveItem" class="q-gutter-md">
-        <div class="q-gutter-md">
-          <div class="" v-if="tiposCuentaOptions.length > 1">
+      <q-form @submit="saveItem" class="">
+        <div class="q-gutter-xs">
+          <div class="q-my-md" v-if="tiposCuentaOptions.length > 1">
             <q-btn-toggle
               v-model="editedFormItem.tipoCuenta.id"
               spread
               no-caps
-              color="grey-4"
-              text-color="grey-7"
-              toggle-color="green-4"
+              color="disable-button"
+              text-color="gray-6"
+              toggle-color="positive"
               toggle-text-color="white"
               :options="tiposCuentaOptions"
               @update:model-value="tipoCuentaUpdated"
@@ -33,20 +35,24 @@
               glossy
             />
           </div>
-          <div class="column items-center q-gutter-y-md">
+          <div class="column items-center">
             <div
               class="q-gutter-xs q-mt-xs"
-              style="width: 70%; border: 0px solid red"
+              style="width: 85%; border: 0px solid red"
             >
               <div>
-                <div class="row item-label">Nombre de la tarjeta:</div>
+                <div class="row input-label">Banco:</div>
+                <BancoSelect></BancoSelect>
+              </div>
+              <div>
+                <div class="row input-label">Nombre de la tarjeta:</div>
                 <q-input
                   v-model="editedFormItem.nombre"
                   type="text"
                   label="Ingresa el nombre"
                   dense
-                  outlined
-                  color="secondary"
+                  filled
+                  color="positive"
                   autofocus
                   lazy-rules
                   :rules="[
@@ -57,12 +63,13 @@
                 />
               </div>
               <div>
-                <div class="row item-label">Número de cuenta:</div>
+                <div class="row input-label">Número de cuenta:</div>
                 <q-input
                   v-model="editedFormItem.identificador"
                   type="text"
                   label="Terminación del número de cuenta"
                   outlined
+                  color="positive"
                   dense
                   :rules="[
                     (val) =>
@@ -84,13 +91,14 @@
                   ></CuentaContableSelect>
                 </div>
               </div>
-              <div class="row inline items-center q-gutter-x-md fit">
+              <div class="column" v-if="isDiaCorteRequired">
                 <div class="col-3 input-label">Día de corte:</div>
                 <div class="">
                   <q-input
                     v-model="editedFormItem.diaCorte"
+                    outlined
+                    style="width: 100px"
                     type="number"
-                    label="Ingresa un día del mes"
                     dense
                     lazy-rules
                     :rules="[
@@ -103,7 +111,7 @@
               </div>
             </div>
           </div>
-          <div align="right" class="q-gutter-x-sm">
+          <div align="right" class="q-gutter-x-sm q-mt-md">
             <q-btn
               label="Cancelar"
               v-close-popup
@@ -112,7 +120,12 @@
               class="q-ml-sm"
               dense
             />
-            <q-btn :label="lblSubmit" type="submit" dense color="secondary" />
+            <q-btn
+              :label="lblSubmit"
+              type="submit"
+              dense
+              color="primary-button"
+            />
           </div>
         </div>
       </q-form>
@@ -130,6 +143,7 @@ import {
   LISTA_TIPOS_CUENTA
 } from 'src/graphql/cuentas'
 import CuentaContableSelect from '../formComponents/CuentaContableSelect.vue'
+import BancoSelect from '../formComponents/BancoSelect.vue'
 
 /**
  * state
@@ -247,7 +261,7 @@ const actionName = computed({
     return !!editedFormItem.value.id
       ? 'Actualizar la Cuenta'
       : editedFormItem.value.tipoCuenta.id === '3'
-      ? 'Nueva tarjeta'
+      ? 'Nueva tarjeta de crédito'
       : 'Nueva Cuenta'
   }
 })
@@ -257,6 +271,11 @@ const lblSubmit = computed({
   }
 })
 
+const isDiaCorteRequired = computed({
+  get() {
+    return editedFormItem.value.tipoCuenta.id === '3'
+  }
+})
 /**
  * onMounted
  */
