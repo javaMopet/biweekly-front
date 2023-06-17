@@ -59,6 +59,10 @@ const routes = [
         component: () => import('src/pages/admin/CuentasPage.vue')
       },
       {
+        path: 'bancos',
+        component: () => import('src/pages/admin/BancosPage.vue')
+      },
+      {
         path: 'cuentas_contables',
         component: () => import('src/pages/admin/CuentasContablesPage.vue')
       },
