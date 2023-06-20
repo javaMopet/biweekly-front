@@ -1,12 +1,15 @@
 <template>
-  <div class="row text-h5 text-secondary q-pa-md font-subtitle">CATEGORIAS</div>
-  <!-- <pre>{{ listaCategoriasInversiones }}</pre> -->
-  <q-toolbar class="text-dark">
+  <q-toolbar class="q-my-md">
     <q-btn-dropdown
+      class="q-ml-lg"
       split
-      icon="add"
-      label="AGREGAR"
-      color="primary"
+      icon="add_circle"
+      push
+      glossy
+      no-caps
+      label="Agregar"
+      color="primary-button"
+      text-color="accent-light"
       @click="addRow('2')"
     >
       <q-list>
@@ -18,17 +21,25 @@
           @click="addRow(tipoMovimiento.id)"
         >
           <q-item-section avatar>
-            <q-icon :name="tipoMovimiento.icono" />
+            <q-avatar
+              size="40px"
+              font-size="25px"
+              :color="tipoMovimiento.nombre_color"
+              text-color="white"
+              :icon="tipoMovimiento.icono"
+            >
+            </q-avatar>
           </q-item-section>
           <q-item-section>
-            <q-item-label>{{ tipoMovimiento.nombre }}</q-item-label>
+            <q-item-label>
+              <span class="text-primary">{{
+                tipoMovimiento.nombre
+              }}</span></q-item-label
+            >
           </q-item-section>
         </q-item>
       </q-list>
     </q-btn-dropdown>
-    <q-toolbar-title> </q-toolbar-title>
-
-    <q-btn flat round dense icon="arrow_back" @click="$router.back()" />
   </q-toolbar>
   <q-space style="height: 10px" />
   <div class="row fit q-gutter-sm" style="border: 0px solid red">
@@ -349,11 +360,16 @@ const listaCategoriasInversiones = computed({
 })
 const listaTiposMovimiento = computed({
   get() {
-    return (
+    const listado =
       resultListaTiposMovimientos.value?.listaTiposMovimiento.filter(
         (tipoMovimiento) => tipoMovimiento.id != '3'
       ) ?? []
-    )
+
+    listado.forEach((element) => {
+      element.nombre_color = element.id === '1' ? 'positive' : 'negative'
+    })
+
+    return listado
   }
 })
 /**

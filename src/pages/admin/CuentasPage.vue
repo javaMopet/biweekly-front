@@ -84,7 +84,7 @@
                 <div class="column">
                   <q-avatar size="60px" color="white">
                     <q-img
-                      :src="`/icons/${props.row.banco.icono}`"
+                      :src="`/icons/${props.row.banco?.icono ?? 'cash.png'}`"
                       width="50px"
                       height="50px"
                     />
@@ -103,7 +103,10 @@
                       }"
                       class="tarjeta__credito--link cuenta__subtitle"
                     >
-                      <div class="fit flex flex-left text-left non-selectable">
+                      <div
+                        class="fit flex flex-left text-left non-selectable"
+                        v-if="props.row.identificador !== ''"
+                      >
                         **** **** **** {{ props.row.identificador }}
                       </div>
                       <q-tooltip> Abrir movimientos </q-tooltip>
@@ -227,11 +230,11 @@ const graphql_options = ref({
   fetchPolicy: 'cache-and-network'
   // fetchPolicy: 'cache-only'
 })
-const { onError: onErrorListaCuentas, result: resultCuentas } = useQuery(
-  LISTA_CUENTAS,
-  null,
-  graphql_options
-)
+const {
+  onError: onErrorListaCuentas,
+  result: resultCuentas,
+  refetch: refetchListaCuentas
+} = useQuery(LISTA_CUENTAS, null, graphql_options)
 
 const {
   mutate: deleteCuenta,
@@ -246,6 +249,7 @@ onDoneDeleteCuenta(({ data }) => {
     listaCuentas.value.splice(rowIndexDelete.value, 1)
     rowIndexDelete.value = null
     mostrarNotificacion('elminó', deletedItem)
+    refetchListaCuentas()
   }
 })
 onErrorDeleteCuenta((error) => {
@@ -260,7 +264,6 @@ onErrorListaCuentas((error) => {
 const defaultItem = {
   id: null,
   nombre: null,
-  descripcion: null,
   tipoCuenta: {
     id: null
   },
@@ -280,7 +283,7 @@ const listaCuentas = computed({
   get() {
     return (
       resultCuentas.value?.listaCuentas.filter(
-        (cuenta) => cuenta.tipoCuenta.id === '1'
+        (cuenta) => cuenta.tipoCuenta.id !== '3'
       ) ?? []
     )
   }
@@ -380,6 +383,7 @@ function cuentaSaved(itemSaved) {
   showFormItem.value = false
   listaCuentas.value.push(itemSaved)
   mostrarNotificacion('guardó', itemSaved)
+  refetchListaCuentas()
 }
 function cuentaUpdated(itemUpdated) {
   showFormItem.value = false
@@ -387,6 +391,7 @@ function cuentaUpdated(itemUpdated) {
   listaCuentas.value[editedIndex.value] = itemUpdated
   editedItem.value = { ...defaultItem }
   editedIndex.value = null
+  refetchListaCuentas()
 }
 function mostrarNotificacion(action, cuenta) {
   notificacion.mostrarNotificacionPositiva(

@@ -1,17 +1,21 @@
 <template>
   <q-card class="my-card" style="width: 500px">
-    <q-card-section class="bg-primary text-accent-light">
-      <q-btn
-        round
-        flat
-        dense
-        icon="close"
-        class="float-right"
-        color="accent"
-        v-close-popup
-        vertical-top
-      ></q-btn>
-      <div class="text-h5 text-accent-light">{{ actionName }}</div>
+    <q-card-section
+      class="bg-main-menu row inline fit q-py-sm justify-between items-center"
+    >
+      <div class="text-subtitle1 text-accent-light">{{ actionName }}</div>
+      <div class="">
+        <q-btn
+          round
+          flat
+          dense
+          icon="close"
+          class="float-right"
+          color="accent"
+          v-close-popup
+          vertical-top
+        ></q-btn>
+      </div>
     </q-card-section>
 
     <q-card-section class="">
@@ -21,9 +25,10 @@
             v-model="editedFormItem.tipoMovimientoId"
             spread
             no-caps
-            color="primary"
-            toggle-color="accent"
-            toggle-text-color="accent-contrast"
+            color="disable-button"
+            text-color="gray-2"
+            toggle-color="positive"
+            toggle-text-color="white"
             :options="tiposMovimientoOptions"
             @update:model-value="onChangeTipoMovimiento"
             push

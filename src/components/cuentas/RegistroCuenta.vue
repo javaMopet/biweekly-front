@@ -41,13 +41,13 @@
               style="width: 85%; border: 0px solid red"
             >
               <div>
-                <div class="row input-label">Nombre de la tarjeta:</div>
+                <div class="row input-label">{{ lbl_nombre }}</div>
                 <q-input
                   v-model="editedFormItem.nombre"
                   type="text"
                   label="Ingresa el nombre"
                   dense
-                  filled
+                  outlined
                   color="positive"
                   autofocus
                   lazy-rules
@@ -120,12 +120,12 @@
               color=""
               flat
               class="q-ml-sm"
-              dense
+              push
             />
             <q-btn
               :label="lblSubmit"
               type="submit"
-              dense
+              push
               color="primary-button"
             />
           </div>
@@ -267,6 +267,15 @@ const actionName = computed({
       : 'Nueva Cuenta'
   }
 })
+const lbl_nombre = computed({
+  get() {
+    return !!editedFormItem.value.tipoCuenta.id
+      ? editedFormItem.value.tipoCuenta.id === '3'
+        ? 'Nombre de la tarjeta:'
+        : 'Nombre de la cuenta:'
+      : ''
+  }
+})
 const lblSubmit = computed({
   get() {
     return !!editedFormItem.value.id ? 'Actualizar' : 'Guardar'
@@ -297,17 +306,27 @@ function saveItem() {
   console.log('save item', editedFormItem.value)
   const cuenta_contable_id = editedFormItem.value.cuentaContable.id
   const tipo_cuenta_id = editedFormItem.value.tipoCuenta.id
+  const bancoId = !!editedFormItem.value.banco
+    ? editedFormItem.value.banco.id
+    : undefined
+  const identificador = !!editedFormItem.value.identificador
+    ? editedFormItem.value.identificador
+    : ''
   const input = {
     ...editedFormItem.value,
+    identificador,
     cuentaContableId: parseInt(cuenta_contable_id),
     cuentaContable: undefined,
     tipoCuentaId: parseInt(tipo_cuenta_id),
+    bancoId,
     diaCorte: parseInt(editedFormItem.value.diaCorte),
+    banco: undefined,
     tipoCuenta: undefined,
     __typename: undefined
   }
   if (!editedFormItem.value.id) {
     console.log('guardando cuenta nueva', input)
+    input.saldo = parseFloat(0)
     createCuenta({
       input
     })
@@ -324,7 +343,7 @@ function tipoCuentaUpdated(value) {
   obtenerCuentasContables(value)
 }
 function obtenerCuentasContables(value) {
-  console.log('tipo ade cuenta acutalizado', value)
+  console.log('tipo de cuenta actualizado', value)
   switch (value) {
     case '1':
       cuentaContableProps.tipoAfectacion = 'C'
