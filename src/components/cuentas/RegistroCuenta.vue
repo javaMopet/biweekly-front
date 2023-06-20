@@ -58,38 +58,40 @@
                   ]"
                 />
               </div>
-              <div>
-                <div class="row input-label">Banco:</div>
-                <BancoSelect v-model="editedFormItem.banco"></BancoSelect>
-              </div>
-              <div>
-                <div class="row input-label">Número de cuenta:</div>
-                <q-input
-                  v-model="editedFormItem.identificador"
-                  type="text"
-                  label="Terminación del número de cuenta"
-                  outlined
-                  color="positive"
-                  dense
-                  :rules="[
-                    (val) =>
-                      (!!val && val.length == 4) ||
-                      'Favor de ingresar los últimos 4 dígitos de la cuenta'
-                  ]"
-                  mask="####"
-                ></q-input>
-                <div class="">
-                  <div class="row input-label">Cuenta Contable:</div>
-                  <CuentaContableSelect
-                    v-model="editedFormItem.cuentaContable"
-                    :subnivel="cuentaContableProps.subnivel"
-                    :clasificacion="cuentaContableProps.clasificacion"
-                    :tipo-afectacion="cuentaContableProps.tipoAfectacion"
-                    :rules="[(val) => !!val || 'Required']"
-                    :is-alta="false"
-                    input-label="Seleccione una Cuenta Contable"
-                  ></CuentaContableSelect>
+              <div v-if="isBancoRequerido">
+                <div>
+                  <div class="row input-label">Banco:</div>
+                  <BancoSelect v-model="editedFormItem.banco"></BancoSelect>
                 </div>
+                <div>
+                  <div class="row input-label">Número de cuenta:</div>
+                  <q-input
+                    v-model="editedFormItem.identificador"
+                    type="text"
+                    label="Terminación del número de cuenta"
+                    outlined
+                    color="positive"
+                    dense
+                    :rules="[
+                      (val) =>
+                        (!!val && val.length == 4) ||
+                        'Favor de ingresar los últimos 4 dígitos de la cuenta'
+                    ]"
+                    mask="####"
+                  ></q-input>
+                </div>
+              </div>
+              <div class="">
+                <div class="row input-label">Cuenta Contable:</div>
+                <CuentaContableSelect
+                  v-model="editedFormItem.cuentaContable"
+                  :subnivel="cuentaContableProps.subnivel"
+                  :clasificacion="cuentaContableProps.clasificacion"
+                  :tipo-afectacion="cuentaContableProps.tipoAfectacion"
+                  :rules="[(val) => !!val || 'Required']"
+                  :is-alta="false"
+                  input-label="Seleccione una Cuenta Contable"
+                ></CuentaContableSelect>
               </div>
               <div class="column" v-if="isDiaCorteRequired">
                 <div class="col-3 input-label">Día de corte:</div>
@@ -274,6 +276,11 @@ const lblSubmit = computed({
 const isDiaCorteRequired = computed({
   get() {
     return editedFormItem.value.tipoCuenta.id === '3'
+  }
+})
+const isBancoRequerido = computed({
+  get() {
+    return editedFormItem.value.tipoCuenta.id === '1'
   }
 })
 /**
