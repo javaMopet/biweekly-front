@@ -23,12 +23,6 @@ export const OBTENER_INGRESOS = gql`
     ) {
       id
       categoriaId
-      cuentaId
-      cuenta {
-        id
-        nombre
-        cuentaContableId
-      }
       observaciones
       registro {
         fecha
@@ -37,6 +31,12 @@ export const OBTENER_INGRESOS = gql`
         registrableId
         registrableType
         estadoRegistroId
+        cuentaId
+        cuenta {
+          id
+          nombre
+          cuentaContableId
+        }
       }
     }
   }

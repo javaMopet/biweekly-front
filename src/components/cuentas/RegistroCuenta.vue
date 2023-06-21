@@ -63,24 +63,23 @@
                   <div class="row input-label">Banco:</div>
                   <BancoSelect v-model="editedFormItem.banco"></BancoSelect>
                 </div>
-                <div>
-                  <div class="row input-label">Número de cuenta:</div>
-                  <q-input
-                    v-model="editedFormItem.identificador"
-                    type="text"
-                    label="Terminación del número de cuenta"
-                    outlined
-                    color="positive"
-                    dense
-                    :rules="[
-                      (val) =>
-                        (!!val && val.length == 4) ||
-                        'Favor de ingresar los últimos 4 dígitos de la cuenta'
-                    ]"
-                    mask="####"
-                  ></q-input>
-                </div>
+                <div class="row input-label">Número de cuenta:</div>
+                <q-input
+                  v-model="editedFormItem.identificador"
+                  type="text"
+                  label="Terminación del número de cuenta"
+                  outlined
+                  color="positive"
+                  dense
+                  :rules="[
+                    (val) =>
+                      (!!val && val.length == 4) ||
+                      'Favor de ingresar los últimos 4 dígitos de la cuenta'
+                  ]"
+                  mask="####"
+                ></q-input>
               </div>
+
               <div class="">
                 <div class="row input-label">Cuenta Contable:</div>
                 <CuentaContableSelect
@@ -288,6 +287,11 @@ const isDiaCorteRequired = computed({
   }
 })
 const isBancoRequerido = computed({
+  get() {
+    return editedFormItem.value.tipoCuenta.id !== '2'
+  }
+})
+const isCuentaBancariaRequerida = computed({
   get() {
     return editedFormItem.value.tipoCuenta.id === '1'
   }

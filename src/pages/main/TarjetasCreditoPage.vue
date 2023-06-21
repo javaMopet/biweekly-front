@@ -1,9 +1,5 @@
 <template>
   <div class="column q-ma-md" style="border: 0px solid red">
-    <!-- <div class="row text-h5 text-secondary q-pa-md font-subtitle">
-      TARJETAS DE CRÉDITO
-    </div> -->
-
     <div class="row fit" style="border: 0px solid red">
       <q-table
         grid
@@ -18,12 +14,13 @@
       >
         <template #top-left>
           <q-btn
-            color="primary"
+            color="primary-button"
             icon="add_card"
-            rounded
             @click="addRow(3)"
-            outline
             label="Nueva Tarjeta"
+            no-caps
+            push
+            text-color="accent-light"
           />
           <!-- <q-btn-dropdown
             split
@@ -99,7 +96,9 @@
                   caption
                   lines="2"
                   class="text-blue-grey-6 text-bold text-h3"
-                  ><span class="text-h6">$ 1,800.00</span>
+                  ><span class="text-h6">{{
+                    formato.toCurrency(props.row.saldo)
+                  }}</span>
                 </q-item-label>
               </q-item-section>
               <q-item-section
@@ -109,7 +108,7 @@
                 class="q-ml-md"
                 @click.prevent
               >
-                <q-btn color="dark" icon="more_horiz" flat dense>
+                <q-btn color="more_button" icon="more_vert" flat dense round>
                   <q-menu>
                     <q-list style="min-width: 100px">
                       <!-- <q-item
@@ -212,8 +211,7 @@ import RegistroCuenta from 'src/components/cuentas/RegistroCuenta.vue'
 import { useQuasar } from 'quasar'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { useRouter } from 'vue-router'
-import { api } from 'src/boot/axios'
-import { route } from 'quasar/wrappers'
+import { useFormato } from 'src/composables/utils/useFormato'
 
 /**
  * composables
@@ -221,6 +219,7 @@ import { route } from 'quasar/wrappers'
 const $q = useQuasar()
 const notificacion = useNotificacion()
 const router = useRouter()
+const formato = useFormato()
 
 /**
  * state

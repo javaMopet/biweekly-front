@@ -1,5 +1,5 @@
 <template>
-  <q-toolbar class="q-my-md">
+  <q-toolbar class="q-my-xs">
     <q-btn-dropdown
       class="q-ml-lg"
       split
@@ -55,7 +55,7 @@
         class="bg-primary-light"
       >
         <template #top-left>
-          <div class="text-h5 text-bold text-accent">Ingresos</div>
+          <div class="text-h6 text-bold text-table-title">Ingresos</div>
         </template>
         <template v-slot:top-right>
           <q-input
@@ -76,8 +76,10 @@
             :style="`border-left: 3px solid ${props.row.color}`"
             class="bg-white"
           >
-            <div class="row justify-around text-white bg-high-contrast">
-              <q-icon :name="props.row.icono" size="22px" />
+            <div
+              class="row justify-around items-center text-white bg-high-contrast"
+            >
+              <q-icon :name="props.row.icono" size="20px" />
             </div>
           </q-td>
         </template>
@@ -85,15 +87,13 @@
           <q-td :props="props" class="bg-white">
             <div class="column">
               <div>
-                <span class="categoria-nombre text-blue-grey-8"
-                  >{{ props.row.nombre }}
-                </span>
+                <span class="categoria-nombre">{{ props.row.nombre }} </span>
                 &nbsp;
-                <span class="text-accent text-caption">{{
-                  props.row.cuentaContable.nombreCompleto
+                <span class="text-table-title categoria-subtitle">{{
+                  props.row.cuentaContable?.nombreCompleto
                 }}</span>
               </div>
-              <span class="text-positive text-subtitle2">{{
+              <span class="text-positive text-condensed">{{
                 props.row.descripcion
               }}</span>
             </div>
@@ -102,97 +102,19 @@
         <template #body-cell-acciones="props">
           <q-td :props="props" fit class="bg-white">
             <q-btn
+              class="edit_button"
               icon="edit"
               size="md"
               dense
               @click="editRow(props)"
               rounded
-              color="dark"
+              color="more-button"
               flat
             />
             <q-btn
               icon="delete"
               size="md"
-              class="q-ml-sm"
-              color="accent"
-              rounded
-              dense
-              @click="deleteRow(props)"
-              flat
-            />
-          </q-td>
-        </template>
-      </q-table>
-      <q-table
-        dense
-        :rows="listaCategoriasInversiones"
-        :columns="columns"
-        row-key="id"
-        :filter="filterInversiones"
-        :rows-per-page-options="[0]"
-        hide-header
-        class="bg-primary-light"
-      >
-        <template #top-left>
-          <div class="text-h5 text-bold text-accent">Inversiones</div>
-        </template>
-        <template v-slot:top-right>
-          <q-input
-            outlined
-            dense
-            debounce="300"
-            v-model="filterInversiones"
-            placeholder="Buscar Inversiones"
-          >
-            <template v-slot:append>
-              <q-icon name="search" />
-            </template>
-          </q-input>
-        </template>
-        <template #body-cell-icono="props">
-          <q-td
-            :props="props"
-            :style="`border-left: 3px solid ${props.row.color}`"
-            class="bg-white"
-          >
-            <div class="row justify-around text-white bg-high-contrast">
-              <q-icon :name="props.row.icono" size="22px" />
-            </div>
-          </q-td>
-        </template>
-        <template #body-cell-nombre="props">
-          <q-td :props="props" class="bg-white">
-            <div class="column">
-              <div>
-                <span class="categoria-nombre text-blue-grey-8"
-                  >{{ props.row.nombre }}
-                </span>
-                &nbsp;
-                <span class="text-accent text-caption">{{
-                  props.row.cuentaContable.nombreCompleto
-                }}</span>
-              </div>
-              <span class="text-positive text-subtitle2">{{
-                props.row.descripcion
-              }}</span>
-            </div>
-          </q-td>
-        </template>
-        <template #body-cell-acciones="props">
-          <q-td :props="props" fit class="bg-white">
-            <q-btn
-              icon="edit"
-              size="md"
-              dense
-              @click="editRow(props)"
-              rounded
-              color="dark"
-              flat
-            />
-            <q-btn
-              icon="delete"
-              size="md"
-              class="q-ml-sm"
+              class="q-ml-sm delete_button"
               color="accent"
               rounded
               dense
@@ -215,7 +137,7 @@
         class="bg-primary-light"
       >
         <template #top-left>
-          <div class="text-h5 text-bold text-accent">Gastos</div>
+          <div class="text-h6 text-bold text-table-title">Gastos</div>
         </template>
         <template v-slot:top-right>
           <q-input
@@ -237,7 +159,7 @@
             class="bg-white"
           >
             <div class="row justify-around text-white bg-high-contrast">
-              <q-icon :name="props.row.icono" size="22px" />
+              <q-icon :name="props.row.icono" size="20px" />
             </div>
           </q-td>
         </template>
@@ -245,15 +167,13 @@
           <q-td :props="props" class="bg-white">
             <div class="column">
               <div>
-                <span class="categoria-nombre text-blue-grey-8"
-                  >{{ props.row.nombre }}
-                </span>
+                <span class="categoria-nombre">{{ props.row.nombre }} </span>
                 &nbsp;
-                <span class="text-accent text-caption">{{
+                <span class="text-table-title categoria-subtitle">{{
                   props.row.cuentaContable.nombreCompleto
                 }}</span>
               </div>
-              <span class="text-positive text-subtitle2">{{
+              <span class="text-positive text-condensed">{{
                 props.row.descripcion
               }}</span>
             </div>
@@ -262,18 +182,19 @@
         <template #body-cell-acciones="props">
           <q-td :props="props" fit class="bg-white">
             <q-btn
+              class="edit_button"
               icon="edit"
               size="md"
               dense
               @click="editRow(props)"
               rounded
-              color="dark"
+              color="more-button"
               flat
             />
             <q-btn
               icon="delete"
               size="md"
-              class="q-ml-sm"
+              class="q-ml-sm delete_button"
               color="accent"
               rounded
               dense
@@ -325,7 +246,7 @@ const defaultItem = {
   tipoMovimientoId: '1',
   cuentaContable: null
 }
-const listaCategorias = ref([])
+// const listaCategorias = ref([])
 const filterIngresos = ref()
 const filterGastos = ref()
 const filterInversiones = ref()
@@ -333,31 +254,72 @@ const editedItem = ref({ ...defaultItem })
 const editedIndex = ref(-1)
 const rowIndexDelete = ref(null)
 const showFormItem = ref(false)
+/**
+ * GRAPHQL
+ */
+const options = ref({
+  fetchPolicy: 'network-only'
+})
 
+const {
+  result: resultListaCategorias,
+  onError: onErrorListaCategorias,
+  refetch: refetchListaCategorias
+} = useQuery(LISTA_CATEGORIAS, null, options)
+
+const {
+  result: resultListaTiposMovimientos,
+  onError: onErrorListaTiposMovimiento
+} = useQuery(LISTA_TIPOS_MOVIMIENTO, null, options)
+
+// onResultCategorias(({ data }) => {
+//   listaCategorias.value = JSON.parse(JSON.stringify(data.listaCategorias))
+// })
+onErrorListaCategorias((error) => {
+  console.error(error)
+})
+onErrorListaTiposMovimiento((error) => {
+  console.error(error)
+})
+
+const {
+  mutate: deleteCategoria,
+  onDone: onDoneDeleteCategoria,
+  onError: onErrorDeleteCategoria
+} = useMutation(CATEGORIA_DELETE)
+
+onDoneDeleteCategoria(({ data }) => {
+  if (!!data) {
+    console.log('item deleted ', data)
+    const deletedItem = data.categoriaDelete.categoria
+    rowIndexDelete.value = null
+    mostrarNotificacion('elminó', deletedItem)
+    refetchListaCategorias()
+  }
+})
+onErrorDeleteCategoria((error) => {
+  console.error(error)
+})
 /**
  * computed
  */
 const listaCategoriasIngresos = computed({
   get() {
-    return listaCategorias.value.filter(
-      (categoria) => categoria.tipoMovimientoId === '1'
+    return (
+      resultListaCategorias.value?.listaCategorias.filter(
+        (categoria) => categoria.tipoMovimientoId === '1'
+      ) ?? []
     )
   }
 })
 const listaCategoriasEgresos = computed({
   get() {
-    return listaCategorias.value.filter(
+    return resultListaCategorias.value?.listaCategorias.filter(
       (categoria) => categoria.tipoMovimientoId === '2'
     )
   }
 })
-const listaCategoriasInversiones = computed({
-  get() {
-    return listaCategorias.value.filter(
-      (categoria) => categoria.tipoMovimientoId === '4'
-    )
-  }
-})
+
 const listaTiposMovimiento = computed({
   get() {
     const listado =
@@ -426,8 +388,8 @@ function deleteRow(item) {
 
 function categoriaSaved(itemSaved) {
   showFormItem.value = false
-  listaCategorias.value.push(itemSaved)
   mostrarNotificacion('guardó', itemSaved)
+  refetchListaCategorias()
 }
 function categoriaUpdated(itemUpdated, indice) {
   console.log('se actualizó el item con indice: ', indice)
@@ -436,6 +398,7 @@ function categoriaUpdated(itemUpdated, indice) {
   // listaCategorias.value[indice] = itemUpdated
   editedItem.value = { ...defaultItem }
   editedIndex.value = null
+  refetchListaCategorias()
 }
 function mostrarNotificacion(action, cuenta) {
   notificacion.mostrarNotificacionPositiva(
@@ -444,49 +407,9 @@ function mostrarNotificacion(action, cuenta) {
   )
 }
 
-/**
- * GRAPHQL
- */
-const options = ref({
-  fetchPolicy: 'network-only'
-})
-
-const { onResult: onResultCategorias, onError: onErrorListaCategorias } =
-  useQuery(LISTA_CATEGORIAS, null, options)
-
-const {
-  result: resultListaTiposMovimientos,
-  onError: onErrorListaTiposMovimiento
-} = useQuery(LISTA_TIPOS_MOVIMIENTO, null, options)
-
-onResultCategorias(({ data }) => {
-  listaCategorias.value = JSON.parse(JSON.stringify(data.listaCategorias))
-})
-onErrorListaCategorias((error) => {
-  console.error(error)
-})
-onErrorListaTiposMovimiento((error) => {
-  console.error(error)
-})
-
-const {
-  mutate: deleteCategoria,
-  onDone: onDoneDeleteCategoria,
-  onError: onErrorDeleteCategoria
-} = useMutation(CATEGORIA_DELETE)
-
-onDoneDeleteCategoria(({ data }) => {
-  if (!!data) {
-    console.log('item deleted ', data)
-    const deletedItem = data.categoriaDelete.categoria
-    listaCategorias.value.splice(rowIndexDelete.value, 1)
-    rowIndexDelete.value = null
-    mostrarNotificacion('elminó', deletedItem)
-  }
-})
-onErrorDeleteCategoria((error) => {
-  console.error(error)
-})
+function loadOrRefetchListaCategorias() {
+  load() || refetchListaCategorias()
+}
 
 const columns = [
   // { name: 'id', label: 'Id', field: 'id', sortable: true, align: 'left' },
@@ -560,13 +483,30 @@ const columns = [
   }
 }
 .categoria-nombre {
-  font-weight: bold;
-  font-size: 1rem;
+  color: $categoria;
+  letter-spacing: -0.025rem;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+.categoria-subtitle {
+  font-size: 0.7rem;
+  // letter-spacing: -0.035rem;
 }
 .bg-high-contrast {
   background-image: linear-gradient(310deg, #7928ca 0%, #ff0080 100%);
-  padding: 10px;
+  padding: 5px;
   border-radius: 0.5rem !important;
-  width: 40px;
+  width: 30px;
+  height: 30px;
+}
+.delete_button {
+  &:hover {
+    color: $negative-pastel !important;
+  }
+}
+.edit_button {
+  &:hover {
+    color: $info !important;
+  }
 }
 </style>

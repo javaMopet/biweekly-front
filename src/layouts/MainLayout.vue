@@ -48,7 +48,7 @@
             src="/icons/tree.png"
             spinner-color="primary"
             spinner-size="72px"
-            width="60px"
+            width="80px"
           />
           <span class="font-title-letter text-secondary">B</span>iweekly
           Application

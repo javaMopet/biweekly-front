@@ -18,11 +18,10 @@
               :options="periodoOptions"
               option-label="nombre"
               label="Periodo"
-              filled
+              outlined
               dense
-              bg-color="categoria"
               color="secondary"
-              label-color="primary"
+              label-color="dark"
             >
               <template #prepend>
                 <q-icon name="calendar_view_week" />
@@ -34,8 +33,7 @@
               option-label="nombre"
               label="Año"
               dense
-              filled
-              bg-color="categoria"
+              outlined
               color="secondary"
               label-color="dark"
             >
@@ -49,8 +47,7 @@
               option-label="nombre"
               label="Mes"
               dense
-              filled
-              bg-color="categoria"
+              outlined
               color="secondary"
               label-color="dark"
               @update:model-value="onChangeMes"
@@ -158,11 +155,11 @@
             <div class="row items-center">
               <div
                 class="row inline q-pa-xs rounded-borders"
-                :style="`background-color: ${props.row.color}`"
+                :style="`background-color: ${props.row.color} !important`"
               >
                 <q-icon :name="props.row.icono" size="22px" color="white" />
               </div>
-              <span class="q-pl-sm movimientos__columna-categoria">
+              <span class="q-ml-md movimientos__categoria-nombre">
                 {{ props.value }}</span
               >
             </div>
@@ -758,5 +755,11 @@ onErrorDeleteMovimiento((error) => {
 .categoria_background {
   background-color: #f3f6f9 !important;
   border: 1px solid red;
+}
+.movimientos__categoria-nombre {
+  color: $primary;
+  letter-spacing: -0.025rem;
+  font-weight: 600;
+  font-size: 0.78rem;
 }
 </style>

@@ -35,7 +35,7 @@ export const CATEGORIA_BY_ID = gql`
       descripcion
       color
       icono
-      importe
+      importeDefault
       tipoMovimiento {
         id
         nombre
@@ -44,7 +44,7 @@ export const CATEGORIA_BY_ID = gql`
         id
         nombre
       }
-      cuenta {
+      cuentaDefault {
         id
         nombre
       }
@@ -61,7 +61,6 @@ export const CATEGORIA_CREATE = gql`
         descripcion
         color
         icono
-        importe
         cuentaContable {
           id
           nombre
@@ -73,10 +72,11 @@ export const CATEGORIA_CREATE = gql`
           nombre
           value
         }
-        cuenta {
+        cuentaDefault {
           id
           nombre
         }
+        importeDefault
       }
     }
   }
@@ -90,7 +90,7 @@ export const CATEGORIA_UPDATE = gql`
         descripcion
         color
         icono
-        importe
+        importeDefault
         cuentaContable {
           id
           nombre
@@ -102,7 +102,7 @@ export const CATEGORIA_UPDATE = gql`
           nombre
           value
         }
-        cuenta {
+        cuentaDefault {
           id
           nombre
         }
@@ -120,7 +120,6 @@ export const CATEGORIA_DELETE = gql`
         descripcion
         color
         icono
-        importe
         cuentaContable {
           id
           nombre
@@ -130,10 +129,6 @@ export const CATEGORIA_DELETE = gql`
           id
           nombre
           value
-        }
-        cuenta {
-          id
-          nombre
         }
       }
     }

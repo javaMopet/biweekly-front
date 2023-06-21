@@ -4,23 +4,35 @@
     flat
     style="width: 920px; min-width: 980px; border: 0px solid red"
   >
-    <!-- <pre>{{ categoria }}</pre> -->
-    <q-card-section class="bg-dark text-white">
-      <q-btn
-        round
-        flat
-        dense
-        icon="close"
-        class="float-right"
-        color="accent"
-        v-close-popup
-        vertical-top
-      ></q-btn>
-      <div class="row items-center text-accent-contrast">
-        <q-icon :name="categoria.icono" size="35px" />
-        <div class="q-ml-md text-h6">{{ categoria.nombre }}</div>
+    <q-card-section
+      class="bg-main-menu row inline fit q-py-sm justify-between items-center"
+    >
+      <div class="row items-center q-gutter-x-md">
+        <q-avatar
+          size="36px"
+          font-size="28px"
+          text-color="white"
+          :icon="categoria.icono"
+          :style="`background-color: ${categoria.color} !important`"
+        />
+        <div class="text-subtitle1 text-accent-light">
+          {{ categoria.nombre }}
+        </div>
+      </div>
+      <div class="">
+        <q-btn
+          round
+          flat
+          dense
+          icon="close"
+          class="float-right"
+          color="accent"
+          v-close-popup
+          vertical-top
+        ></q-btn>
       </div>
     </q-card-section>
+
     <q-card-section style="border: 0px solid red">
       <q-table
         style="width: 100%; border: 0px solid red"
@@ -49,26 +61,26 @@
         <template #body-cell-fecha="props">
           <q-td style="width: 150px" class="bg-white">
             <DateInput
-              v-model="props.row.registro.fecha_formato"
               lbl_field="Fecha"
               :optional="false"
               :rango-fecha-inicio="categoria.fecha_inicio_formato"
               :rango-fecha-fin="categoria.fecha_fin_formato"
               :readonly="props.row.saved"
             ></DateInput>
+            <!-- v-model="props.row.registro.fecha_formato" -->
           </q-td>
         </template>
         <template #body-cell-importe="props">
           <q-td style="width: 160px">
             <PriceInput
-              v-model="props.row.registro.importeString"
               :opcional="true"
               :readonly="props.row.saved"
               :autofocus="true"
-              :is-valid="isImporteValido(props.row.registro.importeValido)"
               @blur="validarPrecio"
             ></PriceInput>
+            <!-- :is-valid="isImporteValido(props.row.registro.importeValido)" -->
           </q-td>
+          <!-- v-model="props.row.registro.importeString" -->
         </template>
         <template #body-cell-cuenta="props">
           <q-td class="bg-white" style="width: 250px">
@@ -144,6 +156,9 @@
           </div>
         </template>
       </q-table>
+    </q-card-section>
+    <q-card-section>
+      <pre>{{ listaRegistros }}</pre>
     </q-card-section>
   </q-card>
 </template>
@@ -253,13 +268,15 @@ function addItem(props_row) {
     categoriaId: props.cellData.categoriaId,
     cuenta: categoria.value.cuenta,
     cuentaValida: true,
-    observaciones: '',
-    registro: {
-      importeString:
-        categoria.value.importe === 0 ? '' : categoria.value.importe.toString(),
-      fecha_formato,
-      importeValido: true
-    }
+    observaciones: ''
+    // registro: {
+    //   importeString:
+    //     categoria.value.registro.importe === 0
+    //       ? ''
+    //       : categoria.value.registro.importe.toString(),
+    //   fecha_formato,
+    //   importeValido: true
+    // }
   }
   listaRegistros.value.push(item)
 }

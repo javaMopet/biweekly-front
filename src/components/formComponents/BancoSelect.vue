@@ -95,7 +95,7 @@ const props = defineProps({
   label: {
     type: String,
     required: false,
-    default: 'Cuenta Bancaria'
+    default: 'Seleccionar Banco'
   },
   hint: {
     type: String,

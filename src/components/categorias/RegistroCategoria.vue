@@ -154,14 +154,8 @@
           </div>
         </div>
         <div class="col row justify-end q-pt-lg">
-          <q-btn
-            label="Cancelar"
-            color="primary"
-            flat
-            v-close-popup
-            class="q-ml-sm"
-          />
-          <q-btn :label="lblSubmit" type="submit" color="primary" />
+          <q-btn label="Cancelar" flat v-close-popup class="q-ml-sm" />
+          <q-btn :label="lblSubmit" type="submit" color="primary-button" />
         </div>
       </q-form>
     </q-card-section>
@@ -300,17 +294,18 @@ function obtenerCuentasContables(tipoMovimientoId) {
 }
 function saveItem() {
   console.log('save item')
-  const cuenta_contable_id = editedFormItem.value.cuentaContable.id
-  const cuenta_id = editedFormItem.value.cuenta?.id
+  const cuenta_contable_id = editedFormItem.value.cuentaContable?.id
+  const cuentaDefaultId = editedFormItem.value.cuentaDefault?.id
   const input = {
     ...editedFormItem.value,
-    importe: parseFloat(editedFormItem.value.importe ?? '0'),
     cuentaContableId: parseInt(cuenta_contable_id),
-    cuentaId: parseInt(cuenta_id),
+    cuentaDefaultId: parseInt(cuentaDefaultId),
     tipoMovimientoId: parseInt(editedFormItem.value.tipoMovimientoId),
+    importeDefault: parseFloat(editedFormItem.value.importeDefault ?? '0'),
+    orden: 1000,
     tipoMovimiento: undefined,
     cuentaContable: undefined,
-    cuenta: undefined,
+    cuentaDefault: undefined,
     __typename: undefined
   }
   console.log('guardando item:', input)
