@@ -9,21 +9,22 @@
         option-label="nombre"
         :label="props.label"
         use-input
+        fill-input
+        hide-selected
         input-debounce="0"
         @filter="filterFn"
         behavior="menu"
         clearable=""
-        :rules="props.rules"
-        lazyRules
+        lazy-rules
+        :rules="rules"
         dense
-        :hint="props.hint"
         :readonly="readonly"
       >
-        <template v-slot:no-option>
+        <!-- <template v-slot:no-option>
           <q-item>
             <q-item-section class="text-grey"> No results </q-item-section>
           </q-item>
-        </template>
+        </template> -->
       </q-select>
     </div>
     <div v-if="agregar" class="q-mt-xs" style="border: 0px solid red">
@@ -40,7 +41,7 @@
 
 <script setup>
 import { useQuery } from '@vue/apollo-composable'
-import { LISTA_CUENTAS } from 'src/graphql/cuentas'
+import { LISTA_CUENTAS_REDUCED } from 'src/graphql/cuentas'
 import { ref, computed } from 'vue'
 import RegistroCuenta from '../cuentas/RegistroCuenta.vue'
 
@@ -72,8 +73,7 @@ const props = defineProps({
   },
   hint: {
     type: String,
-    required: false,
-    default: ''
+    required: false
   },
   agregar: { type: Boolean, required: false, default: false },
   readonly: {
@@ -105,7 +105,7 @@ const graphql_options = ref({
   fetchPolicy: 'network-only'
 })
 const { result: resultadoLista, onError: onErrorListaCuentas } = useQuery(
-  LISTA_CUENTAS,
+  LISTA_CUENTAS_REDUCED,
   null, //arguments
   graphql_options
 )

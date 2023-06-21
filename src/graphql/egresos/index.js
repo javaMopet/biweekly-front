@@ -5,7 +5,11 @@ export const EGRESO_CREATE = gql`
     egresoCreate(egresoInput: $input) {
       egreso {
         id
-        observaciones
+        registro {
+          fecha
+          importe
+          observaciones
+        }
       }
     }
   }

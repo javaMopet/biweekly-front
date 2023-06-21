@@ -6,7 +6,7 @@
     color="secondary"
     :label="lbl_field"
     lazy-rules
-    :rules="[(val) => props.opcional || !!val || 'Favor de ingresar la fecha.']"
+    :rules="rules"
     :readonly="readonly"
     :autofocus="autofocus"
   >
@@ -94,6 +94,13 @@ const props = defineProps({
     type: Boolean,
     required: false,
     default: false
+  },
+  rules: {
+    type: Array,
+    required: false,
+    default: () => {
+      return []
+    }
   }
 })
 /**

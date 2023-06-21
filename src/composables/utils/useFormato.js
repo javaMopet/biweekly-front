@@ -50,6 +50,12 @@ export function useFormato() {
   function convertDateFromIsoToInput(fecha_string) {
     return DateTime.fromISO(fecha_string).toFormat('dd/MM/yyyy')
   }
+  function dateNowToInput() {
+    return DateTime.now().toFormat('dd/MM/yyyy')
+  }
+  function convertDateTimeToInput(date_time) {
+    return date_time.toFormat('dd/MM/yyyy')
+  }
 
   return {
     toCurrency,
@@ -59,6 +65,8 @@ export function useFormato() {
     formatoFechaFromISO,
     toFormatoInputDateFromISO,
     convertDateFromIsoToInput,
-    convertDateFromInputToIso
+    convertDateFromInputToIso,
+    dateNowToInput,
+    convertDateTimeToInput
   }
 }

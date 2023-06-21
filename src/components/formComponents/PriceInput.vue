@@ -12,14 +12,14 @@
       color="secondary"
       dense
       :label="label"
-      :error="!isValid"
       :readonly="readonly"
       :autofocus="autofocus"
+      lazy-rules
+      :rules="rules"
     >
       <template #append>
         <div class="text-subtitle1">{{ editingLabel }}</div>
       </template>
-      <template #error> Favor de ingresar el importe </template>
     </q-input>
   </div>
 </template>
@@ -88,6 +88,13 @@ const props = defineProps({
     type: String,
     required: false,
     default: 'Precio'
+  },
+  rules: {
+    type: Array,
+    required: false,
+    default: () => {
+      return []
+    }
   }
 })
 /**

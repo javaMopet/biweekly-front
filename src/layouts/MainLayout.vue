@@ -42,7 +42,7 @@
       elevated
       class="bg-menu shadow-10"
     >
-      <div class="" style="border: 0px solid red">
+      <!-- <div class="" style="border: 0px solid red">
         <div class="application-title q-pa-lg" align="center">
           <q-img
             src="/icons/tree.png"
@@ -53,7 +53,7 @@
           <span class="font-title-letter text-secondary">B</span>iweekly
           Application
         </div>
-      </div>
+      </div> -->
       <q-separator spaced inset horizontal color="blue-grey-5" />
 
       <q-list class="no-shadow q-mt-lg">
@@ -169,7 +169,7 @@ function onClickAccount() {}
   font-size: 1.5rem;
 }
 .bg-menu {
-  background-color: #e5eaee !important;
+  background-color: $primary-light !important;
   color: #14153f;
   font-size: 0.95rem;
 }

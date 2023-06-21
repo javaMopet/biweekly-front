@@ -29,6 +29,14 @@ export const LISTA_CUENTAS = gql`
     }
   }
 `
+export const LISTA_CUENTAS_REDUCED = gql`
+  query listaCuentas {
+    listaCuentas {
+      id
+      nombre
+    }
+  }
+`
 export const LISTA_TIPOS_CUENTA = gql`
   query listaTiposCuenta {
     listaTiposCuenta {

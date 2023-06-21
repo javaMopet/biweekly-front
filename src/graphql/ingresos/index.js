@@ -5,7 +5,15 @@ export const INGRESO_CREATE = gql`
     ingresoCreate(ingresoInput: $input) {
       ingreso {
         id
-        observaciones
+        registro {
+          fecha
+          importe
+          cuenta {
+            id
+            nombre
+          }
+          observaciones
+        }
       }
     }
   }
@@ -23,7 +31,6 @@ export const OBTENER_INGRESOS = gql`
     ) {
       id
       categoriaId
-      observaciones
       registro {
         fecha
         importe
@@ -37,6 +44,7 @@ export const OBTENER_INGRESOS = gql`
           nombre
           cuentaContableId
         }
+        observaciones
       }
     }
   }

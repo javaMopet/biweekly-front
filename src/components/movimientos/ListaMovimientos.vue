@@ -9,8 +9,8 @@
     >
       <div class="row items-center q-gutter-x-md">
         <q-avatar
-          size="36px"
-          font-size="28px"
+          size="38px"
+          font-size="23px"
           text-color="white"
           :icon="categoria.icono"
           :style="`background-color: ${categoria.color} !important`"
@@ -31,8 +31,39 @@
           vertical-top
         ></q-btn>
       </div>
+      <!-- <pre>{{ categoria }}</pre> -->
     </q-card-section>
-
+    <transition name="fade">
+      <div class="row bg-pink-1" v-if="errorsList.length > 0">
+        <div class="column">
+          <div class="row q-gutter-x-md q-pl-sm q-pt-sm">
+            <q-icon name="warning" size="1.5rem" color="negative" />
+            <span class="text-caption text-dark"
+              >Los datos ingresados contienen errores:</span
+            >
+          </div>
+          <q-list dense>
+            <q-item
+              :inset-level="0.5"
+              dense
+              v-for="error in errorsList"
+              :key="error.code"
+            >
+              <q-item-section
+                avatar
+                dense
+                style="min-width: 25px !important; width: 25px !important"
+              >
+                <q-icon color="primary" name="arrow_right" />
+              </q-item-section>
+              <q-item-section class="errors__list--subtitle">{{
+                error.message
+              }}</q-item-section>
+            </q-item>
+          </q-list>
+        </div>
+      </div>
+    </transition>
     <q-card-section style="border: 0px solid red">
       <q-table
         style="width: 100%; border: 0px solid red"
@@ -61,45 +92,41 @@
         <template #body-cell-fecha="props">
           <q-td style="width: 150px" class="bg-white">
             <DateInput
+              v-model="props.row.registro.fecha"
               lbl_field="Fecha"
               :optional="false"
               :rango-fecha-inicio="categoria.fecha_inicio_formato"
               :rango-fecha-fin="categoria.fecha_fin_formato"
-              :readonly="props.row.saved"
+              v-if="!props.row.saved"
             ></DateInput>
             <!-- v-model="props.row.registro.fecha_formato" -->
+            <q-item-label v-else>{{ props.row.registro.fecha }}</q-item-label>
           </q-td>
         </template>
         <template #body-cell-importe="props">
           <q-td style="width: 160px">
             <PriceInput
-              :opcional="true"
+              v-model="props.row.registro.importe"
               :readonly="props.row.saved"
               :autofocus="true"
-              @blur="validarPrecio"
             ></PriceInput>
-            <!-- :is-valid="isImporteValido(props.row.registro.importeValido)" -->
           </q-td>
-          <!-- v-model="props.row.registro.importeString" -->
+          <!-- " -->
         </template>
         <template #body-cell-cuenta="props">
-          <q-td class="bg-white" style="width: 250px">
+          <q-td style="width: 240px; min-width: 240px; max-width: 240px">
             <CuentaSelect
-              v-model="props.row.cuenta"
+              v-model="props.row.registro.cuenta"
               :agregar="false"
               :readonly="props.row.saved"
-              :is-valid="isCuentaValida(props.row.cuentaValida)"
             ></CuentaSelect>
           </q-td>
+          <!-- :is-valid="isCuentaValida(props.row.cuentaValida)" -->
         </template>
         <template #body-cell-observaciones="props">
-          <q-td
-            align="top"
-            class="column items-start full-height"
-            style="border: 0px solid red; height: 70px !important"
-          >
+          <q-td>
             <q-input
-              v-model="props.row.observaciones"
+              v-model="props.row.registro.observaciones"
               type="textarea"
               label="observaciones"
               dense
@@ -107,6 +134,7 @@
               color="secondary"
               :readonly="props.row.saved"
               rows="1"
+              lazy-rules
             />
           </q-td>
         </template>
@@ -114,9 +142,10 @@
           <q-td
             class=""
             style="width: 110px; height: 50px; border: 0px solid green"
+            :props="props"
           >
-            <div class="row inline">
-              <div class="col">
+            <div class="row inline items-start justify-start">
+              <div class="col justify-start items-start">
                 <q-btn
                   v-if="props.row.saved"
                   color="contrast"
@@ -143,7 +172,7 @@
             </div>
           </q-td>
         </template>
-        <template #bottom="props">
+        <!-- <template #bottom="props">
           <div class="col" align="right" style="border: 0px solid red">
             <q-btn
               color="secondary"
@@ -154,11 +183,11 @@
               class="shadow-3"
             />
           </div>
-        </template>
+        </template> -->
       </q-table>
     </q-card-section>
     <q-card-section>
-      <pre>{{ listaRegistros }}</pre>
+      <!-- <pre>{{ listaRegistros }}</pre> -->
     </q-card-section>
   </q-card>
 </template>
@@ -177,6 +206,7 @@ import CuentaSelect from '../formComponents/CuentaSelect.vue'
 import { useRegistrosCrud } from 'src/composables/useRegistrosCrud'
 import { routerViewLocationKey } from 'vue-router'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
+import { ErrorLink } from '@apollo/client/link/error'
 
 /**
  * composables
@@ -190,6 +220,7 @@ const notificacion = useNotificacion()
  */
 const categoria = ref({})
 const listaRegistros = ref([])
+const errorsList = ref([])
 
 const props = defineProps({
   cellData: {
@@ -237,7 +268,7 @@ const columns = [
   {
     name: 'observaciones',
     label: 'Observaciones',
-    field: 'observaciones',
+    field: (row) => row.registro.observaciones,
     sortable: true,
     align: 'left'
   },
@@ -250,60 +281,84 @@ const columns = [
   }
 ]
 
-function addItem(props_row) {
-  row_to_insert.value = null
+function addItem() {
+  const fecha = obtenerFechaDefault()
+  const importe = !!categoria.value.importeDefault
+    ? categoria.value.importeDefault.toString()
+    : ''
+
+  const item = {
+    categoriaId: props.cellData.categoriaId,
+    cuentaValida: true,
+    registro: {
+      estadoRegistroId: 1,
+      importe,
+      fecha,
+      cuenta: categoria.value.cuentaDefault,
+      observaciones: ''
+    }
+  }
+  listaRegistros.value.push(item)
+}
+
+function obtenerFechaDefault() {
   const fechaInicio = DateTime.fromISO(props.cellData.fecha_inicio)
   const fechaFin = DateTime.fromISO(props.cellData.fecha_fin)
   const now = DateTime.now()
   const diff1 = now.diff(fechaInicio, ['days'])
   const diff2 = fechaFin.diff(now, ['days'])
-  let fecha_formato = null
+  let fecha = null
   if (diff1 > 0 && diff2 > 0) {
-    fecha_formato = now.toFormat('dd/MM/yyyy')
+    fecha = formato.dateNowToInput()
   } else {
-    fecha_formato = fechaInicio.toFormat('dd/MM/yyyy')
+    fecha = formato.convertDateTimeToInput(fechaInicio)
   }
-
-  const item = {
-    categoriaId: props.cellData.categoriaId,
-    cuenta: categoria.value.cuenta,
-    cuentaValida: true,
-    observaciones: ''
-    // registro: {
-    //   importeString:
-    //     categoria.value.registro.importe === 0
-    //       ? ''
-    //       : categoria.value.registro.importe.toString(),
-    //   fecha_formato,
-    //   importeValido: true
-    // }
-  }
-  listaRegistros.value.push(item)
+  return fecha
 }
 /**
  * Methods
  */
 const row_to_insert = ref(null)
+
 function saveItem(row) {
   const fecha = row.registro.fecha_formato
-  const cuenta = row.cuenta ?? null
   row.registro.importeValido = !!row.registro.importeString
-  row.cuentaValida = !!cuenta
-  if (row.registro.importeValido && !!cuenta && !!fecha) {
+  if (isInputItemValid(row)) {
     const input = {
       categoriaId: row.categoriaId,
-      cuentaId: parseInt(cuenta.id),
-      observaciones: row.observaciones,
       registro: {
         estadoRegistroId: 2,
-        importe: parseFloat(row.registro.importeString),
-        fecha: obtenerFechaISO(fecha)
+        cuentaId: parseInt(row.registro.cuenta.id),
+        importe: parseFloat(row.registro.importe),
+        fecha: formato.convertDateFromInputToIso(row.registro.fecha),
+        observaciones: row.observaciones
       }
     }
     row_to_insert.value = row
     saveByTipoMovimiento(input)
   }
 }
+
+function isInputItemValid(row) {
+  errorsList.value.length = 0
+  if (!row.registro.fecha) {
+    addError(1, 'Favor de ingresar la fecha del registro')
+  }
+  if (!row.registro.importe) {
+    addError(2, 'Ingresar un importe mayo a cero')
+  }
+  if (!row.registro.cuenta) {
+    addError(3, 'Favor de seleccionar una cuenta de gasto')
+  }
+  return errorsList.value.length <= 0
+}
+function addError(code, message) {
+  errorsList.value.push({
+    code,
+    message
+  })
+}
+
 function saveByTipoMovimiento(input) {
   switch (props.cellData.tipo_movimiento_id) {
     case '1':
@@ -394,7 +449,8 @@ const {
   {
     categoriaId: props.cellData.categoriaId,
     fechaInicio: props.cellData.fecha_inicio,
-    fechaFin: props.cellData.fecha_fin
+    fechaFin: props.cellData.fecha_fin,
+    cuentaId: null
   },
   graphql_options
 )
@@ -415,7 +471,7 @@ onResultListaIngresos(({ data }) => {
 })
 
 onResultListaEgresos(({ data }) => {
-  console.log('data egresos', data.obtenerEgresos)
+  // console.log('data egresos', data.obtenerEgresos)
   if (data.obtenerEgresos.length > 0) {
     listaRegistros.value = JSON.parse(JSON.stringify(data.obtenerEgresos))
     listaRegistros.value.forEach((element) => {
@@ -505,5 +561,31 @@ function buscarMovimientos() {
   &:hover {
     background-color: white;
   }
+}
+.errors__list--subtitle {
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: -0.025rem;
+}
+/**
+* transition fade
+ */
+.fade-enter-from {
+  opacity: 0;
+}
+.fade-enter-to {
+  opacity: 1;
+}
+.fade-enter-active {
+  transition: all 2s ease;
+}
+.fade-leave-from {
+  opacity: 1;
+}
+.fade-leave-to {
+  opacity: 0;
+}
+.fade-leave-active {
+  transition: all 0.5s ease-out;
 }
 </style>
