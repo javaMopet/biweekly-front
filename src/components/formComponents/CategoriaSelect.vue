@@ -1,5 +1,7 @@
 <template>
-  <!-- <pre>{{ filteredOptions }}</pre> -->
+  <!-- <pre>{{ filteredOptions }}</pre>
+  <pre>{{ resultadoLista }}</pre>
+  <pre>{{ optionsList }}</pre> -->
   <div class="row q-gutter-x-sm">
     <div class="col">
       <q-select
@@ -20,6 +22,7 @@
         lazyRules
         dense
         map-options
+        :readonly="readonly"
       >
         <template v-slot:no-option>
           <q-item>
@@ -28,7 +31,7 @@
         </template>
       </q-select>
     </div>
-    <div class="col-auto" v-if="!props.readonly">
+    <div class="col-auto" v-if="agregar">
       <q-btn color="accent" icon="add" @click="agregarCategoria" />
     </div>
   </div>
@@ -43,9 +46,19 @@
 <script setup>
 import { useQuery } from '@vue/apollo-composable'
 import { LISTA_CATEGORIAS } from 'src/graphql/categorias'
-import { ref, computed, Teleport } from 'vue'
+import { ref, onMounted, computed, Teleport } from 'vue'
 import RegistroCategoria from '../categorias/RegistroCategoria.vue'
 
+/**
+ * onMounted
+ */
+onMounted(() => {
+  console.log('inicializando')
+  // if (filteredOptions.value.length <= 0) {
+  //   console.log('recargando ')
+  //   reloadResultadoLista()
+  // }
+})
 /**
  * state
  */
@@ -65,13 +78,14 @@ const props = defineProps({
   tipoMovimientoId: {
     type: String,
     required: false,
-    default: ''
+    default: null
   },
   readonly: {
     type: Boolean,
     required: false,
     default: false
   },
+  agregar: { type: Boolean, required: false, default: false },
   rules: {
     type: Array,
     required: false,
@@ -90,7 +104,11 @@ const emit = defineEmits(['update:modelValue'])
 const graphql_options = ref({
   fetchPolicy: 'network-only'
 })
-const { result: resultadoLista, onError: onErrorListaCuentas } = useQuery(
+const {
+  result: resultadoLista,
+  onError: onErrorListaCuentas
+  // refetch: reloadResultadoLista
+} = useQuery(
   LISTA_CATEGORIAS,
   null, //argumentos
   graphql_options //opciones
@@ -106,11 +124,15 @@ const categoria = computed({
     emit('update:modelValue', val)
   }
 })
-const options = computed({
+const optionsList = computed({
   get() {
-    return (resultadoLista.value?.listaCategorias ?? []).filter(
-      (categoria) => categoria.tipoMovimientoId === props.tipoMovimientoId
-    )
+    if (!!props.tipoMovimientoId) {
+      return (resultadoLista.value?.listaCategorias ?? []).filter(
+        (categoria) => categoria.tipoMovimientoId === props.tipoMovimientoId
+      )
+    } else {
+      return resultadoLista.value?.listaCategorias ?? []
+    }
   }
 })
 onErrorListaCuentas((error) => {
@@ -122,14 +144,14 @@ onErrorListaCuentas((error) => {
 function filterFn(val, update) {
   if (val === '') {
     update(() => {
-      filteredOptions.value = options.value
+      filteredOptions.value = optionsList.value
     })
     return
   }
 
   update(() => {
     const needle = val.toLowerCase()
-    filteredOptions.value = options.value.filter(
+    filteredOptions.value = optionsList.value.filter(
       (v) => v.nombre.toLowerCase().indexOf(needle) > -1
     )
   })

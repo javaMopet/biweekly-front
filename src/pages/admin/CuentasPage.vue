@@ -98,7 +98,7 @@
                     <!-- **** **** **** {{ props.row.identificador }} -->
                     <router-link
                       :to="{
-                        name: 'tarjetaCredito',
+                        name: 'cuenta',
                         params: { id: props.row.id }
                       }"
                       class="tarjeta__credito--link cuenta__subtitle"
