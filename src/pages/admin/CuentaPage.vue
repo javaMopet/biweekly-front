@@ -129,14 +129,54 @@
               v-model="props.row.categoria"
               title="Editar categoria"
               buttons
-              @before-hide="actualizarCategoria(props)"
-              label-set="Aceptar"
+              @save="saveObs(props)"
+              label-set="Guardar"
               label-cancel="Cancelar"
+              v-slot="scope"
             >
               <!-- @update:model-value="actualizarCategoria" -->
               <!-- <q-input v-model="props.row.name" dense autofocus /> -->
               <q-checkbox left-label v-model="props.row.todo" label="Todos" />
-              <CategoriaSelect v-model="props.row.categoria"></CategoriaSelect>
+              <CategoriaSelect
+                v-model="scope.value"
+                autofocus
+              ></CategoriaSelect>
+            </q-popup-edit>
+          </q-td>
+        </template>
+        <template #body-cell-importe="props">
+          <q-td
+            class="registros__columna--importe"
+            :style="{
+              color: props.row.importe < 0 ? 'red' : 'black'
+            }"
+            align="right"
+          >
+            {{ formato.toCurrency(props.row.importe) }}
+          </q-td>
+        </template>
+        <template #body-cell-observaciones="props">
+          <q-td key="observaciones" :props="props">
+            {{ props.row.observaciones }}
+            <q-popup-edit
+              v-model="props.row.observaciones"
+              title="Editar observaciones"
+              buttons
+              label-set="Guardar"
+              label-cancel="Cancelar"
+              @save="saveObs(props)"
+              v-slot="scope"
+              max-width="150px"
+            >
+              <!-- @before-hide="actualizarObservaciones(props)"
+              -->
+              <q-input
+                v-model="scope.value"
+                @keyup.enter="scope.set"
+                type="text"
+                label="Favor de ingresar observaciones"
+                autofocus
+              />
             </q-popup-edit>
           </q-td>
         </template>
@@ -386,6 +426,7 @@ onErrorListaRegistros((error) => {
 /**
  * functions
  */
+
 function editItem(item) {
   console.log('editando item...', item.rowIndex, item.row)
   registroEditedItem.value = JSON.parse(JSON.stringify(item.row))
@@ -443,6 +484,9 @@ function obtenerListaRegistros() {
 function actualizarCategoria(value) {
   console.log('actualizando la categoria', value.rowIndex, value.row)
 }
+function actualizarObservaciones(value) {
+  console.log('observaciones', value.rowIndex, value.row)
+}
 
 function cargarMovimientos() {
   showFormCarga.value = true
@@ -460,30 +504,11 @@ function mesesSinInteres(item) {
   showFormMSI.value = true
   editRegistroItem.value = item.row
 }
-function quitarMsi(item) {
-  $q.dialog({
-    title: 'Confirmar',
-    style: 'width:500px',
-    message: `¿Está seguro que desea quitar el movimiento de meses sin intereses?`,
-    ok: {
-      push: true,
-      color: 'positive',
-      label: 'Continuar'
-    },
-    cancel: {
-      push: true,
-      color: 'negative',
-      flat: true,
-      label: 'cancelar'
-    },
-    persistent: true
-  })
-    .onOk(() => {
-      confirmQuitarMsi(item.row.id)
-    })
-    .onCancel(() => {})
-    .onDismiss(() => {})
+
+function saveObs(props) {
+  console.log('actualizando.....', props)
 }
+
 function confirmQuitarMsi(id) {
   api
     .put(`/registros_tarjeta/${id}`, {
@@ -529,6 +554,25 @@ function registroUpdated() {
   showForm.value = false
 }
 
+const parentDblClick = (e) => {
+  //emit "click" event  with payload
+  e.target.dispatchEvent(
+    new CustomEvent('click', { detail: { trigger: true } })
+  )
+}
+
+const parentClick = function (e, open) {
+  console.log('click...............', e, !e.detail?.trigger)
+  //check payload and stop in current
+  if (!e.detail?.trigger) {
+    return
+  }
+  return e.stopPropagation()
+
+  //keep event propagating on parent
+  e.target.parentNode.dispatchEvent(new Event('click'))
+}
+
 const mesOptions = ref([
   { id: 1, nombre: 'Enero' },
   { id: 2, nombre: 'Febrero' },
@@ -558,7 +602,7 @@ const columns = [
   {
     name: 'tipomovimeinto',
     label: 'TMovId',
-    field: 'tipoMovimientoId',
+    field: 'registrableType',
     sortable: true,
     align: 'left',
     style: 'width: 10%'
@@ -578,67 +622,15 @@ const columns = [
     sortable: true,
     align: 'right',
     format: (val, row) => formato.toCurrency(val),
-    style: 'width:15%'
+    style: 'width:15%;color: red'
   },
   {
-    name: 'concepto',
+    name: 'observaciones',
     label: 'Observaciones',
-    field: (row) => row.observaciones,
+    field: 'observaciones',
     sortable: true,
     align: 'left',
     style: 'width: 40%'
-  },
-  {
-    name: 'acciones',
-    field: 'action',
-    sortable: false,
-    align: 'center',
-    style: 'width: 5%'
-  }
-]
-const columnsMsi = [
-  // { name: 'id', label: 'Id', field: 'id', sortable: true, align: 'left' },
-  {
-    name: 'fecha',
-    label: 'Fecha',
-    field: 'fecha',
-    sortable: true,
-    align: 'left',
-    format: (val, row) => formato.formatoFechaFromISO(val),
-    style: 'width: 10%'
-  },
-  {
-    name: 'concepto',
-    label: 'Concepto',
-    field: (row) => row.concepto,
-    sortable: true,
-    align: 'left',
-    style: 'width: 30%'
-  },
-  {
-    name: 'importe',
-    label: 'Importe',
-    field: 'importe',
-    sortable: true,
-    align: 'right',
-    format: (val, row) => formato.toCurrency(val),
-    style: 'width:15%'
-  },
-  {
-    name: 'categoria',
-    label: 'Categoria',
-    field: (row) => row.categoria.nombre,
-    sortable: true,
-    align: 'left',
-    style: 'width:30%'
-  },
-  {
-    name: 'numeroMsi',
-    label: 'Número de MSI',
-    field: 'numeroMsi',
-    sortable: true,
-    align: 'left',
-    style: 'width:10%'
   },
   {
     name: 'acciones',
@@ -673,5 +665,10 @@ const columnsMsi = [
   font-size: 0.95rem;
   font-weight: 600;
   color: #7b6992;
+}
+.registros__columna--importe {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: -0.025rem;
 }
 </style>

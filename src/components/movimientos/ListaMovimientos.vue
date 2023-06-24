@@ -193,20 +193,17 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
+import { useLazyQuery, useQuery } from '@vue/apollo-composable'
 import DateInput from '../formComponents/DateInput.vue'
 import { DateTime } from 'luxon'
-import { OBTENER_INGRESOS } from 'src/graphql/ingresos'
-import { OBTENER_EGRESOS } from 'src/graphql/egresos'
+import { LISTA_REGISTROS } from 'src/graphql/registros'
 import { CATEGORIA_BY_ID } from 'src/graphql/categorias'
-import { useLazyQuery, useQuery } from '@vue/apollo-composable'
 import PriceInput from '../formComponents/PriceInput.vue'
 import { useFormato } from 'src/composables/utils/useFormato'
 import CuentaSelect from '../formComponents/CuentaSelect.vue'
 import { useRegistrosCrud } from 'src/composables/useRegistrosCrud'
-import { routerViewLocationKey } from 'vue-router'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
-import { ErrorLink } from '@apollo/client/link/error'
 
 /**
  * composables
@@ -321,21 +318,18 @@ function obtenerFechaDefault() {
 const row_to_insert = ref(null)
 
 function saveItem(row) {
-  const fecha = row.registro.fecha_formato
-  row.registro.importeValido = !!row.registro.importeString
   if (isInputItemValid(row)) {
     const input = {
       categoriaId: row.categoriaId,
-      registro: {
-        estadoRegistroId: 2,
-        cuentaId: parseInt(row.registro.cuenta.id),
-        importe: parseFloat(row.registro.importe),
-        fecha: formato.convertDateFromInputToIso(row.registro.fecha),
-        observaciones: row.observaciones
-      }
+      estadoRegistroId: 2,
+      tipoAfectacion: 'A',
+      cuentaId: parseInt(row.registro.cuenta.id),
+      importe: parseFloat(row.registro.importe),
+      fecha: formato.convertDateFromInputToIso(row.registro.fecha),
+      observaciones: row.observaciones
     }
     row_to_insert.value = row
-    saveByTipoMovimiento(input)
+    registrosCrud.createRegistro({ input })
   }
 }
 
@@ -359,35 +353,17 @@ function addError(code, message) {
   })
 }
 
-function saveByTipoMovimiento(input) {
-  switch (props.cellData.tipo_movimiento_id) {
-    case '1':
-      registrosCrud.createIngreso({ input })
-      break
-    case '2':
-      registrosCrud.createEgreso({ input })
-      break
-    case '3':
-      registrosCrud.createTransferencia({ input })
-      break
-    default:
-      break
-  }
-}
-
-registrosCrud.onDoneCreateIngreso(({ data }) => {
+registrosCrud.onDoneCreateRegistro(({ data }) => {
   afterSaveItem('Ingreso', data.ingresoCreate)
 })
-registrosCrud.onDoneCreateEgreso(({ data }) => {
-  afterSaveItem('Egreso', data.egresoCreate)
-})
+
 function afterSaveItem(tipoRegistro, itemSaved) {
   row_to_insert.value.saved = true
   notificacion.mostrarNotificacionPositiva(`${tipoRegistro} guardado.`, 1000)
   emit('registroCreated', itemSaved)
 }
 
-registrosCrud.onErrorCreateIngreso((error) => {
+registrosCrud.onErrorCreateRegistro((error) => {
   console.error(error)
 })
 function obtenerFechaISO(fecha_formato) {
@@ -428,57 +404,28 @@ const {
 )
 
 const {
-  onError: onErrorListaIngresos,
-  onResult: onResultListaIngresos,
-  load: cargaListaIngresos
+  onError: onErrorListaRegistros,
+  onResult: onResultListaRegistros,
+  load: cargaListaRegistros
 } = useLazyQuery(
-  OBTENER_INGRESOS,
+  LISTA_REGISTROS,
   {
+    cuentaId: null,
     categoriaId: props.cellData.categoriaId,
     fechaInicio: props.cellData.fecha_inicio,
     fechaFin: props.cellData.fecha_fin
   },
   graphql_options
 )
-const {
-  onError: onErrorListaEgresos,
-  onResult: onResultListaEgresos,
-  load: cargaListaEgresos
-} = useLazyQuery(
-  OBTENER_EGRESOS,
-  {
-    categoriaId: props.cellData.categoriaId,
-    fechaInicio: props.cellData.fecha_inicio,
-    fechaFin: props.cellData.fecha_fin,
-    cuentaId: null
-  },
-  graphql_options
-)
 
-onResultListaIngresos(({ data }) => {
-  // console.log('data ingresos', data.obtenerIngresos)
-  if (data.obtenerIngresos.length > 0) {
-    listaRegistros.value = JSON.parse(JSON.stringify(data.obtenerIngresos))
+onResultListaRegistros(({ data }) => {
+  console.log('data registros', data.obtenerRegistros)
+  if (data.obtenerRegistros.length > 0) {
+    listaRegistros.value = JSON.parse(JSON.stringify(data.obtenerRegistros))
     listaRegistros.value.forEach((element) => {
       element.registro.fecha_formato = formato.formatoFechaFromISO(
         element.registro.fecha
       )
-      element.saved = true
-    })
-  } else {
-    addItem()
-  }
-})
-
-onResultListaEgresos(({ data }) => {
-  // console.log('data egresos', data.obtenerEgresos)
-  if (data.obtenerEgresos.length > 0) {
-    listaRegistros.value = JSON.parse(JSON.stringify(data.obtenerEgresos))
-    listaRegistros.value.forEach((element) => {
-      element.registro.fecha_formato = formato.formatoFechaFromISO(
-        element.registro.fecha
-      )
-      element.registro.importeString = element.registro.importe.toString()
       element.saved = true
     })
   } else {
@@ -492,11 +439,7 @@ onResultCategoriaById(({ data }) => {
   buscarMovimientos()
 })
 
-onErrorListaIngresos((error) => {
-  console.error('error', error)
-})
-
-onErrorListaEgresos((error) => {
+onErrorListaRegistros((error) => {
   console.error('error', error)
 })
 
@@ -543,16 +486,7 @@ const isCuentaValida = (cuentaValida) => {
  * Buscar movimientos de acuerdo a la categoria y perido ingresados como propiedades
  */
 function buscarMovimientos() {
-  switch (props.cellData.tipo_movimiento_id) {
-    case '1':
-      cargaListaIngresos()
-      break
-    case '2':
-      cargaListaEgresos()
-      break
-    default:
-      break
-  }
+  cargaListaRegistros()
 }
 </script>
 

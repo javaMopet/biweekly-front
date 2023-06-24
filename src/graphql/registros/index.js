@@ -2,24 +2,56 @@ import gql from 'graphql-tag'
 
 export const LISTA_REGISTROS = gql`
   query obtenerRegistros(
-    $cuentaId: ID!
+    $cuentaId: ID
+    $categoriaId: ID
     $fechaInicio: ISO8601Date!
     $fechaFin: ISO8601Date!
   ) {
     obtenerRegistros(
       cuentaId: $cuentaId
+      categoriaId: $categoriaId
       fechaInicio: $fechaInicio
       fechaFin: $fechaFin
     ) {
       id
       estadoRegistroId
+      tipoAfectacion
       fecha
       importe
       observaciones
-      registrableType
+      importe
+      cuenta {
+        id
+        nombre
+      }
       categoria {
         id
         nombre
+        tipoMovimientoId
+      }
+    }
+  }
+`
+export const REGISTRO_CREATE = gql`
+  mutation registroCreate($input: RegistroInput!) {
+    registroCreate(registroInput: $input) {
+      registro {
+        id
+        estadoRegistroId
+        tipoAfectacion
+        fecha
+        importe
+        observaciones
+        importe
+        cuenta {
+          id
+          nombre
+        }
+        categoria {
+          id
+          nombre
+          tipoMovimientoId
+        }
       }
     }
   }

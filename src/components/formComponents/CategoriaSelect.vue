@@ -23,6 +23,7 @@
         dense
         map-options
         :readonly="readonly"
+        :autofocus="autofocus"
       >
         <template v-slot:no-option>
           <q-item>
@@ -92,6 +93,11 @@ const props = defineProps({
     default: () => {
       return []
     }
+  },
+  autofocus: {
+    type: Boolean,
+    required: false,
+    default: false
   }
 })
 /**

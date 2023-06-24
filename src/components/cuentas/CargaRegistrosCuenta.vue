@@ -1,5 +1,6 @@
 <template>
   <q-card class="my-card" dense style="width: 80vw; min-width: 80vw">
+    <!-- <pre>{{ cuenta }}</pre> -->
     <q-card-section class="bg-primary row inline fit q-py-sm justify-between">
       <div class="text-h6 text-accent">
         Movimientos de la tarjeta {{ cuenta.nombre }}
@@ -128,7 +129,6 @@
         <template #body-cell-categoria="props">
           <q-td :props="props">
             <CategoriaSelect
-              :readonly="true"
               v-model="props.row.categoria"
               tipo-movimiento-id="2"
             ></CategoriaSelect>
@@ -180,7 +180,6 @@ import CategoriaSelect from '../formComponents/CategoriaSelect.vue'
 import { useFormato } from 'src/composables/utils/useFormato'
 import { api } from 'src/boot/axios'
 import { DateTime } from 'luxon'
-import { AddressbarColor } from 'quasar'
 
 /**
  * state
@@ -190,10 +189,12 @@ const registrosSelected = ref([])
 const listaRegistros = ref([])
 const todos = ref()
 const errorsList = ref([])
+
 /**
  * composables
  */
 const formato = useFormato()
+
 /**
  * defProperties
  */
@@ -224,87 +225,59 @@ async function updateFile(v) {
       raw: false
     })
 
-    for (const row of rows) {
-      for (const key in row) {
-        console.log('data cell', row[key])
-      }
+    // for (const row of rows) {
+    //   for (const key in row) {
+    //     console.log('data cell', row[key])
+    //   }
+    // }
+    console.log(props.cuenta.banco.id)
+    switch (props.cuenta.banco.id) {
+      case 1:
+        obtenerMovimientosSantander(wb)
+        break
+      case 2:
+        obtenerMovimientosBancomer(wb)
+        break
+      default:
+        break
     }
-
-    // get data of first worksheet as an array of objects
-    const data = utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {
-      header: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'],
-      skipHeader: true,
-      raw: false
-    })
-
-    // console.log('data', data)
-    const monthsMap = new Map()
-    monthsMap.set('Ene', '01')
-    monthsMap.set('Feb', '02')
-    monthsMap.set('Mar', '03')
-    monthsMap.set('Abr', '04')
-    monthsMap.set('May', '05')
-    monthsMap.set('Jun', '06')
-    monthsMap.set('Jul', '07')
-    monthsMap.set('Ago', '08')
-    monthsMap.set('Sep', '09')
-    monthsMap.set('Oct', '10')
-    monthsMap.set('Nov', '11')
-    monthsMap.set('Dic', '12')
-
-    todos.value = data.map((row) => ({
-      fecha: row.A,
-      concepto: row.D,
-      retiro: row.E,
-      deposito: row.F,
-      saldo: row.G,
-      referencia: row.H
-    }))
-    // console.log('datda', todos.value)
-    // console.log('datda', todos.value[5])
-    todos.value.forEach((row, index) => {
-      let fecha = row.fecha.toString()
-      for (const [key, value] of monthsMap) {
-        // console.log(`${key}: ${value}`)
-        fecha = fecha.replace(key.toString(), value.toString())
-      }
-      const tipoMovimientoId = row.retiro > 0 ? 2 : row.deposito > 0 ? 1 : 'n/a'
-      const importe =
-        row.retiro > 0
-          ? parseFloat(row.retiro) * -1
-          : row.deposito > 0
-          ? parseFloat(row.deposito)
-          : 0
-      const item = {
-        consecutivo: index + 1,
-        tipoMovimientoId,
-        fecha: fecha,
-        concepto: row.concepto,
-        importe,
-        saldo: row.saldo,
-        referencia: row.referencia,
-        saved: false
-      }
-      listaRegistros.value.push(item)
-    })
   } catch (e) {
     console.log(e)
   }
 }
-
-function obtenerMovimientosBancomer(wb) {
+function obtenerMovimientosSantander(wb) {
+  // get data of first worksheet as an array of objects
   const data = utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {
-    header: ['A', 'B', 'C', 'D', 'E'],
+    header: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'],
     skipHeader: true,
     raw: false
   })
+
+  // console.log('data', data)
+  const monthsMap = new Map()
+  monthsMap.set('Ene', '01')
+  monthsMap.set('Feb', '02')
+  monthsMap.set('Mar', '03')
+  monthsMap.set('Abr', '04')
+  monthsMap.set('May', '05')
+  monthsMap.set('Jun', '06')
+  monthsMap.set('Jul', '07')
+  monthsMap.set('Ago', '08')
+  monthsMap.set('Sep', '09')
+  monthsMap.set('Oct', '10')
+  monthsMap.set('Nov', '11')
+  monthsMap.set('Dic', '12')
+
   todos.value = data.map((row) => ({
     fecha: row.A,
-    concepto: row.B,
-    cargo: row.C,
-    abono: row.D,
-    saldo: row.E
+    concepto: row.D,
+    retiro: row.E,
+    deposito: row.F,
+    saldo: row.G,
+    referencia: row.H
   }))
+  // console.log('datda', todos.value)
+  // console.log('datda', todos.value[5])
   todos.value.forEach((row, index) => {
     let fecha = row.fecha.toString()
     for (const [key, value] of monthsMap) {
@@ -330,6 +303,48 @@ function obtenerMovimientosBancomer(wb) {
     }
     listaRegistros.value.push(item)
   })
+}
+function obtenerMovimientosBancomer(wb) {
+  const data = utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {
+    header: ['A', 'B', 'C', 'D', 'E'],
+    skipHeader: true,
+    raw: false
+  })
+
+  todos.value = data.map((row) => ({
+    fecha: row.A,
+    concepto: row.B,
+    cargo: row.C,
+    abono: row.D,
+    saldo: row.E
+  }))
+
+  todos.value.forEach((row, index) => {
+    let fecha = row.fecha.toString()
+    const fechaObject = DateTime.fromFormat(fecha, 'dd/MM/yyyy')
+    if (fechaObject.isValid) {
+      console.log('row', row.cargo, row.abono)
+      const cargo = row.cargo?.replace(',', '')
+      const abono = row.abono?.replace(',', '')
+      const tipoMovimientoId = !!cargo ? 2 : !!abono ? 1 : 'n/a'
+      const importe = !!cargo
+        ? parseFloat(cargo)
+        : !!abono
+        ? parseFloat(abono)
+        : 0
+      const item = {
+        consecutivo: index + 1,
+        tipoMovimientoId,
+        fecha: fecha,
+        concepto: row.concepto,
+        importe,
+        saldo: row.saldo,
+        saved: false
+      }
+      listaRegistros.value.push(item)
+    }
+  })
+  console.log(listaRegistros.value)
 }
 
 function saveItems() {
@@ -428,7 +443,7 @@ const columns = [
     sortable: true,
     align: 'left',
     filter: false,
-    style: 'width:120px'
+    style: 'width:1%'
   },
   {
     name: 'fecha',
@@ -437,7 +452,7 @@ const columns = [
     sortable: true,
     align: 'left',
     filter: false,
-    style: 'width:120px'
+    style: 'width:10%'
   },
   {
     name: 'tipomovimiento',
