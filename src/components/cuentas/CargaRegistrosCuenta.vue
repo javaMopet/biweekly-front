@@ -126,6 +126,11 @@
         v-model:selected="registrosSelected"
         no-data-label="No existen datos disponibles"
       >
+        <template #body-cell-tipoAfectacion="props">
+          <q-td :props="props">
+            {{ props.row.tipoAfectacion.nombre }}
+          </q-td>
+        </template>
         <template #body-cell-categoria="props">
           <q-td :props="props">
             <CategoriaSelect
@@ -326,7 +331,11 @@ function obtenerMovimientosBancomer(wb) {
       console.log('row', row.cargo, row.abono)
       const cargo = row.cargo?.replace(',', '')
       const abono = row.abono?.replace(',', '')
-      const tipoMovimientoId = !!cargo ? 2 : !!abono ? 1 : 'n/a'
+      const tipoAfectacion = !!cargo
+        ? { id: 'C', nombre: 'Egreso' }
+        : !!abono
+        ? { id: 'A', nombre: 'Ingreso' }
+        : null
       const importe = !!cargo
         ? parseFloat(cargo)
         : !!abono
@@ -334,7 +343,8 @@ function obtenerMovimientosBancomer(wb) {
         : 0
       const item = {
         consecutivo: index + 1,
-        tipoMovimientoId,
+        tipoAfectacion,
+        tipoAfectacionId: tipoAfectacion.id,
         fecha: fecha,
         concepto: row.concepto,
         importe,
@@ -455,9 +465,9 @@ const columns = [
     style: 'width:10%'
   },
   {
-    name: 'tipomovimiento',
-    label: 'Tipo Mov',
-    field: 'tipoMovimientoId',
+    name: 'tipoAfectacion',
+    label: 'Tipo Afectacion',
+    field: (row) => row.tipoAfectacion.nombre,
     sortable: true,
     align: 'left',
     filter: true
@@ -467,7 +477,7 @@ const columns = [
     label: 'Categoria',
     field: 'categoria',
     sortable: true,
-    align: 'left',
+    align: 'center',
     style: 'width:250px;max-width:250px'
   },
   {

@@ -123,7 +123,11 @@
 
     <Teleport to="#modal">
       <q-dialog v-model="showFormRegisterItem" persistent>
-        <RegistroBancoForm :edited-item="editedItem"></RegistroBancoForm>
+        <RegistroBancoForm
+          :edited-item="editedItem"
+          @itemSaved="itemSaved"
+          @itemUpdated="itemUpdated"
+        ></RegistroBancoForm>
         <!-- :edited-item="editedItem"
           :edited-index="editedIndex"
           @cuentaSaved="cuentaSaved"
@@ -157,11 +161,11 @@ const graphql_options = ref({
   fetchPolicy: 'cache-and-network'
   // fetchPolicy: 'cache-only'
 })
-const { onError: onErrorListaBancos, result: resultListaBancos } = useQuery(
-  LISTA_BANCOS,
-  null,
-  graphql_options
-)
+const {
+  onError: onErrorListaBancos,
+  result: resultListaBancos,
+  refetch: refetchListaBancos
+} = useQuery(LISTA_BANCOS, null, graphql_options)
 
 const {
   mutate: deleteBanco,
@@ -172,10 +176,9 @@ const {
 onDoneDeleteBanco(({ data }) => {
   if (!!data) {
     console.log('item deleted ', data)
-    const deletedItem = data.cuentaDelete.cuenta
-    listaCuentas.value.splice(rowIndexDelete.value, 1)
-    rowIndexDelete.value = null
+    const deletedItem = data.bancoDelete.banco
     mostrarNotificacion('elminó', deletedItem)
+    refetchListaBancos()
   }
 })
 onErrorDeleteBanco((error) => {
@@ -294,23 +297,22 @@ function deleteRow(item) {
     persistent: true
   })
     .onOk(() => {
-      deleteCuenta({ id: item.row.id })
+      deleteBanco({ id: item.row.id })
     })
     .onCancel(() => {})
     .onDismiss(() => {})
 }
 
-function cuentaSaved(itemSaved) {
+function itemSaved(itemSaved) {
   showFormRegisterItem.value = false
-  listaCuentas.value.push(itemSaved)
   mostrarNotificacion('guardó', itemSaved)
+  refetchListaBancos()
 }
-function cuentaUpdated(itemUpdated) {
+function itemUpdated(itemUpdated) {
   showFormRegisterItem.value = false
   mostrarNotificacion('actualizó', itemUpdated)
-  listaCuentas.value[editedIndex.value] = itemUpdated
   editedItem.value = { ...defaultItem }
-  editedIndex.value = null
+  refetchListaBancos()
 }
 function mostrarNotificacion(action, cuenta) {
   notificacion.mostrarNotificacionPositiva(

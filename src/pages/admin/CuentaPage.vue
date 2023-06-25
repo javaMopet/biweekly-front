@@ -323,6 +323,7 @@ onMounted(() => {
       null,
       {
         cuentaId: route.params.id.toString(),
+        categoriaId: null,
         fechaInicio: fecha_inicio.value,
         fechaFin: fecha_fin.value
       },
@@ -472,6 +473,7 @@ function obtenerListaRegistros() {
   cargaListaRegistros(
     null,
     {
+      categoriaId: null,
       cuentaId: route.params.id,
       fechaInicio,
       fechaFin,

@@ -125,7 +125,7 @@ onDoneCreateBanco(({ data }) => {
   console.log('saved data...', data)
   if (!!data) {
     const itemSaved = data.bancoCreate.banco
-    emit('bancoSaved', itemSaved)
+    emit('itemSaved', itemSaved)
   }
 })
 onErrorCreateBanco((error) => {
@@ -136,7 +136,7 @@ onDoneUpdateBanco(({ data }) => {
   if (!!data) {
     console.log('updated data...', data)
     const itemUpdated = data.bancoUpdate.banco
-    emit('bancoUpdated', itemUpdated)
+    emit('itemUpdated', itemUpdated)
   }
 })
 onErrorUpdateBanco((error) => {
@@ -165,7 +165,7 @@ const props = defineProps({
 /**
  * emits
  */
-const emit = defineEmits(['bancoSaved', 'bancoUpdated'])
+const emit = defineEmits(['itemSaved', 'itemUpdated'])
 /**
  * computed
  */
@@ -198,15 +198,8 @@ onMounted(() => {})
  */
 function saveItem() {
   console.log('save item', editedFormItem.value)
-  const banco_contable_id = editedFormItem.value.bancoContable.id
-  const tipo_banco_id = editedFormItem.value.tipoBanco.id
   const input = {
     ...editedFormItem.value,
-    bancoContableId: parseInt(banco_contable_id),
-    bancoContable: undefined,
-    tipoBancoId: parseInt(tipo_banco_id),
-    diaCorte: parseInt(editedFormItem.value.diaCorte),
-    tipoBanco: undefined,
     __typename: undefined
   }
   if (!editedFormItem.value.id) {
@@ -221,28 +214,6 @@ function saveItem() {
       id,
       input
     })
-  }
-}
-function tipoBancoUpdated(value) {
-  obtenerBancosContables(value)
-}
-function obtenerBancosContables(value) {
-  console.log('tipo ade banco acutalizado', value)
-  switch (value) {
-    case '1':
-      bancoContableProps.tipoAfectacion = 'C'
-      bancoContableProps.clasificacion = '112'
-      break
-    case '2':
-      bancoContableProps.tipoAfectacion = 'C'
-      bancoContableProps.clasificacion = '11100'
-      break
-    case '3':
-      bancoContableProps.tipoAfectacion = 'A'
-      bancoContableProps.clasificacion = '212'
-      break
-    default:
-      break
   }
 }
 </script>

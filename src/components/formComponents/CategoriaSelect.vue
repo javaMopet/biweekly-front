@@ -3,6 +3,7 @@
   <pre>{{ resultadoLista }}</pre>
   <pre>{{ optionsList }}</pre> -->
   <div class="row q-gutter-x-sm">
+    <q-toggle v-model="shift" color="green" keep-color />
     <div class="col">
       <q-select
         outlined
@@ -65,6 +66,7 @@ onMounted(() => {
  */
 const filteredOptions = ref([])
 const showRegistroCategoria = ref(false)
+const shift = ref(false)
 /**
  * props
  */

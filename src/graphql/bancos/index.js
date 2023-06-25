@@ -10,8 +10,8 @@ export const LISTA_BANCOS = gql`
   }
 `
 export const BANCO_CREATE = gql`
-  mutation bancoCreate($input: CuentaInput!) {
-    bancoCreate(cuentaInput: $input) {
+  mutation bancoCreate($input: BancoInput!) {
+    bancoCreate(bancoInput: $input) {
       banco {
         id
         nombre
@@ -21,8 +21,8 @@ export const BANCO_CREATE = gql`
   }
 `
 export const BANCO_UPDATE = gql`
-  mutation bancoUpdate($input: CuentaInput!) {
-    bancoUpdate(cuentaInput: $input) {
+  mutation bancoUpdate($id: ID!, $input: BancoInput!) {
+    bancoUpdate(id: $id, bancoInput: $input) {
       banco {
         id
         nombre
