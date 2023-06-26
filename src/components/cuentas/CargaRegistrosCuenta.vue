@@ -135,7 +135,7 @@
           <q-td :props="props">
             <CategoriaSelect
               v-model="props.row.categoria"
-              tipo-movimiento-id="2"
+              :tipo-afectacion="props.row.tipoAfectacion.id"
             ></CategoriaSelect>
           </q-td>
         </template>

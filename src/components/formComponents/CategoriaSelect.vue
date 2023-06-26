@@ -11,7 +11,7 @@
         v-model="categoria"
         :options="filteredOptions"
         option-label="nombre"
-        label="Categoria"
+        :label="tipoMovimientoLabel"
         use-input
         fill-input
         hide-selected
@@ -78,7 +78,7 @@ const props = defineProps({
       return null
     }
   },
-  tipoMovimientoId: {
+  tipoAfectacion: {
     type: String,
     required: false,
     default: null
@@ -141,6 +141,11 @@ const optionsList = computed({
     } else {
       return resultadoLista.value?.listaCategorias ?? []
     }
+  }
+})
+const tipoMovimientoLabel = computed({
+  get() {
+    return props.tipoAfectacion === 'C' ? 'Egreso' : 'Ingreso'
   }
 })
 onErrorListaCuentas((error) => {
