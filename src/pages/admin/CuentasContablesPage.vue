@@ -87,7 +87,7 @@
             </div> -->
               </div>
               <q-menu touch-position context-menu class="text-primary">
-                <q-list dense style="min-width: 100px">
+                <q-list style="min-width: 100px">
                   <q-item
                     v-if="props.node.subnivel != 0"
                     clickable
@@ -146,10 +146,19 @@
                     clickable
                     v-close-popup
                     @click="deleteItem(props)"
-                    class="bg-negative text-white"
+                    class="text-negative-pastel"
                   >
-                    <q-item-section
-                      >Eliminar {{ props.node.id }}
+                    <q-item-section avatar>
+                      <q-avatar
+                        size="40px"
+                        font-size="22px"
+                        color="negative-pastel"
+                        text-color="white"
+                        icon="delete"
+                      />
+                    </q-item-section>
+                    <q-item-section>
+                      Eliminar {{ props.node.id }}
                     </q-item-section>
                   </q-item>
                   <q-item clickable v-close-popup>
@@ -439,14 +448,17 @@ watch(loadingArbol, (newValue, oldValue) => {
 }
 .active {
   background-color: #fcf6f2;
-  // color: rgb(250, 225, 188) !important;
-  color: #984603 !important;
+  color: $secondary !important;
+  font-weight: 600;
 }
 .text-primary-dark {
   color: #010b24;
 }
 .encabezado {
-  background-color: $secondary-light;
+  background-color: $table-header;
   color: $primary;
+  font-weight: 500 !important;
+  font-size: 0.9rem;
+  letter-spacing: 0.025rem;
 }
 </style>

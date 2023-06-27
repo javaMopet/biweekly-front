@@ -35,6 +35,8 @@
               outlined
               no-caps
               label-color="primary"
+              clearable
+              @clear="fileClear"
             >
               <template #before>
                 <q-icon color="primary" name="cloud_upload" />
@@ -126,16 +128,16 @@
         v-model:selected="registrosSelected"
         no-data-label="No existen datos disponibles"
       >
-        <template #body-cell-tipoAfectacion="props">
+        <!-- <template #body-cell-tipoAfectacion="props">
           <q-td :props="props">
             {{ props.row.tipoAfectacion.nombre }}
           </q-td>
-        </template>
+        </template> -->
         <template #body-cell-categoria="props">
           <q-td :props="props">
             <CategoriaSelect
               v-model="props.row.categoria"
-              :tipo-afectacion="props.row.tipoAfectacion.id"
+              :tipo-afectacion="props.row.tipo_afectacion"
             ></CategoriaSelect>
           </q-td>
         </template>
@@ -185,7 +187,12 @@ import CategoriaSelect from '../formComponents/CategoriaSelect.vue'
 import { useFormato } from 'src/composables/utils/useFormato'
 import { api } from 'src/boot/axios'
 import { DateTime } from 'luxon'
+import { useNotificacion } from 'src/composables/utils/useNotificacion'
 
+/**
+ * Composables
+ */
+const notificacion = useNotificacion()
 /**
  * state
  */
@@ -212,6 +219,10 @@ const props = defineProps({
     }
   }
 })
+/**
+ * emits
+ */
+const emit = defineEmits(['itemsSaved'])
 /**
  *
  * @param {*} v
@@ -289,24 +300,29 @@ function obtenerMovimientosSantander(wb) {
       // console.log(`${key}: ${value}`)
       fecha = fecha.replace(key.toString(), value.toString())
     }
-    const tipoMovimientoId = row.retiro > 0 ? 2 : row.deposito > 0 ? 1 : 'n/a'
-    const importe =
-      row.retiro > 0
-        ? parseFloat(row.retiro) * -1
-        : row.deposito > 0
-        ? parseFloat(row.deposito)
-        : 0
-    const item = {
-      consecutivo: index + 1,
-      tipoMovimientoId,
-      fecha: fecha,
-      concepto: row.concepto,
-      importe,
-      saldo: row.saldo,
-      referencia: row.referencia,
-      saved: false
+    console.log('fecha', fecha)
+    const validDate = DateTime.fromFormat(fecha, 'dd/MM/yyyy')
+    if (validDate.isValid) {
+      const tipo_afectacion =
+        row.retiro > 0 ? 'C' : row.deposito > 0 ? 'A' : 'N/A'
+      const importe =
+        row.retiro > 0
+          ? parseFloat(row.retiro) * -1
+          : row.deposito > 0
+          ? parseFloat(row.deposito)
+          : 0
+      const item = {
+        consecutivo: index + 1,
+        tipo_afectacion,
+        fecha: fecha,
+        concepto: row.concepto,
+        importe,
+        saldo: row.saldo,
+        referencia: row.referencia
+        // saved: false
+      }
+      listaRegistros.value.push(item)
     }
-    listaRegistros.value.push(item)
   })
 }
 function obtenerMovimientosBancomer(wb) {
@@ -331,11 +347,7 @@ function obtenerMovimientosBancomer(wb) {
       console.log('row', row.cargo, row.abono)
       const cargo = row.cargo?.replace(',', '')
       const abono = row.abono?.replace(',', '')
-      const tipoAfectacion = !!cargo
-        ? { id: 'C', nombre: 'Egreso' }
-        : !!abono
-        ? { id: 'A', nombre: 'Ingreso' }
-        : null
+      const tipo_afectacion = !!cargo ? 'C' : !!abono ? 'A' : 'N/A'
       const importe = !!cargo
         ? parseFloat(cargo)
         : !!abono
@@ -343,8 +355,7 @@ function obtenerMovimientosBancomer(wb) {
         : 0
       const item = {
         consecutivo: index + 1,
-        tipoAfectacion,
-        tipoAfectacionId: tipoAfectacion.id,
+        tipo_afectacion,
         fecha: fecha,
         concepto: row.concepto,
         importe,
@@ -370,8 +381,8 @@ function saveItems() {
     listaRegistros.value.forEach((item) => {
       const fecha = DateTime.fromFormat(item.fecha, 'dd/MM/yyyy')
       const registro = {
-        tipoMovimientoId: item.tipoMovimientoId,
         estado_registro_id: 2, //cerrado
+        tipo_afectacion: item.tipo_afectacion,
         cuenta_id: props.cuenta.id,
         categoria_id: item.categoria.id,
         importe: parseFloat(item.importe),
@@ -393,6 +404,11 @@ function saveItemsAfterValidate(lista_registros) {
     .then((response) => {
       console.log('guardado correctamente')
       console.log('response', response)
+      notificacion.mostrarNotificacionPositiva(
+        'Los registros han sido guardados correctamente.',
+        1200
+      )
+      emit('itemsSaved')
     })
     .catch((error) => {
       console.error(error)
@@ -435,6 +451,9 @@ function deleteRow(props) {
 
   listaRegistros.value.splice(rowIndex, 1)
 }
+function fileClear() {
+  listaRegistros.value.length = 0
+}
 /**
  * computed
  */
@@ -447,13 +466,12 @@ const isSelected = computed({
 const columns = [
   // { name: 'id', label: 'Id', field: 'id', sortable: true, align: 'left' },
   {
-    name: 'fecha',
+    name: 'consecutivo',
     label: 'No.',
     field: 'consecutivo',
     sortable: true,
     align: 'left',
-    filter: false,
-    style: 'width:1%'
+    filter: false
   },
   {
     name: 'fecha',
@@ -461,16 +479,24 @@ const columns = [
     field: 'fecha',
     sortable: true,
     align: 'left',
-    filter: false,
-    style: 'width:10%'
+    filter: false
   },
+
   {
-    name: 'tipoAfectacion',
-    label: 'Tipo Afectacion',
-    field: (row) => row.tipoAfectacion.nombre,
+    name: 'concepto',
+    label: 'Concepto',
+    field: 'concepto',
     sortable: true,
     align: 'left',
-    filter: true
+    filter: true,
+    style: 'width: 30%'
+  },
+  {
+    name: 'importe',
+    label: 'Importe',
+    field: 'importe',
+    sortable: true,
+    align: 'right'
   },
   {
     name: 'categoria',
@@ -478,24 +504,7 @@ const columns = [
     field: 'categoria',
     sortable: true,
     align: 'center',
-    style: 'width:250px;max-width:250px'
-  },
-  {
-    name: 'concepto',
-    label: 'Concepto',
-    field: 'concepto',
-    sortable: true,
-    align: 'left',
-    filter: true
-  },
-  {
-    name: 'importe',
-    label: 'Importe',
-    field: 'importe',
-    sortable: true,
-    align: 'right',
-    // format: (val, row) => `${formato.toCurrency(parseFloat(val))}`,
-    style: 'width:200px'
+    style: 'width:30%'
   },
   {
     name: 'acciones',
@@ -503,7 +512,7 @@ const columns = [
     field: 'action',
     sortable: false,
     align: 'center',
-    style: 'width:100px'
+    style: 'width:5%'
   }
 ]
 function closeErrors() {

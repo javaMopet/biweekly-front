@@ -188,7 +188,12 @@ import IconPicker from '/src/components/IconPicker.vue'
 import CuentaContableSelect from '../formComponents/CuentaContableSelect.vue'
 import CuentaSelect from '../formComponents/CuentaSelect.vue'
 import PriceInput from '../formComponents/PriceInput.vue'
+import { useNotificacion } from 'src/composables/utils/useNotificacion'
 
+/**
+ * composables
+ */
+const notificacion = useNotificacion()
 /**
  * state
  */
@@ -354,6 +359,7 @@ const {
 onDoneCreateCategoria(({ data }) => {
   console.log('saved data...', data)
   if (!!data) {
+    notificacion.mostrarNotificacionPositiva('Categoría creada correctamente.')
     const itemSaved = data.categoriaCreate.categoria
     emit('categoriaSaved', itemSaved)
   }

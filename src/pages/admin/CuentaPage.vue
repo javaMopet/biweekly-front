@@ -221,25 +221,20 @@
 
   <Teleport to="#modal">
     <q-dialog v-model="showForm" persistent>
-      <RegistroMovimientoTarjeta
+      <RegistroMovimiento
         :cuenta-id="cuenta.id"
-        :registro-edited-item="registroEditedItem"
+        :edited-item="registroEditedItem"
         @registro-created="registroCreated"
         @registro-updated="registroUpdated"
-      ></RegistroMovimientoTarjeta>
-    </q-dialog>
-  </Teleport>
-  <Teleport to="#modal">
-    <q-dialog v-model="showFormMSI" persistent>
-      <RegistroMesesSinInteres
-        :registro-tarjeta="editRegistroItem"
-        @registroUpdated="registroMsiUpdated"
-      ></RegistroMesesSinInteres>
+      ></RegistroMovimiento>
     </q-dialog>
   </Teleport>
   <Teleport to="#modal">
     <q-dialog v-model="showFormCarga" persistent>
-      <CargaRegistrosCuenta :cuenta="cuenta"></CargaRegistrosCuenta>
+      <CargaRegistrosCuenta
+        :cuenta="cuenta"
+        @items-saved="itemsSaved"
+      ></CargaRegistrosCuenta>
     </q-dialog>
   </Teleport>
 </template>
@@ -248,17 +243,16 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { DateTime } from 'luxon'
-import RegistroMovimientoTarjeta from 'src/components/tarjetasCredito/RegistroMovimientoTarjeta.vue'
 import { api } from 'src/boot/axios'
 import { LISTA_REGISTROS } from 'src/graphql/registros'
 import { useLazyQuery } from '@vue/apollo-composable'
 import { useFormato } from 'src/composables/utils/useFormato'
 import { useRegistrosCrud } from 'src/composables/useRegistrosCrud'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
-import RegistroMesesSinInteres from 'src/components/tarjetasCredito/RegistroMesesSinInteres.vue'
 import { useQuasar } from 'quasar'
 import CargaRegistrosCuenta from 'src/components/cuentas/CargaRegistrosCuenta.vue'
 import CategoriaSelect from 'src/components/formComponents/CategoriaSelect.vue'
+import RegistroMovimiento from 'src/components/movimientos/RegistroMovimiento.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -274,7 +268,6 @@ const fecha_inicio = ref('1900-01-01')
 const fecha_fin = ref('1900-01-01')
 const dia_corte = ref(0)
 
-const listaRegistrosMsi = ref([])
 const listaRegistros = ref([])
 
 const registroEditedItem = ref([
@@ -494,7 +487,16 @@ function cargarMovimientos() {
   showFormCarga.value = true
 }
 function addItem() {
-  registroEditedItem.value = null
+  registroEditedItem.value = {
+    tipoMovimientoId: '1',
+    tipoAfectacion: 'A',
+    categoria: null,
+    estadoRegistroId: 2,
+    importe: '',
+    fecha: formato.formatoFecha(new Date()),
+    observaciones: '',
+    cuenta: cuenta.value
+  }
   showForm.value = true
 }
 
@@ -554,6 +556,13 @@ function registroUpdated() {
   )
   refetchListaRegistros()
   showForm.value = false
+}
+function itemsSaved() {
+  showFormCarga.value = false
+  loadOrRefetchListaRegistros()
+}
+function loadOrRefetchListaRegistros() {
+  cargaListaRegistros() || refetchListaRegistros()
 }
 
 const parentDblClick = (e) => {

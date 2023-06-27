@@ -170,7 +170,7 @@
                 <span class="categoria-nombre">{{ props.row.nombre }} </span>
                 &nbsp;
                 <span class="text-table-title categoria-subtitle">{{
-                  props.row.cuentaContable.nombreCompleto
+                  props.row.cuentaContable?.nombreCompleto
                 }}</span>
               </div>
               <span class="text-positive text-condensed">{{

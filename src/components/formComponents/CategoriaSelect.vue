@@ -1,9 +1,5 @@
 <template>
-  <!-- <pre>{{ filteredOptions }}</pre>
-  <pre>{{ resultadoLista }}</pre>
-  <pre>{{ optionsList }}</pre> -->
   <div class="row q-gutter-x-sm">
-    <q-toggle v-model="shift" color="green" keep-color />
     <div class="col">
       <q-select
         outlined
@@ -26,6 +22,33 @@
         :readonly="readonly"
         :autofocus="autofocus"
       >
+        <template #after>
+          <q-btn color="more-button" round flat dense icon="more_vert">
+            <q-menu>
+              <q-list style="min-width: 100px">
+                <q-item v-close-popup v-if="isCambiable">
+                  <q-item-section>
+                    <q-toggle
+                      :label="lblChangeTipoMovimiento"
+                      v-model="shift"
+                      @update:model-value="toogleTipoAfectacion"
+                      color="green"
+                      keep-color
+                  /></q-item-section>
+                </q-item>
+                <q-item
+                  clickable
+                  @click="addItemCategoria(props)"
+                  v-close-popup
+                >
+                  <q-item-section class="text-teal">
+                    Nueva categoría
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </q-menu>
+          </q-btn>
+        </template>
         <template v-slot:no-option>
           <q-item>
             <q-item-section class="text-grey"> No results </q-item-section>
@@ -40,7 +63,10 @@
 
   <Teleport to="#modal">
     <q-dialog v-model="showRegistroCategoria" persistent>
-      <registro-categoria></registro-categoria>
+      <registro-categoria
+        :edited-item="editedCategoriaParam"
+        @categoriaSaved="categoriaSaved"
+      ></registro-categoria>
     </q-dialog>
   </Teleport>
 </template>
@@ -48,14 +74,15 @@
 <script setup>
 import { useQuery } from '@vue/apollo-composable'
 import { LISTA_CATEGORIAS } from 'src/graphql/categorias'
-import { ref, onMounted, computed, Teleport } from 'vue'
+import { ref, toRefs, watch, onMounted, computed, Teleport } from 'vue'
 import RegistroCategoria from '../categorias/RegistroCategoria.vue'
 
 /**
  * onMounted
  */
 onMounted(() => {
-  console.log('inicializando')
+  // console.log('inicializando', props.tipoAfectacion)
+  tipoMovimientoId.value = props.tipoAfectacion === 'A' ? '1' : '2'
   // if (filteredOptions.value.length <= 0) {
   //   console.log('recargando ')
   //   reloadResultadoLista()
@@ -67,6 +94,10 @@ onMounted(() => {
 const filteredOptions = ref([])
 const showRegistroCategoria = ref(false)
 const shift = ref(false)
+const tipoMovimientoId = ref('1')
+const editedCategoriaParam = ref({ tipoMovimientoId: tipoMovimientoId.value })
+
+const { tipoAfectacion } = toRefs(props)
 /**
  * props
  */
@@ -100,12 +131,24 @@ const props = defineProps({
     type: Boolean,
     required: false,
     default: false
+  },
+  isCambiable: {
+    type: Boolean,
+    required: false,
+    default: true
   }
 })
 /**
  * emits
  */
 const emit = defineEmits(['update:modelValue'])
+/**
+ * watch
+ */
+watch(tipoAfectacion, (newVal, oldVal) => {
+  // console.log('new - old ', newVal, oldVal)
+  tipoMovimientoId.value = newVal === 'A' ? '1' : '2'
+})
 /**
  * graphql
  */
@@ -124,6 +167,27 @@ const {
 /**
  * computed
  */
+// const valor = computed({
+//   get() {
+//     return props.modelValue
+//   },
+//   set(val) {
+//     emit('update:modelValue', val)
+//   }
+// })
+// const tipoMovimientoId =computed({
+//   get(){
+
+//   },
+//   set(val){
+
+//   }
+// })
+const lblChangeTipoMovimiento = computed({
+  get() {
+    return tipoMovimientoId.value === '2' ? 'Ingreso' : 'Egreso'
+  }
+})
 const categoria = computed({
   get() {
     return props.modelValue
@@ -134,9 +198,9 @@ const categoria = computed({
 })
 const optionsList = computed({
   get() {
-    if (!!props.tipoMovimientoId) {
+    if (!!tipoMovimientoId.value) {
       return (resultadoLista.value?.listaCategorias ?? []).filter(
-        (categoria) => categoria.tipoMovimientoId === props.tipoMovimientoId
+        (categoria) => categoria.tipoMovimientoId === tipoMovimientoId.value
       )
     } else {
       return resultadoLista.value?.listaCategorias ?? []
@@ -145,7 +209,7 @@ const optionsList = computed({
 })
 const tipoMovimientoLabel = computed({
   get() {
-    return props.tipoAfectacion === 'C' ? 'Egreso' : 'Ingreso'
+    return tipoMovimientoId.value === '2' ? 'Egreso' : 'Ingreso'
   }
 })
 onErrorListaCuentas((error) => {
@@ -171,6 +235,22 @@ function filterFn(val, update) {
 }
 function agregarCategoria() {
   showRegistroCategoria.value = true
+}
+function toogleTipoAfectacion(val) {
+  categoria.value = null
+  tipoMovimientoId.value = tipoMovimientoId.value === '1' ? '2' : '1'
+}
+function addItemCategoria(props_row) {
+  editedCategoriaParam.value = {
+    tipoMovimientoId: tipoMovimientoId.value,
+    cuentaContable: null,
+    cuentaDefault: null
+  }
+  showRegistroCategoria.value = true
+}
+function categoriaSaved(value) {
+  categoria.value = value
+  showRegistroCategoria.value = false
 }
 </script>
 
