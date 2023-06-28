@@ -61,6 +61,7 @@
       <RegistroCuentaContable
         v-model="cuentaContable"
         :edited-item="formEditedItem"
+        @cuentaContableSaved="cuentaContableSaved"
       ></RegistroCuentaContable>
     </q-dialog>
   </Teleport>
@@ -207,9 +208,14 @@ function addItemCuentaContable() {
       tipoAfectacion: 'A'
     },
     tipoAfectacion: { id: 'A', nombre: 'Abono' },
-    subnivel: 0
+    subnivel: 0,
+    action: 'add'
   }
   form_cuentaContable_show.value = true
+}
+function cuentaContableSaved(item) {
+  form_cuentaContable_show.value = false
+  cuentaContable.value = item
 }
 </script>
 

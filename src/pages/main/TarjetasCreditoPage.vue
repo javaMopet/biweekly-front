@@ -66,11 +66,11 @@
               <div class="column">
                 <div class="row inline fit">
                   <div class="col-4 items-center justify-center column">
-                    <q-avatar size="60px" color="primary-light">
+                    <q-avatar size="45px" color="primary-light">
                       <q-img
                         :src="`/icons/${props.row.banco?.icono ?? 'cash.png'}`"
-                        width="50px"
-                        height="50px"
+                        width="45px"
+                        height="45px"
                       />
                     </q-avatar>
                   </div>
@@ -136,7 +136,7 @@
                     </q-btn>
                   </div>
                 </div>
-                <div class="q-my-md row">
+                <div class="q-my-lg row">
                   <q-img src="/icons/chip-credit-card.png" width="40px" />
                   <div class="q-ml-lg">
                     <router-link

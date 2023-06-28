@@ -34,7 +34,7 @@
                   lazy-rules
                   :rules="[
                     (val) =>
-                      (val && val.length > 0) ||
+                      !!val ||
                       'Favor de ingresar el tipo de afectación de la cuenta contable'
                   ]"
                   outlined
@@ -223,6 +223,7 @@ function saveItem() {
   const padreId = parseInt(editedFormItem.value.padre.id)
   const input = {
     ...editedFormItem.value,
+    tipoAfectacion: editedFormItem.value.tipoAfectacion.id,
     padreId,
     padre: undefined,
     action: undefined,
@@ -296,7 +297,8 @@ function identificadorIngresado(evt) {
         console.log('response', data)
         if (!!data) {
           notificacion.mostrarNotificacionNegativa(
-            'Ya existe una cuenta con el id ingresado'
+            'Ya existe una cuenta con el id ingresado',
+            600
           )
           isError.value = true
         } else {
@@ -309,7 +311,8 @@ function identificadorIngresado(evt) {
         } else {
           console.log('error', error.message)
           notificacion.mostrarNotificacionNegativa(
-            'Surgió un error con la cuenta contable'
+            'Surgió un error con la cuenta contable',
+            1000
           )
           isError.value = true
         }

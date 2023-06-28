@@ -33,6 +33,7 @@ export const CUENTA_CONTABLE_CREATE = gql`
       cuentaContable {
         id
         nombre
+        nombreCompleto
         tipoAfectacion
         subnivel
         padreId

@@ -448,7 +448,8 @@ onMounted(() => {
   mes.value = mes_value
 
   api.get(`/cuentas/${route.params.id}`).then((response) => {
-    cuenta.value = response?.data ?? {}
+    cuenta.value = response?.data.data ?? {}
+    console.log('cuenta', cuenta.value)
     dia_corte.value = cuenta.value.dia_corte
     obtenerSaldoAnterior()
     obtener_fecha_inicio()
@@ -600,6 +601,7 @@ function obtener_fecha_inicio() {
     '0' +
     (mes.value.id - 1)
   ).slice(-2)}-${cuenta.value.dia_corte}`
+  console.log('fecha_inicio', fecha_inicio.value)
 }
 function obtener_fecha_fin() {
   fecha_fin.value = `${ejercicio_fiscal.value}-${('0' + mes.value.id).slice(
