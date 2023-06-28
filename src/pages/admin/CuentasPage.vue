@@ -25,7 +25,7 @@
               @click="addRow(1)"
               text-color="accent-light"
             >
-              <q-list>
+              <q-list class="bg-primary-light">
                 <q-item clickable v-close-popup @click="addRow(1)">
                   <q-item-section avatar>
                     <q-avatar
@@ -35,7 +35,7 @@
                     />
                   </q-item-section>
                   <q-item-section>
-                    <q-item-label>Ahorros</q-item-label>
+                    <q-item-label>Cuenta de Ahorros</q-item-label>
                     <!-- <q-item-label caption>February 22, 2016</q-item-label> -->
                   </q-item-section>
                   <!-- <q-item-section side>
@@ -52,7 +52,7 @@
                     />
                   </q-item-section>
                   <q-item-section>
-                    <q-item-label>Efectivo</q-item-label>
+                    <q-item-label>Cuenta de Efectivo</q-item-label>
                     <!-- <q-item-label caption>February 22, 2016</q-item-label> -->
                   </q-item-section>
                   <!-- <q-item-section side>

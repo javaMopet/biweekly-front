@@ -17,7 +17,6 @@
       <q-toolbar-title> </q-toolbar-title>
       <q-btn flat round dense icon="apps" class="q-mr-xs" />
     </q-toolbar>
-
     <q-toolbar inset class="bg-grey-1">
       <div class="row q-gutter-x-md">
         <q-btn

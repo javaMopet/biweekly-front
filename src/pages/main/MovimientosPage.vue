@@ -12,7 +12,8 @@
         hide-pagination
       >
         <template #top-left>
-          <div class="row inline q-gutter-x-md" style="border: 0px solid red">
+          <div class="row inline q-gutter-x-md items-center">
+            <span>Movements</span>
             <q-select
               v-model="periodo"
               :options="periodoOptions"
@@ -563,20 +564,20 @@ function obtenerSaldosCuentas() {
     .catch((error) => {
       console.log('error', error)
     })
-  api
-    .get('/saldos_cuentas', {
-      params: {
-        ejercicio_fiscal_id: 2023,
-        isSaldos: 1
-      }
-    })
-    .then(({ data }) => {
-      console.log('response data', data.data)
-      saldosCuentas.value = JSON.parse(JSON.stringify(data.data))
-    })
-    .catch((error) => {
-      console.log('error', error)
-    })
+  // api
+  //   .get('/saldos_cuentas', {
+  //     params: {
+  //       ejercicio_fiscal_id: 2023,
+  //       isSaldos: 1
+  //     }
+  //   })
+  //   .then(({ data }) => {
+  //     console.log('response data', data.data)
+  //     saldosCuentas.value = JSON.parse(JSON.stringify(data.data))
+  //   })
+  //   .catch((error) => {
+  //     console.log('error', error)
+  //   })
 }
 
 function obtenerSaldosFinales() {

@@ -58,60 +58,49 @@
         <template #item="props">
           <!--clase: tarjeta__cuenta -->
           <q-card
-            class="q-ma-sm tarjeta__cuenta"
-            outlined
-            bordered
-            style="width: 380px; min-width: 380px"
+            class="tarjeta__cuenta bg-primary-light q-ma-lg"
+            style="width: 330px; min-width: 330px"
           >
             <!-- @click="mostrarMovimientos(props.row.id)" -->
-            <q-item class="text-primary">
-              <q-item-section avatar top>
-                <q-icon name="credit_card" size="40px" color="orange-6" />
-              </q-item-section>
-              <q-item-section align="left">
-                <q-item-label class="text-dark text-bold text-h6">
-                  {{ props.row.nombre }}
-                </q-item-label>
-                <!-- <q-separator
-                  spaced
-                  inset
-                  color="grey-5"
-                  style="width: 100%; margin-left: 0px !important"
-                /> -->
-                <!-- <q-item-label caption lines="2" class="text-grey-7"></q-item-label> -->
-                <router-link
-                  :to="{ name: 'tarjetaCredito', params: { id: props.row.id } }"
-                  class="tarjeta__credito--link"
-                >
-                  <div
-                    class="fit flex flex-left text-left non-selectable q-py-sm"
-                  >
-                    **** **** {{ props.row.identificador }}
+            <q-card-section>
+              <div class="column">
+                <div class="row inline fit">
+                  <div class="col-4 items-center justify-center column">
+                    <q-avatar size="60px" color="primary-light">
+                      <q-img
+                        :src="`/icons/${props.row.banco?.icono ?? 'cash.png'}`"
+                        width="50px"
+                        height="50px"
+                      />
+                    </q-avatar>
                   </div>
-                  <q-tooltip> Abrir movimientos </q-tooltip>
-                </router-link>
-
-                <q-item-label
-                  align="right"
-                  caption
-                  lines="2"
-                  class="text-blue-grey-6 text-bold text-h3"
-                  ><span class="text-h6">{{
-                    formato.toCurrency(props.row.saldo)
-                  }}</span>
-                </q-item-label>
-              </q-item-section>
-              <q-item-section
-                side
-                top
-                cursor-pointer
-                class="q-ml-md"
-                @click.prevent
-              >
-                <q-btn color="more_button" icon="more_vert" flat dense round>
-                  <q-menu>
-                    <q-list style="min-width: 100px">
-                      <!-- <q-item
+                  <div
+                    class="col-6"
+                    align="right"
+                    style="border: 0px solid purple"
+                  >
+                    <q-item-label
+                      align="right"
+                      class="text-dark text-bold text-h6"
+                    >
+                      {{ props.row.nombre }}
+                    </q-item-label>
+                  </div>
+                  <div
+                    class="col-2"
+                    align="right"
+                    style="border: 0px solid red"
+                  >
+                    <q-btn
+                      color="more-button"
+                      icon="more_vert"
+                      flat
+                      dense
+                      round
+                    >
+                      <q-menu>
+                        <q-list style="min-width: 100px">
+                          <!-- <q-item
                         clickable
                         @click="mostrarMovimientos(props.row.id)"
                         v-close-popup
@@ -121,66 +110,65 @@
                         </q-item-section>
                         <q-item-section>Movimientos</q-item-section>
                       </q-item> -->
-                      <q-item clickable @click="editRow(props)" v-close-popup>
-                        <q-item-section avatar>
-                          <q-icon name="edit" color="info"
-                        /></q-item-section>
-                        <q-item-section>Editar</q-item-section>
-                      </q-item>
-                      <q-separator />
-                      <q-item clickable @click="deleteRow(props)" v-close-popup>
-                        <q-item-section avatar>
-                          <q-icon name="delete" color="negative"
-                        /></q-item-section>
-                        <q-item-section>Eliminar</q-item-section>
-                      </q-item>
-                    </q-list>
-                  </q-menu>
-                </q-btn>
-                <!-- <q-icon
-                  name="more_horiz"
-                  color="dark"
-                  cursor-pointer
-                  clickable
-                  outlined
-                /> -->
-                <!-- <q-btn color="contrast" flat icon="menu" style="width: 18px">
-                  <q-menu>
-                    <q-list style="min-width: 100px">
-                      <q-item clickable v-close-popup>
-                        <q-item-section>Movimientos</q-item-section>
-                      </q-item>
-                      <q-separator inset horizontal spaced />
-                      <q-item clickable v-close-popup>
-                        <q-item-section>Modificar</q-item-section>
-                      </q-item>
-                      <q-item clickable v-close-popup>
-                        <q-item-section>Eliminar</q-item-section>
-                      </q-item>
-                    </q-list>
-                  </q-menu>
-                </q-btn> -->
-              </q-item-section>
-            </q-item>
-
-            <!-- <q-separator inset color="grey-7" />
-            <q-card-actions align="left">
-              <q-btn
-                round
-                flat
-                icon="edit"
-                @click="editRow(props)"
-                color="info"
-              />
-              <q-btn
-                round
-                flat
-                icon="delete"
-                color="negative-pastel"
-                class="q-ml-sm"
-                @click="deleteRow(props)"
-              />
-            </q-card-actions> -->
+                          <q-item
+                            clickable
+                            @click="editRow(props)"
+                            v-close-popup
+                          >
+                            <q-item-section avatar>
+                              <q-icon name="edit" color="info"
+                            /></q-item-section>
+                            <q-item-section>Editar</q-item-section>
+                          </q-item>
+                          <q-separator />
+                          <q-item
+                            clickable
+                            @click="deleteRow(props)"
+                            v-close-popup
+                          >
+                            <q-item-section avatar>
+                              <q-icon name="delete" color="negative"
+                            /></q-item-section>
+                            <q-item-section>Eliminar</q-item-section>
+                          </q-item>
+                        </q-list>
+                      </q-menu>
+                    </q-btn>
+                  </div>
+                </div>
+                <div class="q-my-md row">
+                  <q-img src="/icons/chip-credit-card.png" width="40px" />
+                  <div class="q-ml-lg">
+                    <router-link
+                      :to="{
+                        name: 'tarjetaCredito',
+                        params: { id: props.row.id }
+                      }"
+                      class="tarjeta__credito--link"
+                    >
+                      <div
+                        class="fit flex flex-left text-left non-selectable q-py-sm"
+                      >
+                        **** **** **** {{ props.row.identificador }}
+                      </div>
+                      <q-tooltip> Abrir movimientos </q-tooltip>
+                    </router-link>
+                  </div>
+                </div>
+                <div class="row justify-between items-center q-mx-lg">
+                  <span class="text-caption">HORACIO PEÑA MENDOZA</span>
+                  <q-item-label
+                    align="right"
+                    caption
+                    lines="2"
+                    class="text-blue-grey-6 text-bold text-h3"
+                    ><span class="text-h6">{{
+                      formato.toCurrency(props.row.saldo)
+                    }}</span>
+                  </q-item-label>
+                </div>
+              </div>
+            </q-card-section>
           </q-card>
         </template>
         <template #body-cell-icono="props">
@@ -199,7 +187,6 @@
         ></RegistroCuenta>
       </q-dialog>
     </Teleport>
-    <!-- <pre>{{ listaCuentas }}</pre> -->
   </div>
 </template>
 
@@ -416,7 +403,8 @@ function mostrarMovimientos(value) {
 
 <style lang="scss">
 .tarjeta__credito--link {
-  font-size: 0.85rem;
+  font-size: 1rem;
+  letter-spacing: -0.025rem;
   color: #a19ba9 !important;
   text-decoration: underline !important;
   color: $dark;

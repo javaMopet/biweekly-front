@@ -21,6 +21,23 @@
         :rules="rules"
         :readonly="props.readonly"
       >
+        <template #after>
+          <q-btn color="more-button" round flat dense icon="more_vert">
+            <q-menu>
+              <q-list style="min-width: 100px">
+                <q-item
+                  clickable
+                  @click="addItemCuentaContable(props)"
+                  v-close-popup
+                >
+                  <q-item-section class="text-teal">
+                    Nueva cuenta contable
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </q-menu>
+          </q-btn>
+        </template>
         <template v-slot:no-option>
           <q-item>
             <q-item-section class="text-grey"> No results </q-item-section>
@@ -28,7 +45,7 @@
         </template>
       </q-select>
     </div>
-    <div class="q-mt-xs" style="border: 0px solid red" v-if="props.isAlta">
+    <!-- <div class="q-mt-xs" style="border: 0px solid red" v-if="props.isAlta">
       <q-btn
         color="accent"
         outline
@@ -36,12 +53,15 @@
         dense
         @click="registrarCuentaContable"
       />
-    </div>
+    </div> -->
   </div>
 
   <Teleport to="#modal">
     <q-dialog v-model="form_cuentaContable_show" persistent>
-      <RegistroCuentaContable></RegistroCuentaContable>
+      <RegistroCuentaContable
+        v-model="cuentaContable"
+        :edited-item="formEditedItem"
+      ></RegistroCuentaContable>
     </q-dialog>
   </Teleport>
 </template>
@@ -57,6 +77,7 @@ import RegistroCuentaContable from '../cuentasContables/RegistroCuentaContable.v
  */
 const filteredOptions = ref([])
 const form_cuentaContable_show = ref(false)
+const formEditedItem = ref(null)
 /**
  * props
  */
@@ -172,8 +193,22 @@ function filterFn(val, update) {
     )
   })
 }
-function registrarCuentaContable() {
+function addItemCuentaContable() {
   console.log('registrar una cuenta contable')
+
+  formEditedItem.value = {
+    padre: {
+      __typename: 'CuentaContable',
+      id: '212000',
+      nombre: 'Documentos por Pagar a Corto Plazo',
+      nombreCompleto: '212000 - Documentos por Pagar a Corto Plazo',
+      padreId: 210000,
+      subnivel: 1,
+      tipoAfectacion: 'A'
+    },
+    tipoAfectacion: { id: 'A', nombre: 'Abono' },
+    subnivel: 0
+  }
   form_cuentaContable_show.value = true
 }
 </script>

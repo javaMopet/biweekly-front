@@ -1,66 +1,92 @@
 <template>
   <q-card class="my-card" style="width: 400px">
-    <q-card-section class="bg-primary">
-      <q-btn
-        round
-        flat
-        dense
-        icon="close"
-        class="float-right"
-        color="accent"
-        v-close-popup
-        vertical-top
-      ></q-btn>
+    <q-card-section
+      class="bg-main-menu row inline fit q-py-sm justify-between items-center"
+    >
       <div class="text-subtitle1 text-accent-light">{{ actionName }}</div>
-      <!-- <pre>{{ editedFormItem }}</pre> -->
+      <div class="">
+        <q-btn
+          round
+          flat
+          dense
+          icon="close"
+          class="float-right"
+          color="accent"
+          v-close-popup
+          vertical-top
+        ></q-btn>
+      </div>
+      <!-- <pre>{{ editedFormItem.tipoAfectacion }}</pre> -->
     </q-card-section>
 
     <q-card-section class="">
       <q-form @submit="saveItem" class="q-gutter-md">
         <div class="q-gutter-md">
+          <div>
+            <div class="row inline fit">
+              <div class="col q-mr-md">
+                <q-select
+                  v-model="editedFormItem.tipoAfectacion"
+                  :options="tiposAfectacionOptions"
+                  label="Tipo de Afectación"
+                  option-label="nombre"
+                  option-value="id"
+                  lazy-rules
+                  :rules="[
+                    (val) =>
+                      (val && val.length > 0) ||
+                      'Favor de ingresar el tipo de afectación de la cuenta contable'
+                  ]"
+                  outlined
+                  color="secondary"
+                  dense
+                />
+              </div>
+              <div class="col">
+                <q-input
+                  v-model="editedFormItem.subnivel"
+                  type="text"
+                  label="Subnivel"
+                  dense
+                  readonly
+                  outlined
+                  color="secondary"
+                />
+              </div>
+            </div>
+          </div>
           <div class="">
             <CuentaContableSelect
               v-model="editedFormItem.padre"
-              tipo-afectacion="C"
+              :subnivel="1"
+              :tipo-afectacion="editedFormItem.tipoAfectacion.id"
               input-label="Padre"
               :readonly="isReadonly"
             ></CuentaContableSelect>
           </div>
-          <div class="row">
-            <div class="col q-mr-xs">
-              <q-input
-                v-model="editedFormItem.id"
-                type="text"
-                label="Id"
-                placeholder="Favor de ingresar el Id"
-                dense
-                maxlength="6"
-                min
-                mask="######"
-                lazy-rules
-                :rules="[
-                  (val) => !!val || 'Favor de ingresar el Id',
-                  (val) =>
-                    (!!val && val.length >= 6) ||
-                    'Please use maximum 5 character'
-                ]"
-                :readonly="isReadonly"
-                outlined
-                color="secondary"
-              />
-            </div>
-            <div class="col q-ml-xs">
-              <q-input
-                v-model="editedFormItem.subnivel"
-                type="text"
-                label="Subnivel"
-                dense
-                readonly
-                outlined
-                color="secondary"
-              />
-            </div>
+          <div class="col">
+            <q-input
+              v-model="editedFormItem.id"
+              type="text"
+              label="Id"
+              placeholder="Favor de ingresar el Id"
+              dense
+              maxlength="6"
+              min
+              mask="######"
+              lazy-rules
+              :rules="[
+                (val) => !!val || 'Favor de ingresar el Id',
+                (val) =>
+                  (!!val && val.length >= 6) || 'Please use maximum 5 character'
+              ]"
+              :readonly="isReadonly"
+              outlined
+              color="secondary"
+              @blur="identificadorIngresado"
+            />
           </div>
+
           <div>
             <q-input
               v-model="editedFormItem.nombre"
@@ -79,24 +105,6 @@
             />
           </div>
           <div></div>
-          <div>
-            <q-select
-              v-model="editedFormItem.tipoAfectacion"
-              :options="tiposAfectacionOptions"
-              label="Tipo de Afectación"
-              option-label="nombre"
-              option-value="id"
-              lazy-rules
-              :rules="[
-                (val) =>
-                  (val && val.length > 0) ||
-                  'Favor de ingresar el tipo de afectación de la cuenta contable'
-              ]"
-              outlined
-              color="secondary"
-              dense
-            />
-          </div>
         </div>
         <div align="right" class="q-gutter-sm">
           <q-btn
@@ -106,7 +114,12 @@
             flat
             class="q-ml-sm"
           />
-          <q-btn :label="lblSubmit" type="submit" color="primary" />
+          <q-btn
+            :label="lblSubmit"
+            type="submit"
+            color="primary"
+            :disable="isError"
+          />
         </div>
       </q-form>
     </q-card-section>
@@ -122,23 +135,32 @@ import {
 } from 'src/graphql/cuentasContableGql'
 import { useMutation } from '@vue/apollo-composable'
 import CuentaContableSelect from '../formComponents/CuentaContableSelect.vue'
+import { api } from 'src/boot/axios'
+import { useNotificacion } from 'src/composables/utils/useNotificacion'
 
+/**
+ * composables
+ */
+const notificacion = useNotificacion()
 // import IconPicker from '/src/components/IconPicker.vue'
 /**
  * state
  */
 const formItem = ref({
-  id: '',
+  id: undefined,
   nombre: '',
   subnivel: 0,
-  padre: '',
+  padre: null,
   tipoAfectacion: ''
 })
 
-const tiposAfectacionOptions = ref(['Cargo', 'Abono'])
+const tiposAfectacionOptions = ref([
+  { id: 'C', nombre: 'Cargo' },
+  { id: 'A', nombre: 'Abono' }
+])
 
-const tiposCuentaContableOptions = ref([])
-const cuentasContablesOptions = ref([])
+const isError = ref(false)
+
 /**
  * props
  */
@@ -147,10 +169,7 @@ const props = defineProps({
     type: Object,
     required: false,
     default: () => {
-      return {
-        id: null,
-        nombre: null
-      }
+      return null
     }
   }
 })
@@ -163,7 +182,7 @@ const emit = defineEmits(['cuentaContableSaved', 'cuentaContableUpdated'])
  */
 const editedFormItem = computed({
   get() {
-    return props.editedItem
+    return !!props.editedItem ? props.editedItem : formItem.value
   },
   set(val) {
     formItem.value = val
@@ -265,6 +284,38 @@ onDoneUpdateCuentaContable(({ data }) => {
 onErrorUpdateCuentaContable((error) => {
   console.error(error)
 })
+function identificadorIngresado(evt) {
+  const value = evt.target.value
+  console.log('value', value)
+  console.log('value', value.length)
+  if (value.length === 6) {
+    console.log('recuperando....')
+    api
+      .get(`/cuentas_contable/${value}`)
+      .then(({ data }) => {
+        console.log('response', data)
+        if (!!data) {
+          notificacion.mostrarNotificacionNegativa(
+            'Ya existe una cuenta con el id ingresado'
+          )
+          isError.value = true
+        } else {
+          isError.value = false
+        }
+      })
+      .catch((error) => {
+        if (error.message.includes('404')) {
+          isError.value = false
+        } else {
+          console.log('error', error.message)
+          notificacion.mostrarNotificacionNegativa(
+            'Surgió un error con la cuenta contable'
+          )
+          isError.value = true
+        }
+      })
+  }
+}
 </script>
 
 <style lang="sass" scoped>

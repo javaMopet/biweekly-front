@@ -92,7 +92,7 @@
         <template #body-cell-fecha="props">
           <q-td style="width: 150px" class="bg-white">
             <DateInput
-              v-model="props.row.registro.fecha"
+              v-model="props.row.fecha"
               lbl_field="Fecha"
               :optional="false"
               :rango-fecha-inicio="categoria.fecha_inicio_formato"
@@ -100,13 +100,13 @@
               v-if="!props.row.saved"
             ></DateInput>
             <!-- v-model="props.row.registro.fecha_formato" -->
-            <q-item-label v-else>{{ props.row.registro.fecha }}</q-item-label>
+            <q-item-label v-else>{{ props.row.fecha }}</q-item-label>
           </q-td>
         </template>
         <template #body-cell-importe="props">
           <q-td style="width: 160px">
             <PriceInput
-              v-model="props.row.registro.importe"
+              v-model="props.row.importe"
               :readonly="props.row.saved"
               :autofocus="true"
             ></PriceInput>
@@ -116,7 +116,7 @@
         <template #body-cell-cuenta="props">
           <q-td style="width: 240px; min-width: 240px; max-width: 240px">
             <CuentaSelect
-              v-model="props.row.registro.cuenta"
+              v-model="props.row.cuenta"
               :agregar="false"
               :readonly="props.row.saved"
             ></CuentaSelect>
@@ -126,7 +126,7 @@
         <template #body-cell-observaciones="props">
           <q-td>
             <q-input
-              v-model="props.row.registro.observaciones"
+              v-model="props.row.observaciones"
               type="textarea"
               label="observaciones"
               dense
@@ -244,7 +244,7 @@ const columns = [
   {
     name: 'fecha',
     label: 'Fecha',
-    field: (row) => formato.formatoFecha(row.registro.fecha),
+    field: (row) => formato.formatoFecha(row.fecha),
     sortable: true,
     align: 'center'
   },
@@ -265,7 +265,7 @@ const columns = [
   {
     name: 'observaciones',
     label: 'Observaciones',
-    field: (row) => row.registro.observaciones,
+    field: (row) => row.observaciones,
     sortable: true,
     align: 'left'
   },
@@ -287,13 +287,11 @@ function addItem() {
   const item = {
     categoriaId: props.cellData.categoriaId,
     cuentaValida: true,
-    registro: {
-      estadoRegistroId: 1,
-      importe,
-      fecha,
-      cuenta: categoria.value.cuentaDefault,
-      observaciones: ''
-    }
+    estadoRegistroId: 1,
+    importe,
+    fecha,
+    cuenta: categoria.value.cuentaDefault,
+    observaciones: ''
   }
   listaRegistros.value.push(item)
 }
@@ -319,29 +317,39 @@ const row_to_insert = ref(null)
 
 function saveItem(row) {
   if (isInputItemValid(row)) {
-    const input = {
-      categoriaId: row.categoriaId,
-      estadoRegistroId: 2,
-      tipoAfectacion: 'A',
-      cuentaId: parseInt(row.registro.cuenta.id),
-      importe: parseFloat(row.registro.importe),
-      fecha: formato.convertDateFromInputToIso(row.registro.fecha),
-      observaciones: row.observaciones
+    console.log('categoria', categoria.value.tipoMovimiento.id)
+    if (['1', '2'].includes(categoria.value.tipoMovimiento.id)) {
+      const tipoAfectacion =
+        categoria.value.tipoMovimiento.id === '1' ? 'A' : 'C'
+      const importe =
+        // tipoAfectacion === 'C'
+        //   ? parseFloat(row.registro.importe) * -1:
+        parseFloat(row.importe)
+      const input = {
+        categoriaId: row.categoriaId,
+        estadoRegistroId: 2,
+        tipoAfectacion,
+        cuentaId: parseInt(row.cuenta.id),
+        importe,
+        fecha: formato.convertDateFromInputToIso(row.fecha),
+        observaciones: row.observaciones
+      }
+      row_to_insert.value = row
+      registrosCrud.createRegistro({ input })
     }
-    row_to_insert.value = row
-    registrosCrud.createRegistro({ input })
   }
 }
 
 function isInputItemValid(row) {
+  console.log('row', row)
   errorsList.value.length = 0
-  if (!row.registro.fecha) {
+  if (!row.fecha) {
     addError(1, 'Favor de ingresar la fecha del registro')
   }
-  if (!row.registro.importe) {
+  if (!(row.importe !== 0)) {
     addError(2, 'Ingresar un importe mayo a cero')
   }
-  if (!row.registro.cuenta) {
+  if (!row.cuenta) {
     addError(3, 'Favor de seleccionar una cuenta de gasto')
   }
   return errorsList.value.length <= 0
@@ -423,9 +431,8 @@ onResultListaRegistros(({ data }) => {
   if (data.obtenerRegistros.length > 0) {
     listaRegistros.value = JSON.parse(JSON.stringify(data.obtenerRegistros))
     listaRegistros.value.forEach((element) => {
-      element.registro.fecha_formato = formato.formatoFechaFromISO(
-        element.registro.fecha
-      )
+      element.fecha = formato.convertDateFromIsoToInput(element.fecha)
+      element.importe = element.importe.toString()
       element.saved = true
     })
   } else {
