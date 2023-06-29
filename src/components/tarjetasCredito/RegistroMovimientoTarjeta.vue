@@ -34,13 +34,19 @@
           <div class="row inline q-gutter-x-xs">
             <div class="col column">
               <div class="row input-label">Fecha de registro:</div>
-              <DateInput v-model="editedFormItem.fecha"></DateInput>
+              <DateInput
+                v-model="editedFormItem.fecha"
+                :rules="[(val) => !!val || 'Favor de ingresar la fecha']"
+              ></DateInput>
             </div>
             <div class="col column">
               <div class="row input-label">Importe:</div>
               <PriceInput
                 label="Importe"
                 v-model="editedFormItem.importe"
+                :rules="[
+                  (val) => !!val || 'Favor de ingresar un importe válido'
+                ]"
               ></PriceInput>
             </div>
           </div>
@@ -48,8 +54,6 @@
           <div class="row input-label">Categoría:</div>
           <CategoriaSelect
             v-model="editedFormItem.categoria"
-            :tipoMovimientoId="tipoMovimientoId"
-            :readonly="true"
             :rules="[(val) => !!val || 'Selecciona una categoría']"
           ></CategoriaSelect>
           <div class="row">

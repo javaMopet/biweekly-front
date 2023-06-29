@@ -69,8 +69,20 @@
         color="toolbar-button"
         @click="cargarMovimientos"
       /> -->
+
       <div class="row q-gutter-x-md">
-        <q-btn-dropdown
+        <q-btn
+          color="primary-button"
+          outline
+          @click="cargarMovimientos"
+          no-caps
+        >
+          <q-avatar square size="24px">
+            <q-img src="/icons/excel.png" width="24px" height="24px" />
+          </q-avatar>
+          <span class="q-ml-sm">Importar Movimientos</span>
+        </q-btn>
+        <!-- <q-btn-dropdown
           label="AGREGAR"
           color="primary-button"
           class=""
@@ -100,21 +112,16 @@
                 avatar
                 style="min-width: 45px !important; width: 45px !important"
               >
-                <!-- <q-icon name="format_list_bulleted" /> -->
-
                 <q-avatar text-color="white" square>
                   <q-img src="/icons/excel.png" width="35px" height="35px" />
                 </q-avatar>
-                <!-- spinner-color="primary"
-                spinner-size="82px"
-              :ratio="16 / 9"-->
               </q-item-section>
               <q-item-section>
                 <q-item-label>Importar Movimientos</q-item-label>
               </q-item-section>
             </q-item>
           </q-list>
-        </q-btn-dropdown>
+        </q-btn-dropdown> -->
         <q-btn
           icon="payments"
           color="toolbar-button"
@@ -237,6 +244,19 @@
       </div>
     </q-card-section>
     <q-card-section>
+      <!-- <q-btn
+        class="btn-add"
+        icon="add_circle"
+        rounded
+        outline
+        @click="addItem"
+        bordered
+      >
+        <q-tooltip :offset="[10, 10]"> Agregar Movimiento a tarjeta </q-tooltip>
+      </q-btn> -->
+      <q-icon name="add_circle" class="btn-add" clickable @click="addItem">
+        <q-tooltip :offset="[10, 10]"> Add New </q-tooltip>
+      </q-icon>
       <q-table
         v-if="listaRegistrosMsi.length > 0"
         :rows="listaRegistrosMsi"
@@ -360,7 +380,10 @@
   </Teleport>
   <Teleport to="#modal">
     <q-dialog v-model="showFormCarga" persistent>
-      <CargaRegistrosTarjeta :cuenta="cuenta"></CargaRegistrosTarjeta>
+      <CargaRegistrosTarjeta
+        :cuenta="cuenta"
+        @items-saved="cargaMasivaSaved"
+      ></CargaRegistrosTarjeta>
     </q-dialog>
   </Teleport>
   <Teleport to="#modal">
@@ -369,6 +392,8 @@
         :cuenta="cuenta"
         :saldo-periodo-anterior="parseFloat(saldo_anterior)"
         :suma-movimientos="parseFloat(sumaMovimientos)"
+        :fecha_inicio="fecha_inicio"
+        :fecha_fin="fecha_fin"
       ></PagosTarjeta>
     </q-dialog>
   </Teleport>
@@ -597,22 +622,25 @@ function editItem(item) {
 }
 
 function obtener_fecha_inicio() {
+  const dia_inicio = ('0' + (cuenta.value.dia_corte + 1)).slice(-2)
   fecha_inicio.value = `${ejercicio_fiscal.value}-${(
     '0' +
     (mes.value.id - 1)
-  ).slice(-2)}-${cuenta.value.dia_corte}`
+  ).slice(-2)}-${dia_inicio}`
   console.log('fecha_inicio', fecha_inicio.value)
 }
 function obtener_fecha_fin() {
+  const dia_fin = ('0' + cuenta.value.dia_corte).slice(-2)
   fecha_fin.value = `${ejercicio_fiscal.value}-${('0' + mes.value.id).slice(
     -2
-  )}-${cuenta.value.dia_corte}`
+  )}-${dia_fin}`
 }
 
 function obtenerSaldoAnterior() {
+  const dia = ('0' + cuenta.value.dia_corte).slice(-2)
   const fecha = `${ejercicio_inicial_id.value}-${(
     '0' + mes_inicial_id.value
-  ).slice(-2)}-${cuenta.value.dia_corte}`
+  ).slice(-2)}-${dia}`
   console.log('fecha para obtener saldos', fecha)
   api
     .get('/cuentas/obtener_saldo_tarjeta', {
@@ -642,12 +670,14 @@ function onChangeEjercicio(ejercicio_fiscal) {
  * Lista de registros de la tarjeta
  */
 function obtenerListaRegistros() {
+  const dia_inicio = ('0' + (cuenta.value.dia_corte + 1)).slice(-2)
+  const dia_fin = ('0' + cuenta.value.dia_corte).slice(-2)
   const fechaInicio = `${ejercicio_inicial_id.value}-${(
     '0' + mes_inicial_id.value
-  ).slice(-2)}-${dia_corte_inicial.value}`
+  ).slice(-2)}-${dia_inicio}`
   const fechaFin = `${ejercicio_final_id.value}-${(
     '0' + mes_final_id.value
-  ).slice(-2)}-${dia_corte_final.value}`
+  ).slice(-2)}-${dia_fin}`
   console.log('fechaInicio', fechaInicio)
   console.log('fechaFin', fechaFin)
   cargaListaRegistros(
@@ -748,6 +778,14 @@ function registroUpdated() {
   )
   refetchListaRegistros()
   showForm.value = false
+}
+function cargaMasivaSaved() {
+  this.showFormCarga.value = false
+  notificacion.mostrarNotificacionPositiva(
+    'Los movimientos fueron guardados correctamente.',
+    900
+  )
+  refetchListaRegistros()
 }
 
 const mesOptions = ref([
@@ -886,5 +924,20 @@ const columnsMsi = [
   font-size: 0.95rem;
   font-weight: 600;
   color: #7b6992;
+}
+.btn-add {
+  cursor: pointer;
+  color: $toolbar-button;
+  font-size: 1.5rem;
+  opacity: 0.8;
+  border: 1px solid white;
+  color: $toolbar-button !important;
+  &:hover {
+    opacity: 1;
+    color: $toolbar-button;
+    border: 1px solid #55b4b0;
+    border-radius: 15px;
+    transition: all 0.3s ease;
+  }
 }
 </style>

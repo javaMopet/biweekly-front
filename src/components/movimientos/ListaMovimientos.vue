@@ -119,6 +119,7 @@
               v-model="props.row.cuenta"
               :agregar="false"
               :readonly="props.row.saved"
+              :filter-array="['1', '2']"
             ></CuentaSelect>
           </q-td>
           <!-- :is-valid="isCuentaValida(props.row.cuentaValida)" -->

@@ -1,18 +1,19 @@
 <template>
   <q-card class="my-card" dense style="width: 80vw; min-width: 80vw">
-    <q-card-section class="bg-primary row inline fit q-py-sm justify-between">
-      <div class="text-h6 text-accent">
-        Movimientos de la tarjeta {{ cuenta.nombre }}
-      </div>
+    <q-card-section
+      class="bg-main-menu row inline fit q-py-sm justify-between items-center"
+    >
+      <div class="text-h6 text-accent-light">{{ cuenta.nombre }}</div>
       <div class="">
         <q-btn
           round
           flat
           dense
           icon="close"
+          class="float-right"
+          color="accent dialog__title--closeButton"
           v-close-popup
-          color="accent"
-          class="btn-close"
+          vertical-top
         ></q-btn>
       </div>
     </q-card-section>
@@ -29,12 +30,12 @@
               accept=".xlsx,.xls"
               @input="updateFile"
               dense
-              style="width: 250px"
+              style="width: 450px"
               max-files="1"
               outlined
               label-color="accent"
               clearable
-              bg-color="primary"
+              bg-color="toolbar-button"
               dark
             >
               <template #prepend>
@@ -94,9 +95,8 @@
         <template #body-cell-categoria="props">
           <q-td :props="props">
             <CategoriaSelect
-              :readonly="true"
               v-model="props.row.categoria"
-              tipo-movimiento-id="2"
+              :tipo-afectacion="props.row.tipoAfectacion"
             ></CategoriaSelect>
           </q-td>
         </template>
@@ -125,12 +125,17 @@
           </q-td>
         </template>
       </q-table>
+      <!-- <pre>{{ props.cuenta }}</pre> -->
     </q-card-section>
 
     <q-card-actions align="right">
-      <div class="row">
-        <q-btn flat label="Cancelar" color="primary" v-close-popup />
-        <q-btn label="Guardar" color="primary" @click="guardarMovimientos" />
+      <div class="row q-gutter-x-md">
+        <q-btn flat label="Cancelar" v-close-popup />
+        <q-btn
+          label="Guardar"
+          color="primary-button"
+          @click="guardarMovimientos"
+        />
       </div>
     </q-card-actions>
   </q-card>
@@ -172,6 +177,10 @@ const props = defineProps({
   }
 })
 /**
+ * emits
+ */
+const emit = defineEmits(['itemsSaved'])
+/**
  *
  * @param {*} v
  */
@@ -184,65 +193,120 @@ async function updateFile(v) {
 
     // read first file
     const wb = read(await files[0].arrayBuffer())
-    // get data of first worksheet as an array of objects
-    const rows = utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {
-      raw: false
-    })
+    // // get data of first worksheet as an array of objects
+    // const rows = utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {
+    //   raw: false
+    // })
 
-    for (const row of rows) {
-      for (const key in row) {
-        console.log('data cell', row[key])
-      }
+    // for (const row of rows) {
+    //   for (const key in row) {
+    //     console.log('data cell', row[key])
+    //   }
+    // }
+    switch (props.cuenta.banco.id.toString()) {
+      case '1':
+        cargarMovimientosSantander(wb)
+        break
+      case '2':
+        cargarMovimientosBancomer(wb)
+        break
+      default:
+        break
     }
-
-    // get data of first worksheet as an array of objects
-    const data = utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {
-      header: ['A', 'B', 'C', 'D'],
-      skipHeader: true,
-      raw: false
-    })
-
-    console.log('data', data)
-    const monthsMap = new Map()
-    monthsMap.set('Ene', '01')
-    monthsMap.set('Feb', '02')
-    monthsMap.set('Mar', '03')
-    monthsMap.set('Abr', '04')
-    monthsMap.set('May', '05')
-    monthsMap.set('Jun', '06')
-    monthsMap.set('Jul', '07')
-    monthsMap.set('Ago', '08')
-    monthsMap.set('Sep', '09')
-    monthsMap.set('Oct', '10')
-    monthsMap.set('Nov', '11')
-    monthsMap.set('Dic', '12')
-
-    todos.value = data.map((row) => ({
-      fecha: row.A,
-      consecutivo: row.B,
-      concepto: row.C,
-      importe: row.D
-    }))
-    // console.log('datda', todos.value)
-    // console.log('datda', todos.value[5])
-    todos.value.forEach((row) => {
-      let fecha = row.fecha.toString()
-      for (const [key, value] of monthsMap) {
-        // console.log(`${key}: ${value}`)
-        fecha = fecha.replace(key.toString(), value.toString())
-      }
-      const item = {
-        fecha: fecha,
-        consecutivo: row.consecutivo,
-        importe: row.importe,
-        concepto: row.concepto,
-        saved: false
-      }
-      listaRegistrosTarjeta.value.push(item)
-    })
   } catch (e) {
     console.log(e)
   }
+}
+function cargarMovimientosSantander(wb) {
+  // get data of first worksheet as an array of objects
+  const data = utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {
+    header: ['A', 'B', 'C', 'D'],
+    skipHeader: true,
+    raw: false
+  })
+
+  console.log('data', data)
+  const monthsMap = new Map()
+  monthsMap.set('Ene', '01')
+  monthsMap.set('Feb', '02')
+  monthsMap.set('Mar', '03')
+  monthsMap.set('Abr', '04')
+  monthsMap.set('May', '05')
+  monthsMap.set('Jun', '06')
+  monthsMap.set('Jul', '07')
+  monthsMap.set('Ago', '08')
+  monthsMap.set('Sep', '09')
+  monthsMap.set('Oct', '10')
+  monthsMap.set('Nov', '11')
+  monthsMap.set('Dic', '12')
+
+  todos.value = data.map((row) => ({
+    fecha: row.A,
+    consecutivo: row.B,
+    concepto: row.C,
+    importe: row.D
+  }))
+  // console.log('datda', todos.value)
+  // console.log('datda', todos.value[5])
+  todos.value.forEach((row) => {
+    let fecha = row.fecha.toString()
+    for (const [key, value] of monthsMap) {
+      // console.log(`${key}: ${value}`)
+      fecha = fecha.replace(key.toString(), value.toString())
+    }
+    const item = {
+      fecha: fecha,
+      consecutivo: row.consecutivo,
+      importe: row.importe,
+      concepto: row.concepto,
+      saved: false
+    }
+    listaRegistrosTarjeta.value.push(item)
+  })
+}
+function cargarMovimientosBancomer(wb) {
+  // get data of first worksheet as an array of objects
+  const data = utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {
+    header: ['A', 'B', 'C', 'D', 'E'],
+    skipHeader: true,
+    raw: false
+  })
+
+  console.log('data', data)
+
+  todos.value = data.map((row) => ({
+    fecha: row.A,
+    concepto: row.B,
+    cargo: row.C,
+    abono: row.D,
+    saldo: row.E
+  }))
+  // console.log('datda', todos.value)
+  // console.log('datda', todos.value[5])
+  todos.value.forEach((row, index) => {
+    let fecha = row.fecha.toString()
+    const fechaObject = DateTime.fromFormat(fecha, 'dd/MM/yyyy')
+    if (fechaObject.isValid) {
+      console.log('row', row.cargo, row.abono)
+      const cargo = row.cargo?.replace(',', '')
+      const abono = row.abono?.replace(',', '')
+      const tipo_afectacion = !!cargo ? 'C' : !!abono ? 'A' : 'N/A'
+      const importe = !!cargo
+        ? parseFloat(cargo)
+        : !!abono
+        ? parseFloat(abono)
+        : 0
+      const item = {
+        fecha,
+        consecutivo: index,
+        importe,
+        concepto: row.concepto,
+        tipo_afectacion,
+        saved: false
+      }
+      listaRegistrosTarjeta.value.push(item)
+    }
+  })
 }
 
 function guardarMovimientos() {
@@ -260,8 +324,11 @@ function guardarMovimientos() {
       console.log('item', item)
       console.log('fecha', item.fecha)
       const fecha = DateTime.fromFormat(item.fecha, 'dd/MM/yyyy')
+      const importe = parseFloat(item.importe)
+      const tipo_afectacion = importe >= 0 ? 'A' : 'C'
       const registro = {
-        estado_registro_tarjeta_id: 1, //abierto
+        estado_registro_tarjeta_id: 1, //pendiente
+        tipo_afectacion,
         cuenta_id: props.cuenta.id,
         categoria_id: item.categoria.id,
         importe: parseFloat(item.importe),
@@ -278,6 +345,7 @@ function guardarMovimientos() {
       .then((response) => {
         console.log('guardado correctamente')
         console.log('response', response)
+        emit('itemsSaved')
       })
       .catch((error) => {
         console.error(error)
@@ -407,5 +475,12 @@ const columns = [
 }
 .importe_positivo {
   color: green;
+}
+.dialog__title--closeButton {
+  opacity: 0.5;
+  &:hover {
+    opacity: 1;
+    color: white !important;
+  }
 }
 </style>

@@ -31,6 +31,10 @@
       <q-btn color="accent" outline icon="add" dense @click="registrarCuenta" />
     </div>
   </div>
+  <!-- <div>
+    <pre>{{ options }}</pre>
+    <pre>{{ resultadoLista }}</pre>
+  </div> -->
 
   <Teleport to="#modal">
     <q-dialog v-model="form_cuenta_show" persistent>
@@ -59,6 +63,13 @@ const props = defineProps({
     required: false,
     default: () => {
       return null
+    }
+  },
+  filterArray: {
+    type: Array,
+    required: false,
+    default: () => {
+      return ['1', '2', '3']
     }
   },
   opcional: {
@@ -122,7 +133,12 @@ const cuenta = computed({
 })
 const options = computed({
   get() {
-    return resultadoLista.value?.listaCuentas ?? []
+    return (
+      resultadoLista.value?.listaCuentas.filter((option) => {
+        console.log(props.filterArray.includes(option.tipoCuenta.id))
+        return props.filterArray.includes(option.tipoCuenta.id)
+      }) ?? []
+    )
   }
 })
 onErrorListaCuentas((error) => {

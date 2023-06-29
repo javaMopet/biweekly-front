@@ -17,48 +17,6 @@
     </q-card-section>
     <q-card-section>
       <q-form @submit="generarPago" class="q-gutter-xs">
-        <!-- <div class="column">
-          <q-carousel
-            v-model="formItem.cuenta_egreso"
-            transition-prev="jump-right"
-            transition-next="jump-left"
-            swipeable
-            animated
-            control-color="purple"
-            prev-icon="arrow_left"
-            next-icon="arrow_right"
-            navigation-icon="radio_button_unchecked"
-            navigation
-            padding
-            arrows
-            height="140px"
-            class="text-dark shadow-1 rounded-borders"
-          >
-            <q-carousel-slide name="style" class="column no-wrap flex-center">
-              <q-card class="my-card">
-                <q-card-section avatar>
-                  <q-avatar
-                    size="50px"
-                    font-size="52px"
-                    color="teal"
-                    text-color="white"
-                    icon="directions"
-                  />
-                </q-card-section>
-                <q-card-section right>
-                  <div class="text-h6">Nómina HPM</div>
-                  <div class="text-subtitle2">$1,500</div>
-                </q-card-section>
-              </q-card>
-            </q-carousel-slide>
-            <q-carousel-slide name="tv" class="column no-wrap flex-center">
-              <q-icon name="live_tv" size="56px" />
-              <div class="q-mt-md text-center">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit
-              </div>
-            </q-carousel-slide>
-          </q-carousel>
-        </div> -->
         <transition name="fade">
           <div class="row bg-pink-1" v-if="isNotPagable">
             <div class="column">
@@ -133,11 +91,27 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
+import { useLazyQuery } from '@vue/apollo-composable'
 import CuentaSelect from '../formComponents/CuentaSelect.vue'
 import DateInput from '../formComponents/DateInput.vue'
 import PriceInput from '../formComponents/PriceInput.vue'
 import { useFormato } from 'src/composables/utils/useFormato'
+import { LISTA_REGISTROS_TARJETA } from 'src/graphql/registrosTarjeta'
+import { DateTime } from 'luxon'
+/**
+ * graphql
+ */
+const graphqlOptions = reactive({
+  // fetchPolicy: 'network-only'
+  fetchPolicy: 'no-cache'
+})
+const {
+  onError: onErrorListaRegistros,
+  onResult: onResultListaRegistros,
+  load: cargaListaRegistros,
+  refetch: refetchListaRegistros
+} = useLazyQuery(LISTA_REGISTROS_TARJETA)
 /**
  * composables
  */
@@ -156,6 +130,14 @@ const formItem = ref({
 const props = defineProps({
   cuenta: {
     type: Object,
+    required: true
+  },
+  fecha_inicio: {
+    type: String,
+    required: true
+  },
+  fecha_fin: {
+    type: String,
     required: true
   },
   saldoPeriodoAnterior: {
@@ -178,7 +160,56 @@ onMounted(() => {
  */
 function generarPago() {
   console.log('Generando el pago de la tarjeta')
+  cargaListaRegistros(
+    null,
+    {
+      cuentaId: props.cuenta.id,
+      fechaInicio: props.fecha_inicio,
+      fechaFin: props.fecha_fin,
+      isMsi: false
+    },
+    graphqlOptions
+  )
 }
+onResultListaRegistros(({ data }) => {
+  const listaRegistros = data?.listaRegistrosTarjeta ?? []
+  console.log('data', listaRegistros)
+  var lista_registros = []
+  listaRegistros.forEach((item) => {
+    const registro = {
+      estado_registro_id: 2, //cerrado
+      tipo_afectacion: item.tipo_afectacion,
+      cuenta_id: formItem.value.cuenta_egreso.id,
+      categoria_id: item.categoriaId,
+      importe: parseFloat(item.importe),
+      fecha: item.fecha,
+      observaciones: item.concepto,
+      registro_id: item.id
+    }
+    lista_registros.push(registro)
+  })
+  console.log('listaregistros', lista_registros)
+  api
+    .post('/registros_tarjeta/create_pago', {
+      lista_registros
+    })
+    .then((response) => {
+      console.log('guardado correctamente')
+      console.log('response', response)
+      notificacion.mostrarNotificacionPositiva(
+        'Los registros han sido guardados correctamente.',
+        1200
+      )
+      emit('itemsSaved')
+    })
+    .catch((error) => {
+      console.error(error)
+      console.error('esto es un error')
+    })
+})
+onErrorListaRegistros((error) => {
+  console.error(error)
+})
 /**
  * computed
  */

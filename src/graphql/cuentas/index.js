@@ -34,6 +34,10 @@ export const LISTA_CUENTAS_REDUCED = gql`
     listaCuentas {
       id
       nombre
+      tipoCuenta {
+        id
+        nombre
+      }
     }
   }
 `
