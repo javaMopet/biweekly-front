@@ -3,7 +3,9 @@
     <q-card-section
       class="bg-main-menu row inline fit q-py-sm justify-between items-center"
     >
-      <div class="text-h6 text-accent-light">{{ cuenta.nombre }}</div>
+      <div class="dialog__title--name">
+        Tarjeta de crédito - {{ cuenta.nombre }}
+      </div>
       <div class="">
         <q-btn
           round
@@ -102,11 +104,7 @@
         </template>
         <template #body-cell-importe="props">
           <q-td :props="props">
-            <span
-              :class="[
-                props.row.importe > 0 ? 'importe_negativo' : 'importe_positivo'
-              ]"
-            >
+            <span class="text-primary">
               {{ formato.toCurrency(parseFloat(props.row.importe)) }}
             </span>
           </q-td>
@@ -254,14 +252,17 @@ function cargarMovimientosSantander(wb) {
       // console.log(`${key}: ${value}`)
       fecha = fecha.replace(key.toString(), value.toString())
     }
-    const item = {
-      fecha: fecha,
-      consecutivo: row.consecutivo,
-      importe: row.importe,
-      concepto: row.concepto,
-      saved: false
+    const fechaObject = DateTime.fromFormat(fecha, 'dd/MM/yyyy')
+    if (fechaObject.isValid) {
+      const item = {
+        fecha: fechaObject,
+        consecutivo: row.consecutivo,
+        importe: row.importe,
+        concepto: row.concepto,
+        saved: false
+      }
+      listaRegistrosTarjeta.value.push(item)
     }
-    listaRegistrosTarjeta.value.push(item)
   })
 }
 function cargarMovimientosBancomer(wb) {
@@ -291,13 +292,16 @@ function cargarMovimientosBancomer(wb) {
       const cargo = row.cargo?.replace(',', '')
       const abono = row.abono?.replace(',', '')
       const tipo_afectacion = !!cargo ? 'C' : !!abono ? 'A' : 'N/A'
-      const importe = !!cargo
-        ? parseFloat(cargo)
+      const importeCargoAbono = !!cargo
+        ? Math.abs(parseFloat(cargo))
         : !!abono
-        ? parseFloat(abono)
+        ? Math.abs(parseFloat(abono))
         : 0
+
+      const importe =
+        tipo_afectacion === 'C' ? importeCargoAbono * -1 : importeCargoAbono
       const item = {
-        fecha,
+        fecha: fechaObject,
         consecutivo: index,
         importe,
         concepto: row.concepto,
@@ -321,18 +325,13 @@ function guardarMovimientos() {
     var lista_registros_tarjeta = []
 
     listaRegistrosTarjeta.value.forEach((item) => {
-      console.log('item', item)
-      console.log('fecha', item.fecha)
-      const fecha = DateTime.fromFormat(item.fecha, 'dd/MM/yyyy')
-      const importe = parseFloat(item.importe)
-      const tipo_afectacion = importe >= 0 ? 'A' : 'C'
       const registro = {
         estado_registro_tarjeta_id: 1, //pendiente
-        tipo_afectacion,
+        tipo_afectacion: item.tipo_afectacion,
         cuenta_id: props.cuenta.id,
         categoria_id: item.categoria.id,
         importe: parseFloat(item.importe),
-        fecha: fecha.toISODate(),
+        fecha: item.fecha.toISODate(),
         concepto: item.concepto
       }
       lista_registros_tarjeta.push(registro)
@@ -432,7 +431,7 @@ const columns = [
     sortable: true,
     align: 'right',
     // format: (val, row) => `${formato.toCurrency(parseFloat(val))}`,
-    style: 'width:200px'
+    style: 'width:150px'
   },
   {
     name: 'acciones',
@@ -470,17 +469,10 @@ const columns = [
 .fade-leave-active {
   transition: all 0.5s ease-out;
 }
-.importe_negativo {
-  color: red;
-}
-.importe_positivo {
-  color: green;
-}
-.dialog__title--closeButton {
-  opacity: 0.5;
-  &:hover {
-    opacity: 1;
-    color: white !important;
-  }
-}
+// .importe_negativo {
+//   color: red;
+// }
+// .importe_positivo {
+//   color: green;
+// }
 </style>

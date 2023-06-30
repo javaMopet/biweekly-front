@@ -1,19 +1,19 @@
 <template>
   <q-card class="my-card" dense style="width: 80vw; min-width: 80vw">
-    <!-- <pre>{{ cuenta }}</pre> -->
-    <q-card-section class="bg-primary row inline fit q-py-sm justify-between">
-      <div class="text-h6 text-accent">
-        Movimientos de la tarjeta {{ cuenta.nombre }}
-      </div>
+    <q-card-section
+      class="bg-main-menu row inline fit q-py-sm justify-between items-center"
+    >
+      <div class="dialog__title--name">{{ cuenta.nombre }}</div>
       <div class="">
         <q-btn
           round
           flat
           dense
           icon="close"
+          class="float-right"
+          color="accent dialog__title--closeButton"
           v-close-popup
-          color="accent"
-          class="btn-close"
+          vertical-top
         ></q-btn>
       </div>
     </q-card-section>

@@ -78,6 +78,11 @@
         flat
         table-class="myClass"
       >
+        <template #top-left
+          ><q-icon name="add_circle" class="btn-add" clickable @click="addItem">
+            <q-tooltip :offset="[10, 10]"> Add New </q-tooltip>
+          </q-icon></template
+        >
         <template #body-cell-estatus="props">
           <q-td class="" style="border: 0px solid red">
             <q-icon
@@ -323,9 +328,9 @@ function saveItem(row) {
       const tipoAfectacion =
         categoria.value.tipoMovimiento.id === '1' ? 'A' : 'C'
       const importe =
-        // tipoAfectacion === 'C'
-        //   ? parseFloat(row.registro.importe) * -1:
-        parseFloat(row.importe)
+        tipoAfectacion === 'C'
+          ? parseFloat(row.importe) * -1
+          : parseFloat(row.importe)
       const input = {
         categoriaId: row.categoriaId,
         estadoRegistroId: 2,
@@ -386,8 +391,18 @@ function editItem(row) {
 }
 
 function deleteItem(item) {
-  // console.log('item', item)
-  // console.log('item index', item.rowIndex)
+  console.log('item', item.row)
+  console.log('item index', item.rowIndex)
+
+  if (!!item.row.saved) {
+    console.log('el registro esta guardado')
+    confirmarEliminacion(item)
+  } else {
+    listaRegistros.value.splice(item.rowIndex, 1)
+  }
+}
+function confirmarEliminacion(item) {
+  item.row
 }
 
 function validarPrecio(value) {
@@ -433,7 +448,9 @@ onResultListaRegistros(({ data }) => {
     listaRegistros.value = JSON.parse(JSON.stringify(data.obtenerRegistros))
     listaRegistros.value.forEach((element) => {
       element.fecha = formato.convertDateFromIsoToInput(element.fecha)
-      element.importe = element.importe.toString()
+      const importe =
+        element.tipoAfectacion === 'C' ? element.importe * -1 : element.importe
+      element.importe = importe.toString()
       element.saved = true
     })
   } else {

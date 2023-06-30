@@ -193,6 +193,13 @@
         </div>
         <q-separator spaced inset vertical />
         <div class="col column items-center">
+          <span class="tarjeta__resumen-etiqueta"> Importe del periodo </span>
+          <span class="tarjeta__resumen-valor-importante">
+            {{ formato.toCurrency(sumaMovimientos) }}</span
+          >
+        </div>
+        <q-separator spaced inset vertical />
+        <div class="col column items-center">
           <span class="tarjeta__resumen-etiqueta">
             Saldo del periodo anterior
           </span>
@@ -200,6 +207,7 @@
             {{ formato.toCurrency(saldo_anterior) }}</span
           >
         </div>
+
         <!-- <q-separator spaced inset vertical />
         <div class="col column items-center">
           <span class="tarjeta__resumen-etiqueta"> Suma movimientos </span>
@@ -210,7 +218,10 @@
       </div>
       <q-separator spaced inset horizontal />
       <div class="row">
-        <div class="col column items-center">
+        <div
+          class="col column items-center"
+          v-if="listaRegistrosMsi.length > 0"
+        >
           <span class="tarjeta__resumen-etiqueta">
             Suma de movimientos de meses sin intereses
           </span>
@@ -218,16 +229,13 @@
             {{ formato.toCurrency(suma_msi) }}</span
           >
         </div>
-        <q-separator spaced inset vertical />
-        <div class="col column items-center">
-          <span class="tarjeta__resumen-etiqueta">
-            Suma de movimientos del periodo
-          </span>
-          <span class="tarjeta__resumen-valor-importante">
-            {{ formato.toCurrency(sumaMovimientos) }}</span
-          >
-        </div>
-        <q-separator spaced inset vertical />
+        <q-separator
+          spaced
+          inset
+          vertical
+          v-if="listaRegistrosMsi.length > 0"
+        />
+
         <div class="col column items-center">
           <span class="tarjeta__resumen-etiqueta"> Saldo Final </span>
           <span class="tarjeta__resumen-valor">
@@ -296,7 +304,7 @@
                       <q-item-section>Quitar MSI</q-item-section>
                     </q-item>
                     <q-separator />
-                    <q-item clickable v-close-popup>
+                    <q-item clickable v-close-popup @click="deleteItem(props)">
                       <q-item-section class="text-negative"
                         >Eliminar</q-item-section
                       >
@@ -345,7 +353,7 @@
                       <q-item-section>Meses Sin Intereses</q-item-section>
                     </q-item>
                     <q-separator />
-                    <q-item clickable v-close-popup>
+                    <q-item clickable v-close-popup @click="deleteItem(props)">
                       <q-item-section class="text-negative"
                         >Eliminar</q-item-section
                       >
@@ -405,15 +413,19 @@ import { useRoute, useRouter } from 'vue-router'
 import { DateTime } from 'luxon'
 import RegistroMovimientoTarjeta from 'src/components/tarjetasCredito/RegistroMovimientoTarjeta.vue'
 import { api } from 'src/boot/axios'
-import { LISTA_REGISTROS_TARJETA } from 'src/graphql/registrosTarjeta'
+import {
+  LISTA_REGISTROS_TARJETA,
+  DELETE_REGISTRO_TARJETA
+} from 'src/graphql/registrosTarjeta'
 import CargaRegistrosTarjeta from 'src/components/tarjetasCredito/CargaRegistrosTarjeta.vue'
-import { useLazyQuery } from '@vue/apollo-composable'
+import { useLazyQuery, useMutation } from '@vue/apollo-composable'
 import { useFormato } from 'src/composables/utils/useFormato'
 import { useRegistrosCrud } from 'src/composables/useRegistrosCrud'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import RegistroMesesSinInteres from 'src/components/tarjetasCredito/RegistroMesesSinInteres.vue'
 import { useQuasar } from 'quasar'
 import PagosTarjeta from 'src/components/tarjetasCredito/PagosTarjeta.vue'
+import { portals } from 'caniuse-lite/data/features'
 
 const route = useRoute()
 const router = useRouter()
@@ -481,7 +493,7 @@ onMounted(() => {
     obtener_fecha_fin()
     // variables.fechaInicio = fecha_inicio.value
     // variables.fechaFin = fecha_fin.value
-    cargaListaRegistros(
+    loadListaRegistros(
       null,
       {
         cuentaId: route.params.id,
@@ -500,11 +512,14 @@ onMounted(() => {
 
 const sumaMovimientos = computed({
   get() {
-    return listaRegistros.value.reduce((accumulator, registro) => {
-      return accumulator + registro.importe
-    }, 0)
+    return Math.abs(
+      listaRegistros.value.reduce((accumulator, registro) => {
+        return accumulator + registro.importe * -1
+      }, 0)
+    )
   }
 })
+
 const suma_msi = computed({
   get() {
     return listaRegistrosMsi.value.reduce((accumulator, registro) => {
@@ -591,7 +606,7 @@ const graphqlOptions = reactive({
 const {
   onError: onErrorListaRegistros,
   onResult: onResultListaRegistros,
-  load: cargaListaRegistros,
+  load: loadListaRegistros,
   refetch: refetchListaRegistros
 } = useLazyQuery(LISTA_REGISTROS_TARJETA)
 
@@ -607,18 +622,76 @@ onResultListaRegistros(({ data }) => {
 onErrorListaRegistros((error) => {
   console.error('response', error)
 })
+
+const {
+  mutate: deleteRegistroTarjeta,
+  onDone: onDoneDeleteRegistroTarjeta,
+  onError: onErrorDeleteRegistroTarjeta
+} = useMutation(DELETE_REGISTRO_TARJETA)
+
+onDoneDeleteRegistroTarjeta((response) => {
+  console.log('registro eliminado', response)
+  loadOrRefetchListaRegistrosTarjeta()
+  showSuccessMessage('eliminó')
+})
+onErrorDeleteRegistroTarjeta((error) => {
+  console.error(error)
+})
+function showSuccessMessage(action) {
+  notificacion.mostrarNotificacionPositiva(
+    `El registro se ${action} correctamente.`,
+    1000
+  )
+}
+function loadOrRefetchListaRegistrosTarjeta() {
+  loadListaRegistros() || refetchListaRegistros()
+}
 /**
  * functions
  */
 function editItem(item) {
   console.log('editando item...', item.rowIndex, item.row)
   registroEditedItem.value = JSON.parse(JSON.stringify(item.row))
-  registroEditedItem.value.importe = registroEditedItem.value.importe.toString()
+  const importe = parseFloat(registroEditedItem.value.importe)
+  const importeAEditar =
+    registroEditedItem.value.tipoAfectacion === 'A' ? importe * -1 : importe
+  registroEditedItem.value.importe = importeAEditar.toString()
   console.log('fecha', registroEditedItem.value.fecha)
   registroEditedItem.value.fecha = formato.convertDateFromIsoToInput(
     registroEditedItem.value.fecha
   )
   showForm.value = true
+}
+
+function deleteItem(props_row) {
+  console.log('eliminar')
+  const row = props_row.row
+
+  $q.dialog({
+    title: 'Confirmar',
+    style: 'width:500px',
+    message: `¿Está seguro que desea eliminar el registro con un monto de ${formato.toCurrency(
+      row.importe
+    )}?`,
+    ok: {
+      push: true,
+      color: 'positive',
+      label: 'Continuar'
+    },
+    cancel: {
+      push: true,
+      color: 'negative',
+      flat: true,
+      label: 'cancelar'
+    },
+    persistent: true
+  })
+    .onOk(() => {
+      deleteRegistroTarjeta({ id: row.id })
+    })
+    .onCancel(() => {})
+    .onDismiss(() => {})
+  // deleteRegistroTarjeta({ id: props_row.id })
 }
 
 function obtener_fecha_inicio() {
@@ -680,7 +753,7 @@ function obtenerListaRegistros() {
   ).slice(-2)}-${dia_fin}`
   console.log('fechaInicio', fechaInicio)
   console.log('fechaFin', fechaFin)
-  cargaListaRegistros(
+  loadListaRegistros(
     null,
     {
       cuentaId: route.params.id,
@@ -780,7 +853,7 @@ function registroUpdated() {
   showForm.value = false
 }
 function cargaMasivaSaved() {
-  this.showFormCarga.value = false
+  showFormCarga.value = false
   notificacion.mostrarNotificacionPositiva(
     'Los movimientos fueron guardados correctamente.',
     900
@@ -823,9 +896,18 @@ const columns = [
     style: 'width: 40%'
   },
   {
-    name: 'importe',
-    label: 'Importe',
-    field: 'importe',
+    name: 'cargo',
+    label: 'Cargo',
+    field: 'cargo',
+    sortable: true,
+    align: 'right',
+    format: (val, row) => formato.toCurrency(val),
+    style: 'width:15%'
+  },
+  {
+    name: 'abono',
+    label: 'abono',
+    field: 'abono',
     sortable: true,
     align: 'right',
     format: (val, row) => formato.toCurrency(val),
@@ -834,7 +916,7 @@ const columns = [
   {
     name: 'categoria',
     label: 'Categoria',
-    field: (row) => row.categoria.nombre,
+    field: (row) => row.categoria?.nombre || 'Pago del periodo',
     sortable: true,
     align: 'left',
     style: 'width:30%'
@@ -924,20 +1006,5 @@ const columnsMsi = [
   font-size: 0.95rem;
   font-weight: 600;
   color: #7b6992;
-}
-.btn-add {
-  cursor: pointer;
-  color: $toolbar-button;
-  font-size: 1.5rem;
-  opacity: 0.8;
-  border: 1px solid white;
-  color: $toolbar-button !important;
-  &:hover {
-    opacity: 1;
-    color: $toolbar-button;
-    border: 1px solid #55b4b0;
-    border-radius: 15px;
-    transition: all 0.3s ease;
-  }
 }
 </style>

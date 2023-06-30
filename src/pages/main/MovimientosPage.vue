@@ -642,7 +642,7 @@ function mostrarNotificacion(action, cuenta) {
 }
 function onRegistroCreated(itemCreated) {
   console.log('El registro fue creado', itemCreated)
-  show_movimientos.value = false
+  // show_movimientos.value = false
   cargarDatos()
 }
 function onChangeMes(value) {

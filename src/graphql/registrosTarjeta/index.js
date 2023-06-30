@@ -21,6 +21,9 @@ export const LISTA_REGISTROS_TARJETA = gql`
       concepto
       isMsi
       numeroMsi
+      tipoAfectacion
+      cargo
+      abono
       estadoRegistroTarjeta {
         id
         nombre
@@ -93,6 +96,23 @@ export const UPDATE_REGISTRO_TARJETA = gql`
           nombre
           tipoMovimientoId
         }
+      }
+    }
+  }
+`
+
+export const DELETE_REGISTRO_TARJETA = gql`
+  mutation registroTarjetaDelete($id: ID!) {
+    registroTarjetaDelete(id: $id) {
+      registroTarjeta {
+        id
+        cuentaId
+        categoriaId
+        importe
+        fecha
+        concepto
+        isMsi
+        numeroMsi
       }
     }
   }

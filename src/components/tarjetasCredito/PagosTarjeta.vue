@@ -99,6 +99,14 @@ import PriceInput from '../formComponents/PriceInput.vue'
 import { useFormato } from 'src/composables/utils/useFormato'
 import { LISTA_REGISTROS_TARJETA } from 'src/graphql/registrosTarjeta'
 import { DateTime } from 'luxon'
+import { api } from 'src/boot/axios'
+import { useNotificacion } from 'src/composables/utils/useNotificacion'
+
+/**
+ * composables
+ */
+const notificacion = useNotificacion()
+const formato = useFormato()
 /**
  * graphql
  */
@@ -112,10 +120,7 @@ const {
   load: cargaListaRegistros,
   refetch: refetchListaRegistros
 } = useLazyQuery(LISTA_REGISTROS_TARJETA)
-/**
- * composables
- */
-const formato = useFormato()
+
 /**
  * state
  */
@@ -150,6 +155,10 @@ const props = defineProps({
   }
 })
 /**
+ * emits
+ */
+const emit = defineEmits(['itemsSaved'])
+/**
  * onMounted
  */
 onMounted(() => {
@@ -178,7 +187,7 @@ onResultListaRegistros(({ data }) => {
   listaRegistros.forEach((item) => {
     const registro = {
       estado_registro_id: 2, //cerrado
-      tipo_afectacion: item.tipo_afectacion,
+      tipo_afectacion: item.tipoAfectacion,
       cuenta_id: formItem.value.cuenta_egreso.id,
       categoria_id: item.categoriaId,
       importe: parseFloat(item.importe),
@@ -189,6 +198,7 @@ onResultListaRegistros(({ data }) => {
     lista_registros.push(registro)
   })
   console.log('listaregistros', lista_registros)
+
   api
     .post('/registros_tarjeta/create_pago', {
       lista_registros
@@ -202,9 +212,10 @@ onResultListaRegistros(({ data }) => {
       )
       emit('itemsSaved')
     })
-    .catch((error) => {
-      console.error(error)
-      console.error('esto es un error')
+    .catch(function (error) {
+      console.log(error.response.data)
+      console.log(error.response.status)
+      console.log(error.response.data.exception)
     })
 })
 onErrorListaRegistros((error) => {

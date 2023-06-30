@@ -119,3 +119,44 @@
 .bg-table-title {
   background: $table-title !important;
 }
+/* *************************** */
+.dialog__title--closeButton {
+  opacity: 0.5;
+  &:hover {
+    opacity: 1;
+    color: white !important;
+  }
+}
+.dialog__title--name {
+  font-size: 1.05rem !important;
+  font-weight: 500;
+  color: $accent-light !important;
+  letter-spacing: -0.025rem;
+}
+
+.btn-add {
+  cursor: pointer;
+  color: $toolbar-button;
+  padding: 2px;
+  font-size: 1.8rem;
+  opacity: 1;
+  // border: 0px solid white;
+  background-color: color-mix(in srgb, $primary-button 5%, white 40%);
+  color: $toolbar-button !important;
+  box-shadow: rgba(17, 17, 26, 0.05) 0px 1px 0px,
+    rgba(17, 17, 26, 0.1) 0px 0px 8px;
+  border-radius: 5px;
+  // padding: 0px 10px;
+  &:hover {
+    opacity: 1;
+    filter: brightness(0.85);
+    // border: 1px solid $toolbar-button;
+    // border-radius: 15px;
+    transition: all 0.3s ease;
+    background-color: color-mix(in srgb, $toolbar-button 10%, white 70%);
+  }
+  &:active {
+    translate: 1px 1px;
+    transition: all 0.3s ease;
+  }
+}

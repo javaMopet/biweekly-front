@@ -16,7 +16,7 @@
       </div>
     </q-card-section>
     <q-card-section class="q-mx-lg">
-      <q-form @submit="onSubmit" class="q-gutter-md">
+      <q-form @submit="saveItem" class="q-gutter-md">
         <div class="column">
           <div class="row input-label">Concepto:</div>
           <q-input
@@ -36,7 +36,11 @@
               <div class="row input-label">Fecha de registro:</div>
               <DateInput
                 v-model="editedFormItem.fecha"
-                :rules="[(val) => !!val || 'Favor de ingresar la fecha']"
+                :rules="[
+                  (val) =>
+                    (!!val && isFechaValida(val)) ||
+                    'Favor de ingresar una fecha correcta'
+                ]"
               ></DateInput>
             </div>
             <div class="col column">
@@ -172,16 +176,21 @@ const {
   onDone: onDoneUpdateRegistroTarjeta,
   onError: onErrorUpdateRegistroTarjeta
 } = useMutation(UPDATE_REGISTRO_TARJETA)
-
-function onSubmit() {
+/**
+ * Guardar movimiento a tarjeta
+ */
+function saveItem() {
   console.log('onsubmit', editedFormItem.value)
   const isMsi = editedFormItem.value.isMsi
   const numero_msi = isMsi ? editedFormItem.value.numeroMsi : 0
+  const importe = parseFloat(editedFormItem.value.importe) * -1
+  const tipoAfectacion = importe >= 0 ? 'A' : 'C'
   const input = {
     estadoRegistroTarjetaId: 1,
     cuentaId: props.cuentaId,
+    tipoAfectacion,
     categoriaId: parseInt(editedFormItem.value.categoria.id),
-    importe: parseFloat(editedFormItem.value.importe), //convert
+    importe: importe,
     fecha: formato.convertDateFromInputToIso(editedFormItem.value.fecha), //convert
     concepto: editedFormItem.value.concepto,
     isMsi,
@@ -194,10 +203,15 @@ function onSubmit() {
     createRegistroTarjeta({ input })
   }
 }
+
 onDoneCreateRegistroTarjeta(({ data }) => {
   const item = data?.registroTarjetaCreate?.registroTarjeta
   console.log('item guardado', item)
   emit('registroCreated', item)
+})
+onErrorCreateRegistroTarjeta((error) => {
+  console.log('error', error)
+  console.log('error', error.graphQLErrors[0].extensions)
 })
 onDoneUpdateRegistroTarjeta(({ data }) => {
   const item = data?.registroTarjetaUpdate?.registroTarjeta
@@ -227,6 +241,10 @@ const editedFormItem = computed({
     formItem.value = val
   }
 })
+function isFechaValida(val) {
+  const date = DateTime.fromFormat(val, 'dd/MM/yyyy')
+  return date.isValid
+}
 </script>
 
 <style lang="scss" scoped></style>
