@@ -255,7 +255,7 @@ function cargarMovimientosSantander(wb) {
     const fechaObject = DateTime.fromFormat(fecha, 'dd/MM/yyyy')
     if (fechaObject.isValid) {
       const item = {
-        fecha: fechaObject,
+        fecha,
         consecutivo: row.consecutivo,
         importe: row.importe,
         concepto: row.concepto,
@@ -301,7 +301,7 @@ function cargarMovimientosBancomer(wb) {
       const importe =
         tipo_afectacion === 'C' ? importeCargoAbono * -1 : importeCargoAbono
       const item = {
-        fecha: fechaObject,
+        fecha,
         consecutivo: index,
         importe,
         concepto: row.concepto,
@@ -392,12 +392,12 @@ const columns = [
   // { name: 'id', label: 'Id', field: 'id', sortable: true, align: 'left' },
   {
     name: 'consecutivo',
-    label: 'Consecutivo',
+    label: 'No.',
     field: 'consecutivo',
     sortable: true,
     align: 'left',
     filter: true,
-    style: 'width:100px'
+    style: 'width:80px'
   },
   {
     name: 'fecha',
@@ -422,7 +422,7 @@ const columns = [
     field: 'categoria',
     sortable: true,
     align: 'left',
-    style: 'width:250px;max-width:250px'
+    style: 'width:300px;max-width:300px'
   },
   {
     name: 'importe',

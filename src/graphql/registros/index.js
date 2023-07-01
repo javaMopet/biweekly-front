@@ -56,6 +56,30 @@ export const REGISTRO_CREATE = gql`
     }
   }
 `
+export const REGISTRO_UPDATE = gql`
+  mutation registroUpdate($id: ID!, $input: RegistroInput!) {
+    registroUpdate(id: $id, registroInput: $input) {
+      registro {
+        id
+        estadoRegistroId
+        tipoAfectacion
+        fecha
+        importe
+        observaciones
+        importe
+        cuenta {
+          id
+          nombre
+        }
+        categoria {
+          id
+          nombre
+          tipoMovimientoId
+        }
+      }
+    }
+  }
+`
 
 export const REGISTRO_DELETE = gql`
   mutation registroDelete($id: ID!) {

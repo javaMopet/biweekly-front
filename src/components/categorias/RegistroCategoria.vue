@@ -180,20 +180,21 @@
 </template>
 
 <script setup>
-import { useQuery, useMutation } from '@vue/apollo-composable'
+import { useQuery } from '@vue/apollo-composable'
 import { ref, computed, onMounted } from 'vue'
-import { CATEGORIA_CREATE, CATEGORIA_UPDATE } from '/src/graphql/categorias'
 import { LISTA_TIPOS_MOVIMIENTO } from 'src/graphql/movimientos'
 import IconPicker from '/src/components/IconPicker.vue'
 import CuentaContableSelect from '../formComponents/CuentaContableSelect.vue'
 import CuentaSelect from '../formComponents/CuentaSelect.vue'
 import PriceInput from '../formComponents/PriceInput.vue'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
+import { useCategoriaCrud } from 'src/composables/useCategoriaCrud'
 
 /**
  * composables
  */
 const notificacion = useNotificacion()
+const categoriaCrud = useCategoriaCrud()
 /**
  * state
  */
@@ -316,18 +317,33 @@ function saveItem() {
   console.log('guardando item:', input)
   if (!editedFormItem.value.id) {
     console.log('guardando categoria nueva', input)
-    createCategoria({
+    categoriaCrud.createCategoria({
       input
     })
   } else {
     const id = editedFormItem.value.id
     console.log('actualizando categoria', id, input)
-    updateCategoria({
+    categoriaCrud.updateCategoria({
       id,
       input
     })
   }
 }
+categoriaCrud.onDoneCreate(({ data }) => {
+  console.log('saved data...', data)
+  if (!!data) {
+    notificacion.mostrarNotificacionPositiva('Categoría creada correctamente.')
+    const itemSaved = data.categoriaCreate.categoria
+    emit('categoriaSaved', itemSaved)
+  }
+})
+categoriaCrud.onDoneUpdate(({ data }) => {
+  if (!!data) {
+    console.log('updated data...', data)
+    const itemUpdated = data.categoriaUpdate.categoria
+    emit('categoriaUpdated', itemUpdated, props.editedIndex)
+  }
+})
 /**
  * onMounted
  */
@@ -343,41 +359,6 @@ const options = ref({
 })
 const { onResult: onResultTipoMovimiento, result: resultTipoMovimiento } =
   useQuery(LISTA_TIPOS_MOVIMIENTO, null, options)
-
-const {
-  mutate: createCategoria,
-  onDone: onDoneCreateCategoria,
-  onError: onErrorCreateCategoria
-} = useMutation(CATEGORIA_CREATE)
-
-const {
-  mutate: updateCategoria,
-  onDone: onDoneUpdateCategoria,
-  onError: onErrorUpdateCategoria
-} = useMutation(CATEGORIA_UPDATE)
-
-onDoneCreateCategoria(({ data }) => {
-  console.log('saved data...', data)
-  if (!!data) {
-    notificacion.mostrarNotificacionPositiva('Categoría creada correctamente.')
-    const itemSaved = data.categoriaCreate.categoria
-    emit('categoriaSaved', itemSaved)
-  }
-})
-onErrorCreateCategoria((error) => {
-  console.log(error)
-  console.error(error)
-})
-onDoneUpdateCategoria(({ data }) => {
-  if (!!data) {
-    console.log('updated data...', data)
-    const itemUpdated = data.categoriaUpdate.categoria
-    emit('categoriaUpdated', itemUpdated, props.editedIndex)
-  }
-})
-onErrorUpdateCategoria((error) => {
-  console.error(error)
-})
 
 /**
  * icon picker

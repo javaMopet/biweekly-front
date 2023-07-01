@@ -157,7 +157,7 @@
                   color="contrast"
                   flat
                   icon="edit"
-                  @click="editItem(props.row)"
+                  @click="updateItem(props.row)"
                 />
                 <q-btn
                   v-else
@@ -386,7 +386,8 @@ function obtenerFechaISO(fecha_formato) {
     : null
   return date?.toISODate()
 }
-function editItem(row) {
+function updateItem(row) {
+  registrosCrud.updateItem()
   row.saved = false
 }
 

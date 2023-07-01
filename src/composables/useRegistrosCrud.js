@@ -1,7 +1,10 @@
 import { useMutation } from '@vue/apollo-composable'
 import { ref } from 'vue'
-import { REGISTRO_CREATE } from 'src/graphql/registros'
-import { REGISTRO_DELETE } from 'src/graphql/registros'
+import {
+  REGISTRO_CREATE,
+  REGISTRO_UPDATE,
+  REGISTRO_DELETE
+} from 'src/graphql/registros'
 
 export function useRegistrosCrud() {
   /**
@@ -18,6 +21,12 @@ export function useRegistrosCrud() {
   } = useMutation(REGISTRO_CREATE)
 
   const {
+    mutate: updateItem,
+    onDone: onDoneUpdate,
+    onError: onErrorUpdate
+  } = useMutation(REGISTRO_UPDATE)
+
+  const {
     mutate: deleteRegistro,
     onDone: onDoneDeleteRegistro,
     onError: onErrorDeleteRegistro
@@ -29,6 +38,9 @@ export function useRegistrosCrud() {
     onErrorCreateRegistro,
     deleteRegistro,
     onDoneDeleteRegistro,
-    onErrorDeleteRegistro
+    onErrorDeleteRegistro,
+    updateItem,
+    onDoneUpdate,
+    onErrorUpdate
   }
 }

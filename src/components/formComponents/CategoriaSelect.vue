@@ -73,10 +73,16 @@
 
 <script setup>
 import { useQuery } from '@vue/apollo-composable'
-import { LISTA_CATEGORIAS } from 'src/graphql/categorias'
+// import { LISTA_CATEGORIAS } from 'src/graphql/categorias'
 import { ref, toRefs, watch, onMounted, computed, Teleport } from 'vue'
 import RegistroCategoria from '../categorias/RegistroCategoria.vue'
 
+import { useCategoriaCrud } from '/src/composables/useCategoriaCrud.js'
+
+/**
+ *
+ */
+const categoriaCrud = useCategoriaCrud()
 /**
  * onMounted
  */
@@ -155,15 +161,15 @@ watch(tipoAfectacion, (newVal, oldVal) => {
 const graphql_options = ref({
   fetchPolicy: 'network-only'
 })
-const {
-  result: resultadoLista,
-  onError: onErrorListaCuentas
-  // refetch: reloadResultadoLista
-} = useQuery(
-  LISTA_CATEGORIAS,
-  null, //argumentos
-  graphql_options //opciones
-)
+// const {
+//   result: resultadoLista,
+//   onError: onErrorListaCuentas
+//   // refetch: reloadResultadoLista
+// } = useQuery(
+//   LISTA_CATEGORIAS,
+//   null, //argumentos
+//   graphql_options //opciones
+// )
 /**
  * computed
  */
@@ -199,7 +205,10 @@ const categoria = computed({
 const optionsList = computed({
   get() {
     if (!!tipoMovimientoId.value) {
-      return (resultadoLista.value?.listaCategorias ?? []).filter(
+      // return (resultadoLista.value?.listaCategorias ?? []).filter(
+      //   (categoria) => categoria.tipoMovimientoId === tipoMovimientoId.value
+      // )
+      return categoriaCrud.listaCategorias.value.filter(
         (categoria) => categoria.tipoMovimientoId === tipoMovimientoId.value
       )
     } else {
@@ -212,9 +221,9 @@ const tipoMovimientoLabel = computed({
     return tipoMovimientoId.value === '2' ? 'Egreso' : 'Ingreso'
   }
 })
-onErrorListaCuentas((error) => {
-  console.log('error', error)
-})
+// onErrorListaCuentas((error) => {
+//   console.log('error', error)
+// })
 /**
  * methods
  */
