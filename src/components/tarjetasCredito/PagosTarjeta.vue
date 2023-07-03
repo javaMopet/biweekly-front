@@ -87,6 +87,10 @@
         </div>
       </q-form>
     </q-card-section>
+    <q-card-section>
+      <pre>{{ fecha_inicio }}</pre>
+      <pre>{{ fecha_fin }}</pre>
+    </q-card-section>
   </q-card>
 </template>
 
@@ -117,7 +121,7 @@ const graphqlOptions = reactive({
 const {
   onError: onErrorListaRegistros,
   onResult: onResultListaRegistros,
-  load: cargaListaRegistros,
+  load: cargaListaRegistrosTarjeta,
   refetch: refetchListaRegistros
 } = useLazyQuery(LISTA_REGISTROS_TARJETA)
 
@@ -125,7 +129,7 @@ const {
  * state
  */
 const formItem = ref({
-  fecha: '13/06/2023',
+  fecha: '',
   cuenta_egreso: null,
   saldo_periodo: ''
 })
@@ -163,19 +167,21 @@ const emit = defineEmits(['itemsSaved'])
  */
 onMounted(() => {
   formItem.value.saldo_periodo = props.sumaMovimientos.toString()
+  formItem.value.fecha = DateTime.now().toFormat('dd/MM/yyyy')
 })
 /**
  * funciones
  */
 function generarPago() {
   console.log('Generando el pago de la tarjeta')
-  cargaListaRegistros(
+  cargaListaRegistrosTarjeta(
     null,
     {
       cuentaId: props.cuenta.id,
       fechaInicio: props.fecha_inicio,
       fechaFin: props.fecha_fin,
-      isMsi: false
+      isMsi: false,
+      estadoRegistroTarjetaId: 1
     },
     graphqlOptions
   )
@@ -183,6 +189,9 @@ function generarPago() {
 onResultListaRegistros(({ data }) => {
   const listaRegistros = data?.listaRegistrosTarjeta ?? []
   console.log('data', listaRegistros)
+  const fecha = formato.convertDateFromInputToIso(formItem.value.fecha)
+  console.log('data', fecha)
+
   var lista_registros = []
   listaRegistros.forEach((item) => {
     const registro = {
@@ -191,7 +200,7 @@ onResultListaRegistros(({ data }) => {
       cuenta_id: formItem.value.cuenta_egreso.id,
       categoria_id: item.categoriaId,
       importe: parseFloat(item.importe),
-      fecha: item.fecha,
+      fecha,
       observaciones: item.concepto,
       registro_id: item.id
     }
@@ -201,7 +210,9 @@ onResultListaRegistros(({ data }) => {
 
   api
     .post('/registros_tarjeta/create_pago', {
-      lista_registros
+      lista_registros,
+      fecha_fin: props.fecha_fin,
+      cuenta_id: props.cuenta.id
     })
     .then((response) => {
       console.log('guardado correctamente')

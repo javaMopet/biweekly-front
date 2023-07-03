@@ -147,35 +147,9 @@
             <q-icon name="calendar_month" />
           </template>
         </q-select>
-        <q-select
-          v-model="mes"
-          :options="mesOptions"
-          option-label="nombre"
-          label="Mes"
-          dense
-          outlined
-          color="secondary"
-          label-color="dark"
-          @update:model-value="onChangeMes"
-        >
-          <template #prepend>
-            <q-icon name="calendar_month" />
-          </template>
-        </q-select>
+        <MesSelect v-model="mes" @update:model-value="onChangeMes"></MesSelect>
       </div>
     </q-toolbar>
-    <!-- <q-toolbar inset class="bg-grey-2 q-gutter-x-l" dense fit>
-      <q-btn
-        color="toolbar-button"
-        text-color="white"
-        label="Cargar movimientos"
-
-        icon="upload"
-        dense
-      />
-
-
-    </q-toolbar> -->
   </q-card>
   <q-card flat>
     <q-card-section>
@@ -207,14 +181,6 @@
             {{ formato.toCurrency(saldo_anterior) }}</span
           >
         </div>
-
-        <!-- <q-separator spaced inset vertical />
-        <div class="col column items-center">
-          <span class="tarjeta__resumen-etiqueta"> Suma movimientos </span>
-          <span class="tarjeta__resumen-valor">
-            {{ formato.toCurrency(sumaMovimientos) }}</span
-          >
-        </div> -->
       </div>
       <q-separator spaced inset horizontal />
       <div class="row">
@@ -252,16 +218,6 @@
       </div>
     </q-card-section>
     <q-card-section>
-      <!-- <q-btn
-        class="btn-add"
-        icon="add_circle"
-        rounded
-        outline
-        @click="addItem"
-        bordered
-      >
-        <q-tooltip :offset="[10, 10]"> Agregar Movimiento a tarjeta </q-tooltip>
-      </q-btn> -->
       <q-icon name="add_circle" class="btn-add" clickable @click="addItem">
         <q-tooltip :offset="[10, 10]"> Add New </q-tooltip>
       </q-icon>
@@ -400,8 +356,9 @@
         :cuenta="cuenta"
         :saldo-periodo-anterior="parseFloat(saldo_anterior)"
         :suma-movimientos="parseFloat(sumaMovimientos)"
-        :fecha_inicio="fecha_inicio"
-        :fecha_fin="fecha_fin"
+        :fecha_inicio="fechaInicioPeriodo"
+        :fecha_fin="fechaFinPeriodo"
+        @items-saved="pagosRegistrados"
       ></PagosTarjeta>
     </q-dialog>
   </Teleport>
@@ -425,7 +382,7 @@ import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import RegistroMesesSinInteres from 'src/components/tarjetasCredito/RegistroMesesSinInteres.vue'
 import { useQuasar } from 'quasar'
 import PagosTarjeta from 'src/components/tarjetasCredito/PagosTarjeta.vue'
-import { portals } from 'caniuse-lite/data/features'
+import MesSelect from 'src/components/formComponents/MesSelect.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -499,7 +456,8 @@ onMounted(() => {
         cuentaId: route.params.id,
         fechaInicio: fecha_inicio.value,
         fechaFin: fecha_fin.value,
-        isMsi: null
+        isMsi: null,
+        estadoRegistroTarjetaId: null
       },
       graphqlOptions
     )
@@ -570,6 +528,25 @@ const mes_final_id = computed({
     return mes.value.id
   }
 })
+const fechaInicioPeriodo = computed({
+  get() {
+    const dia_inicio = ('0' + (cuenta.value.dia_corte + 1)).slice(-2)
+    return `${ejercicio_fiscal.value}-${('0' + (mes.value.id - 1)).slice(
+      -2
+    )}-${dia_inicio}`
+  }
+})
+const fechaFinPeriodo = computed({
+  get() {
+    const dia_fin = ('0' + cuenta.value.dia_corte).slice(-2)
+    return `${ejercicio_fiscal.value}-${('0' + mes.value.id).slice(
+      -2
+    )}-${dia_fin}`
+  }
+})
+/**
+ *
+ */
 const periodoInicio = computed({
   get() {
     const mes = mesOptions.value.find(
@@ -759,7 +736,8 @@ function obtenerListaRegistros() {
       cuentaId: route.params.id,
       fechaInicio,
       fechaFin,
-      isMsi: null
+      isMsi: null,
+      estadoRegistroTarjetaId: null
     },
     graphqlOptions
   )
@@ -833,6 +811,7 @@ function registroMsiUpdated() {
 }
 function pagosTarjeta() {
   console.log('registrando el pago')
+
   showPagosTarjeta.value = true
 }
 function registroCreated(registro) {
@@ -859,6 +838,10 @@ function cargaMasivaSaved() {
     900
   )
   refetchListaRegistros()
+}
+function pagosRegistrados() {
+  showPagosTarjeta.value = false
+  loadOrRefetchListaRegistrosTarjeta()
 }
 
 const mesOptions = ref([
@@ -917,6 +900,14 @@ const columns = [
     name: 'categoria',
     label: 'Categoria',
     field: (row) => row.categoria?.nombre || 'Pago del periodo',
+    sortable: true,
+    align: 'left',
+    style: 'width:30%'
+  },
+  {
+    name: 'estado',
+    label: 'Estado',
+    field: (row) => row.estadoRegistroTarjeta?.nombre || 'Error',
     sortable: true,
     align: 'left',
     style: 'width:30%'

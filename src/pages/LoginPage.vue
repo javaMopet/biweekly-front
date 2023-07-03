@@ -44,7 +44,7 @@
             >
               <q-input
                 v-if="isRegistration"
-                v-model="form.fullname"
+                v-model="form.name"
                 lazy-rules
                 type="text"
                 label="Nombre Completo"
@@ -138,7 +138,7 @@ const sessionStore = useSessionStore()
  * state
  */
 const form = reactive({
-  fullname: 'Horacio Peña Mendoza',
+  name: 'Horacio Peña Mendoza',
   email: 'hpenam@uaemex.mx',
   password: 'Pqt:72i_9,0c',
   password_confirmation: 'Pqt:72i_9,0c'
@@ -167,7 +167,7 @@ function submitForm() {
   if (isRegistration.value) {
     const payload = {
       user: {
-        // fullname: form.fullname,
+        name: form.name,
         email: form.email,
         password: form.password,
         password_confirmation: form.password_confirmation

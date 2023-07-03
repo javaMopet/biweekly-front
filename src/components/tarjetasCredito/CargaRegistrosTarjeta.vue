@@ -39,6 +39,7 @@
               clearable
               bg-color="toolbar-button"
               dark
+              @clear="fileClear"
             >
               <template #prepend>
                 <!-- <q-icon color="white" name="attach_file" /> -->
@@ -46,6 +47,11 @@
                 <q-separator spaced inset vertical dark />
               </template>
             </q-file>
+            <DateInput
+              v-model="fecha_desde"
+              clearable
+              label="Desde la fecha"
+            ></DateInput>
             <q-btn
               v-if="isSelected"
               label="Eliminar"
@@ -149,6 +155,7 @@ import CategoriaSelect from '../formComponents/CategoriaSelect.vue'
 import { useFormato } from 'src/composables/utils/useFormato'
 import { api } from 'src/boot/axios'
 import { DateTime } from 'luxon'
+import DateInput from '../formComponents/DateInput.vue'
 
 /**
  * state
@@ -158,6 +165,7 @@ const registrosSelected = ref([])
 const listaRegistrosTarjeta = ref([])
 const todos = ref()
 const isErrors = ref(false)
+const fecha_desde = ref()
 /**
  * composables
  */
@@ -254,10 +262,13 @@ function cargarMovimientosSantander(wb) {
     }
     const fechaObject = DateTime.fromFormat(fecha, 'dd/MM/yyyy')
     if (fechaObject.isValid) {
+      const importe = parseFloat(row.importe) * -1
+      const tipoAfectacion = importe < 0 ? 'C' : 'A'
       const item = {
         fecha,
         consecutivo: row.consecutivo,
-        importe: row.importe,
+        importe: importe.toString(),
+        tipoAfectacion,
         concepto: row.concepto,
         saved: false
       }
@@ -327,11 +338,11 @@ function guardarMovimientos() {
     listaRegistrosTarjeta.value.forEach((item) => {
       const registro = {
         estado_registro_tarjeta_id: 1, //pendiente
-        tipo_afectacion: item.tipo_afectacion,
+        tipo_afectacion: item.tipoAfectacion,
         cuenta_id: props.cuenta.id,
         categoria_id: item.categoria.id,
         importe: parseFloat(item.importe),
-        fecha: item.fecha.toISODate(),
+        fecha: formato.convertDateFromInputToIso(item.fecha),
         concepto: item.concepto
       }
       lista_registros_tarjeta.push(registro)
@@ -347,7 +358,8 @@ function guardarMovimientos() {
         emit('itemsSaved')
       })
       .catch((error) => {
-        console.error(error)
+        console.error(error.response.data)
+        console.error(error.response.data.exception)
         console.error('esto es un error')
       })
     console.log('items guardados')
@@ -378,6 +390,9 @@ function deleteRow(props) {
   const rowIndex = props.rowIndex
 
   listaRegistrosTarjeta.value.splice(rowIndex, 1)
+}
+function fileClear() {
+  listaRegistrosTarjeta.value.length = 0
 }
 /**
  * computed
@@ -422,7 +437,7 @@ const columns = [
     field: 'categoria',
     sortable: true,
     align: 'left',
-    style: 'width:300px;max-width:300px'
+    style: 'width:450px;max-width:450px'
   },
   {
     name: 'importe',

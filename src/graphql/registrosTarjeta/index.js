@@ -6,12 +6,14 @@ export const LISTA_REGISTROS_TARJETA = gql`
     $fechaInicio: ISO8601Date!
     $fechaFin: ISO8601Date!
     $isMsi: Boolean
+    $estadoRegistroTarjetaId: ID
   ) {
     listaRegistrosTarjeta(
       cuentaId: $cuentaId
       fechaInicio: $fechaInicio
       fechaFin: $fechaFin
       isMsi: $isMsi
+      estadoRegistroTarjetaId: $estadoRegistroTarjetaId
     ) {
       id
       cuentaId

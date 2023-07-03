@@ -115,6 +115,7 @@ export const useSessionStore = defineStore('session', () => {
 
   function setUserInfo(response) {
     user.value = response.data.user
+    console.log('usuarioRecuperado', user.value)
     auth_token.value = response.headers.authorization
     // api.defaults.headers.common["Authorization"] = auth_token.value;
     SessionStorage.set('auth_token', auth_token.value)
