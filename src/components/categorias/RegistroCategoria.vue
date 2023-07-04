@@ -148,6 +148,7 @@
             <CuentaSelect
               v-model="editedFormItem.cuentaDefault"
               :opcional="true"
+              :filter-array="['1', '2']"
               label="Cuenta Bancaria por Defecto"
               hint="Esta cuenta se tomará por defecto al agregar un movimiento"
             ></CuentaSelect>

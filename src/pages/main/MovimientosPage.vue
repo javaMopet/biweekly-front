@@ -85,9 +85,10 @@
           <q-td
             dense
             :props="props"
+            class="text-primary"
             :style="`border-left: 5px solid ${props.row.color}`"
           >
-            <q-icon :name="props.row.icono" size="22px" color="accent" />
+            <q-icon :name="props.row.icono" size="22px" color="brown" />
 
             <span class="q-pl-sm movimientos__columna-categoria">
               {{ props.value }}</span

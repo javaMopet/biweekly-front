@@ -1,24 +1,56 @@
 <template>
   <q-card flat>
     <q-toolbar class="bg-grey-1 text-primary" fit dense>
-      <q-btn
+      <!-- <q-btn
         icon="navigate_before"
         flat
         round
         @click="router.push('/admin/cuentas')"
         dense
         size="1rem"
-      />
+      /> -->
       <!-- <pre>{{ cuenta.nombre }}</pre> -->
       <div class="row items-center q-ml-sm q-gutter-x-sm">
         <!-- <q-img :src="`/icons/${cuenta.banco?.icono}`" width="50px" /> -->
-        <span class="text-h6">{{ cuenta.nombre }}</span>
+        <!-- <span class="text-h6">{{ cuenta.nombre }}</span> -->
+        <div class="q-pa-md q-gutter-sm">
+          <q-breadcrumbs>
+            <q-breadcrumbs-el icon="home" to="/" />
+            <q-breadcrumbs-el
+              label="Cuentas"
+              icon="account_balance"
+              to="/admin/cuentas"
+            />
+            <q-breadcrumbs-el
+              :label="cuenta.nombre"
+              icon="account_balance_wallet"
+            />
+          </q-breadcrumbs>
+        </div>
       </div>
       <q-toolbar-title> </q-toolbar-title>
-      <q-btn flat round dense icon="apps" class="q-mr-xs" />
+      <q-btn flat round dense icon="apps" class="q-mr-xs">
+        <q-menu>
+          <q-list style="min-width: 180px">
+            <q-item clickable v-close-popup @click="cargarMovimientos">
+              <q-item-section>
+                <div class="row inline justify-around items-around">
+                  <q-avatar square size="24px">
+                    <q-img
+                      src="/icons/excel2.png"
+                      width="24px"
+                      height="24px"
+                    /> </q-avatar
+                  >Importar Excel
+                </div></q-item-section
+              >
+            </q-item>
+          </q-list>
+        </q-menu>
+      </q-btn>
     </q-toolbar>
     <q-toolbar inset class="bg-grey-1">
-      <div class="row q-gutter-x-md">
+      <!-- <div class="row q-gutter-x-md">
         <q-btn
           color="primary-button"
           outline
@@ -30,7 +62,7 @@
           </q-avatar>
           <span class="q-ml-sm">Importar Movimientos</span>
         </q-btn>
-      </div>
+      </div> -->
       <q-toolbar-title> </q-toolbar-title>
       <div class="row q-gutter-x-sm">
         <q-select
@@ -77,10 +109,6 @@
           >
         </div>
         <q-separator spaced inset vertical />
-      </div>
-      <q-separator spaced inset horizontal />
-      <div class="row">
-        <q-separator spaced inset vertical />
         <div class="col column items-center">
           <span class="tarjeta__resumen-etiqueta">
             Suma de movimientos del periodo
@@ -89,11 +117,20 @@
             {{ formato.toCurrency(sumaMovimientos) }}</span
           >
         </div>
-        <q-separator spaced inset vertical />
+      </div>
+      <q-separator spaced inset horizontal />
+      <div class="row">
         <div class="col column items-center">
           <span class="tarjeta__resumen-etiqueta">
             Saldo al final del periodo</span
           >
+          <span class="tarjeta__resumen-valor">
+            {{ formato.toCurrency(saldo_final_periodo) }}
+          </span>
+        </div>
+        <q-separator spaced inset vertical />
+        <div class="col column items-center">
+          <span class="tarjeta__resumen-etiqueta"> Saldo final</span>
           <span class="tarjeta__resumen-valor">
             {{ formato.toCurrency(saldo_final_periodo) }}
           </span>
@@ -113,12 +150,20 @@
       >
         <template #top-left>
           <q-tr class="cuenta__data-subtitle">
-            <q-btn color="primary-button" @click="addItem" no-caps push outline>
+            <!-- <q-btn color="primary-button" @click="addItem" no-caps push outline>
               <q-avatar square size="24px">
                 <q-img src="/icons/add.png" width="24px" height="24px" />
               </q-avatar>
               <span class="q-ml-sm">Nuevo</span>
-            </q-btn>
+            </q-btn> -->
+            <q-icon
+              name="add_circle"
+              class="btn-add"
+              clickable
+              @click="addItem"
+            >
+              <q-tooltip :offset="[10, 10]"> Add New </q-tooltip>
+            </q-icon>
           </q-tr>
         </template>
         <!-- <template v-slot:body="props">

@@ -367,7 +367,7 @@ function addError(code, message) {
   })
 }
 
-registrosCrud.onDoneCreateRegistro(({ data }) => {
+registrosCrud.onDoneCreate(({ data }) => {
   afterSaveItem('Ingreso', data.ingresoCreate)
 })
 
@@ -377,7 +377,7 @@ function afterSaveItem(tipoRegistro, itemSaved) {
   emit('registroCreated', itemSaved)
 }
 
-registrosCrud.onErrorCreateRegistro((error) => {
+registrosCrud.onErrorCreate((error) => {
   console.error(error)
 })
 function obtenerFechaISO(fecha_formato) {
