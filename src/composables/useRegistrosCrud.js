@@ -16,8 +16,8 @@ export function useRegistrosCrud() {
 
   const {
     mutate: createRegistro,
-    onDone: onDoneCreateRegistro,
-    onError: onErrorCreateRegistro
+    onDone: onDoneCreate,
+    onError: onErrorCreate
   } = useMutation(REGISTRO_CREATE)
 
   const {
@@ -28,17 +28,17 @@ export function useRegistrosCrud() {
 
   const {
     mutate: deleteRegistro,
-    onDone: onDoneDeleteRegistro,
-    onError: onErrorDeleteRegistro
+    onDone: onDoneDelete,
+    onError: onErrorDelete
   } = useMutation(REGISTRO_DELETE)
 
   return {
     createRegistro,
-    onDoneCreateRegistro,
-    onErrorCreateRegistro,
+    onDoneCreate,
+    onErrorCreate,
     deleteRegistro,
-    onDoneDeleteRegistro,
-    onErrorDeleteRegistro,
+    onDoneDelete,
+    onErrorDelete,
     updateItem,
     onDoneUpdate,
     onErrorUpdate

@@ -751,10 +751,6 @@ function addItem() {
   showForm.value = true
 }
 
-registroCrud.onDoneDeleteRegistro((response) => {
-  notificacion.mostrarNotificacionInformativa('Registro eliminado')
-  console.log('response', response)
-})
 function mesesSinInteres(item) {
   showFormMSI.value = true
   editRegistroItem.value = item.row

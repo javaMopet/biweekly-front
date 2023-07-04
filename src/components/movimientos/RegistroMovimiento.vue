@@ -16,6 +16,7 @@
           vertical-top
         ></q-btn>
       </div>
+      <!-- <pre>{{ editedFormItem }}</pre> -->
     </q-card-section>
 
     <q-card-section>
@@ -157,7 +158,7 @@ const props = defineProps({
 /**
  * emits
  */
-const emit = defineEmits(['movimientoSaved', 'movimientoUpdated'])
+const emit = defineEmits(['itemSaved', 'itemUpdated'])
 /**
  * GRAPHQL
  */
@@ -179,6 +180,16 @@ onDoneCreateTransferencia(({ data }) => {
 
 onErrorCreateTransferencia((error) => {
   console.error(error)
+})
+registrosCrud.onDoneCreate(({ data }) => {
+  console.log('REgistro created', data)
+  const item = data.registroCreated.registro
+  emit('itemSaved', item)
+})
+registrosCrud.onDoneUpdate(({ data }) => {
+  console.log('Registro updated', data)
+  const item = data.registroUpdated.registro
+  emit('itemUpdated', item)
 })
 /**
  * computed
@@ -224,18 +235,31 @@ function onChangeTipoMovimiento(value) {
 }
 
 function saveItem() {
+  const importe = parseFloat(editedFormItem.value.importe)
+  const tipoAfectacion = importe < 0 ? 'C' : 'A'
+  const importeReal =
+    editedFormItem.value.categoria.tipoMovimientoId === '1'
+      ? importe
+      : importe * -1
   const input = {
-    tipoAfectacion: 'C',
+    id: editedFormItem.value.id,
+    tipoAfectacion,
     estadoRegistroId: 2,
     categoriaId: parseInt(editedFormItem.value.categoria.id),
     cuentaId: parseInt(editedFormItem.value.cuenta.id),
-    importe: parseFloat(editedFormItem.value.importe),
+    importe: importeReal,
     fecha: formato.convertDateFromInputToIso(editedFormItem.value.fecha),
     observaciones: editedFormItem.value.observaciones
   }
   console.log('saveItem input:', input)
-
-  registrosCrud.createRegistro({ input })
+  if (!!editedFormItem.value.id) {
+    registrosCrud.updateItem({
+      id: editedFormItem.value.id,
+      input
+    })
+  } else {
+    registrosCrud.createRegistro({ input })
+  }
 }
 
 function onSelectCategoria(value) {
@@ -243,9 +267,15 @@ function onSelectCategoria(value) {
     if (!props.editedItem.cuenta) {
       editedFormItem.value.cuenta = value.cuentaDefault
     }
-    editedFormItem.value.importe = value.importeDefault.toString()
+    editedFormItem.value.importe =
+      value.importeDefault === 0 ? '' : value.importeDefault.toString()
   }
 }
+
+registrosCrud.onDoneUpdate(({ data }) => {
+  console.log('data', data)
+  emit('itemUpdated')
+})
 </script>
 
 <style lang="sass" scoped>

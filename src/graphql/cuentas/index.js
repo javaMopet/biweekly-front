@@ -52,6 +52,11 @@ export const LISTA_TIPOS_CUENTA = gql`
     }
   }
 `
+export const OBTENER_SALDO_A_FECHA = gql`
+  query saldoAFecha($cuentaId: ID!, $fechaFin: ISO8601Date!) {
+    obtenerSaldoAFecha(cuentaId: $cuentaId, fechaFin: $fechaFin)
+  }
+`
 
 export const CUENTA_CREATE = gql`
   mutation cuentaCreate($input: CuentaInput!) {

@@ -48,7 +48,7 @@
             <q-icon name="calendar_month" />
           </template>
         </q-select>
-        <q-select
+        <!-- <q-select
           v-model="mes"
           :options="mesOptions"
           option-label="nombre"
@@ -62,7 +62,8 @@
           <template #prepend>
             <q-icon name="calendar_month" />
           </template>
-        </q-select>
+        </q-select> -->
+        <MesSelect v-model="mes" @update:model-value="onChangeMes"></MesSelect>
       </div>
     </q-toolbar>
   </q-card>
@@ -90,9 +91,11 @@
         </div>
         <q-separator spaced inset vertical />
         <div class="col column items-center">
-          <span class="tarjeta__resumen-etiqueta"> Account Balance </span>
+          <span class="tarjeta__resumen-etiqueta">
+            Saldo al final del periodo</span
+          >
           <span class="tarjeta__resumen-valor">
-            {{ formato.toCurrency(saldo_final) }}
+            {{ formato.toCurrency(saldo_final_periodo) }}
           </span>
         </div>
       </div>
@@ -203,7 +206,7 @@
                       <q-item-section>Meses Sin Intereses</q-item-section>
                     </q-item>
                     <q-separator />
-                    <q-item clickable v-close-popup>
+                    <q-item clickable v-close-popup @click="deleteItem(props)">
                       <q-item-section class="text-negative"
                         >Eliminar</q-item-section
                       >
@@ -223,8 +226,8 @@
       <RegistroMovimiento
         :cuenta-id="cuenta.id"
         :edited-item="registroEditedItem"
-        @registro-created="registroCreated"
-        @registro-updated="registroUpdated"
+        @item-saved="registroCreated"
+        @item-updated="registroUpdated"
       ></RegistroMovimiento>
     </q-dialog>
   </Teleport>
@@ -244,7 +247,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { DateTime } from 'luxon'
 import { api } from 'src/boot/axios'
 import { LISTA_REGISTROS } from 'src/graphql/registros'
-import { useLazyQuery } from '@vue/apollo-composable'
+import { useLazyQuery, useQuery } from '@vue/apollo-composable'
 import { useFormato } from 'src/composables/utils/useFormato'
 import { useRegistrosCrud } from 'src/composables/useRegistrosCrud'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
@@ -252,12 +255,14 @@ import { useQuasar } from 'quasar'
 import CargaRegistrosCuenta from 'src/components/cuentas/CargaRegistrosCuenta.vue'
 import CategoriaSelect from 'src/components/formComponents/CategoriaSelect.vue'
 import RegistroMovimiento from 'src/components/movimientos/RegistroMovimiento.vue'
+import MesSelect from 'src/components/formComponents/MesSelect.vue'
+import { OBTENER_SALDO_A_FECHA } from 'src/graphql/cuentas'
 
 const route = useRoute()
 const router = useRouter()
 const formato = useFormato()
 const notificacion = useNotificacion()
-const registroCrud = useRegistrosCrud()
+const registrosCrud = useRegistrosCrud()
 const $q = useQuasar()
 
 /**
@@ -370,6 +375,14 @@ const mes_final_id = computed({
     return mes.value.id
   }
 })
+
+const fecha_fin_periodo = computed({
+  get() {
+    return `${ejercicio_final_id.value}-${('0' + mes_final_id.value).slice(
+      -2
+    )}-${dia_corte_final.value}`
+  }
+})
 const periodoInicio = computed({
   get() {
     const mes = mesOptions.value.find(
@@ -416,6 +429,25 @@ onResultListaRegistros(({ data }) => {
 onErrorListaRegistros((error) => {
   console.error('response', error)
 })
+
+const { result: resultSaldoAFecha, onError: onErrorObtenerSaldo } = useQuery(
+  OBTENER_SALDO_A_FECHA,
+  {
+    cuentaId: route.params.id,
+    fechaFin: fecha_fin_periodo
+  },
+  graphqlOptions
+)
+
+const saldo_final_periodo = computed({
+  get() {
+    console.log(resultSaldoAFecha.value)
+    return resultSaldoAFecha.value?.obtenerSaldoAFecha ?? 0
+  }
+})
+onErrorObtenerSaldo((error) => {
+  console.log(error)
+})
 /**
  * functions
  */
@@ -423,13 +455,58 @@ onErrorListaRegistros((error) => {
 function editItem(item) {
   console.log('editando item...', item.rowIndex, item.row)
   registroEditedItem.value = JSON.parse(JSON.stringify(item.row))
-  registroEditedItem.value.importe = registroEditedItem.value.importe.toString()
+  registroEditedItem.value.importe = (
+    registroEditedItem.value.categoria.tipoMovimientoId === '2'
+      ? registroEditedItem.value.importe * -1
+      : registroEditedItem.value.importe
+  ).toString()
   console.log('fecha', registroEditedItem.value.fecha)
   registroEditedItem.value.fecha = formato.convertDateFromIsoToInput(
     registroEditedItem.value.fecha
   )
+  registroEditedItem.value.tipoMovimientoId =
+    registroEditedItem.value.categoria?.tipoMovimientoId || '3'
   showForm.value = true
 }
+
+function deleteItem(props_row) {
+  const item = props_row.row
+  deleteItem.value = $q
+    .dialog({
+      title: 'Confirmar',
+      style: 'width:500px',
+      message: `Va a eliminar un movimiento con un importe de: ${formato.toCurrency(
+        item.importe
+      )} ¿Desea continuar con la eliminación?`,
+      ok: {
+        push: true,
+        color: 'positive',
+        label: 'Continuar'
+      },
+      cancel: {
+        push: true,
+        color: 'negative',
+        flat: true,
+        label: 'cancelar'
+      },
+      persistent: true
+    })
+    .onOk(() => {
+      registrosCrud.deleteRegistro({
+        id: item.id
+      })
+    })
+    .onCancel(() => {})
+    .onDismiss(() => {})
+}
+
+registrosCrud.onDoneDelete(({ data }) => {
+  loadOrRefetchListaRegistros()
+  notificacion.mostrarNotificacionPositiva(
+    'Registro eliminado correctamente.',
+    1000
+  )
+})
 
 function obtener_fecha_inicio() {
   fecha_inicio.value = `${ejercicio_fiscal.value}-${('0' + mes.value.id).slice(
@@ -475,13 +552,6 @@ function obtenerListaRegistros() {
   )
 }
 
-function actualizarCategoria(value) {
-  console.log('actualizando la categoria', value.rowIndex, value.row)
-}
-function actualizarObservaciones(value) {
-  console.log('observaciones', value.rowIndex, value.row)
-}
-
 function cargarMovimientos() {
   showFormCarga.value = true
 }
@@ -499,10 +569,6 @@ function addItem() {
   showForm.value = true
 }
 
-registroCrud.onDoneDeleteRegistro((response) => {
-  notificacion.mostrarNotificacionInformativa('Registro eliminado')
-  console.log('response', response)
-})
 function mesesSinInteres(item) {
   showFormMSI.value = true
   editRegistroItem.value = item.row
@@ -533,12 +599,6 @@ function confirmQuitarMsi(id) {
     })
 }
 
-function registroMsiUpdated() {
-  showFormMSI.value = false
-  console.log('El registro fue modificado')
-  refetchListaRegistros()
-}
-
 function registroCreated(registro) {
   notificacion.mostrarNotificacionPositiva(
     'Se ha ingresado un nuevo registro.',
@@ -562,25 +622,6 @@ function itemsSaved() {
 }
 function loadOrRefetchListaRegistros() {
   cargaListaRegistros() || refetchListaRegistros()
-}
-
-const parentDblClick = (e) => {
-  //emit "click" event  with payload
-  e.target.dispatchEvent(
-    new CustomEvent('click', { detail: { trigger: true } })
-  )
-}
-
-const parentClick = function (e, open) {
-  console.log('click...............', e, !e.detail?.trigger)
-  //check payload and stop in current
-  if (!e.detail?.trigger) {
-    return
-  }
-  return e.stopPropagation()
-
-  //keep event propagating on parent
-  e.target.parentNode.dispatchEvent(new Event('click'))
 }
 
 const mesOptions = ref([
