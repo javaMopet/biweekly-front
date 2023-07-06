@@ -47,11 +47,11 @@
                 <q-separator spaced inset vertical dark />
               </template>
             </q-file>
-            <DateInput
+            <!-- <DateInput
               v-model="fecha_desde"
               clearable
               label="Desde la fecha"
-            ></DateInput>
+            ></DateInput> -->
             <q-btn
               v-if="isSelected"
               label="Eliminar"
@@ -156,6 +156,7 @@ import { useFormato } from 'src/composables/utils/useFormato'
 import { api } from 'src/boot/axios'
 import { DateTime } from 'luxon'
 import DateInput from '../formComponents/DateInput.vue'
+import { useNotificacion } from 'src/composables/utils/useNotificacion'
 
 /**
  * state
@@ -170,6 +171,7 @@ const fecha_desde = ref()
  * composables
  */
 const formato = useFormato()
+const notificacion = useNotificacion()
 /**
  * defProperties
  */
@@ -338,7 +340,7 @@ function guardarMovimientos() {
     listaRegistrosTarjeta.value.forEach((item) => {
       const registro = {
         estado_registro_tarjeta_id: 1, //pendiente
-        tipo_afectacion: item.tipoAfectacion,
+        tipo_afectacion: item.tipo_afectacion,
         cuenta_id: props.cuenta.id,
         categoria_id: item.categoria.id,
         importe: parseFloat(item.importe),
@@ -358,9 +360,11 @@ function guardarMovimientos() {
         emit('itemsSaved')
       })
       .catch((error) => {
-        console.error(error.response.data)
         console.error(error.response.data.exception)
-        console.error('esto es un error')
+        notificacion.mostrarNotificacionNegativa(
+          'No fue posible posible guardar los registro, revisar consola',
+          900
+        )
       })
     console.log('items guardados')
   }

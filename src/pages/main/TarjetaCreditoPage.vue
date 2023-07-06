@@ -1,76 +1,31 @@
 <template>
   <q-card flat>
     <q-toolbar class="bg-grey-1 text-primary" fit dense>
-      <!-- arrow_back_ios -->
-      <q-btn
-        icon="navigate_before"
-        flat
-        round
-        @click="router.push('/tarjetas_credito')"
-        dense
-        size="1rem"
-      />
-      <span class="text-h6">{{ cuenta.nombre }}</span>
-
-      <q-toolbar-title>
-        <!-- Tarjeta de crédito {{ route.params.id }} -->
-      </q-toolbar-title>
+      <div class="row items-center q-ml-sm q-gutter-x-sm">
+        <!-- <q-img :src="`/icons/${cuenta.banco?.icono}`" width="50px" /> -->
+        <!-- <span class="text-h6">{{ cuenta.nombre }}</span> -->
+        <div class="q-pa-md q-gutter-sm">
+          <q-breadcrumbs>
+            <q-breadcrumbs-el icon="home" to="/" />
+            <q-breadcrumbs-el
+              label="Tarjetas de crédito"
+              icon="credit_card"
+              to="/admin/cuentas"
+            />
+            <q-breadcrumbs-el
+              :label="cuenta.nombre"
+              icon="account_balance_wallet"
+            />
+          </q-breadcrumbs>
+        </div>
+      </div>
+      <q-toolbar-title> </q-toolbar-title>
 
       <q-btn flat round dense icon="apps" class="q-mr-xs" />
-      <!-- <q-btn outline dense icon="more_vert" flat>
-        <q-menu>
-          <q-list dense style="min-width: 100px">
-            <q-item clickable v-close-popup>
-              <q-item-section>Open...</q-item-section>
-            </q-item>
-            <q-item clickable v-close-popup>
-              <q-item-section>New</q-item-section>
-            </q-item>
-            <q-separator />
-            <q-item clickable>
-              <q-item-section>Preferences</q-item-section>
-              <q-item-section side>
-                <q-icon name="keyboard_arrow_right" />
-              </q-item-section>
-
-              <q-menu anchor="top end" self="top start">
-                <q-list>
-                  <q-item v-for="n in 3" :key="n" dense clickable>
-                    <q-item-section>Submenu Label</q-item-section>
-                    <q-item-section side>
-                      <q-icon name="keyboard_arrow_right" />
-                    </q-item-section>
-                    <q-menu auto-close anchor="top end" self="top start">
-                      <q-list>
-                        <q-item v-for="n in 3" :key="n" dense clickable>
-                          <q-item-section>3rd level Label</q-item-section>
-                        </q-item>
-                      </q-list>
-                    </q-menu>
-                  </q-item>
-                </q-list>
-              </q-menu>
-            </q-item>
-            <q-separator />
-            <q-item clickable v-close-popup>
-              <q-item-section>Quit</q-item-section>
-            </q-item>
-          </q-list>
-        </q-menu>
-      </q-btn> -->
     </q-toolbar>
     <q-toolbar inset class="bg-grey-1">
-      <!-- <q-btn
-        outline
-        rounded
-        dense
-        icon="upload"
-        label="Importar Movimimientos"
-        color="toolbar-button"
-        @click="cargarMovimientos"
-      /> -->
-
       <div class="row q-gutter-x-md">
+        <q-btn color="primary-button" label="Agregar" @click="addItem" push />
         <q-btn
           color="primary-button"
           outline
@@ -80,50 +35,10 @@
           <q-avatar square size="24px">
             <q-img src="/icons/excel.png" width="24px" height="24px" />
           </q-avatar>
-          <span class="q-ml-sm">Importar Movimientos</span>
+          <span class="q-ml-sm">Importar</span>
         </q-btn>
-        <!-- <q-btn-dropdown
-          label="AGREGAR"
-          color="primary-button"
-          class=""
-          no-caps
-          icon="add_circle"
-        >
-          <q-list>
-            <q-item clickable v-close-popup @click="addItem">
-              <q-item-section
-                avatar
-                style="min-width: 45px !important; width: 45px !important"
-                class="items-start"
-              >
-                <q-avatar
-                  icon="assignment"
-                  text-color="secondary"
-                  outlined
-                  font-size="40px"
-                />
-              </q-item-section>
-              <q-item-section>
-                <q-item-label>Nuevo registro</q-item-label>
-              </q-item-section>
-            </q-item>
-            <q-item clickable v-close-popup @click="cargarMovimientos" dense>
-              <q-item-section
-                avatar
-                style="min-width: 45px !important; width: 45px !important"
-              >
-                <q-avatar text-color="white" square>
-                  <q-img src="/icons/excel.png" width="35px" height="35px" />
-                </q-avatar>
-              </q-item-section>
-              <q-item-section>
-                <q-item-label>Importar Movimientos</q-item-label>
-              </q-item-section>
-            </q-item>
-          </q-list>
-        </q-btn-dropdown> -->
+
         <q-btn
-          icon="payments"
           color="toolbar-button"
           label="pagos"
           @click="pagosTarjeta"
@@ -218,9 +133,9 @@
       </div>
     </q-card-section>
     <q-card-section>
-      <q-icon name="add_circle" class="btn-add" clickable @click="addItem">
+      <!-- <q-icon name="add_circle" class="btn-add" clickable @click="addItem">
         <q-tooltip :offset="[10, 10]"> Add New </q-tooltip>
-      </q-icon>
+      </q-icon> -->
       <q-table
         v-if="listaRegistrosMsi.length > 0"
         :rows="listaRegistrosMsi"
