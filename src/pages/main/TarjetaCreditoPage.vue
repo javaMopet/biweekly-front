@@ -10,7 +10,7 @@
             <q-breadcrumbs-el
               label="Tarjetas de crédito"
               icon="credit_card"
-              to="/admin/cuentas"
+              to="/tarjetas_credito"
             />
             <q-breadcrumbs-el
               :label="cuenta.nombre"

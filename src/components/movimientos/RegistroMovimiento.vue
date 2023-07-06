@@ -181,14 +181,15 @@ onDoneCreateTransferencia(({ data }) => {
 onErrorCreateTransferencia((error) => {
   console.error(error)
 })
+
 registrosCrud.onDoneCreate(({ data }) => {
   console.log('REgistro created', data)
-  const item = data.registroCreated.registro
+  const item = data.registroCreate.registro
   emit('itemSaved', item)
 })
 registrosCrud.onDoneUpdate(({ data }) => {
-  console.log('Registro updated', data)
-  const item = data.registroUpdated.registro
+  console.log('Registro update', data)
+  const item = data.registroUpdate.registro
   emit('itemUpdated', item)
 })
 /**

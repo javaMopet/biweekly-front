@@ -1,20 +1,14 @@
 <template>
+  <!-- <q-card flat>
+    <q-card-section>
+      <pre class="text-condensed">{{ cuenta }}</pre>
+    </q-card-section>
+  </q-card> -->
   <q-card flat>
     <q-toolbar class="bg-grey-1 text-primary" fit dense>
-      <!-- <q-btn
-        icon="navigate_before"
-        flat
-        round
-        @click="router.push('/admin/cuentas')"
-        dense
-        size="1rem"
-      /> -->
-      <!-- <pre>{{ cuenta.nombre }}</pre> -->
       <div class="row items-center q-ml-sm q-gutter-x-sm">
-        <!-- <q-img :src="`/icons/${cuenta.banco?.icono}`" width="50px" /> -->
-        <!-- <span class="text-h6">{{ cuenta.nombre }}</span> -->
         <div class="q-pa-md q-gutter-sm">
-          <q-breadcrumbs>
+          <q-breadcrumbs class="text-blue-grey-6" active-color="primary">
             <q-breadcrumbs-el icon="home" to="/" />
             <q-breadcrumbs-el
               label="Cuentas"
@@ -29,40 +23,29 @@
         </div>
       </div>
       <q-toolbar-title> </q-toolbar-title>
-      <q-btn flat round dense icon="apps" class="q-mr-xs">
-        <q-menu>
-          <q-list style="min-width: 180px">
-            <q-item clickable v-close-popup @click="cargarMovimientos">
-              <q-item-section>
-                <div class="row inline justify-around items-around">
-                  <q-avatar square size="24px">
-                    <q-img
-                      src="/icons/excel2.png"
-                      width="24px"
-                      height="24px"
-                    /> </q-avatar
-                  >Importar Excel
-                </div></q-item-section
-              >
-            </q-item>
-          </q-list>
-        </q-menu>
-      </q-btn>
     </q-toolbar>
     <q-toolbar inset class="bg-grey-1">
-      <!-- <div class="row q-gutter-x-md">
+      <div class="row q-gutter-x-md">
+        <q-btn
+          color="primary-button"
+          icon="add_circle"
+          label="Agregar"
+          no-caps
+          @click="addItem"
+        />
         <q-btn
           color="primary-button"
           outline
           @click="cargarMovimientos"
           no-caps
+          v-if="isCuentaAhorros"
         >
           <q-avatar square size="24px">
             <q-img src="/icons/excel2.png" width="24px" height="24px" />
           </q-avatar>
-          <span class="q-ml-sm">Importar Movimientos</span>
+          <span class="q-ml-sm">Importar</span>
         </q-btn>
-      </div> -->
+      </div>
       <q-toolbar-title> </q-toolbar-title>
       <div class="row q-gutter-x-sm">
         <q-select
@@ -156,14 +139,14 @@
               </q-avatar>
               <span class="q-ml-sm">Nuevo</span>
             </q-btn> -->
-            <q-icon
+            <!-- <q-icon
               name="add_circle"
               class="btn-add"
               clickable
               @click="addItem"
             >
               <q-tooltip :offset="[10, 10]"> Add New </q-tooltip>
-            </q-icon>
+            </q-icon> -->
           </q-tr>
         </template>
         <!-- <template v-slot:body="props">
@@ -452,6 +435,11 @@ const periodoFin = computed({
     return ''
   }
 })
+const isCuentaAhorros = computed({
+  get() {
+    return cuenta.value?.tipo_cuenta_id === 1
+  }
+})
 /**
  * graphql
  */
@@ -645,6 +633,7 @@ function confirmQuitarMsi(id) {
 }
 
 function registroCreated(registro) {
+  console.log('El registro fue guardardo correctamente', registro)
   notificacion.mostrarNotificacionPositiva(
     'Se ha ingresado un nuevo registro.',
     1200

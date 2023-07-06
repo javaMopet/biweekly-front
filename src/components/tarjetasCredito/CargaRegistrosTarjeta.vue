@@ -104,7 +104,7 @@
           <q-td :props="props">
             <CategoriaSelect
               v-model="props.row.categoria"
-              :tipo-afectacion="props.row.tipoAfectacion"
+              :tipo-afectacion="props.row.tipo_afectacion"
             ></CategoriaSelect>
           </q-td>
         </template>
@@ -265,12 +265,12 @@ function cargarMovimientosSantander(wb) {
     const fechaObject = DateTime.fromFormat(fecha, 'dd/MM/yyyy')
     if (fechaObject.isValid) {
       const importe = parseFloat(row.importe) * -1
-      const tipoAfectacion = importe < 0 ? 'C' : 'A'
+      const tipo_afectacion = importe < 0 ? 'C' : 'A'
       const item = {
         fecha,
         consecutivo: row.consecutivo,
         importe: importe.toString(),
-        tipoAfectacion,
+        tipo_afectacion,
         concepto: row.concepto,
         saved: false
       }

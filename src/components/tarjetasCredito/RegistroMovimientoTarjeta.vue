@@ -18,9 +18,14 @@
     <q-card-section class="q-mx-lg">
       <q-form @submit="saveItem" class="q-gutter-md">
         <div class="column">
+          <div class="row input-label">Categoría:</div>
+          <CategoriaSelect
+            v-model="editedFormItem.categoria"
+            :rules="[(val) => !!val || 'Selecciona una categoría']"
+            autofocus
+          ></CategoriaSelect>
           <div class="row input-label">Concepto:</div>
           <q-input
-            autofocus
             color="secondary"
             v-model="editedFormItem.concepto"
             type="textarea"
@@ -55,11 +60,6 @@
             </div>
           </div>
 
-          <div class="row input-label">Categoría:</div>
-          <CategoriaSelect
-            v-model="editedFormItem.categoria"
-            :rules="[(val) => !!val || 'Selecciona una categoría']"
-          ></CategoriaSelect>
           <div class="row">
             <q-checkbox
               color="secondary"

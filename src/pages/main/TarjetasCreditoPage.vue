@@ -58,14 +58,18 @@
         <template #item="props">
           <!--clase: tarjeta__cuenta -->
           <q-card
-            class="tarjeta__cuenta bg-primary-light q-ma-lg"
+            class="tarjeta__cuenta bg-credit-card q-ma-lg"
             style="width: 330px; min-width: 330px"
+            clickable
           >
             <!-- @click="mostrarMovimientos(props.row.id)" -->
             <q-card-section>
               <div class="column">
                 <div class="row inline fit">
-                  <div class="col-4 items-center justify-center column">
+                  <div
+                    class="col-4 items-center justify-center column"
+                    @click="abrirMovimientos(props)"
+                  >
                     <q-avatar size="45px" color="primary-light">
                       <q-img
                         :src="`/icons/${props.row.banco?.icono ?? 'cash.png'}`"
@@ -78,6 +82,7 @@
                     class="col-6"
                     align="right"
                     style="border: 0px solid purple"
+                    @click="abrirMovimientos(props)"
                   >
                     <q-item-label
                       align="right"
@@ -136,26 +141,29 @@
                     </q-btn>
                   </div>
                 </div>
-                <div class="q-my-lg row">
+                <div class="q-py-lg row" @click="abrirMovimientos(props)">
                   <q-img src="/icons/chip-credit-card.png" width="40px" />
                   <div class="q-ml-lg">
-                    <router-link
+                    <!-- <router-link
                       :to="{
                         name: 'tarjetaCredito',
                         params: { id: props.row.id }
                       }"
                       class="tarjeta__credito--link"
+                    > -->
+                    <div
+                      class="fit flex flex-left text-left non-selectable q-py-sm"
                     >
-                      <div
-                        class="fit flex flex-left text-left non-selectable q-py-sm"
-                      >
-                        **** **** **** {{ props.row.identificador }}
-                      </div>
-                      <q-tooltip> Abrir movimientos </q-tooltip>
-                    </router-link>
+                      **** **** **** {{ props.row.identificador }}
+                    </div>
+                    <q-tooltip> Abrir movimientos </q-tooltip>
+                    <!-- </router-link> -->
                   </div>
                 </div>
-                <div class="row justify-between items-center q-mx-lg">
+                <div
+                  class="row justify-between items-center q-px-lg"
+                  @click="abrirMovimientos(props)"
+                >
                   <span class="text-caption">HORACIO PEÑA MENDOZA</span>
                   <q-item-label
                     align="right"
@@ -347,6 +355,9 @@ function editRow(item) {
   editedIndex.value = item.rowIndex
   showFormItem.value = true
 }
+function abrirMovimientos(props_row) {
+  router.push(`/tarjetas_credito/${props_row.row.id}`)
+}
 
 function deleteRow(item) {
   $q.dialog({
@@ -411,17 +422,6 @@ function mostrarMovimientos(value) {
   &:hover {
     text-decoration: underline !important;
     color: $dark !important;
-  }
-}
-.tarjeta__cuenta {
-  // border: 1px solid white !important;
-  &:hover {
-    // border: 1px solid red !important;
-    cursor: pointer;
-    box-shadow: rgba(0, 0, 0, 0.25) 0px 14px 28px,
-      rgba(0, 0, 0, 0.22) 0px 10px 10px;
-    transform: translate(-1px, -2px);
-    transition: all 0.25s;
   }
 }
 </style>

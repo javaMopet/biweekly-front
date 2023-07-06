@@ -1,108 +1,124 @@
 <template>
-  <div class="column q-ma-md" style="border: 0px solid red">
-    <div class="row fit" style="border: 0px solid red">
-      <q-table
-        grid
-        style="width: 100%"
-        dense
-        :rows="listaCuentas"
-        :columns="columns"
-        row-key="id"
-        :filter="filter"
-        :rows-per-page-options="[0]"
-        hide-pagination
-      >
-        <template v-slot:top-left>
-          <div class="q-pa-md">
-            <q-btn-dropdown
-              split
-              icon="add_circle"
-              color="primary-button"
-              push
-              glossy
-              no-caps
-              label="agregar"
-              @click="addRow(1)"
-              text-color="accent-light"
+  <div class="">
+    <q-toolbar class="" dense fit>
+      <div class="row items-center q-ml-sm q-gutter-x-sm">
+        <div class="q-pa-md q-gutter-sm">
+          <q-breadcrumbs class="text-blue-grey-6" active-color="primary">
+            <q-breadcrumbs-el icon="home" to="/" />
+            <q-breadcrumbs-el
+              label="Cuentas"
+              icon="account_balance"
+              to="/admin/cuentas"
+            />
+          </q-breadcrumbs>
+        </div>
+      </div>
+      <q-toolbar-title> </q-toolbar-title>
+    </q-toolbar>
+    <div class="column q-mx-md" style="border: 0px solid red">
+      <div class="row fit" style="border: 0px solid red">
+        <q-table
+          grid
+          style="width: 100%"
+          dense
+          :rows="listaCuentas"
+          :columns="columns"
+          row-key="id"
+          :filter="filter"
+          :rows-per-page-options="[0]"
+          hide-pagination
+        >
+          <template v-slot:top-left>
+            <div class="q-pa-md">
+              <q-btn-dropdown
+                split
+                icon="add_circle"
+                color="primary-button"
+                push
+                glossy
+                no-caps
+                label="agregar"
+                @click="addRow(1)"
+                text-color="accent-light"
+              >
+                <q-list class="bg-primary-light">
+                  <q-item clickable v-close-popup @click="addRow(1)">
+                    <q-item-section avatar>
+                      <q-avatar
+                        icon="account_balance"
+                        color="primary"
+                        text-color="white"
+                      />
+                    </q-item-section>
+                    <q-item-section>
+                      <q-item-label>Cuenta de Ahorros</q-item-label>
+                      <!-- <q-item-label caption>February 22, 2016</q-item-label> -->
+                    </q-item-section>
+                    <!-- <q-item-section side>
+                    <q-icon name="info" color="amber" />
+                  </q-item-section> -->
+                  </q-item>
+
+                  <q-item clickable v-close-popup @click="addRow(2)">
+                    <q-item-section avatar>
+                      <q-avatar
+                        icon="payments"
+                        color="secondary"
+                        text-color="white"
+                      />
+                    </q-item-section>
+                    <q-item-section>
+                      <q-item-label>Cuenta de Efectivo</q-item-label>
+                      <!-- <q-item-label caption>February 22, 2016</q-item-label> -->
+                    </q-item-section>
+                    <!-- <q-item-section side>
+                    <q-icon name="info" color="amber" />
+                  </q-item-section> -->
+                  </q-item>
+                </q-list>
+              </q-btn-dropdown>
+            </div>
+          </template>
+
+          <template v-slot:top-right>
+            <q-input
+              outlined
+              dense
+              debounce="300"
+              v-model="filter"
+              placeholder="Buscar Cuenta"
             >
-              <q-list class="bg-primary-light">
-                <q-item clickable v-close-popup @click="addRow(1)">
-                  <q-item-section avatar>
-                    <q-avatar
-                      icon="account_balance"
-                      color="primary"
-                      text-color="white"
-                    />
-                  </q-item-section>
-                  <q-item-section>
-                    <q-item-label>Cuenta de Ahorros</q-item-label>
-                    <!-- <q-item-label caption>February 22, 2016</q-item-label> -->
-                  </q-item-section>
-                  <!-- <q-item-section side>
-                    <q-icon name="info" color="amber" />
-                  </q-item-section> -->
-                </q-item>
-
-                <q-item clickable v-close-popup @click="addRow(2)">
-                  <q-item-section avatar>
-                    <q-avatar
-                      icon="payments"
-                      color="secondary"
-                      text-color="white"
-                    />
-                  </q-item-section>
-                  <q-item-section>
-                    <q-item-label>Cuenta de Efectivo</q-item-label>
-                    <!-- <q-item-label caption>February 22, 2016</q-item-label> -->
-                  </q-item-section>
-                  <!-- <q-item-section side>
-                    <q-icon name="info" color="amber" />
-                  </q-item-section> -->
-                </q-item>
-              </q-list>
-            </q-btn-dropdown>
-          </div>
-        </template>
-
-        <template v-slot:top-right>
-          <q-input
-            outlined
-            dense
-            debounce="300"
-            v-model="filter"
-            placeholder="Buscar Cuenta"
-          >
-            <template v-slot:append>
-              <q-icon name="search" />
-            </template>
-          </q-input>
-        </template>
-        <template #item="props">
-          <q-card class="text-primary q-ma-sm">
-            <q-card-section>
-              <div class="row q-gutter-x-lg">
-                <div class="column">
-                  <q-avatar size="60px" color="white">
-                    <q-img
-                      :src="`/icons/${props.row.banco?.icono ?? 'cash.png'}`"
-                      width="50px"
-                      height="50px"
-                    />
-                  </q-avatar>
-                </div>
-                <div class="column">
-                  <div class="row cuenta__title">
-                    {{ props.row.nombre }}
+              <template v-slot:append>
+                <q-icon name="search" />
+              </template>
+            </q-input>
+          </template>
+          <template #item="props">
+            <q-card class="tarjeta__cuenta text-primary q-ma-sm clickable">
+              <q-card-section>
+                <div class="row q-gutter-x-lg">
+                  <div class="column" @click="abrirMovimientos(props)">
+                    <q-avatar size="60px" color="white">
+                      <q-img
+                        :src="`/icons/${props.row.banco?.icono ?? 'cash.png'}`"
+                        width="50px"
+                        height="50px"
+                      />
+                    </q-avatar>
                   </div>
-                  <div class="row cuenta__subtitle">
-                    <!-- **** **** **** {{ props.row.identificador }} -->
-                    <router-link
+                  <div class="column" @click="abrirMovimientos(props)">
+                    <div class="row cuenta__title">
+                      {{ props.row.nombre }}
+                    </div>
+                    <div class="row cuenta__subtitle">
+                      <!-- **** **** **** {{ props.row.identificador }} -->
+                      <!-- <router-link
                       :to="{
                         name: 'cuenta',
                         params: { id: props.row.id }
                       }"
                       class="tarjeta__credito--link cuenta__subtitle"
-                    >
+                    > -->
                       <div
                         class="fit flex flex-left text-left non-selectable"
                         v-if="props.row.identificador !== ''"
@@ -110,56 +126,67 @@
                         **** **** **** {{ props.row.identificador }}
                       </div>
                       <q-tooltip> Abrir movimientos </q-tooltip>
-                    </router-link>
+                      <!-- </router-link> -->
+                    </div>
+                    <div class="row text-condensed text-blue-grey-4">
+                      {{ props.row.cuentaContable.nombreCompleto }}
+                    </div>
                   </div>
-                  <div class="row text-condensed text-blue-grey-4">
-                    {{ props.row.cuentaContable.nombreCompleto }}
+                  <div class="column">
+                    <q-btn
+                      color="more-button"
+                      flat
+                      icon="more_vert"
+                      round
+                      dense
+                    >
+                      <q-menu>
+                        <q-list style="min-width: 100px">
+                          <q-item
+                            clickable
+                            @click="editRow(props)"
+                            v-close-popup
+                          >
+                            <q-item-section avatar>
+                              <q-icon name="edit" color="info"
+                            /></q-item-section>
+                            <q-item-section>Editar</q-item-section>
+                          </q-item>
+                          <q-separator />
+                          <q-item
+                            clickable
+                            @click="deleteRow(props)"
+                            v-close-popup
+                          >
+                            <q-item-section avatar>
+                              <q-icon name="delete" color="negative"
+                            /></q-item-section>
+                            <q-item-section>Eliminar</q-item-section>
+                          </q-item>
+                        </q-list>
+                      </q-menu>
+                    </q-btn>
                   </div>
                 </div>
-                <div class="column">
-                  <q-btn color="more-button" flat icon="more_vert" round dense>
-                    <q-menu>
-                      <q-list style="min-width: 100px">
-                        <q-item clickable @click="editRow(props)" v-close-popup>
-                          <q-item-section avatar>
-                            <q-icon name="edit" color="info"
-                          /></q-item-section>
-                          <q-item-section>Editar</q-item-section>
-                        </q-item>
-                        <q-separator />
-                        <q-item
-                          clickable
-                          @click="deleteRow(props)"
-                          v-close-popup
-                        >
-                          <q-item-section avatar>
-                            <q-icon name="delete" color="negative"
-                          /></q-item-section>
-                          <q-item-section>Eliminar</q-item-section>
-                        </q-item>
-                      </q-list>
-                    </q-menu>
-                  </q-btn>
-                </div>
-              </div>
-              <div
-                class="row inline"
-                style="border: 0px solid red; width: 100%"
-              >
-                <q-item-label
+                <div
+                  class="row inline"
                   style="border: 0px solid red; width: 100%"
-                  caption
-                  class="text-blue-grey-6 text-bold"
-                  align="right"
+                  @click="abrirMovimientos(props)"
                 >
-                  <span class="text-h6">
-                    {{ formato.toCurrency(props.row.saldo) }}
-                  </span>
-                </q-item-label>
-              </div>
-            </q-card-section>
+                  <q-item-label
+                    style="border: 0px solid red; width: 100%"
+                    caption
+                    class="text-blue-grey-6 text-bold"
+                    align="right"
+                  >
+                    <span class="text-h6">
+                      {{ formato.toCurrency(props.row.saldo) }}
+                    </span>
+                  </q-item-label>
+                </div>
+              </q-card-section>
 
-            <!-- <q-card-section>
+              <!-- <q-card-section>
               <div
                 class="text-subtitle text-grey-8 text-bold q-mt-xs"
                 align="right"
@@ -167,9 +194,9 @@
               <span class="cuenta__card--descripcion"> </span>
             </q-card-section> -->
 
-            <!-- <q-separator inset /> -->
+              <!-- <q-separator inset /> -->
 
-            <!-- <q-card-actions>
+              <!-- <q-card-actions>
               <q-btn
                 round
                 color="primary"
@@ -185,25 +212,26 @@
                 @click="deleteRow(props)"
               />
             </q-card-actions> -->
-          </q-card>
-        </template>
-        <template #body-cell-icono="props">
-          <q-icon :name="props.row.icono" size="35px" color="cyan" />
-        </template>
-      </q-table>
-    </div>
+            </q-card>
+          </template>
+          <template #body-cell-icono="props">
+            <q-icon :name="props.row.icono" size="35px" color="cyan" />
+          </template>
+        </q-table>
+      </div>
 
-    <Teleport to="#modal">
-      <q-dialog v-model="showFormItem" persistent>
-        <RegistroCuenta
-          :edited-item="editedItem"
-          :edited-index="editedIndex"
-          @cuentaSaved="cuentaSaved"
-          @cuentaUpdated="cuentaUpdated"
-        ></RegistroCuenta>
-      </q-dialog>
-    </Teleport>
-    <!-- <pre>{{ listaCuentas }}</pre> -->
+      <Teleport to="#modal">
+        <q-dialog v-model="showFormItem" persistent>
+          <RegistroCuenta
+            :edited-item="editedItem"
+            :edited-index="editedIndex"
+            @cuentaSaved="cuentaSaved"
+            @cuentaUpdated="cuentaUpdated"
+          ></RegistroCuenta>
+        </q-dialog>
+      </Teleport>
+      <!-- <pre>{{ listaCuentas }}</pre> -->
+    </div>
   </div>
 </template>
 
@@ -215,6 +243,7 @@ import RegistroCuenta from 'src/components/cuentas/RegistroCuenta.vue'
 import { useQuasar } from 'quasar'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { useFormato } from 'src/composables/utils/useFormato'
+import { useRouter } from 'vue-router'
 
 /**
  * composables
@@ -222,6 +251,7 @@ import { useFormato } from 'src/composables/utils/useFormato'
 const $q = useQuasar()
 const notificacion = useNotificacion()
 const formato = useFormato()
+const router = useRouter()
 
 /**
  * GRAPHQL
@@ -352,7 +382,9 @@ function editRow(item) {
   editedIndex.value = item.rowIndex
   showFormItem.value = true
 }
-
+function abrirMovimientos(props_row) {
+  router.push(`/admin/cuenta/${props_row.row.id}`)
+}
 function deleteRow(item) {
   rowIndexDelete.value = item.rowIndex
   $q.dialog({
