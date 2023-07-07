@@ -241,7 +241,7 @@ const defaultItem = {
   nombre: null,
   icono: 'insert_emoticon',
   descripcion: null,
-  color: '#019a9d',
+  color: '#019A9D',
   tipoMovimiento: null,
   tipoMovimientoId: '1',
   cuentaContable: null

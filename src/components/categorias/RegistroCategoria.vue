@@ -89,19 +89,19 @@
               <div class="col q-mr-xs">
                 <q-input
                   outlined
-                  color="secondary"
+                  color="white"
                   v-model="editedFormItem.color"
                   :rules="['anyColor']"
                   class="my-input"
-                  style="min-width: 100%"
                   dense
                 >
-                  <template #before>
+                  <!-- style="min-width: 100%" -->
+                  <template #default>
                     <div
                       :style="{
                         backgroundColor: `${editedFormItem.color}`,
                         height: 40 + 'px',
-                        width: 40 + 'px'
+                        width: 250 + 'px'
                       }"
                     >
                       &nbsp;
@@ -124,7 +124,6 @@
                             '#E8045A',
                             '#B2028A',
                             '#2A0449',
-                            '#019A9D',
                             '#1ad560'
                           ]"
                           default-view="palette"
@@ -204,7 +203,7 @@ const defaultItem = {
   nombre: null,
   icono: 'insert_emoticon',
   descripcion: null,
-  color: '#019a9d',
+  color: '#019A9D',
   tipoMovimiento: null,
   tipoMovimientoId: '2',
   cuentaContable: null
@@ -381,7 +380,4 @@ function colorSelecionado(value) {
 }
 </script>
 
-<style lang="sass" scoped>
-.my-input
-  max-width: 250px
-</style>
+<style lang="sass" scoped></style>

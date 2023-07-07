@@ -253,7 +253,9 @@ function addItemCategoria(props_row) {
   editedCategoriaParam.value = {
     tipoMovimientoId: tipoMovimientoId.value,
     cuentaContable: null,
-    cuentaDefault: null
+    cuentaDefault: null,
+    icono: 'insert_emoticon',
+    color: '#019A9D'
   }
   showRegistroCategoria.value = true
 }

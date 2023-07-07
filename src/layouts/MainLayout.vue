@@ -10,6 +10,12 @@
           @click="toggleLeftDrawer"
           class="float-right"
         />
+        <q-img
+          src="/icons/logoHorizontal3.png"
+          spinner-color="primary"
+          spinner-size="72px"
+          width="380px"
+        />
         <q-toolbar-title class="font-title"> </q-toolbar-title>
         <span class="q-pr-sm text-bold" v-if="user">{{ user.name }}</span>
         <q-btn
@@ -42,18 +48,24 @@
       elevated
       class="bg-menu shadow-10"
     >
-      <!-- <div class="" style="border: 0px solid red">
+      <div class="" style="border: 0px solid red">
         <div class="application-title q-pa-lg" align="center">
-          <q-img
-            src="/icons/tree.png"
+          <!-- <q-img
+            src="/icons/logo4.png"
             spinner-color="primary"
             spinner-size="72px"
-            width="80px"
-          />
-          <span class="font-title-letter text-secondary">B</span>iweekly
-          Application
+            width="220px"
+          /> -->
+          <!-- <q-img
+            src="/icons/logo.png"
+            spinner-color="primary"
+            spinner-size="72px"
+            width="220px"
+          /> -->
+          <!-- <span class="font-title-letter text-secondary">B</span>iweekly
+          Application -->
         </div>
-      </div> -->
+      </div>
       <q-separator spaced inset horizontal color="blue-grey-5" />
 
       <q-list class="no-shadow q-mt-lg">
