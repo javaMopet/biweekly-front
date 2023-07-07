@@ -18,6 +18,15 @@ const routes = [
         component: () => import('src/pages/main/MovimientosPage.vue')
       },
       {
+        path: '/cuentas',
+        component: () => import('src/pages/admin/CuentasPage.vue')
+      },
+      {
+        path: '/cuenta/:id',
+        name: 'cuenta',
+        component: () => import('src/pages/admin/CuentaPage.vue')
+      },
+      {
         path: '/tarjetas_credito',
         component: () => import('src/pages/main/TarjetasCreditoPage.vue')
       },
@@ -54,15 +63,7 @@ const routes = [
         path: 'categorias',
         component: () => import('src/pages/admin/CategoriasPage.vue')
       },
-      {
-        path: 'cuentas',
-        component: () => import('src/pages/admin/CuentasPage.vue')
-      },
-      {
-        path: 'cuenta/:id',
-        name: 'cuenta',
-        component: () => import('src/pages/admin/CuentaPage.vue')
-      },
+
       {
         path: 'bancos',
         component: () => import('src/pages/admin/BancosPage.vue')

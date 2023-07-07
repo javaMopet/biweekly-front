@@ -3,7 +3,7 @@
     <q-page-container class="">
       <q-page class="flex flex-center bg-color">
         <q-card
-          class="bg-primary text-accent card-login"
+          class="bg-dark text-accent card-login"
           v-bind:style="
             $q.screen.lt.sm || $q.screen.lt.md
               ? { width: '80%' }

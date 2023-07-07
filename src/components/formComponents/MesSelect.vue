@@ -1,13 +1,5 @@
 <template>
   <div class="row component__bordered">
-    <q-btn
-      color="primary"
-      round
-      icon="arrow_left"
-      @click="prevMonth"
-      dense
-      flat
-    />
     <q-select
       v-model="mes"
       :options="mesOptions"
@@ -21,20 +13,33 @@
       use-input
       hide-selected
       fill-input
-      style="width: 100px"
+      style="width: 180px"
+      hide-dropdown-icon
     >
+      <template #before>
+        <q-btn
+          color="primary"
+          round
+          icon="arrow_left"
+          @click="prevMonth"
+          dense
+          flat
+        />
+      </template>
       <template #prepend>
         <q-icon name="calendar_month" />
       </template>
+      <template #after>
+        <q-btn
+          color="primary"
+          round
+          icon="arrow_right"
+          dense
+          flat
+          @click="nextMont"
+        />
+      </template>
     </q-select>
-    <q-btn
-      color="primary"
-      round
-      icon="arrow_right"
-      dense
-      flat
-      @click="nextMont"
-    />
   </div>
 </template>
 

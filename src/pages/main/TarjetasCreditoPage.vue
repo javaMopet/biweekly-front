@@ -1,6 +1,21 @@
 <template>
-  <div class="column q-ma-md" style="border: 0px solid red">
-    <div class="row fit" style="border: 0px solid red">
+  <div>
+    <q-toolbar class="" dense fit>
+      <div class="row items-center q-ml-sm q-gutter-x-sm">
+        <div class="q-pa-md q-gutter-sm">
+          <q-breadcrumbs class="text-blue-grey-6" active-color="primary">
+            <q-breadcrumbs-el icon="home" to="/" />
+            <q-breadcrumbs-el
+              label="Tarjetas de Crédito"
+              icon="account_balance"
+              to="/admin/cuentas"
+            />
+          </q-breadcrumbs>
+        </div>
+      </div>
+      <q-toolbar-title> </q-toolbar-title>
+    </q-toolbar>
+    <div class="row fit q-px-lg" style="border: 0px solid red">
       <q-table
         grid
         style="width: 100%"

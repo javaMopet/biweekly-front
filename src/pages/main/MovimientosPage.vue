@@ -4,7 +4,7 @@
       <q-table
         dense
         :rows="listaMovimientosIngreso"
-        :columns="columns"
+        :columns="columnsIngresos"
         row-key="id"
         :filter="filter"
         :rows-per-page-options="[0]"
@@ -13,21 +13,6 @@
       >
         <template #top-left>
           <div class="row inline q-gutter-x-md items-center">
-            <span>Movements</span>
-            <q-select
-              v-model="periodo"
-              :options="periodoOptions"
-              option-label="nombre"
-              label="Periodo"
-              outlined
-              dense
-              color="secondary"
-              label-color="dark"
-            >
-              <template #prepend>
-                <q-icon name="calendar_view_week" />
-              </template>
-            </q-select>
             <q-select
               v-model="ejercicio_fiscal"
               :options="ejercicioFiscalOptions"
@@ -42,21 +27,10 @@
                 <q-icon name="calendar_month" />
               </template>
             </q-select>
-            <q-select
+            <MesSelect
               v-model="mes"
-              :options="mesOptions"
-              option-label="nombre"
-              label="Mes"
-              dense
-              outlined
-              color="secondary"
-              label-color="dark"
               @update:model-value="onChangeMes"
-            >
-              <template #prepend>
-                <q-icon name="calendar_month" />
-              </template>
-            </q-select>
+            ></MesSelect>
           </div>
         </template>
         <template #top-right>
@@ -86,9 +60,9 @@
             dense
             :props="props"
             class="text-primary"
-            :style="`border-left: 5px solid ${props.row.color}`"
+            :style="`border-left: 6px solid ${props.row.color}`"
           >
-            <q-icon :name="props.row.icono" size="22px" color="brown" />
+            <q-icon :name="props.row.icono" size="22px" color="blue-grey-6" />
 
             <span class="q-pl-sm movimientos__columna-categoria">
               {{ props.value }}</span
@@ -123,7 +97,7 @@
         :rows-per-page-options="[0]"
         dense
         :rows="listaMovimientos"
-        :columns="columns"
+        :columns="columnsEgresos"
         row-key="id"
         :filter="filter"
         separator="horizontal"
@@ -152,19 +126,19 @@
             </q-th>
           </q-tr>
         </template>
-        <template #body-cell-nombre_categoria="props">
-          <q-td dense :props="props">
-            <div class="row items-center">
-              <div
-                class="row inline q-pa-xs rounded-borders"
-                :style="`background-color: ${props.row.color} !important`"
-              >
-                <q-icon :name="props.row.icono" size="22px" color="white" />
-              </div>
-              <span class="q-ml-md movimientos__categoria-nombre">
-                {{ props.value }}</span
-              >
-            </div>
+
+        <template v-slot:body-cell-nombre_categoria="props">
+          <q-td
+            dense
+            :props="props"
+            class="text-primary"
+            :style="`border-left: 5px solid ${props.row.color}`"
+          >
+            <q-icon :name="props.row.icono" size="22px" color="blue-grey-7" />
+
+            <span class="q-pl-sm movimientos__columna-categoria">
+              {{ props.value }}</span
+            >
           </q-td>
         </template>
         <template v-slot:body-cell="props">
@@ -186,10 +160,10 @@
       />
     </div>
     <div class="">
-      <!-- NET CASH PROCEDS - FINAL CASH BALANCE -->
+      <!-- NET CASH PROCEDS and FINAL CASH BALANCE -->
       <q-table
         :rows="listaSaldosMovimientos"
-        :columns="columns"
+        :columns="columnsIngresos"
         row-key="name"
         hide-header
         hide-bottom
@@ -211,6 +185,7 @@
       </q-table>
     </div>
     <div class="row fit" style="border: 0px solid red">
+      <!-- LISTA DE CUENTAS BANCARIAS -->
       <q-table
         style="width: 100%"
         flat
@@ -219,12 +194,13 @@
         :rows-per-page-options="[0]"
         dense
         :rows="listaSaldosCuentas"
-        :columns="columns"
+        :columns="columnsIngresos"
         row-key="id"
         :filter="filter"
         separator="none"
         hide-pagination
         hide-bottom
+        hide-header
       >
         <template #header="props">
           <q-tr :props="props" class="movimientos__headers-background">
@@ -253,9 +229,10 @@
       </q-table>
     </div>
     <div class="">
+      <!-- Total Cash bank account & Net Balance -->
       <q-table
         :rows="listaSaldosFinales"
-        :columns="columns"
+        :columns="columnsIngresos"
         row-key="name"
         hide-header
         hide-bottom
@@ -310,6 +287,7 @@ import { useFormato } from 'src/composables/utils/useFormato'
 import { api } from 'src/boot/axios'
 import PriceInput from 'src/components/formComponents/PriceInput.vue'
 import ListaMovimientos from 'src/components/movimientos/ListaMovimientos.vue'
+import MesSelect from 'src/components/formComponents/MesSelect.vue'
 
 /**
  * composables
@@ -367,7 +345,6 @@ const saldosEgreso = ref([])
 const listaSaldosCuentas = ref([])
 const listaSaldosFinales = ref([])
 const listaSaldosMovimientos = ref([])
-const saldosCuentas = ref([])
 const filter = ref()
 const editedItem = ref({ ...defaultItem })
 const editedIndex = ref(null)
@@ -376,7 +353,8 @@ const showFormItem = ref(false)
 const show_movimientos = ref(false)
 const cellData = ref({})
 
-const columns = ref([])
+const columnsIngresos = ref([])
+const columnsEgresos = ref([])
 const columnsSaldos = ref([])
 /**
  * onMount
@@ -436,7 +414,7 @@ function editRow(item) {
   showFormItem.value = true
 }
 function obtenerColumnas(ejercicio_fiscal, mes) {
-  console.log('Obteniendo columnas del ejercicio y mes', ejercicio_fiscal, mes)
+  // console.log('Obteniendo columnas del ejercicio y mes', ejercicio_fiscal, mes)
   api
     .get('/columnas', {
       params: {
@@ -445,9 +423,23 @@ function obtenerColumnas(ejercicio_fiscal, mes) {
       }
     })
     .then(({ data }) => {
-      columns.value = JSON.parse(JSON.stringify(data.data))
+      columnsIngresos.value = JSON.parse(JSON.stringify(data.data))
+      columnsEgresos.value = JSON.parse(JSON.stringify(data.data))
       columnsSaldos.value = JSON.parse(JSON.stringify(data.data))
-      columns.value.forEach((column) => {
+
+      columnsIngresos.value.forEach((column) => {
+        // console.log('column', column)
+        if (column.name != 'nombre_categoria') {
+          column.format = (val, row) =>
+            !!val ? `${formato.toCurrency(val)}` : ''
+        } else {
+          // column.style = 'background-color: #aebbc7'
+          // column.style = 'background-color: #c8d7ca'
+          // column.classes = 'categoria_background'
+        }
+      })
+      columnsEgresos.value.forEach((column) => {
+        // console.log('column', column)
         if (column.name != 'nombre_categoria') {
           column.format = (val, row) =>
             !!val ? `${formato.toCurrency(val)}` : ''
@@ -464,7 +456,7 @@ function obtenerColumnas(ejercicio_fiscal, mes) {
         }
         element.classes = 'table__body-totals'
       })
-      console.log('columnas saldos', columnsSaldos.value)
+      // console.log('columnas saldos', columnsSaldos.value)
     })
     .catch((error) => {
       console.log('error', error)
@@ -509,7 +501,7 @@ function obtenerIngresosEgresosSaldos() {
     })
     .then(({ data }) => {
       saldosIngreso.value = JSON.parse(JSON.stringify(data.data))
-      console.log('saldos de ingresos obtenidos', saldosIngreso.value)
+      // console.log('saldos de ingresos obtenidos', saldosIngreso.value)
     })
     .catch((error) => {
       console.log('error', error)
@@ -538,7 +530,7 @@ function obtenerSaldosMovimientos() {
       }
     })
     .then(({ data }) => {
-      console.log('response data', data.data)
+      // console.log('response data', data.data)
       listaSaldosMovimientos.value = JSON.parse(JSON.stringify(data.data))
 
       // console.log('ingresos data', listaMovimientosIngreso.value)
@@ -557,7 +549,7 @@ function obtenerSaldosCuentas() {
       }
     })
     .then(({ data }) => {
-      console.log('response data', data.data)
+      // console.log('response data', data.data)
       listaSaldosCuentas.value = JSON.parse(JSON.stringify(data.data))
 
       // console.log('ingresos data', listaMovimientosIngreso.value)
@@ -695,7 +687,7 @@ onErrorDeleteMovimiento((error) => {
 
 .my-sticky-header-table {
   /* height or max-height is important */
-  height: calc(100vh - 550px);
+  height: calc(100vh - 470px);
 
   .q-table__top,
   .q-table__bottom,
@@ -727,7 +719,7 @@ onErrorDeleteMovimiento((error) => {
 }
 
 .table__body-totals {
-  background-color: #cae1ff !important;
+  background-color: #d9e6f8 !important;
   font-weight: 600 !important;
   font-size: 0.8rem !important;
   font-style: italic;
@@ -740,19 +732,18 @@ onErrorDeleteMovimiento((error) => {
 }
 .movimientos__headers-font {
   font-size: 0.65rem;
-  color: #626d81 !important;
+  color: #748097 !important;
   font-weight: bold !important;
   text-transform: uppercase !important;
 }
 .movimientos__headers-background {
-  background-color: #e3f2e7 !important;
+  background-color: #eaecea !important;
 }
 .movimientos__columna-categoria {
   font-weight: 600 !important;
   font-size: 0.78rem;
-  color: #705404;
-  // color: #f8cb77;
-  letter-spacing: -0.025rem;
+  color: $dark;
+  letter-spacing: -0.015rem;
 }
 .categoria_background {
   background-color: #f3f6f9 !important;

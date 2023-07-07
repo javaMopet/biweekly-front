@@ -383,7 +383,7 @@ function editRow(item) {
   showFormItem.value = true
 }
 function abrirMovimientos(props_row) {
-  router.push(`/admin/cuenta/${props_row.row.id}`)
+  router.push(`/cuenta/${props_row.row.id}`)
 }
 function deleteRow(item) {
   rowIndexDelete.value = item.rowIndex

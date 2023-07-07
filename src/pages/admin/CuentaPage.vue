@@ -1,7 +1,7 @@
 <template>
   <!-- <q-card flat>
     <q-card-section>
-      <pre class="text-condensed">{{ cuenta }}</pre>
+      <pre> <span class="text-condensed">{{ cuenta }} </span></pre>
     </q-card-section>
   </q-card> -->
   <q-card flat>
@@ -13,7 +13,7 @@
             <q-breadcrumbs-el
               label="Cuentas"
               icon="account_balance"
-              to="/admin/cuentas"
+              to="/cuentas"
             />
             <q-breadcrumbs-el
               :label="cuenta.nombre"
@@ -115,7 +115,7 @@
         <div class="col column items-center">
           <span class="tarjeta__resumen-etiqueta"> Saldo final</span>
           <span class="tarjeta__resumen-valor">
-            {{ formato.toCurrency(saldo_final_periodo) }}
+            {{ formato.toCurrency(parseFloat(cuenta.saldo)) }}
           </span>
         </div>
       </div>

@@ -24,6 +24,9 @@ $negative: #c10015;
 $info: #1c5685;
 $warning: #ecd13b;
 
+// $primary-text: darken ($primary, 50%);
+$primary-text: lighten ($primary, 90%);
+$primary-icon: darken ($primary, 90%);
 $primary-light: #f5f5fd;
 $secondary-light: #fdbf8b;
 $contrast: #fcb227;
@@ -50,18 +53,22 @@ $main-menu: #45494d;
 $more-button: #8f88a3;
 $accent-title: #705404;
 $credit-card: #fcf5fb;
-/* ***************************GREEN ********************** */
-// $primary: #3d6129;
-// $secondary: #469f49;
-// $accent: #d5d3db;
-// $dark: #30005a;
+
+/************************** other ****************** */
+// https://hookagency.com/blog/website-color-schemes-2020/
+
+// $primary: #845883;
+// $secondary: #a0d2eb;
+// $accent: #e5eaf5;
+// $dark: #494d5f;
 
 // $positive: #79920b;
 // $negative: #c10015;
 // $info: #1c5685;
 // $warning: #ecd13b;
 
-// $primary-light: #f9faf6;
+// $primary-text: #a871a7;
+// $primary-light: #f5f5fd;
 // $secondary-light: #fdbf8b;
 // $contrast: #fcb227;
 // $contrast-light: #2f4211;
@@ -76,12 +83,16 @@ $credit-card: #fcf5fb;
 // $table-header: #dfe5e9;
 // $table-title: #8f88a3;
 
+// // $categoria-title: #705404;
+// $categoria-title: #f75990;
 // $categoria-title-light: #aebbc7;
 
 // $primary-grey: #9898a8;
 
-// $primary-button: #88b047;
+// $primary-button: #4767b0;
 // $toolbar-button: #4b9972;
 // $disable-button: #e7e7e7;
-// $main-menu: #534f53;
+// $main-menu: #45494d;
 // $more-button: #8f88a3;
+// $accent-title: #705404;
+// $credit-card: #fcf5fb;
