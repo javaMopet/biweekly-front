@@ -718,6 +718,23 @@ const columns = [
     style: 'width: 40%'
   },
   {
+    name: 'tarjetaCredito',
+    label: 'Tarjeta de Crédito',
+    field: (row) => row.registroTarjeta?.cuenta.nombre,
+    sortable: true,
+    align: 'left',
+    style: 'width: 40%'
+  },
+  {
+    name: 'tarjetaCredito',
+    label: 'Tarjeta de Crédito',
+    field: (row) => row.registroTarjeta?.fecha,
+    sortable: true,
+    align: 'left',
+    style: 'width: 40%',
+    format: (val, row) => (val ? formato.formatoFechaFromISO(val) : '')
+  },
+  {
     name: 'acciones',
     field: 'action',
     sortable: false,

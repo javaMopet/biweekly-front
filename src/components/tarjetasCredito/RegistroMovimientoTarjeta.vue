@@ -74,7 +74,7 @@
           >
             <div class="input-label">Número de meses:</div>
             <q-input
-              v-model="editedFormItem.numero_msi"
+              v-model="editedFormItem.numeroMsi"
               type="number"
               outlined
               dense
@@ -182,7 +182,7 @@ const {
 function saveItem() {
   console.log('onsubmit', editedFormItem.value)
   const isMsi = editedFormItem.value.isMsi
-  const numero_msi = isMsi ? editedFormItem.value.numeroMsi : 0
+  const numero_msi = isMsi ? parseInt(editedFormItem.value.numeroMsi) : 0
   const importe = parseFloat(editedFormItem.value.importe) * -1
   const tipoAfectacion = importe >= 0 ? 'A' : 'C'
   const input = {

@@ -29,6 +29,14 @@ export const LISTA_REGISTROS = gql`
         nombre
         tipoMovimientoId
       }
+      registroTarjeta {
+        id
+        fecha
+        cuenta {
+          id
+          nombre
+        }
+      }
     }
   }
 `
