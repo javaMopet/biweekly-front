@@ -237,7 +237,7 @@ onErrorListaRegistros((error) => {
  */
 const isNotPagable = computed({
   get() {
-    return props.saldoPeriodoAnterior > 0
+    return props.saldoPeriodoAnterior > 0 || formItem.value.saldo_periodo <= 0
   }
 })
 </script>

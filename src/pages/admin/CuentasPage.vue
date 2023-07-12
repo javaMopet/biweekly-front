@@ -5,11 +5,7 @@
         <div class="q-pa-md q-gutter-sm">
           <q-breadcrumbs class="text-blue-grey-6" active-color="primary">
             <q-breadcrumbs-el icon="home" to="/" />
-            <q-breadcrumbs-el
-              label="Cuentas"
-              icon="account_balance"
-              to="/admin/cuentas"
-            />
+            <q-breadcrumbs-el label="Cuentas" icon="account_balance" />
           </q-breadcrumbs>
         </div>
       </div>

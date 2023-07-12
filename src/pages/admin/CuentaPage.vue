@@ -38,7 +38,6 @@
           outline
           @click="cargarMovimientos"
           no-caps
-          v-if="isCuentaAhorros"
         >
           <q-avatar square size="24px">
             <q-img src="/icons/excel2.png" width="24px" height="24px" />

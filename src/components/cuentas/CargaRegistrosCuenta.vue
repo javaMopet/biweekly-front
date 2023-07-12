@@ -246,16 +246,20 @@ async function updateFile(v) {
     //     console.log('data cell', row[key])
     //   }
     // }
-    console.log(props.cuenta.banco.id)
-    switch (props.cuenta.banco.id) {
-      case 1:
-        obtenerMovimientosSantander(wb)
-        break
-      case 2:
-        obtenerMovimientosBancomer(wb)
-        break
-      default:
-        break
+    // console.log(props.cuenta)
+    if (!!props.cuenta.banco) {
+      switch (props.cuenta.banco.id) {
+        case 1:
+          obtenerMovimientosSantander(wb)
+          break
+        case 2:
+          obtenerMovimientosBancomer(wb)
+          break
+        default:
+          break
+      }
+    } else {
+      obtenerMovimientosEfectivo(wb)
     }
   } catch (e) {
     console.log(e)
@@ -355,6 +359,47 @@ function obtenerMovimientosBancomer(wb) {
         : 0
       const item = {
         consecutivo: index + 1,
+        tipo_afectacion,
+        fecha: fecha,
+        concepto: row.concepto,
+        importe,
+        saldo: row.saldo,
+        saved: false
+      }
+      listaRegistros.value.push(item)
+    }
+  })
+  console.log(listaRegistros.value)
+}
+function obtenerMovimientosEfectivo(wb) {
+  const data = utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {
+    header: ['A', 'B', 'C', 'D', 'E'],
+    skipHeader: true,
+    raw: false
+  })
+
+  todos.value = data.map((row) => ({
+    consecutivo: row.A,
+    fecha: row.B,
+    concepto: row.C,
+    importe: row.D,
+    saldo: row.E
+  }))
+  console.log('todos', todos.value)
+
+  todos.value.forEach((row, index) => {
+    let fecha = row.fecha?.toString() || ''
+    console.log('fecha', fecha)
+    const fechaObject = DateTime.fromFormat(fecha, 'dd/MM/yyyy')
+    console.log('fecha valida', fechaObject.isValid)
+    if (fechaObject.isValid) {
+      console.log('row', row.importe)
+      const importeReal = row.importe?.replace(',', '')
+      const importe = !!importeReal ? parseFloat(importeReal) : 0
+      const tipo_afectacion = importe >= 0 ? 'A' : 'C'
+
+      const item = {
+        consecutivo: row.consecutivo,
         tipo_afectacion,
         fecha: fecha,
         concepto: row.concepto,
