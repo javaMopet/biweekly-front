@@ -687,7 +687,7 @@ onErrorDeleteMovimiento((error) => {
 
 .my-sticky-header-table {
   /* height or max-height is important */
-  height: calc(100vh - 495px);
+  height: calc(100vh - 530px);
 
   .q-table__top,
   .q-table__bottom,
