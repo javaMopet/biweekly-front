@@ -3,7 +3,12 @@
     <q-toolbar class="" dense fit>
       <div class="row items-center q-ml-sm q-gutter-x-sm">
         <div class="q-pa-md q-gutter-sm">
-          <q-breadcrumbs class="text-blue-grey-6" active-color="primary">
+          <q-breadcrumbs
+            class="breadcrum_clase"
+            active-color="primary"
+            separator=">"
+            separator-color="primary"
+          >
             <q-breadcrumbs-el icon="home" to="/" />
             <q-breadcrumbs-el label="Cuentas" icon="account_balance" />
           </q-breadcrumbs>
@@ -379,7 +384,7 @@ function editRow(item) {
   showFormItem.value = true
 }
 function abrirMovimientos(props_row) {
-  router.push(`/cuenta/${props_row.row.id}`)
+  router.push(`/cuentas/${props_row.row.id}`)
 }
 function deleteRow(item) {
   rowIndexDelete.value = item.rowIndex

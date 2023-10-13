@@ -8,7 +8,12 @@
     <q-toolbar class="bg-grey-1 text-primary" fit dense>
       <div class="row items-center q-ml-sm q-gutter-x-sm">
         <div class="q-pa-md q-gutter-sm">
-          <q-breadcrumbs class="text-blue-grey-6" active-color="primary">
+          <q-breadcrumbs
+            class="text-blue-grey-6 breadcrum_clase"
+            active-color="primary"
+            separator=">"
+            separator-color="primary"
+          >
             <q-breadcrumbs-el icon="home" to="/" />
             <q-breadcrumbs-el
               label="Cuentas"

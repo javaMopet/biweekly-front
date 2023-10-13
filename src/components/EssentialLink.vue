@@ -7,7 +7,7 @@
         :inset-level="nivel / 2"
         dense
         :to="'/' + ruta"
-        active-class="bg-white q-py-sm q-mx-xs rounded-borders main-menu__active"
+        active-class="bg-white q-py-sm q-mx-xs main-menu__active"
         class="text-main-menu q-py-sm q-mx-xs"
       >
         <q-item-section avatar>
@@ -38,7 +38,7 @@
               <q-icon :name="icono" size="27px" color="main-menu" />
               <!-- </div> -->
             </q-item-section>
-            <q-item-section class="menu__link--name text-main-menu">
+            <q-item-section class="menu__link--name">
               {{ nombre }}
             </q-item-section>
           </template>
@@ -107,12 +107,19 @@ export default {
   // height: 30px;
 }
 .menu__link--name {
-  font-size: 0.8rem !important;
-  font-weight: 600 !important;
+  font-size: 1rem !important;
+  font-weight: 300 !important;
   letter-spacing: -0.025rem;
-  // color: #252f40;
+  color: $main-menu;
 }
 .main-menu__active {
+  // color: $secondary !important;
   color: $secondary !important;
+}
+
+.main-menu__active .menu__link--name {
+  // color: $secondary !important;
+  color: $primary !important;
+  font-weight: 400 !important;
 }
 </style>

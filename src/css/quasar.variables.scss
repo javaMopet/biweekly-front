@@ -13,13 +13,13 @@
 // Tip: Use the "Theme Builder" on Quasar's documentation website.
 
 /************************** correct ****************** */
-
-$primary: #292961;
-$secondary: #469f49;
+$primary: #263238;
+// $primary: #292961;
+$secondary: #eb7e1f;
 $accent: #d5d3db;
 $dark: #30005a;
 
-$positive: #79920b;
+$positive: #689f38;
 $negative: #c10015;
 $info: #1c5685;
 $warning: #ecd13b;
@@ -27,9 +27,9 @@ $warning: #ecd13b;
 // $primary-text: darken ($primary, 50%);
 $primary-text: lighten ($primary, 90%);
 $primary-icon: darken ($primary, 90%);
-$primary-light: #f5f5fd;
+$primary-light: #404b5a;
 $secondary-light: #fdbf8b;
-$contrast: #fcb227;
+$contrast: #c4943a;
 $contrast-light: #2f4211;
 
 $accent-light: #e9e8f0;
@@ -44,15 +44,17 @@ $table-title: #8f88a3;
 
 $categoria-title-light: #aebbc7;
 
-$primary-grey: #9898a8;
+$primary-grey: #a3a3a8;
 
-$primary-button: #4767b0;
+$primary-button: #00838f;
 $toolbar-button: #4b9972;
 $disable-button: #e7e7e7;
-$main-menu: #45494d;
+$main-menu: #d5dde5;
 $more-button: #8f88a3;
 $accent-title: #705404;
 $credit-card: #fcf5fb;
+
+$breadcrum: #ae6449;
 
 /************************** other ****************** */
 // https://hookagency.com/blog/website-color-schemes-2020/

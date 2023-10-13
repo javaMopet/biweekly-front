@@ -1,6 +1,6 @@
 <template>
   <q-layout view="lHh LpR lFr">
-    <q-header bordered class="bg-primary text-primary-light" dense>
+    <q-header bordered class="bg-white text-primary-light" dense>
       <q-toolbar>
         <q-btn
           dense
@@ -8,7 +8,7 @@
           round
           icon="menu"
           @click="toggleLeftDrawer"
-          class="float-right"
+          class="float-right text-primary"
         />
         <!-- <q-img
           src="/icons/logoHorizontal3.png"
@@ -51,10 +51,10 @@
       <div class="" style="border: 0px solid red">
         <div class="application-title q-pa-lg" align="center">
           <q-img
-            src="/icons/logo.png"
+            src="/icons/tree.png"
             spinner-color="primary"
             spinner-size="72px"
-            width="220px"
+            width="120px"
           />
           <!-- <q-img
             src="/icons/logo.png"
@@ -181,7 +181,7 @@ function onClickAccount() {}
   font-size: 1.5rem;
 }
 .bg-menu {
-  background-color: $primary-light !important;
+  background-color: $primary !important;
   color: #14153f;
   font-size: 0.95rem;
 }

@@ -22,7 +22,7 @@ const routes = [
         component: () => import('src/pages/admin/CuentasPage.vue')
       },
       {
-        path: '/cuenta/:id',
+        path: '/cuentas/:id',
         name: 'cuenta',
         component: () => import('src/pages/admin/CuentaPage.vue')
       },
