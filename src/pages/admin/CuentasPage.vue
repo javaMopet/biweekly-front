@@ -16,6 +16,7 @@
       </div>
       <q-toolbar-title> </q-toolbar-title>
     </q-toolbar>
+    <div class="page-title"></div>
     <div class="column q-mx-md" style="border: 0px solid red">
       <div class="row fit" style="border: 0px solid red">
         <q-table

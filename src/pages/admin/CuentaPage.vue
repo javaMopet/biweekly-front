@@ -1,9 +1,4 @@
 <template>
-  <!-- <q-card flat>
-    <q-card-section>
-      <pre> <span class="text-condensed">{{ cuenta }} </span></pre>
-    </q-card-section>
-  </q-card> -->
   <q-card flat>
     <q-toolbar class="bg-grey-1 text-primary" fit dense>
       <div class="row items-center q-ml-sm q-gutter-x-sm">
@@ -29,6 +24,7 @@
       </div>
       <q-toolbar-title> </q-toolbar-title>
     </q-toolbar>
+    <div class="page-title q-pa-md">Cuenta {{ cuenta.nombre }}</div>
     <q-toolbar inset class="bg-grey-1">
       <div class="row q-gutter-x-md">
         <q-btn
