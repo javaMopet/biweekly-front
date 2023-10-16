@@ -16,7 +16,7 @@
 $primary: #263238;
 // $primary: #292961;
 $secondary: #eb7e1f;
-$accent: #d5d3db;
+$accent: #404b5a;
 $dark: #30005a;
 
 $positive: #689f38;
@@ -27,7 +27,7 @@ $warning: #ecd13b;
 // $primary-text: darken ($primary, 50%);
 $primary-text: lighten ($primary, 90%);
 $primary-icon: darken ($primary, 90%);
-$primary-light: #404b5a;
+$primary-light: #f2f2f2;
 $secondary-light: #fdbf8b;
 $contrast: #c4943a;
 $contrast-light: #2f4211;
@@ -46,7 +46,10 @@ $categoria-title-light: #aebbc7;
 
 $primary-grey: #a3a3a8;
 
-$primary-button: #00838f;
+$primary-button: #00838f; //Utilizado en itop
+/*$primary-button: #00AAC1;*/
+// $toggle-button: #4b9972;
+$toggle-button: #b4d9df;
 $toolbar-button: #4b9972;
 $disable-button: #e7e7e7;
 $main-menu: #d5dde5;

@@ -1,7 +1,7 @@
 <template>
   <q-card class="my-card" dense style="width: 80vw; min-width: 80vw">
     <q-card-section
-      class="bg-main-menu row inline fit q-py-sm justify-between items-center"
+      class="bg-white row inline fit q-py-sm justify-between items-center dialog-title"
     >
       <div class="dialog__title--name">{{ cuenta.nombre }}</div>
       <div class="">
@@ -24,6 +24,9 @@
         </div> -->
         <div class="row">
           <q-toolbar class="q-gutter-x-md">
+            <div class="load__file-text">
+              Comienza seleccionando un archivo en formato Excel:
+            </div>
             <q-file
               v-model="archivoExcel"
               label="Carga archivo Excel"
@@ -38,7 +41,7 @@
               clearable
               @clear="fileClear"
             >
-              <template #before>
+              <template #prepend>
                 <q-icon color="primary" name="cloud_upload" />
               </template>
               <template #append>
@@ -601,5 +604,10 @@ function closeErrors() {
   font-weight: 600;
   letter-spacing: -0.025rem;
   color: $negative-pastel;
+}
+.load__file-text {
+  color: $secondary;
+  font-weight: 600;
+  font-size: 0.85rem;
 }
 </style>

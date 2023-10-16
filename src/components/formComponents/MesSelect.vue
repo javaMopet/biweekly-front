@@ -13,7 +13,7 @@
       use-input
       hide-selected
       fill-input
-      style="width: 180px"
+      style="width: 200px"
       hide-dropdown-icon
     >
       <template #before>

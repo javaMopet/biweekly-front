@@ -1,9 +1,9 @@
 <template>
   <q-card class="my-card" style="width: 520px">
     <q-card-section
-      class="bg-main-menu row inline fit q-py-sm justify-between items-center"
+      class="row inline fit q-py-sm justify-between items-center dialog-title"
     >
-      <div class="text-subtitle1 text-accent-light">{{ actionName }}</div>
+      <div class="dialog__title--name">{{ actionName }}</div>
       <div class="">
         <q-btn
           round
@@ -28,12 +28,11 @@
             no-caps
             color="disable-button"
             text-color="gray-2"
-            toggle-color="positive"
-            toggle-text-color="white"
+            toggle-color="toggle-button"
+            toggle-text-color="info"
             :options="tiposMovimientoOptions"
             @update:model-value="onChangeTipoMovimiento"
             push
-            glossy
           />
         </div>
         <div></div>
@@ -43,6 +42,7 @@
             v-if="isTransferencia"
             v-model="cuentaOrigen"
             label="Cuenta Origen"
+            :readonly="cuentaReadOnly"
           ></CuentaSelect>
           <CategoriaSelect
             v-else
@@ -69,7 +69,10 @@
           </div>
         </div>
         <div class="">
-          <CuentaSelect v-model="editedFormItem.cuenta"></CuentaSelect>
+          <CuentaSelect
+            v-model="editedFormItem.cuenta"
+            :readonly="cuentaReadOnly"
+          ></CuentaSelect>
         </div>
 
         <div>
@@ -84,8 +87,14 @@
           />
         </div>
         <div class="col row justify-end q-gutter-x-md">
-          <q-btn label="Cancelar" color="negative" flat v-close-popup dense />
-          <q-btn :label="lblSubmit" dense type="submit" color="positive" />
+          <q-btn label="Cancelar" flat v-close-popup dense />
+          <q-btn
+            :label="lblSubmit"
+            type="submit"
+            color="primary-button"
+            push
+            no-caps
+          />
         </div>
       </q-form>
     </q-card-section>
@@ -126,6 +135,8 @@ const defaultItem = {
   fecha: formato.formatoFecha(new Date()),
   observaciones: ''
 }
+
+const cuentaReadOnly = ref(true)
 
 const formItem = ref({ ...defaultItem })
 const tipoMovimiento = ref('1')
