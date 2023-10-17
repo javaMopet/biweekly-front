@@ -1,9 +1,9 @@
 <template>
   <q-card class="my-card" style="width: 450px">
     <q-card-section
-      class="bg-main-menu row inline fit q-py-sm justify-between items-center"
+      class="row inline fit q-py-sm justify-between items-center dialog-title"
     >
-      <div class="text-subtitle1 text-accent-light">{{ actionName }}</div>
+      <div class="dialog__title--name">{{ actionName }}</div>
       <div class="">
         <q-btn
           round
@@ -26,13 +26,12 @@
               spread
               no-caps
               color="disable-button"
-              text-color="gray-6"
-              toggle-color="positive"
-              toggle-text-color="white"
+              text-color="gray-2"
+              toggle-color="toggle-button"
+              toggle-text-color="info"
               :options="tiposCuentaOptions"
               @update:model-value="tipoCuentaUpdated"
               push
-              glossy
             />
           </div>
           <div class="column items-center">
@@ -117,7 +116,7 @@
               label="Cancelar"
               v-close-popup
               color=""
-              flat
+              outline
               class="q-ml-sm"
               push
             />

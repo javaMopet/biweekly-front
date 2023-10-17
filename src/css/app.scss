@@ -95,6 +95,12 @@
 .bg-primary-button {
   background: $primary-button !important;
 }
+.text-secondary-button {
+  color: $secondary-button !important;
+}
+.bg-secondary-button {
+  background: $secondary-button !important;
+}
 .text-main-menu {
   color: $main-menu !important;
 }
@@ -142,6 +148,12 @@
 }
 .bg-toggle-button {
   background: $toggle-button !important;
+}
+.text-main-background {
+  color: $main-background !important;
+}
+.bg-main-background {
+  background: $main-background !important;
 }
 /* *************************** */
 .dialog__title--closeButton {
@@ -198,14 +210,25 @@
 
 .tarjeta__cuenta {
   // border: 1px solid white !important;
+  background: #f2f2f2;
+  box-shadow: rgba(206, 207, 209, 0.568) 1px 4px 26px,
+    rgba(195, 198, 202, 0.678) 2px 2px 3px;
   &:hover {
     // border: 1px solid red !important;
     cursor: pointer;
-    box-shadow: rgba(0, 0, 0, 0.25) 0px 14px 28px,
-      rgba(0, 0, 0, 0.22) 0px 10px 10px;
+    box-shadow: rgba(104, 102, 102, 0.25) 0px 14px 28px,
+      rgba(105, 102, 102, 0.22) 0px 10px 10px;
+    background: white;
     transform: translate(-1px, -2px);
     transition: all 0.25s;
   }
+
+  /*&-avatar {
+    background: $main-background;
+    &::hover {
+      background: white;
+    }
+  }*/
 }
 
 /* ********************************************* */

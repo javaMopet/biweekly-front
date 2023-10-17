@@ -35,13 +35,14 @@
               <q-btn-dropdown
                 split
                 icon="add_circle"
-                color="primary-button"
+                color="secondary-button"
                 push
                 glossy
                 no-caps
-                label="agregar"
+                label="Agregar"
                 @click="addRow(1)"
                 text-color="accent-light"
+                dense
               >
                 <q-list class="bg-primary-light">
                   <q-item clickable v-close-popup @click="addRow(1)">
@@ -100,7 +101,7 @@
               <q-card-section>
                 <div class="row q-gutter-x-lg">
                   <div class="column" @click="abrirMovimientos(props)">
-                    <q-avatar size="60px" color="white">
+                    <q-avatar size="60px">
                       <q-img
                         :src="`/icons/${props.row.banco?.icono ?? 'cash.png'}`"
                         width="50px"
