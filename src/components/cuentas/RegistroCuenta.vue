@@ -28,7 +28,7 @@
               color="disable-button"
               text-color="gray-2"
               toggle-color="toggle-button"
-              toggle-text-color="info"
+              toggle-text-color="primary-button"
               :options="tiposCuentaOptions"
               @update:model-value="tipoCuentaUpdated"
               push

@@ -4,7 +4,7 @@
 //   src: url(./fonts/NotoSerif-Regular.ttf);
 // }
 
-@import url('https://fonts.googleapis.com/css2?family=Assistant:wght@300;400&display=swap');
+//@import url('https://fonts.googleapis.com/css2?family=Assistant:wght@300;400&display=swap');
 
 @import url('https://fonts.googleapis.com/css2?family=Chivo+Mono:ital@0;1&family=Lobster+Two&family=Montserrat+Alternates:wght@300&family=Mulish:ital,wght@0,400;0,500;1,400;1,500&family=Roboto+Flex:wght@200;300;400&family=Roboto+Slab:wght@500&display=swap');
 
@@ -14,7 +14,7 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@200;300;400&display=swap');
 
-@import url('https://fonts.googleapis.com/css2?family=Cousine:ital,wght@0,400;0,700;1,400;1,700&family=Kanit:wght@200;300;400&display=swap');
+// @import url('https://fonts.googleapis.com/css2?family=Cousine:ital,wght@0,400;0,700;1,400;1,700&family=Kanit:wght@200;300;400&display=swap');
 
 .text-accent-light {
   color: $accent-light !important;
@@ -209,16 +209,18 @@
 }
 
 .tarjeta__cuenta {
+  width: 340px;
+  min-width: 330px;
   // border: 1px solid white !important;
   background: #f2f2f2;
-  box-shadow: rgba(206, 207, 209, 0.568) 1px 4px 26px,
-    rgba(195, 198, 202, 0.678) 2px 2px 3px;
+  box-shadow: rgba(206, 207, 209, 0.568) 1px 1px 26px,
+    rgba(195, 198, 202, 0.678) 1px 1px 3px;
   &:hover {
     // border: 1px solid red !important;
     cursor: pointer;
     box-shadow: rgba(104, 102, 102, 0.25) 0px 14px 28px,
       rgba(105, 102, 102, 0.22) 0px 10px 10px;
-    background: white;
+    background-color: white !important;
     transform: translate(-1px, -2px);
     transition: all 0.25s;
   }
@@ -236,7 +238,44 @@
   font-family: 'Raleway', sans-serif;
   font-feature-settings: 'lnum';
   text-rendering: optimizeLegibility !important;
-  font-size: 0.85rem;
+  font-size: 0.85rem !important;
   color: $breadcrum !important;
   font-weight: 300;
+
+  &:active {
+    font-size: 1.2rem;
+  }
+}
+
+.page-title {
+  letter-spacing: -0.0025rem !important;
+  font-size: 1.4rem;
+  font-weight: 600;
+  font-family: 'Montserrat', sans-serif;
+  color: $accent-title;
+}
+/* *********************************************** */
+.main-content {
+  padding-left: 36px;
+  padding-right: 36px;
+}
+.cuenta-content {
+  position: relative;
+  z-index: 1;
+  padding: 32px 16px 24px 16px;
+  background-color: white;
+  border: 1px solid #b2bdb6;
+  border-radius: 5px;
+  overflow: hidden;
+
+  &::before {
+    background-color: #929fb1;
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    content: '';
+    width: 100%;
+    height: 8px;
+  }
 }

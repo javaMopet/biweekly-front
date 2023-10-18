@@ -16,7 +16,7 @@
       </div>
       <q-toolbar-title> </q-toolbar-title>
     </q-toolbar>
-    <div class="page-title">Cuentas</div>
+
     <div class="column q-mx-md">
       <div class="row fit">
         <q-table
@@ -30,76 +30,79 @@
           :rows-per-page-options="[0]"
           hide-pagination
         >
-          <template v-slot:top-left>
-            <div class="q-pa-md">
-              <q-btn-dropdown
-                split
-                icon="add_circle"
-                color="secondary-button"
-                push
-                glossy
-                no-caps
-                label="Agregar"
-                @click="addRow(1)"
-                text-color="accent-light"
-                dense
-              >
-                <q-list class="bg-primary-light">
-                  <q-item clickable v-close-popup @click="addRow(1)">
-                    <q-item-section avatar>
-                      <q-avatar
-                        icon="account_balance"
-                        color="primary"
-                        text-color="white"
-                      />
-                    </q-item-section>
-                    <q-item-section>
-                      <q-item-label>Cuenta de Ahorros</q-item-label>
-                      <!-- <q-item-label caption>February 22, 2016</q-item-label> -->
-                    </q-item-section>
-                    <!-- <q-item-section side>
-                    <q-icon name="info" color="amber" />
-                  </q-item-section> -->
-                  </q-item>
-
-                  <q-item clickable v-close-popup @click="addRow(2)">
-                    <q-item-section avatar>
-                      <q-avatar
-                        icon="payments"
-                        color="secondary"
-                        text-color="white"
-                      />
-                    </q-item-section>
-                    <q-item-section>
-                      <q-item-label>Cuenta de Efectivo</q-item-label>
-                      <!-- <q-item-label caption>February 22, 2016</q-item-label> -->
-                    </q-item-section>
-                    <!-- <q-item-section side>
-                    <q-icon name="info" color="amber" />
-                  </q-item-section> -->
-                  </q-item>
-                </q-list>
-              </q-btn-dropdown>
-            </div>
+          <template #top-left>
+            <div class="page-title">Cuentas</div>
           </template>
+          <template #top-right>
+            <div class="row inline items-center q-gutter-x-md">
+              <div class="">
+                <!-- icon="add_circle" -->
+                <q-btn-dropdown
+                  split
+                  color="primary"
+                  push
+                  glossy
+                  no-caps
+                  label="Agregar"
+                  @click="addRow(1)"
+                  text-color="white"
+                >
+                  <q-list class="bg-primary-light">
+                    <q-item clickable v-close-popup @click="addRow(1)">
+                      <q-item-section avatar>
+                        <q-avatar
+                          icon="account_balance"
+                          color="primary"
+                          text-color="white"
+                        />
+                      </q-item-section>
+                      <q-item-section>
+                        <q-item-label>Cuenta de Ahorros</q-item-label>
+                        <!-- <q-item-label caption>February 22, 2016</q-item-label> -->
+                      </q-item-section>
+                      <!-- <q-item-section side>
+                    <q-icon name="info" color="amber" />
+                  </q-item-section> -->
+                    </q-item>
 
-          <template v-slot:top-right>
-            <q-input
-              outlined
-              dense
-              debounce="300"
-              v-model="filter"
-              placeholder="Buscar Cuenta"
-            >
-              <template v-slot:append>
-                <q-icon name="search" />
-              </template>
-            </q-input>
+                    <q-item clickable v-close-popup @click="addRow(2)">
+                      <q-item-section avatar>
+                        <q-avatar
+                          icon="payments"
+                          color="secondary"
+                          text-color="white"
+                        />
+                      </q-item-section>
+                      <q-item-section>
+                        <q-item-label>Cuenta de Efectivo</q-item-label>
+                        <!-- <q-item-label caption>February 22, 2016</q-item-label> -->
+                      </q-item-section>
+                      <!-- <q-item-section side>
+                    <q-icon name="info" color="amber" />
+                  </q-item-section> -->
+                    </q-item>
+                  </q-list>
+                </q-btn-dropdown>
+              </div>
+              <div class="bg-accent-light">
+                <q-input
+                  outlined
+                  dense
+                  debounce="300"
+                  v-model="filter"
+                  placeholder="Buscar"
+                >
+                  <template v-slot:append>
+                    <q-icon name="search" />
+                  </template>
+                </q-input>
+              </div>
+            </div>
           </template>
           <template #item="props">
             <q-card class="tarjeta__cuenta text-primary q-ma-sm clickable">
               <q-card-section>
-                <div class="row q-gutter-x-lg">
+                <div class="row justify-around q-gutter-x-lg">
                   <div class="column" @click="abrirMovimientos(props)">
                     <q-avatar size="60px">
                       <q-img

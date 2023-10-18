@@ -4,7 +4,7 @@
       <div class="row items-center q-ml-sm q-gutter-x-sm">
         <div class="q-pa-md q-gutter-sm">
           <q-breadcrumbs
-            class="text-blue-grey-6 breadcrum_clase"
+            class="breadcrum-component"
             active-color="primary"
             separator=">"
             separator-color="primary"
@@ -33,7 +33,7 @@
         label="Regresar"
       ></q-btn>
     </q-toolbar>
-    <!-- <pre>{{ cuenta }}</pre> -->
+
     <div class="q-pl-xl q-pt-lg q-gutter-sm row inline items-center">
       <q-img
         :src="`/icons/${cuenta.banco?.icono ?? 'cash.png'}`"
@@ -838,30 +838,7 @@ const columns = [
   font-weight: 500;
   letter-spacing: -0.025rem;
 }
-.main-content {
-  padding-left: 36px;
-  padding-right: 36px;
-}
-.cuenta-content {
-  position: relative;
-  z-index: 1;
-  padding: 32px 16px 24px 16px;
-  background-color: white;
-  border: 1px solid #b2bdb6;
-  border-radius: 5px;
-  overflow: hidden;
 
-  &::before {
-    background-color: #929fb1;
-    position: absolute;
-    top: 0;
-    left: 0;
-    display: block;
-    content: '';
-    width: 100%;
-    height: 8px;
-  }
-}
 .table-title {
   font-family: 'Raleway', sans-serif;
   font-weight: 500;

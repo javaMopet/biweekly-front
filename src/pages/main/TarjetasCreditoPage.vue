@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="">
     <q-toolbar class="" dense fit>
       <div class="row items-center q-ml-sm q-gutter-x-sm">
         <div class="q-pa-md q-gutter-sm">
@@ -20,116 +20,99 @@
       </div>
       <q-toolbar-title> </q-toolbar-title>
     </q-toolbar>
-    <div class="page-title">Tarjetas de crédito</div>
-    <div class="row fit q-px-lg">
-      <q-table
-        grid
-        style="width: 100%"
-        dense
-        :rows="listaCuentas"
-        :columns="columns"
-        row-key="id"
-        :filter="filter"
-        :rows-per-page-options="[0]"
-        hide-pagination
-      >
-        <template #top-left>
-          <div class="q-pa-md">
-            <q-btn
-              color="primary-button"
-              icon="add_card"
-              @click="addRow(3)"
-              label="Nueva Tarjeta"
-              no-caps
-              push
-              text-color="accent-light"
-              glossy
-            />
-            <!-- <q-btn-dropdown
-            split
-            icon="add"
-            label="AGREGAR"
-            color="primary"
-            @click="addRow(3)"
-          >
-            <q-list>
-              <q-item clickable v-close-popup @click="addRow(3)">
-                <q-item-section avatar>
-                  <q-icon name="credit_card" />
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label>Tarjeta Crédito</q-item-label>
-                </q-item-section>
-              </q-item>
-            </q-list>
-          </q-btn-dropdown> -->
-          </div>
-        </template>
 
-        <template v-slot:top-right>
-          <q-input
-            outlined
-            dense
-            debounce="300"
-            v-model="filter"
-            placeholder="Buscar"
-          >
-            <template v-slot:append>
-              <q-icon name="search" />
-            </template>
-          </q-input>
-        </template>
-        <template #item="props">
-          <!--clase: tarjeta__cuenta -->
-          <q-card
-            class="tarjeta__cuenta bg-credit-card q-ma-lg"
-            style="width: 330px; min-width: 330px"
-            clickable
-          >
-            <!-- @click="mostrarMovimientos(props.row.id)" -->
-            <q-card-section>
-              <div class="column">
-                <div class="row inline fit">
-                  <div
-                    class="col-4 items-center justify-center column"
-                    @click="abrirMovimientos(props)"
-                  >
-                    <q-avatar size="45px" color="primary-light">
-                      <q-img
-                        :src="`/icons/${props.row.banco?.icono ?? 'cash.png'}`"
-                        width="45px"
-                        height="45px"
-                      />
-                    </q-avatar>
-                  </div>
-                  <div
-                    class="col-6"
-                    align="right"
-                    style="border: 0px solid purple"
-                    @click="abrirMovimientos(props)"
-                  >
-                    <q-item-label
+    <div class="column q-mx-md">
+      <div class="row fit">
+        <q-table
+          grid
+          style="width: 100%"
+          dense
+          :rows="listaCuentas"
+          :columns="columns"
+          row-key="id"
+          :filter="filter"
+          :rows-per-page-options="[0]"
+          hide-pagination
+        >
+          <template #top-left>
+            <div class="page-title">Tarjetas de crédito</div>
+          </template>
+          <template #top-right>
+            <div class="row inline items-center q-gutter-x-md">
+              <div class="">
+                <q-btn
+                  color="primary"
+                  icon="add_card"
+                  @click="addRow(3)"
+                  label="Agregar"
+                  no-caps
+                  push
+                  text-color="accent-light"
+                  glossy
+                />
+              </div>
+              <div class="bg-accent-light">
+                <q-input
+                  outlined
+                  dense
+                  debounce="300"
+                  v-model="filter"
+                  placeholder="Buscar"
+                >
+                  <template v-slot:append>
+                    <q-icon name="search" />
+                  </template>
+                </q-input>
+              </div>
+            </div>
+          </template>
+          <template #item="props">
+            <q-card
+              class="tarjeta__cuenta bg-credit-card q-ma-sm clickable"
+              clickable
+            >
+              <q-card-section>
+                <div class="column">
+                  <div class="row inline fit items-center justify-around">
+                    <div class="" @click="abrirMovimientos(props)">
+                      <q-avatar size="45px">
+                        <q-img
+                          :src="`/icons/${
+                            props.row.banco?.icono ?? 'cash.png'
+                          }`"
+                          width="45px"
+                          height="45px"
+                        />
+                      </q-avatar>
+                    </div>
+                    <div
+                      class=""
                       align="right"
-                      class="text-dark text-bold text-h6"
+                      style="border: 0px solid purple"
+                      @click="abrirMovimientos(props)"
                     >
-                      {{ props.row.nombre }}
-                    </q-item-label>
-                  </div>
-                  <div
-                    class="col-2"
-                    align="right"
-                    style="border: 0px solid red"
-                  >
-                    <q-btn
-                      color="more-button"
-                      icon="more_vert"
-                      flat
-                      dense
-                      round
+                      <q-item-label
+                        align="right"
+                        class="text-dark text-bold text-h6"
+                      >
+                        {{ props.row.nombre }}
+                      </q-item-label>
+                    </div>
+                    <div
+                      class="col-2"
+                      align="right"
+                      style="border: 0px solid red"
                     >
-                      <q-menu>
-                        <q-list style="min-width: 100px">
-                          <!-- <q-item
+                      <q-btn
+                        color="more-button"
+                        icon="more_vert"
+                        flat
+                        dense
+                        round
+                      >
+                        <q-menu>
+                          <q-list style="min-width: 100px">
+                            <!-- <q-item
                         clickable
                         @click="mostrarMovimientos(props.row.id)"
                         v-close-popup
@@ -139,74 +122,75 @@
                         </q-item-section>
                         <q-item-section>Movimientos</q-item-section>
                       </q-item> -->
-                          <q-item
-                            clickable
-                            @click="editRow(props)"
-                            v-close-popup
-                          >
-                            <q-item-section avatar>
-                              <q-icon name="edit" color="info"
-                            /></q-item-section>
-                            <q-item-section>Editar</q-item-section>
-                          </q-item>
-                          <q-separator />
-                          <q-item
-                            clickable
-                            @click="deleteRow(props)"
-                            v-close-popup
-                          >
-                            <q-item-section avatar>
-                              <q-icon name="delete" color="negative"
-                            /></q-item-section>
-                            <q-item-section>Eliminar</q-item-section>
-                          </q-item>
-                        </q-list>
-                      </q-menu>
-                    </q-btn>
+                            <q-item
+                              clickable
+                              @click="editRow(props)"
+                              v-close-popup
+                            >
+                              <q-item-section avatar>
+                                <q-icon name="edit" color="info"
+                              /></q-item-section>
+                              <q-item-section>Editar</q-item-section>
+                            </q-item>
+                            <q-separator />
+                            <q-item
+                              clickable
+                              @click="deleteRow(props)"
+                              v-close-popup
+                            >
+                              <q-item-section avatar>
+                                <q-icon name="delete" color="negative"
+                              /></q-item-section>
+                              <q-item-section>Eliminar</q-item-section>
+                            </q-item>
+                          </q-list>
+                        </q-menu>
+                      </q-btn>
+                    </div>
                   </div>
-                </div>
-                <div class="q-py-lg row" @click="abrirMovimientos(props)">
-                  <q-img src="/icons/chip-credit-card.png" width="40px" />
-                  <div class="q-ml-lg">
-                    <!-- <router-link
+                  <div class="q-py-lg row" @click="abrirMovimientos(props)">
+                    <q-img src="/icons/chip-credit-card.png" width="40px" />
+                    <div class="q-ml-lg">
+                      <!-- <router-link
                       :to="{
                         name: 'tarjetaCredito',
                         params: { id: props.row.id }
                       }"
                       class="tarjeta__credito--link"
                     > -->
-                    <div
-                      class="fit flex flex-left text-left non-selectable q-py-sm"
-                    >
-                      **** **** **** {{ props.row.identificador }}
+                      <div
+                        class="fit flex flex-left text-left non-selectable q-py-sm"
+                      >
+                        **** **** **** {{ props.row.identificador }}
+                      </div>
+                      <q-tooltip> Abrir movimientos </q-tooltip>
+                      <!-- </router-link> -->
                     </div>
-                    <q-tooltip> Abrir movimientos </q-tooltip>
-                    <!-- </router-link> -->
+                  </div>
+                  <div
+                    class="row justify-between items-center q-px-lg"
+                    @click="abrirMovimientos(props)"
+                  >
+                    <span class="text-caption">HORACIO PEÑA MENDOZA</span>
+                    <q-item-label
+                      align="right"
+                      caption
+                      lines="2"
+                      class="text-blue-grey-6 text-bold text-h3"
+                      ><span class="text-h6">{{
+                        formato.toCurrency(props.row.saldo)
+                      }}</span>
+                    </q-item-label>
                   </div>
                 </div>
-                <div
-                  class="row justify-between items-center q-px-lg"
-                  @click="abrirMovimientos(props)"
-                >
-                  <span class="text-caption">HORACIO PEÑA MENDOZA</span>
-                  <q-item-label
-                    align="right"
-                    caption
-                    lines="2"
-                    class="text-blue-grey-6 text-bold text-h3"
-                    ><span class="text-h6">{{
-                      formato.toCurrency(props.row.saldo)
-                    }}</span>
-                  </q-item-label>
-                </div>
-              </div>
-            </q-card-section>
-          </q-card>
-        </template>
-        <template #body-cell-icono="props">
-          <q-icon :name="props.row.icono" size="35px" color="cyan" />
-        </template>
-      </q-table>
+              </q-card-section>
+            </q-card>
+          </template>
+          <template #body-cell-icono="props">
+            <q-icon :name="props.row.icono" size="35px" color="cyan" />
+          </template>
+        </q-table>
+      </div>
     </div>
 
     <Teleport to="#modal">

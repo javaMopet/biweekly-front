@@ -2,10 +2,8 @@
   <q-card flat>
     <q-toolbar class="bg-grey-1 text-primary" fit dense>
       <div class="row items-center q-ml-sm q-gutter-x-sm">
-        <!-- <q-img :src="`/icons/${cuenta.banco?.icono}`" width="50px" /> -->
-        <!-- <span class="text-h6">{{ cuenta.nombre }}</span> -->
         <div class="q-pa-md q-gutter-sm">
-          <q-breadcrumbs>
+          <q-breadcrumbs class="breadcrum-component">
             <q-breadcrumbs-el icon="home" to="/" />
             <q-breadcrumbs-el
               label="Tarjetas de crédito"
@@ -20,224 +18,320 @@
         </div>
       </div>
       <q-toolbar-title> </q-toolbar-title>
-
-      <!-- <q-btn flat round dense icon="apps" class="q-mr-xs" /> -->
+      <q-btn
+        color="primary"
+        icon="fa-solid fa-circle-left"
+        @click="router.go(-1)"
+        flat
+        rounded
+        no-caps
+        label="Regresar"
+      ></q-btn>
     </q-toolbar>
-    <q-toolbar inset class="bg-grey-1">
-      <div class="row q-gutter-x-md">
-        <q-btn color="primary-button" label="Agregar" @click="addItem" push />
-        <q-btn
-          color="primary-button"
-          outline
-          @click="cargarMovimientos"
-          no-caps
-        >
-          <q-avatar square size="24px">
-            <q-img src="/icons/excel.png" width="24px" height="24px" />
-          </q-avatar>
-          <span class="q-ml-sm">Importar</span>
-        </q-btn>
-
-        <q-btn
-          color="toolbar-button"
-          label="pagos"
-          @click="pagosTarjeta"
-          push
-        />
-      </div>
-      <q-toolbar-title> </q-toolbar-title>
-      <div class="row q-gutter-x-sm">
-        <q-select
-          v-model="ejercicio_fiscal"
-          :options="ejercicioFiscalOptions"
-          option-label="nombre"
-          label="Año"
-          dense
-          outlined
-          color="secondary"
-          label-color="dark"
-          @update:model-value="onChangeEjercicio"
-        >
-          <template #prepend>
-            <q-icon name="calendar_month" />
-          </template>
-        </q-select>
-        <MesSelect v-model="mes" @update:model-value="onChangeMes"></MesSelect>
-      </div>
-    </q-toolbar>
+    <div class="q-pl-xl q-pt-lg q-gutter-sm row inline items-center">
+      <q-img
+        :src="`/icons/${cuenta.banco?.icono ?? 'cash.png'}`"
+        width="50px"
+        height="50px"
+      />
+      <div class="row cuenta__title inline">Tarjeta {{ cuenta.nombre }}</div>
+    </div>
   </q-card>
-  <q-card flat>
-    <q-card-section>
-      <div class="row">
-        <div class="col column items-center">
-          <span class="tarjeta__resumen-etiqueta"> Día de corte </span>
-          <span class="tarjeta__resumen-valor"> {{ cuenta.dia_corte }}</span>
-        </div>
-        <q-separator spaced inset vertical />
-        <div class="col column items-center">
-          <span class="tarjeta__resumen-etiqueta"> Periodo </span>
-          <span class="tarjeta__resumen-valor">
-            {{ periodoInicio }} - {{ periodoFin }}</span
+  <div class="main-content">
+    <div class="cuenta-content">
+      <q-toolbar>
+        <div class="row q-gutter-x-sm">
+          <q-select
+            v-model="ejercicio_fiscal"
+            :options="ejercicioFiscalOptions"
+            option-label="nombre"
+            label="Año"
+            dense
+            outlined
+            color="secondary"
+            label-color="dark"
+            @update:model-value="onChangeEjercicio"
           >
+            <template #prepend>
+              <q-icon name="calendar_month" />
+            </template>
+          </q-select>
+          <MesSelect
+            v-model="mes"
+            @update:model-value="onChangeMes"
+          ></MesSelect>
         </div>
-        <q-separator spaced inset vertical />
-        <div class="col column items-center">
-          <span class="tarjeta__resumen-etiqueta"> Importe del periodo </span>
-          <span class="tarjeta__resumen-valor-importante">
-            {{ formato.toCurrency(sumaMovimientos) }}</span
-          >
-        </div>
-        <q-separator spaced inset vertical />
-        <div class="col column items-center">
-          <span class="tarjeta__resumen-etiqueta">
-            Saldo del periodo anterior
-          </span>
-          <span class="tarjeta__resumen-valor">
-            {{ formato.toCurrency(saldo_anterior) }}</span
-          >
-        </div>
-      </div>
-      <q-separator spaced inset horizontal />
-      <div class="row">
-        <div
-          class="col column items-center"
-          v-if="listaRegistrosMsi.length > 0"
-        >
-          <span class="tarjeta__resumen-etiqueta">
-            Suma de movimientos de meses sin intereses
-          </span>
-          <span class="tarjeta__resumen-valor">
-            {{ formato.toCurrency(suma_msi) }}</span
-          >
-        </div>
-        <q-separator
-          spaced
-          inset
-          vertical
-          v-if="listaRegistrosMsi.length > 0"
-        />
+      </q-toolbar>
+      <q-card flat>
+        <q-card-section>
+          <div class="row">
+            <div class="col column items-center">
+              <span class="tarjeta__resumen-etiqueta"> Día de corte </span>
+              <span class="tarjeta__resumen-valor">
+                {{ cuenta.dia_corte }}</span
+              >
+            </div>
+            <q-separator spaced inset vertical />
+            <div class="col column items-center">
+              <span class="tarjeta__resumen-etiqueta"> Periodo </span>
+              <span class="tarjeta__resumen-valor">
+                {{ periodoInicio }} - {{ periodoFin }}</span
+              >
+            </div>
+            <q-separator spaced inset vertical />
+            <div class="col column items-center">
+              <span class="tarjeta__resumen-etiqueta">
+                Importe del periodo
+              </span>
+              <span class="tarjeta__resumen-valor-importante">
+                {{ formato.toCurrency(sumaMovimientos) }}</span
+              >
+            </div>
+            <q-separator spaced inset vertical />
+            <div class="col column items-center">
+              <span class="tarjeta__resumen-etiqueta">
+                Saldo del periodo anterior
+              </span>
+              <span class="tarjeta__resumen-valor">
+                {{ formato.toCurrency(saldo_anterior) }}</span
+              >
+            </div>
+          </div>
+          <q-separator spaced inset horizontal />
+          <div class="row">
+            <div
+              class="col column items-center"
+              v-if="listaRegistrosMsi.length > 0"
+            >
+              <span class="tarjeta__resumen-etiqueta">
+                Suma de movimientos de meses sin intereses
+              </span>
+              <span class="tarjeta__resumen-valor">
+                {{ formato.toCurrency(suma_msi) }}</span
+              >
+            </div>
+            <q-separator
+              spaced
+              inset
+              vertical
+              v-if="listaRegistrosMsi.length > 0"
+            />
 
-        <div class="col column items-center">
-          <span class="tarjeta__resumen-etiqueta"> Saldo Final </span>
-          <span class="tarjeta__resumen-valor">
-            {{ formato.toCurrency(saldo_final) }}
-          </span>
-        </div>
-        <q-separator spaced inset vertical />
-        <div class="col column items-center">
-          <span class="tarjeta__resumen-etiqueta"> Saldo Total </span>
-          <span class="tarjeta__resumen-valor">
-            {{ formato.toCurrency(saldo_total) }}
-          </span>
-        </div>
-      </div>
-    </q-card-section>
-    <q-card-section>
-      <!-- <q-icon name="add_circle" class="btn-add" clickable @click="addItem">
+            <div class="col column items-center">
+              <span class="tarjeta__resumen-etiqueta"> Saldo Final </span>
+              <span class="tarjeta__resumen-valor">
+                {{ formato.toCurrency(saldo_final) }}
+              </span>
+            </div>
+            <q-separator spaced inset vertical />
+            <div class="col column items-center">
+              <span class="tarjeta__resumen-etiqueta"> Saldo Total </span>
+              <span class="tarjeta__resumen-valor">
+                {{ formato.toCurrency(saldo_total) }}
+              </span>
+            </div>
+          </div>
+        </q-card-section>
+        <q-card-section>
+          <!-- <q-icon name="add_circle" class="btn-add" clickable @click="addItem">
         <q-tooltip :offset="[10, 10]"> Add New </q-tooltip>
       </q-icon> -->
-      <q-table
-        v-if="listaRegistrosMsi.length > 0"
-        :rows="listaRegistrosMsi"
-        :columns="columnsMsi"
-        dense
-        :rows-per-page-options="[0]"
-        table-header-class="bg-accent text-dark"
-        separator="horizontal"
-        hide-bottom
-      >
-        <template #top-left>
-          <q-tr class="">
-            <div class="column q-gutter-y-md">
-              <span class="cuenta__data-subtitle"
-                >Movimientos a meses sin intereses</span
-              >
-            </div>
-          </q-tr>
-        </template>
-        <template #body-cell-acciones="props">
-          <q-td :props="props">
-            <div class="row">
-              <q-btn
-                color="primary"
-                icon="more_vert"
-                flat
-                dense
-                size=".6rem"
-                round
-              >
-                <q-menu style="width: 150px">
-                  <q-list>
-                    <q-item clickable v-close-popup @click="editItem(props)">
-                      <q-item-section>Editar...</q-item-section>
-                    </q-item>
-                    <q-item clickable v-close-popup @click="quitarMsi(props)">
-                      <q-item-section>Quitar MSI</q-item-section>
-                    </q-item>
-                    <q-separator />
-                    <q-item clickable v-close-popup @click="deleteItem(props)">
-                      <q-item-section class="text-negative"
-                        >Eliminar</q-item-section
-                      >
-                    </q-item>
-                  </q-list>
-                </q-menu>
-              </q-btn>
-            </div>
-          </q-td>
-        </template>
-      </q-table>
-      <q-separator spaced inset vertical dark />
-      <q-table
-        :rows="listaRegistros"
-        :columns="columns"
-        dense
-        :rows-per-page-options="[0]"
-        table-header-class="bg-accent text-dark"
-        separator="horizontal"
-        hide-bottom
-      >
-        <template #top-left>
-          <q-tr class="cuenta__data-subtitle"> Movimientos </q-tr>
-        </template>
-        <template #body-cell-acciones="props">
-          <q-td :props="props">
-            <div class="row">
-              <q-btn
-                color="primary"
-                icon="more_vert"
-                flat
-                dense
-                size=".6rem"
-                round
-              >
-                <q-menu style="width: 200px; min-width: 200px" dense>
-                  <q-list dense>
-                    <q-item clickable v-close-popup @click="editItem(props)">
-                      <q-item-section>Editar...</q-item-section>
-                    </q-item>
-                    <q-item
-                      clickable
-                      v-close-popup
-                      @click="mesesSinInteres(props)"
-                    >
-                      <q-item-section>Meses Sin Intereses</q-item-section>
-                    </q-item>
-                    <q-separator />
-                    <q-item clickable v-close-popup @click="deleteItem(props)">
-                      <q-item-section class="text-negative"
-                        >Eliminar</q-item-section
-                      >
-                    </q-item>
-                  </q-list>
-                </q-menu>
-              </q-btn>
-            </div>
-          </q-td>
-        </template>
-      </q-table>
-    </q-card-section>
-  </q-card>
+          <q-table
+            v-if="listaRegistrosMsi.length > 0"
+            :rows="listaRegistrosMsi"
+            :columns="columnsMsi"
+            dense
+            :rows-per-page-options="[0]"
+            table-header-class="bg-accent text-dark"
+            separator="horizontal"
+            hide-bottom
+          >
+            <template #top-left>
+              <q-tr class="">
+                <div class="column q-gutter-y-md">
+                  <span class="cuenta__data-subtitle"
+                    >Movimientos a meses sin intereses</span
+                  >
+                </div>
+              </q-tr>
+            </template>
+            <template #top-right>
+              <div class="">
+                <div class="row q-gutter-x-md">
+                  <q-btn
+                    color="primary-button"
+                    label="Agregar"
+                    @click="addItem"
+                    push
+                  />
+                  <q-btn
+                    color="primary-button"
+                    outline
+                    @click="cargarMovimientos"
+                    no-caps
+                  >
+                    <q-avatar square size="24px">
+                      <q-img
+                        src="/icons/excel.png"
+                        width="24px"
+                        height="24px"
+                      />
+                    </q-avatar>
+                    <span class="q-ml-sm">Importar</span>
+                  </q-btn>
+
+                  <q-btn
+                    color="toolbar-button"
+                    label="pagos"
+                    @click="pagosTarjeta"
+                    push
+                  />
+                </div>
+              </div>
+            </template>
+            <template #body-cell-acciones="props">
+              <q-td :props="props">
+                <div class="row">
+                  <q-btn
+                    color="primary"
+                    icon="more_vert"
+                    flat
+                    dense
+                    size=".6rem"
+                    round
+                  >
+                    <q-menu style="width: 150px">
+                      <q-list>
+                        <q-item
+                          clickable
+                          v-close-popup
+                          @click="editItem(props)"
+                        >
+                          <q-item-section>Editar...</q-item-section>
+                        </q-item>
+                        <q-item
+                          clickable
+                          v-close-popup
+                          @click="quitarMsi(props)"
+                        >
+                          <q-item-section>Quitar MSI</q-item-section>
+                        </q-item>
+                        <q-separator />
+                        <q-item
+                          clickable
+                          v-close-popup
+                          @click="deleteItem(props)"
+                        >
+                          <q-item-section class="text-negative"
+                            >Eliminar</q-item-section
+                          >
+                        </q-item>
+                      </q-list>
+                    </q-menu>
+                  </q-btn>
+                </div>
+              </q-td>
+            </template>
+          </q-table>
+          <q-separator spaced inset vertical dark />
+          <q-table
+            :rows="listaRegistros"
+            :columns="columns"
+            dense
+            :rows-per-page-options="[0]"
+            table-header-class="bg-accent text-dark"
+            separator="horizontal"
+            hide-bottom
+          >
+            <template #top-left>
+              <q-tr class="cuenta__data-subtitle"> Movimientos </q-tr>
+            </template>
+
+            <template #top-right>
+              <div class="">
+                <div class="row q-gutter-x-md">
+                  <q-btn
+                    color="primary"
+                    label="Agregar"
+                    @click="addItem"
+                    push
+                    flat
+                    icon="add_circle"
+                    rounded
+                  />
+                  <q-btn
+                    color="primary-button"
+                    outline
+                    @click="cargarMovimientos"
+                    no-caps
+                  >
+                    <q-avatar square size="24px">
+                      <q-img
+                        src="/icons/excel.png"
+                        width="24px"
+                        height="24px"
+                      />
+                    </q-avatar>
+                    <span class="q-ml-sm">Importar</span>
+                  </q-btn>
+
+                  <q-btn
+                    color="toolbar-button"
+                    label="pagos"
+                    @click="pagosTarjeta"
+                    push
+                  />
+                </div>
+              </div>
+            </template>
+            <template #body-cell-acciones="props">
+              <q-td :props="props">
+                <div class="row">
+                  <q-btn
+                    color="primary"
+                    icon="more_vert"
+                    flat
+                    dense
+                    size=".6rem"
+                    round
+                  >
+                    <q-menu style="width: 200px; min-width: 200px" dense>
+                      <q-list dense>
+                        <q-item
+                          clickable
+                          v-close-popup
+                          @click="editItem(props)"
+                        >
+                          <q-item-section>Editar...</q-item-section>
+                        </q-item>
+                        <q-item
+                          clickable
+                          v-close-popup
+                          @click="mesesSinInteres(props)"
+                        >
+                          <q-item-section>Meses Sin Intereses</q-item-section>
+                        </q-item>
+                        <q-separator />
+                        <q-item
+                          clickable
+                          v-close-popup
+                          @click="deleteItem(props)"
+                        >
+                          <q-item-section class="text-negative"
+                            >Eliminar</q-item-section
+                          >
+                        </q-item>
+                      </q-list>
+                    </q-menu>
+                  </q-btn>
+                </div>
+              </q-td>
+            </template>
+          </q-table>
+        </q-card-section>
+      </q-card>
+    </div>
+  </div>
 
   <Teleport to="#modal">
     <q-dialog v-model="showForm" persistent>
