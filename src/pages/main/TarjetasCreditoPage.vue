@@ -3,7 +3,12 @@
     <q-toolbar class="" dense fit>
       <div class="row items-center q-ml-sm q-gutter-x-sm">
         <div class="q-pa-md q-gutter-sm">
-          <q-breadcrumbs class="text-blue-grey-6" active-color="primary">
+          <q-breadcrumbs
+            class="breadcrum-component"
+            active-color="primary"
+            separator=">"
+            separator-color="primary"
+          >
             <q-breadcrumbs-el icon="home" to="/" />
             <q-breadcrumbs-el
               label="Tarjetas de Crédito"
@@ -15,7 +20,8 @@
       </div>
       <q-toolbar-title> </q-toolbar-title>
     </q-toolbar>
-    <div class="row fit q-px-lg" style="border: 0px solid red">
+    <div class="page-title">Tarjetas de crédito</div>
+    <div class="row fit q-px-lg">
       <q-table
         grid
         style="width: 100%"
@@ -28,16 +34,18 @@
         hide-pagination
       >
         <template #top-left>
-          <q-btn
-            color="primary-button"
-            icon="add_card"
-            @click="addRow(3)"
-            label="Nueva Tarjeta"
-            no-caps
-            push
-            text-color="accent-light"
-          />
-          <!-- <q-btn-dropdown
+          <div class="q-pa-md">
+            <q-btn
+              color="primary-button"
+              icon="add_card"
+              @click="addRow(3)"
+              label="Nueva Tarjeta"
+              no-caps
+              push
+              text-color="accent-light"
+              glossy
+            />
+            <!-- <q-btn-dropdown
             split
             icon="add"
             label="AGREGAR"
@@ -55,6 +63,7 @@
               </q-item>
             </q-list>
           </q-btn-dropdown> -->
+          </div>
         </template>
 
         <template v-slot:top-right>

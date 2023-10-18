@@ -4,7 +4,7 @@
       <div class="row items-center q-ml-sm q-gutter-x-sm">
         <div class="q-pa-md q-gutter-sm">
           <q-breadcrumbs
-            class="breadcrum_clase"
+            class="breadcrum-component"
             active-color="primary"
             separator=">"
             separator-color="primary"
@@ -16,9 +16,9 @@
       </div>
       <q-toolbar-title> </q-toolbar-title>
     </q-toolbar>
-    <div class="page-title"></div>
-    <div class="column q-mx-md" style="border: 0px solid red">
-      <div class="row fit" style="border: 0px solid red">
+    <div class="page-title">Cuentas</div>
+    <div class="column q-mx-md">
+      <div class="row fit">
         <q-table
           grid
           style="width: 100%"
