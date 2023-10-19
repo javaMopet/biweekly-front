@@ -100,7 +100,7 @@
             </div>
           </template>
           <template #item="props">
-            <q-card class="tarjeta__cuenta text-primary q-ma-sm clickable">
+            <q-card class="cuenta__card-main text-primary q-ma-sm clickable">
               <q-card-section>
                 <div class="row justify-around q-gutter-x-lg">
                   <div class="column" @click="abrirMovimientos(props)">

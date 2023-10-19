@@ -134,72 +134,43 @@
             separator="horizontal"
             hide-bottom
           >
+            <template #top-left>
+              <q-tr class="cuenta__data-subtitle">
+                <div class="table-title">Movimientos del periodo</div>
+              </q-tr>
+            </template>
             <template #top-right>
               <q-tr>
                 <div class="q-gutter-x-md">
                   <q-btn
-                    color="accent"
+                    color="primary"
                     label="Agregar"
-                    no-caps
                     @click="addItem"
-                    class="text-condensed"
-                    dense
+                    push
+                    flat
+                    icon="add_circle"
+                    rounded
                   />
                   <q-btn
-                    color="primary"
-                    icon="fa-solid fa-upload"
-                    @click="cargarMovimientos"
-                    outline
-                    no-caps
-                    label="Carga Excel"
-                    class="text-condensed"
-                  />
-                  <!-- <q-btn
                     color="primary-button"
-                    outline
+                    flat
                     @click="cargarMovimientos"
                     no-caps
+                    rounded
                   >
                     <q-avatar square size="24px">
                       <q-img
-                        src="/icons/excel2.png"
+                        src="/icons/excel.png"
                         width="24px"
                         height="24px"
                       />
                     </q-avatar>
                     <span class="q-ml-sm">Importar</span>
-                  </q-btn> -->
+                  </q-btn>
                 </div>
               </q-tr>
             </template>
-            <template #top-left>
-              <q-tr class="cuenta__data-subtitle">
-                <!-- <q-btn
-                  color="primary-button"
-                  @click="addItem"
-                  no-caps
-                  push
-                  outline
-                >
-                  <q-avatar square size="24px">
-                    <q-img src="/icons/add.png" width="24px" height="24px" />
-                  </q-avatar>
-                  <span class="q-ml-sm">Nuevo</span>
-                </q-btn> -->
-                <!-- <q-icon
-              name="add_circle"
-              class="btn-add"
-              clickable
-              @click="addItem"
-            >
-              <q-tooltip :offset="[10, 10]"> Add New </q-tooltip>
-            </q-icon> -->
-                <div class="table-title">Movimientos del periodo</div>
-              </q-tr>
-            </template>
-            <!-- <template v-slot:body="props">
-          <q-tr :props="props"> </q-tr>
-        </template> -->
+
             <template #body-cell-categoria="props">
               <q-td key="categoria" :props="props">
                 {{ props.row.categoria?.nombre }}
@@ -212,8 +183,6 @@
                   label-cancel="Cancelar"
                   v-slot="scope"
                 >
-                  <!-- @update:model-value="actualizarCategoria" -->
-                  <!-- <q-input v-model="props.row.name" dense autofocus /> -->
                   <q-checkbox
                     left-label
                     v-model="props.row.todo"

@@ -1,7 +1,9 @@
 <template>
   <q-card class="my-card" style="width: 450px">
-    <q-card-section class="bg-main-menu row inline fit q-py-sm justify-between">
-      <div class="text-h6 text-accent-light">{{ actionName }}</div>
+    <q-card-section
+      class="row inline fit q-py-sm justify-between items-center dialog-title"
+    >
+      <div class="dialog__title--name">{{ actionName }}</div>
       <div class="">
         <q-btn
           round
@@ -9,7 +11,7 @@
           dense
           icon="close"
           class="float-right"
-          color="accent"
+          color="more-button"
           v-close-popup
           vertical-top
         ></q-btn>

@@ -41,25 +41,34 @@
     <div class="cuenta-content">
       <q-toolbar>
         <div class="row q-gutter-x-sm">
-          <q-select
-            v-model="ejercicio_fiscal"
-            :options="ejercicioFiscalOptions"
-            option-label="nombre"
-            label="Año"
-            dense
-            outlined
-            color="secondary"
-            label-color="dark"
-            @update:model-value="onChangeEjercicio"
-          >
-            <template #prepend>
-              <q-icon name="calendar_month" />
-            </template>
-          </q-select>
-          <MesSelect
-            v-model="mes"
-            @update:model-value="onChangeMes"
-          ></MesSelect>
+          <div class="row q-gutter-x-md q-px-md">
+            <q-select
+              v-model="ejercicio_fiscal"
+              :options="ejercicioFiscalOptions"
+              option-label="nombre"
+              label="Año"
+              dense
+              outlined
+              color="secondary"
+              label-color="dark"
+              @update:model-value="onChangeEjercicio"
+            >
+              <template #prepend>
+                <q-icon name="calendar_month" />
+              </template>
+            </q-select>
+            <MesSelect
+              v-model="mes"
+              @update:model-value="onChangeMes"
+            ></MesSelect>
+          </div>
+          <q-separator spaced vertical inset />
+          <q-btn
+            color="toolbar-button"
+            label="pagos"
+            @click="pagosTarjeta"
+            push
+          />
         </div>
       </q-toolbar>
       <q-card flat>
@@ -71,14 +80,14 @@
                 {{ cuenta.dia_corte }}</span
               >
             </div>
-            <q-separator spaced inset vertical />
+            <q-separator spaced vertical />
             <div class="col column items-center">
               <span class="tarjeta__resumen-etiqueta"> Periodo </span>
               <span class="tarjeta__resumen-valor">
                 {{ periodoInicio }} - {{ periodoFin }}</span
               >
             </div>
-            <q-separator spaced inset vertical />
+            <q-separator spaced vertical />
             <div class="col column items-center">
               <span class="tarjeta__resumen-etiqueta">
                 Importe del periodo
@@ -87,7 +96,7 @@
                 {{ formato.toCurrency(sumaMovimientos) }}</span
               >
             </div>
-            <q-separator spaced inset vertical />
+            <q-separator spaced vertical />
             <div class="col column items-center">
               <span class="tarjeta__resumen-etiqueta">
                 Saldo del periodo anterior
@@ -97,7 +106,7 @@
               >
             </div>
           </div>
-          <q-separator spaced inset horizontal />
+          <q-separator spaced horizontal />
           <div class="row">
             <div
               class="col column items-center"
@@ -123,7 +132,7 @@
                 {{ formato.toCurrency(saldo_final) }}
               </span>
             </div>
-            <q-separator spaced inset vertical />
+            <q-separator spaced vertical />
             <div class="col column items-center">
               <span class="tarjeta__resumen-etiqueta"> Saldo Total </span>
               <span class="tarjeta__resumen-valor">
@@ -166,7 +175,7 @@
                   />
                   <q-btn
                     color="primary-button"
-                    outline
+                    flat
                     @click="cargarMovimientos"
                     no-caps
                   >
@@ -179,13 +188,6 @@
                     </q-avatar>
                     <span class="q-ml-sm">Importar</span>
                   </q-btn>
-
-                  <q-btn
-                    color="toolbar-button"
-                    label="pagos"
-                    @click="pagosTarjeta"
-                    push
-                  />
                 </div>
               </div>
             </template>
@@ -239,12 +241,14 @@
             :columns="columns"
             dense
             :rows-per-page-options="[0]"
-            table-header-class="bg-accent text-dark"
+            table-header-class="bg-primary-light text-accent text-condensed"
             separator="horizontal"
             hide-bottom
           >
             <template #top-left>
-              <q-tr class="cuenta__data-subtitle"> Movimientos </q-tr>
+              <q-tr class="cuenta__data-subtitle">
+                <div class="table-title">Movimientos de la tarjeta</div>
+              </q-tr>
             </template>
 
             <template #top-right>
@@ -261,9 +265,10 @@
                   />
                   <q-btn
                     color="primary-button"
-                    outline
+                    flat
                     @click="cargarMovimientos"
                     no-caps
+                    rounded
                   >
                     <q-avatar square size="24px">
                       <q-img
@@ -274,13 +279,6 @@
                     </q-avatar>
                     <span class="q-ml-sm">Importar</span>
                   </q-btn>
-
-                  <q-btn
-                    color="toolbar-button"
-                    label="pagos"
-                    @click="pagosTarjeta"
-                    push
-                  />
                 </div>
               </div>
             </template>

@@ -1,9 +1,14 @@
 <template>
-  <q-card class="my-card" dense style="width: 80vw; min-width: 80vw">
+  <q-card
+    class="my-card"
+    dense
+    style="width: 80vw; min-width: 80vw; border: 0px solid red"
+  >
     <q-card-section
-      class="bg-main-menu row inline fit q-py-sm justify-between items-center"
+      style="border: 0px solid red"
+      class="row inline fit q-py-sm justify-between items-center dialog-title"
     >
-      <div class="dialog__title--name">
+      <div class="dialog__title--name" style="border: 0px solid green">
         Tarjeta de crédito - {{ cuenta.nombre }}
       </div>
       <div class="">
@@ -13,7 +18,7 @@
           dense
           icon="close"
           class="float-right"
-          color="accent dialog__title--closeButton"
+          color="accent "
           v-close-popup
           vertical-top
         ></q-btn>
@@ -26,39 +31,57 @@
         </div> -->
         <div class="row">
           <q-toolbar class="q-gutter-x-md">
-            <q-file
-              v-model="archivoExcel"
-              label="CARGAR"
-              accept=".xlsx,.xls"
-              @input="updateFile"
-              dense
-              style="width: 450px"
-              max-files="1"
-              outlined
-              label-color="accent"
-              clearable
-              bg-color="toolbar-button"
-              dark
-              @clear="fileClear"
-            >
-              <template #prepend>
-                <!-- <q-icon color="white" name="attach_file" /> -->
-                <q-icon color="white" name="cloud_upload" />
-                <q-separator spaced inset vertical dark />
-              </template>
-            </q-file>
-            <!-- <DateInput
+            <div class="row q-pr-lg">
+              <div class="load__file-text text-condensed" style="width: 130px">
+                Selecciona un archivo en formato Excel:
+              </div>
+              <q-file
+                v-model="archivoExcel"
+                label="Carga archivo Excel"
+                accept=".xlsx,.xls"
+                @input="updateFile"
+                dense
+                style="width: 350px"
+                max-files="1"
+                outlined
+                label-color="accent"
+                clearable
+                @clear="fileClear"
+              >
+                <template #prepend>
+                  <!-- <q-icon color="white" name="attach_file" /> -->
+                  <q-icon color="primary" name="cloud_upload" />
+                  <!-- <q-separator spaced inset vertical dark /> -->
+                </template>
+              </q-file>
+              <!-- <DateInput
               v-model="fecha_desde"
               clearable
               label="Desde la fecha"
             ></DateInput> -->
-            <q-btn
-              v-if="isSelected"
-              label="Eliminar"
-              @click="eliminarSeleccionados"
-              outline
-              color="primary"
-            />
+              <q-btn
+                v-if="isSelected"
+                label="Eliminar"
+                @click="eliminarSeleccionados"
+                outline
+                color="primary"
+              />
+            </div>
+            <q-separator vertical inset></q-separator>
+            <div class="row items-center q-gutter-x-md">
+              <span class="text-condensed"> Desde:</span>
+              <DateInput
+                v-model="fecha_desde"
+                lbl_field="Fecha"
+                :opcional="false"
+              ></DateInput>
+              <span class="text-condensed">Hasta:</span>
+              <DateInput
+                v-model="fecha_hasta"
+                lbl_field="Fecha"
+                :opcional="false"
+              ></DateInput>
+            </div>
           </q-toolbar>
         </div>
         <transition name="fade">
@@ -99,6 +122,7 @@
         dense
         selection="multiple"
         v-model:selected="registrosSelected"
+        table-header-class="text-condensed bg-primary-light text-accent"
       >
         <template #body-cell-categoria="props">
           <q-td :props="props">
@@ -166,7 +190,8 @@ const registrosSelected = ref([])
 const listaRegistrosTarjeta = ref([])
 const todos = ref()
 const isErrors = ref(false)
-const fecha_desde = ref()
+const fecha_desde = ref('10/10/2023')
+const fecha_hasta = ref('10/11/2023')
 /**
  * composables
  */

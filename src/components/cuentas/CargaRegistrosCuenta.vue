@@ -605,9 +605,4 @@ function closeErrors() {
   letter-spacing: -0.025rem;
   color: $negative-pastel;
 }
-.load__file-text {
-  color: $secondary;
-  font-weight: 600;
-  font-size: 0.85rem;
-}
 </style>
