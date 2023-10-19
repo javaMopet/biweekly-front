@@ -67,34 +67,20 @@
             </div>
           </template>
           <template #item="props">
-            <q-card
-              class="tarjeta__cuenta bg-credit-card q-ma-sm clickable"
-              clickable
-            >
+            <q-card class="tarjeta__cuenta q-ma-sm clickable" clickable>
               <q-card-section>
-                <div class="column">
-                  <div class="row inline fit items-center justify-around">
-                    <div class="" @click="abrirMovimientos(props)">
-                      <q-avatar size="45px">
-                        <q-img
-                          :src="`/icons/${
-                            props.row.banco?.icono ?? 'cash.png'
-                          }`"
-                          width="45px"
-                          height="45px"
-                        />
-                      </q-avatar>
-                    </div>
+                <div class="column" style="border: 0px solid red">
+                  <div
+                    class="row inline fit items-center justify-between"
+                    style="border: 0px solid yellow; padding-left: 15px"
+                  >
                     <div
-                      class=""
+                      class="q-pl-md"
                       align="right"
                       style="border: 0px solid purple"
                       @click="abrirMovimientos(props)"
                     >
-                      <q-item-label
-                        align="right"
-                        class="text-dark text-bold text-h6"
-                      >
+                      <q-item-label align="right" class="text-grey-2 text-bold">
                         {{ props.row.nombre }}
                       </q-item-label>
                     </div>
@@ -104,24 +90,15 @@
                       style="border: 0px solid red"
                     >
                       <q-btn
-                        color="more-button"
+                        color="grey-5"
                         icon="more_vert"
                         flat
                         dense
                         round
+                        style="transform: translate(10px, -10px)"
                       >
                         <q-menu>
                           <q-list style="min-width: 100px">
-                            <!-- <q-item
-                        clickable
-                        @click="mostrarMovimientos(props.row.id)"
-                        v-close-popup
-                      >
-                        <q-item-section avatar>
-                          <q-icon name="receipt" />
-                        </q-item-section>
-                        <q-item-section>Movimientos</q-item-section>
-                      </q-item> -->
                             <q-item
                               clickable
                               @click="editRow(props)"
@@ -148,35 +125,55 @@
                       </q-btn>
                     </div>
                   </div>
-                  <div class="q-py-lg row" @click="abrirMovimientos(props)">
-                    <q-img src="/icons/chip-credit-card.png" width="40px" />
-                    <div class="q-ml-lg">
-                      <!-- <router-link
-                      :to="{
-                        name: 'tarjetaCredito',
-                        params: { id: props.row.id }
-                      }"
-                      class="tarjeta__credito--link"
-                    > -->
+                  <div class="column" style="border: 0px solid red">
+                    <div
+                      class="q-py-sm row inline justify-between items-center"
+                      style="
+                        padding-left: 10px;
+                        padding-top: 20px;
+                        padding-bottom: 10px;
+                      "
+                      @click="abrirMovimientos(props)"
+                    >
+                      <q-img
+                        src="/images/chip.png"
+                        width="46px"
+                        height="40px"
+                      />
+                      <div class="q-pr-lg" @click="abrirMovimientos(props)">
+                        <q-img
+                          :src="`/icons/${
+                            props.row.banco?.icono ?? 'cash.png'
+                          }`"
+                          width="60px"
+                        />
+                      </div>
+                    </div>
+                    <div
+                      class="row inline justify-start"
+                      style="border: 0px solid green; padding-left: 20px"
+                    >
                       <div
-                        class="fit flex flex-left text-left non-selectable q-py-sm"
+                        class="non-selectable q-py-sm text-grey-4 text-h6"
+                        @click="abrirMovimientos(props)"
                       >
                         **** **** **** {{ props.row.identificador }}
                       </div>
                       <q-tooltip> Abrir movimientos </q-tooltip>
-                      <!-- </router-link> -->
                     </div>
                   </div>
                   <div
                     class="row justify-between items-center q-px-lg"
                     @click="abrirMovimientos(props)"
                   >
-                    <span class="text-caption">HORACIO PEÑA MENDOZA</span>
+                    <span class="text-caption text-grey-6"
+                      >HORACIO PEÑA MENDOZA</span
+                    >
                     <q-item-label
                       align="right"
                       caption
                       lines="2"
-                      class="text-blue-grey-6 text-bold text-h3"
+                      class="text-blue-grey-3 text-bold text-h3"
                       ><span class="text-h6">{{
                         formato.toCurrency(props.row.saldo)
                       }}</span>
