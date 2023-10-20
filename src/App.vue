@@ -17,7 +17,7 @@ export default defineComponent({
 html,
 body {
   margin: 0;
-  font-family: Open Sans;
+  font-family: 'DM Sans', sans-serif;
   font-size: 1rem;
   font-weight: 400;
   line-height: 1.5;

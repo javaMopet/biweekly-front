@@ -1,19 +1,16 @@
 <template>
   <q-card class="my-card" dense style="width: 80vw; min-width: 80vw">
     <q-card-section
-      class="bg-white row inline fit q-py-sm justify-between items-center dialog-title"
+      class="row inline fit q-py-xs justify-between items-center dialog-title"
     >
       <div class="dialog__title--name">{{ cuenta.nombre }}</div>
       <div class="">
         <q-btn
           round
-          flat
-          dense
           icon="close"
-          class="float-right"
-          color="accent dialog__title--closeButton"
+          class="dialog__title--closeButton"
           v-close-popup
-          vertical-top
+          push
         ></q-btn>
       </div>
     </q-card-section>
@@ -24,37 +21,54 @@
         </div> -->
         <div class="row">
           <q-toolbar class="q-gutter-x-md">
-            <div class="load__file-text">
-              Comienza seleccionando un archivo en formato Excel:
+            <div class="row q-pr-lg justify-between">
+              <div class="load__file-text text-condensed" style="width: 135px">
+                Selecciona un archivo en formato Excel:
+              </div>
+              <q-file
+                v-model="archivoExcel"
+                label="Carga archivo Excel"
+                accept=".xlsx,.xls"
+                @input="updateFile"
+                dense
+                style="width: 350px"
+                max-files="1"
+                outlined
+                no-caps
+                label-color="primary"
+                clearable
+                @clear="fileClear"
+              >
+                <template #prepend>
+                  <q-icon color="primary" name="cloud_upload" />
+                </template>
+                <template #append>
+                  <q-img src="/icons/excel2.png" width="24px" />
+                </template>
+              </q-file>
+              <q-btn
+                v-if="isSelected"
+                label="Eliminar"
+                @click="eliminarSeleccionados"
+                outline
+                color="primary"
+              />
             </div>
-            <q-file
-              v-model="archivoExcel"
-              label="Carga archivo Excel"
-              accept=".xlsx,.xls"
-              @input="updateFile"
-              dense
-              style="width: 450px"
-              max-files="1"
-              outlined
-              no-caps
-              label-color="primary"
-              clearable
-              @clear="fileClear"
-            >
-              <template #prepend>
-                <q-icon color="primary" name="cloud_upload" />
-              </template>
-              <template #append>
-                <q-img src="/icons/excel2.png" width="24px" />
-              </template>
-            </q-file>
-            <q-btn
-              v-if="isSelected"
-              label="Eliminar"
-              @click="eliminarSeleccionados"
-              outline
-              color="primary"
-            />
+            <q-separator vertical inset></q-separator>
+            <div class="row items-center q-gutter-x-md">
+              <span class="text-condensed"> Desde:</span>
+              <DateInput
+                v-model="fecha_inicio"
+                lbl_field="Fecha"
+                :opcional="false"
+              ></DateInput>
+              <span class="text-condensed">Hasta:</span>
+              <DateInput
+                v-model="fecha_fin"
+                lbl_field="Fecha"
+                :opcional="false"
+              ></DateInput>
+            </div>
           </q-toolbar>
         </div>
         <q-page-sticky
@@ -122,7 +136,7 @@
     </q-card-section>
     <q-card-section style="max-height: 70vh; height: 70vh" class="scroll">
       <q-table
-        :rows="listaRegistros"
+        :rows="listaRegistrosFiltrados"
         :columns="columns"
         :rows-per-page-options="[0]"
         row-key="consecutivo"
@@ -130,6 +144,7 @@
         selection="multiple"
         v-model:selected="registrosSelected"
         no-data-label="No existen datos disponibles"
+        hide-pagination
       >
         <!-- <template #body-cell-tipoAfectacion="props">
           <q-td :props="props">
@@ -168,6 +183,12 @@
             />
           </q-td>
         </template>
+        <template #bottom-row>
+          <q-tr>
+            <q-td class="text-bold" colspan="4">Total Movimientos:</q-td>
+            <q-td align="right"> a</q-td>
+          </q-tr>
+        </template>
       </q-table>
     </q-card-section>
 
@@ -184,13 +205,14 @@
 /**
  * imports
  */
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { read, utils } from 'xlsx'
 import CategoriaSelect from '../formComponents/CategoriaSelect.vue'
 import { useFormato } from 'src/composables/utils/useFormato'
 import { api } from 'src/boot/axios'
 import { DateTime } from 'luxon'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
+import DateInput from '../formComponents/DateInput.vue'
 
 /**
  * Composables
@@ -204,6 +226,8 @@ const registrosSelected = ref([])
 const listaRegistros = ref([])
 const todos = ref()
 const errorsList = ref([])
+const fecha_inicio = ref('01/01/1900')
+const fecha_fin = ref('01/01/1900')
 
 /**
  * composables
@@ -220,7 +244,31 @@ const props = defineProps({
     default: () => {
       return {}
     }
+  },
+  fecha_desde: {
+    type: String,
+    required: true,
+    default: () => {
+      return null
+    }
+  },
+  fecha_hasta: {
+    type: String,
+    required: true,
+    default: () => {
+      return null
+    }
   }
+})
+/**
+ * onMounted
+ */
+onMounted(() => {
+  let desde = formato.formatoFechaFromISO(props.fecha_desde)
+  let hasta = formato.formatoFechaFromISO(props.fecha_hasta)
+  // console.log('desde', desde)
+  fecha_inicio.value = desde
+  fecha_fin.value = hasta
 })
 /**
  * emits
@@ -508,6 +556,18 @@ function fileClear() {
 const isSelected = computed({
   get() {
     return registrosSelected.value.length > 0
+  }
+})
+
+const listaRegistrosFiltrados = computed({
+  get() {
+    const start_date = DateTime.fromFormat(fecha_inicio.value, 'dd/MM/yyyy')
+    const end_date = DateTime.fromFormat(fecha_fin.value, 'dd/MM/yyyy')
+
+    return listaRegistros.value.filter((registro) => {
+      const fecha_registro = DateTime.fromFormat(registro.fecha, 'dd/MM/yyyy')
+      return fecha_registro >= start_date && fecha_registro <= end_date
+    })
   }
 })
 

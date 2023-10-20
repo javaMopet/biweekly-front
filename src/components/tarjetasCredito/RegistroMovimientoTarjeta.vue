@@ -7,13 +7,10 @@
       <div class="">
         <q-btn
           round
-          flat
-          dense
           icon="close"
-          class="float-right"
-          color="more-button"
+          class="dialog__title--closeButton"
           v-close-popup
-          vertical-top
+          push
         ></q-btn>
       </div>
     </q-card-section>

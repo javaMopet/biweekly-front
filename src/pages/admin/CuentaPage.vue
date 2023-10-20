@@ -295,6 +295,8 @@
       <ImportarRegistrosCuenta
         :cuenta="cuenta"
         @items-saved="itemsSaved"
+        :fecha_desde="fecha_inicio"
+        :fecha_hasta="fecha_fin"
       ></ImportarRegistrosCuenta>
     </q-dialog>
   </Teleport>
