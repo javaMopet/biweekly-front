@@ -25,19 +25,9 @@
             v-model="editedFormItem.categoria"
             :rules="[(val) => !!val || 'Selecciona una categoría']"
             autofocus
+            @update:model-value="onSelectCategoria"
           ></CategoriaSelect>
-          <div class="row input-label">Concepto:</div>
-          <q-input
-            color="secondary"
-            v-model="editedFormItem.concepto"
-            type="textarea"
-            label="Concepto"
-            rows="3"
-            outlined
-            dense
-            lazy-rules
-            :rules="[(val) => !!val || 'Favor de ingresar el concepto']"
-          />
+
           <div class="row inline q-gutter-x-xs">
             <div class="col column">
               <div class="row input-label">Fecha de registro:</div>
@@ -81,6 +71,18 @@
               outlined
               dense
               style="width: 60px"
+            />
+          </div>
+          <div class="">
+            <div class="row input-label">Observaciones:</div>
+            <q-input
+              color="secondary"
+              v-model="editedFormItem.concepto"
+              type="textarea"
+              label="Observaciones"
+              rows="2"
+              outlined
+              dense
             />
           </div>
           <div class="column q-py-md">
@@ -246,6 +248,16 @@ const editedFormItem = computed({
 function isFechaValida(val) {
   const date = DateTime.fromFormat(val, 'dd/MM/yyyy')
   return date.isValid
+}
+
+function onSelectCategoria(value) {
+  if (!!value) {
+    // if (!props.editedItem.cuenta) {
+    //   editedFormItem.value.cuenta = value.cuentaDefault
+    // }
+    editedFormItem.value.importe =
+      value.importeDefault === 0 ? '' : value.importeDefault.toString()
+  }
 }
 </script>
 

@@ -1,7 +1,7 @@
 <template>
   <q-card class="my-card" style="width: 500px">
-    <q-card-section class="bg-main-menu row inline fit q-py-sm justify-between">
-      <div class="text-h6 text-accent-light">{{ cuenta.nombre }}</div>
+    <q-card-section class="row inline fit q-py-sm justify-between dialog-title">
+      <div class="dialog__title--name">{{ cuenta.nombre }}</div>
       <div class="">
         <q-btn
           round
@@ -16,7 +16,7 @@
       </div>
     </q-card-section>
     <q-card-section>
-      <q-form @submit="generarPago" class="q-gutter-xs">
+      <q-form @submit="generarPago" class="q-px-lg">
         <transition name="fade">
           <div class="row bg-pink-1" v-if="isNotPagable">
             <div class="column">

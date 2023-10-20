@@ -78,7 +78,10 @@
           <div class="row">
             <div class="col column items-center">
               <span class="tarjeta__resumen-etiqueta"> Día de corte </span>
-              <span class="tarjeta__resumen-valor">
+              <span
+                class="tarjeta__resumen-valor"
+                style="font-size: 1rem !important; font-weight: bold"
+              >
                 {{ cuenta.dia_corte }}</span
               >
             </div>
@@ -110,26 +113,10 @@
           </div>
           <q-separator spaced horizontal />
           <div class="row">
-            <div
-              class="col column items-center"
-              v-if="listaRegistrosMsi.length > 0"
-            >
-              <span class="tarjeta__resumen-etiqueta">
-                Suma de movimientos de meses sin intereses
-              </span>
-              <span class="tarjeta__resumen-valor">
-                {{ formato.toCurrency(suma_msi) }}</span
-              >
-            </div>
-            <q-separator
-              spaced
-              inset
-              vertical
-              v-if="listaRegistrosMsi.length > 0"
-            />
-
             <div class="col column items-center">
-              <span class="tarjeta__resumen-etiqueta"> Saldo Final </span>
+              <span class="tarjeta__resumen-etiqueta">
+                Saldo Final al {{ periodoFin }}
+              </span>
               <span class="tarjeta__resumen-valor">
                 {{ formato.toCurrency(saldo_final) }}
               </span>
@@ -153,9 +140,9 @@
             :columns="columnsMsi"
             dense
             :rows-per-page-options="[0]"
-            table-header-class="bg-accent text-dark"
+            hide-pagination
+            table-header-class="bg-primary-light text-accent text-condensed"
             separator="horizontal"
-            hide-bottom
           >
             <template #top-left>
               <q-tr class="">
@@ -170,26 +157,12 @@
               <div class="">
                 <div class="row q-gutter-x-md">
                   <q-btn
-                    color="primary-button"
-                    label="Agregar"
+                    color="primary"
+                    icon="add_circle"
                     @click="addItem"
-                    push
-                  />
-                  <q-btn
-                    color="primary-button"
                     flat
-                    @click="cargarMovimientos"
-                    no-caps
-                  >
-                    <q-avatar square size="24px">
-                      <q-img
-                        src="/icons/excel.png"
-                        width="24px"
-                        height="24px"
-                      />
-                    </q-avatar>
-                    <span class="q-ml-sm">Importar</span>
-                  </q-btn>
+                    rounded
+                  />
                 </div>
               </div>
             </template>
@@ -236,6 +209,12 @@
                 </div>
               </q-td>
             </template>
+            <template #bottom-row>
+              <q-tr class="text-bold">
+                <q-td colspan="2">Total meses sin intereses:</q-td>
+                <q-td align="right">{{ formato.toCurrency(suma_msi) }}</q-td>
+              </q-tr>
+            </template>
           </q-table>
           <q-separator spaced inset vertical dark />
           <q-table
@@ -245,7 +224,7 @@
             :rows-per-page-options="[0]"
             table-header-class="bg-primary-light text-accent text-condensed"
             separator="horizontal"
-            hide-bottom
+            :pagination-label="obtenerMensajePaginacion"
           >
             <template #top-left>
               <q-tr class="cuenta__data-subtitle">
@@ -327,6 +306,17 @@
                 </div>
               </q-td>
             </template>
+            <template v-slot:bottom-row>
+              <q-tr class="text-bold">
+                <q-td colspan="2"> Totales: </q-td>
+                <q-td align="right">
+                  {{ formato.toCurrency(sumatoriaCargos) }}
+                </q-td>
+                <q-td align="right">
+                  {{ formato.toCurrency(sumatoriaAbonos) }}
+                </q-td>
+              </q-tr>
+            </template>
           </q-table>
         </q-card-section>
       </q-card>
@@ -373,7 +363,7 @@
       ></PagosTarjeta>
     </q-dialog>
   </Teleport>
-  <pre>{{ fechaInicioPeriodo }}{{ fecha_inicio }}</pre>
+  <!-- <pre>{{ fechaInicioPeriodo }}{{ fecha_inicio }}</pre> -->
 </template>
 
 <script setup>
@@ -487,11 +477,33 @@ const sumaMovimientos = computed({
     )
   }
 })
+const sumatoriaCargos = computed({
+  get() {
+    return listaRegistros.value
+      .filter((registro) => {
+        return registro.tipoAfectacion === 'C'
+      })
+      .reduce((accumulator, registro) => {
+        return accumulator + registro.importe * -1
+      }, 0)
+  }
+})
+const sumatoriaAbonos = computed({
+  get() {
+    return listaRegistros.value
+      .filter((registro) => {
+        return registro.tipoAfectacion === 'A'
+      })
+      .reduce((accumulator, registro) => {
+        return accumulator + registro.importe
+      }, 0)
+  }
+})
 
 const suma_msi = computed({
   get() {
     return listaRegistrosMsi.value.reduce((accumulator, registro) => {
-      return accumulator + registro.importe
+      return accumulator + registro.importe * -1
     }, 0)
   }
 })
@@ -849,6 +861,9 @@ function pagosRegistrados() {
   showPagosTarjeta.value = false
   loadOrRefetchListaRegistrosTarjeta()
 }
+function obtenerMensajePaginacion(firstRowIndex, endRowIndex, totalRowsNumber) {
+  return `Número de movimientos en el periodo: ${totalRowsNumber}`
+}
 
 const mesOptions = ref([
   { id: 1, nombre: 'Enero' },
@@ -981,23 +996,23 @@ const columnsMsi = [
 </script>
 
 <style lang="scss" scoped>
-.tarjeta__resumen-etiqueta {
-  letter-spacing: -0.025rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #686666;
-}
-.tarjeta__resumen-valor {
-  font-size: 0.85rem;
-  font-weight: 400;
-  color: #888585;
-  &-importante {
-    font-size: 0.85rem;
-    font-weight: 600;
-    letter-spacing: -0.035rem;
-    color: #476d59 !important;
-  }
-}
+// .tarjeta__resumen-etiqueta {
+//   letter-spacing: -0.025rem;
+//   font-size: 0.75rem;
+//   font-weight: 600;
+//   color: #686666;
+// }
+// .tarjeta__resumen-valor {
+//   font-size: 0.85rem;
+//   font-weight: 400;
+//   color: #888585;
+//   &-importante {
+//     font-size: 0.85rem;
+//     font-weight: 600;
+//     letter-spacing: -0.035rem;
+//     color: #476d59 !important;
+//   }
+// }
 .cuenta__data-subtitle {
   letter-spacing: -0.045rem;
   font-size: 0.95rem;

@@ -50,16 +50,9 @@
                 @clear="fileClear"
               >
                 <template #prepend>
-                  <!-- <q-icon color="white" name="attach_file" /> -->
                   <q-icon color="primary" name="cloud_upload" />
-                  <!-- <q-separator spaced inset vertical dark /> -->
                 </template>
               </q-file>
-              <!-- <DateInput
-              v-model="fecha_desde"
-              clearable
-              label="Desde la fecha"
-            ></DateInput> -->
               <q-btn
                 v-if="isSelected"
                 label="Eliminar"
@@ -116,7 +109,7 @@
     </q-card-section>
     <q-card-section style="max-height: 70vh; height: 70vh" class="scroll">
       <q-table
-        :rows="listaRegistrosTarjeta"
+        :rows="listaRegistroFiltrados"
         :columns="columns"
         :rows-per-page-options="[0]"
         row-key="consecutivo"
@@ -125,6 +118,11 @@
         v-model:selected="registrosSelected"
         table-header-class="text-condensed bg-primary-light text-accent"
       >
+        <template #body-cell-concepto="props">
+          <q-td :props="props" :class="props.row.clase">
+            {{ props.row.concepto }}
+          </q-td>
+        </template>
         <template #body-cell-categoria="props">
           <q-td :props="props">
             <CategoriaSelect
@@ -135,7 +133,7 @@
         </template>
         <template #body-cell-importe="props">
           <q-td :props="props">
-            <span class="text-primary">
+            <span :class="props.row.clase">
               {{ formato.toCurrency(parseFloat(props.row.importe)) }}
             </span>
           </q-td>
@@ -145,26 +143,34 @@
             <q-btn
               icon="delete_sweep"
               size="md"
-              class="q-ml-sm"
-              color="negative"
+              :class="props.row.clase"
               dense
               @click="deleteRow(props)"
               flat
             />
+            <!-- class="q-ml-sm"
+              color="accent" -->
           </q-td>
         </template>
       </q-table>
-      <!-- <pre>{{ props.cuenta }}</pre> -->
     </q-card-section>
 
-    <q-card-actions align="right">
-      <div class="row q-gutter-x-md">
-        <q-btn flat label="Cancelar" v-close-popup />
-        <q-btn
-          label="Guardar"
-          color="primary-button"
-          @click="guardarMovimientos"
-        />
+    <q-card-actions>
+      <div class="row inline justify-between items-center fit q-pa-md">
+        <div class="">
+          <span class="text-bold text-primary"> Importe Total:</span>
+          <span class="q-pl-md text-secondary text-bold">{{
+            formato.toCurrency(sumatoriaImporte)
+          }}</span>
+        </div>
+        <div class="row q-gutter-lg q-pa-sm">
+          <q-btn flat label="Cancelar" v-close-popup />
+          <q-btn
+            label="Guardar"
+            color="primary-button"
+            @click="guardarMovimientos"
+          />
+        </div>
       </div>
     </q-card-actions>
   </q-card>
@@ -182,6 +188,7 @@ import { api } from 'src/boot/axios'
 import { DateTime } from 'luxon'
 import DateInput from '../formComponents/DateInput.vue'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
+import ListaMovimientos from '../movimientos/ListaMovimientos.vue'
 
 /**
  * state
@@ -280,7 +287,7 @@ function cargarMovimientosSantander(wb) {
     raw: false
   })
 
-  console.log('data', data)
+  // console.log('data', data)
   const monthsMap = new Map()
   monthsMap.set('Ene', '01')
   monthsMap.set('Feb', '02')
@@ -303,7 +310,7 @@ function cargarMovimientosSantander(wb) {
   }))
   // console.log('datda', todos.value)
   // console.log('datda', todos.value[5])
-  todos.value.forEach((row) => {
+  todos.value.forEach((row, index) => {
     let fecha = row.fecha.toString()
     for (const [key, value] of monthsMap) {
       // console.log(`${key}: ${value}`)
@@ -313,18 +320,41 @@ function cargarMovimientosSantander(wb) {
     if (fechaObject.isValid) {
       const importe = parseFloat(row.importe) * -1
       const tipo_afectacion = importe < 0 ? 'C' : 'A'
+      const clase = importe >= 0 ? 'registro_positivo' : ''
       const item = {
+        id: index,
         fecha,
         consecutivo: row.consecutivo,
         importe: importe.toString(),
         tipo_afectacion,
         concepto: row.concepto,
-        saved: false
+        saved: false,
+        clase
       }
       listaRegistrosTarjeta.value.push(item)
     }
   })
+
+  console.table(listaRegistrosTarjeta.value)
 }
+const listaRegistroFiltrados = computed({
+  get() {
+    const start_date = DateTime.fromFormat(fecha_inicio.value, 'dd/MM/yyyy')
+    const end_date = DateTime.fromFormat(fecha_fin.value, 'dd/MM/yyyy')
+
+    return listaRegistrosTarjeta.value.filter((registro) => {
+      const fecha_registro = DateTime.fromFormat(registro.fecha, 'dd/MM/yyyy')
+      return fecha_registro >= start_date && fecha_registro <= end_date
+    })
+  }
+})
+const sumatoriaImporte = computed({
+  get() {
+    return listaRegistroFiltrados.value.reduce((accumulator, registro) => {
+      return accumulator + parseFloat(registro.importe)
+    }, 0)
+  }
+})
 function cargarMovimientosBancomer(wb) {
   // get data of first worksheet as an array of objects
   const data = utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {
@@ -374,7 +404,7 @@ function cargarMovimientosBancomer(wb) {
 }
 
 function guardarMovimientos() {
-  console.log('guardando los movimeintos', listaRegistrosTarjeta.value)
+  console.table(listaRegistroFiltrados)
   const containsErrors = validarMovimientos()
   if (containsErrors) {
     isErrors.value = true
@@ -384,7 +414,7 @@ function guardarMovimientos() {
   } else {
     var lista_registros_tarjeta = []
 
-    listaRegistrosTarjeta.value.forEach((item) => {
+    listaRegistroFiltrados.value.forEach((item) => {
       const registro = {
         estado_registro_tarjeta_id: 1, //pendiente
         tipo_afectacion: item.tipo_afectacion,
@@ -419,8 +449,8 @@ function guardarMovimientos() {
 
 function validarMovimientos() {
   let containsErrors = false
-  containsErrors = listaRegistrosTarjeta.value.length <= 0
-  listaRegistrosTarjeta.value.forEach((item) => {
+  containsErrors = listaRegistroFiltrados.value.length <= 0
+  listaRegistroFiltrados.value.forEach((item) => {
     if (!item.categoria) {
       containsErrors = true
     }
@@ -438,9 +468,13 @@ function eliminarSeleccionados() {
 }
 
 function deleteRow(props) {
-  const rowIndex = props.rowIndex
+  // const rowIndex = props.rowIndex
+  const id = props.row.id
+  console.log(id)
+  const index = listaRegistrosTarjeta.value.findIndex((r) => r.id == id)
+  // listaRegistrosTarjeta.find
 
-  listaRegistrosTarjeta.value.splice(rowIndex, 1)
+  listaRegistrosTarjeta.value.splice(index, 1)
 }
 function fileClear() {
   listaRegistrosTarjeta.value.length = 0
@@ -541,4 +575,9 @@ const columns = [
 // .importe_positivo {
 //   color: green;
 // }
+
+.registro_positivo {
+  color: $negative !important;
+  font-weight: 700;
+}
 </style>

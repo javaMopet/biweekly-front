@@ -776,26 +776,6 @@ const columns = [
 </script>
 
 <style lang="scss" scoped>
-.tarjeta__resumen-etiqueta {
-  letter-spacing: -0.025rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #686666;
-}
-.tarjeta__resumen-valor {
-  font-family: 'Cousine', monospace;
-  font-size: 0.85rem;
-  font-weight: 400;
-  letter-spacing: -0.025rem;
-  color: #813333;
-  &-importante {
-    font-family: 'Cousine', monospace;
-    font-size: 0.85rem;
-    font-weight: 600;
-    letter-spacing: -0.035rem;
-    color: #476d59 !important;
-  }
-}
 .cuenta__data-subtitle {
   letter-spacing: -0.045rem;
   font-size: 0.95rem;
