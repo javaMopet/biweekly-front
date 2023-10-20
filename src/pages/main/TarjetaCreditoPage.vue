@@ -34,7 +34,9 @@
         width="50px"
         height="50px"
       />
-      <div class="row cuenta__title inline">Tarjeta {{ cuenta.nombre }}</div>
+      <div class="row cuenta__title inline">
+        Tarjeta de crédito {{ cuenta.nombre }}
+      </div>
     </div>
   </q-card>
   <div class="main-content">
@@ -351,10 +353,12 @@
   </Teleport>
   <Teleport to="#modal">
     <q-dialog v-model="showFormCarga" persistent>
-      <CargaRegistrosTarjeta
+      <ImportarRegistrosTarjeta
         :cuenta="cuenta"
         @items-saved="cargaMasivaSaved"
-      ></CargaRegistrosTarjeta>
+        :fecha_desde="fechaInicioPeriodo"
+        :fecha_hasta="fechaFinPeriodo"
+      ></ImportarRegistrosTarjeta>
     </q-dialog>
   </Teleport>
   <Teleport to="#modal">
@@ -369,6 +373,7 @@
       ></PagosTarjeta>
     </q-dialog>
   </Teleport>
+  <pre>{{ fechaInicioPeriodo }}{{ fecha_inicio }}</pre>
 </template>
 
 <script setup>
@@ -381,21 +386,19 @@ import {
   LISTA_REGISTROS_TARJETA,
   DELETE_REGISTRO_TARJETA
 } from 'src/graphql/registrosTarjeta'
-import CargaRegistrosTarjeta from 'src/components/tarjetasCredito/CargaRegistrosTarjeta.vue'
 import { useLazyQuery, useMutation } from '@vue/apollo-composable'
 import { useFormato } from 'src/composables/utils/useFormato'
-import { useRegistrosCrud } from 'src/composables/useRegistrosCrud'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import RegistroMesesSinInteres from 'src/components/tarjetasCredito/RegistroMesesSinInteres.vue'
 import { useQuasar } from 'quasar'
 import PagosTarjeta from 'src/components/tarjetasCredito/PagosTarjeta.vue'
 import MesSelect from 'src/components/formComponents/MesSelect.vue'
+import ImportarRegistrosTarjeta from 'src/components/tarjetasCredito/ImportarRegistrosTarjeta.vue'
 
 const route = useRoute()
 const router = useRouter()
 const formato = useFormato()
 const notificacion = useNotificacion()
-const registroCrud = useRegistrosCrud()
 const $q = useQuasar()
 
 /**

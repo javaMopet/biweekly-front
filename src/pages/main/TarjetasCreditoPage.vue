@@ -154,7 +154,7 @@
                       style="border: 0px solid green; padding-left: 20px"
                     >
                       <div
-                        class="non-selectable q-py-sm text-grey-4 text-h6"
+                        class="non-selectable q-py-xs text-grey-4 text-h6"
                         @click="abrirMovimientos(props)"
                       >
                         **** **** **** {{ props.row.identificador }}

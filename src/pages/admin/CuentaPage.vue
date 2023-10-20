@@ -154,7 +154,7 @@
                   <q-btn
                     color="primary-button"
                     flat
-                    @click="cargarMovimientos"
+                    @click="importarMovimientos"
                     no-caps
                     rounded
                   >
@@ -292,10 +292,10 @@
   </Teleport>
   <Teleport to="#modal">
     <q-dialog v-model="showFormCarga" persistent>
-      <CargaRegistrosCuenta
+      <ImportarRegistrosCuenta
         :cuenta="cuenta"
         @items-saved="itemsSaved"
-      ></CargaRegistrosCuenta>
+      ></ImportarRegistrosCuenta>
     </q-dialog>
   </Teleport>
 </template>
@@ -311,11 +311,11 @@ import { useFormato } from 'src/composables/utils/useFormato'
 import { useRegistrosCrud } from 'src/composables/useRegistrosCrud'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { useQuasar } from 'quasar'
-import CargaRegistrosCuenta from 'src/components/cuentas/CargaRegistrosCuenta.vue'
 import CategoriaSelect from 'src/components/formComponents/CategoriaSelect.vue'
 import RegistroMovimiento from 'src/components/movimientos/RegistroMovimiento.vue'
 import MesSelect from 'src/components/formComponents/MesSelect.vue'
 import { OBTENER_SALDO_A_FECHA } from 'src/graphql/cuentas'
+import ImportarRegistrosCuenta from 'src/components/cuentas/ImportarRegistrosCuenta.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -616,7 +616,7 @@ function obtenerListaRegistros() {
   )
 }
 
-function cargarMovimientos() {
+function importarMovimientos() {
   showFormCarga.value = true
 }
 function addItem() {

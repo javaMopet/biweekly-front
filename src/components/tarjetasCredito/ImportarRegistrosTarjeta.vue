@@ -4,6 +4,7 @@
     dense
     style="width: 80vw; min-width: 80vw; border: 0px solid red"
   >
+    <!-- <pre>{{ fecha_desde }} - {{ fecha_hasta }}</pre> -->
     <q-card-section
       style="border: 0px solid red"
       class="row inline fit q-py-sm justify-between items-center dialog-title"
@@ -71,13 +72,13 @@
             <div class="row items-center q-gutter-x-md">
               <span class="text-condensed"> Desde:</span>
               <DateInput
-                v-model="fecha_desde"
+                v-model="fecha_inicio"
                 lbl_field="Fecha"
                 :opcional="false"
               ></DateInput>
               <span class="text-condensed">Hasta:</span>
               <DateInput
-                v-model="fecha_hasta"
+                v-model="fecha_fin"
                 lbl_field="Fecha"
                 :opcional="false"
               ></DateInput>
@@ -173,7 +174,7 @@
 /**
  * imports
  */
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, toRef } from 'vue'
 import { read, utils } from 'xlsx'
 import CategoriaSelect from '../formComponents/CategoriaSelect.vue'
 import { useFormato } from 'src/composables/utils/useFormato'
@@ -190,8 +191,8 @@ const registrosSelected = ref([])
 const listaRegistrosTarjeta = ref([])
 const todos = ref()
 const isErrors = ref(false)
-const fecha_desde = ref('10/10/2023')
-const fecha_hasta = ref('10/11/2023')
+const fecha_inicio = ref('01/01/1900')
+const fecha_fin = ref('01/01/1900')
 /**
  * composables
  */
@@ -207,7 +208,28 @@ const props = defineProps({
     default: () => {
       return {}
     }
+  },
+  fecha_desde: {
+    type: String,
+    required: true,
+    default: () => {
+      return null
+    }
+  },
+  fecha_hasta: {
+    type: String,
+    required: true,
+    default: () => {
+      return null
+    }
   }
+})
+onMounted(() => {
+  let desde = formato.formatoFechaFromISO(props.fecha_desde)
+  let hasta = formato.formatoFechaFromISO(props.fecha_hasta)
+  console.log('desde', desde)
+  fecha_inicio.value = desde
+  fecha_fin.value = hasta
 })
 /**
  * emits
