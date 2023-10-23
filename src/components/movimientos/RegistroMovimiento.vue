@@ -1,7 +1,7 @@
 <template>
   <q-card class="my-card" style="width: 520px">
     <q-card-section
-      class="row inline fit q-py-sm justify-between items-center dialog-title"
+      class="row inline fit justify-between items-center dialog-title"
     >
       <div class="dialog__title--name">{{ actionName }}</div>
       <div class="">
@@ -16,7 +16,7 @@
       <!-- <pre>{{ editedFormItem }}</pre> -->
     </q-card-section>
 
-    <q-card-section>
+    <q-card-section class="q-py-lg q-px-xl">
       <q-form @submit="saveItem" class="q-gutter-md">
         <div class="">
           <q-btn-toggle
@@ -142,7 +142,11 @@ const cuentaOrigen = ref({})
 /**
  * onMounted
  */
-onMounted(() => {})
+onMounted(() => {
+  editedFormItem.value.fecha = !!props.fecha
+    ? formato.convertDateFromIsoToInput(props.fecha)
+    : formato.formatoFecha(new Date())
+})
 
 /**
  * props
@@ -161,6 +165,10 @@ const props = defineProps({
     type: Number,
     required: false,
     default: -1
+  },
+  fecha: {
+    type: String,
+    required: false
   }
 })
 /**

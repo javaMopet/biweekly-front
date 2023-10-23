@@ -94,7 +94,7 @@
                 {{ periodoInicio }} - {{ periodoFin }}</span
               >
             </div>
-            <q-separator spaced inset vertical />
+            <!-- <q-separator spaced inset vertical />
             <div class="col column items-center">
               <span class="tarjeta__resumen-etiqueta">
                 Suma de movimientos del periodo
@@ -102,7 +102,7 @@
               <span class="tarjeta__resumen-valor-importante">
                 {{ formato.toCurrency(sumaMovimientos) }}</span
               >
-            </div>
+            </div> -->
           </div>
           <q-separator spaced inset horizontal />
           <div class="row">
@@ -132,7 +132,7 @@
             :rows-per-page-options="[0]"
             table-header-class="bg-primary-light text-accent text-condensed"
             separator="horizontal"
-            hide-bottom
+            hide-pagination
           >
             <template #top-left>
               <q-tr class="cuenta__data-subtitle">
@@ -174,7 +174,7 @@
             <template #body-cell-categoria="props">
               <q-td key="categoria" :props="props">
                 {{ props.row.categoria?.nombre }}
-                <q-popup-edit
+                <!-- <q-popup-edit
                   v-model="props.row.categoria"
                   title="Editar categoria"
                   buttons
@@ -192,7 +192,7 @@
                     v-model="scope.value"
                     autofocus
                   ></CategoriaSelect>
-                </q-popup-edit>
+                </q-popup-edit> -->
               </q-td>
             </template>
             <template #body-cell-importe="props">
@@ -274,6 +274,16 @@
                 </div>
               </q-td>
             </template>
+            <template #bottom-row>
+              <q-tr>
+                <q-td colspan="3" class="text-condensed text-bold"
+                  >Importe total de movimientos del periodo</q-td
+                >
+                <q-td class="text-bold" align="right">{{
+                  formato.toCurrency(sumaMovimientos)
+                }}</q-td>
+              </q-tr>
+            </template>
           </q-table>
         </q-card-section>
       </q-card>
@@ -287,6 +297,7 @@
         :edited-item="registroEditedItem"
         @item-saved="registroCreated"
         @item-updated="registroUpdated"
+        :fecha="fecha_registro"
       ></RegistroMovimiento>
     </q-dialog>
   </Teleport>
@@ -473,6 +484,18 @@ const isCuentaAhorros = computed({
     return cuenta.value?.tipo_cuenta_id === 1
   }
 })
+
+const fecha_registro = computed({
+  get() {
+    const begin_date = DateTime.fromISO(fecha_inicio.value)
+    const end_date = DateTime.fromISO(fecha_fin.value)
+    const today = DateTime.now()
+
+    return begin_date <= today && today <= end_date
+      ? undefined
+      : fecha_fin.value
+  }
+})
 /**
  * graphql
  */
@@ -587,6 +610,8 @@ function obtener_fecha_fin() {
 
 function onChangeMes(mes) {
   console.log('Cambiando mes', mes.id)
+  obtener_fecha_inicio()
+  obtener_fecha_fin()
   obtenerListaRegistros()
 }
 function onChangeEjercicio(ejercicio_fiscal) {

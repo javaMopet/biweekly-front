@@ -90,6 +90,7 @@
           </div>
         </div>
       </q-form>
+      <!-- <pre>{{ props.fecha }}</pre> -->
     </q-card-section>
     <q-card-section> </q-card-section>
   </q-card>
@@ -107,11 +108,13 @@ import {
   UPDATE_REGISTRO_TARJETA
 } from 'src/graphql/registrosTarjeta'
 import { useMutation } from '@vue/apollo-composable'
+import { useNotificacion } from 'src/composables/utils/useNotificacion'
 
 /**
  * composables
  */
 const formato = useFormato()
+const notificacion = useNotificacion()
 
 /**
  * state
@@ -136,6 +139,9 @@ onMounted(() => {
       isMsi: false,
       numero_msi: 3
     }
+    editedFormItem.value.fecha = !!props.fecha
+      ? formato.convertDateFromIsoToInput(props.fecha)
+      : formato.formatoFecha(new Date())
   }
 })
 
@@ -155,6 +161,10 @@ const props = defineProps({
   cuentaId: {
     type: Number,
     required: true
+  },
+  fecha: {
+    type: String,
+    required: false
   }
 })
 /**
@@ -185,23 +195,30 @@ function saveItem() {
   const isMsi = editedFormItem.value.isMsi
   const numero_msi = isMsi ? parseInt(editedFormItem.value.numeroMsi) : 0
   const importe = parseFloat(editedFormItem.value.importe) * -1
-  const tipoAfectacion = importe >= 0 ? 'A' : 'C'
-  const input = {
-    estadoRegistroTarjetaId: 1,
-    cuentaId: props.cuentaId,
-    tipoAfectacion,
-    categoriaId: parseInt(editedFormItem.value.categoria.id),
-    importe: importe,
-    fecha: formato.convertDateFromInputToIso(editedFormItem.value.fecha), //convert
-    concepto: editedFormItem.value.concepto,
-    isMsi,
-    numeroMsi: numero_msi
-  }
-  console.log('item guardando...', input)
-  if (!!editedFormItem.value.id) {
-    updateRegistroTarjeta({ id: editedFormItem.value.id, input })
+  if (importe > 0) {
+    const tipoAfectacion = importe >= 0 ? 'A' : 'C'
+    const input = {
+      estadoRegistroTarjetaId: 1,
+      cuentaId: props.cuentaId,
+      tipoAfectacion,
+      categoriaId: parseInt(editedFormItem.value.categoria.id),
+      importe: importe,
+      fecha: formato.convertDateFromInputToIso(editedFormItem.value.fecha), //convert
+      concepto: editedFormItem.value.concepto,
+      isMsi,
+      numeroMsi: numero_msi
+    }
+    console.log('item guardando...', input)
+    if (!!editedFormItem.value.id) {
+      updateRegistroTarjeta({ id: editedFormItem.value.id, input })
+    } else {
+      createRegistroTarjeta({ input })
+    }
   } else {
-    createRegistroTarjeta({ input })
+    notificacion.mostrarNotificacionNegativa(
+      'Ingresar un importe mayo a cero.',
+      200
+    )
   }
 }
 

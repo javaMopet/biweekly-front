@@ -118,14 +118,14 @@
                 Saldo Final al {{ periodoFin }}
               </span>
               <span class="tarjeta__resumen-valor">
-                {{ formato.toCurrency(saldo_final) }}
+                {{ formato.toCurrency(saldo_final_periodo) }}
               </span>
             </div>
             <q-separator spaced vertical />
             <div class="col column items-center">
-              <span class="tarjeta__resumen-etiqueta"> Saldo Total </span>
+              <span class="tarjeta__resumen-etiqueta"> Saldo al Día </span>
               <span class="tarjeta__resumen-valor">
-                {{ formato.toCurrency(saldo_total) }}
+                {{ formato.toCurrency(saldo_al_dia) }}
               </span>
             </div>
           </div>
@@ -283,13 +283,13 @@
                         >
                           <q-item-section>Editar...</q-item-section>
                         </q-item>
-                        <q-item
+                        <!-- <q-item
                           clickable
                           v-close-popup
                           @click="mesesSinInteres(props)"
                         >
                           <q-item-section>Meses Sin Intereses</q-item-section>
-                        </q-item>
+                        </q-item> -->
                         <q-separator />
                         <q-item
                           clickable
@@ -330,6 +330,7 @@
         :registro-edited-item="registroEditedItem"
         @registro-created="registroCreated"
         @registro-updated="registroUpdated"
+        :fecha="fecha_registro"
       ></RegistroMovimientoTarjeta>
     </q-dialog>
   </Teleport>
@@ -417,6 +418,8 @@ const cuenta = ref({})
 const ejercicio_fiscal = ref(0)
 const mes = ref({})
 const saldo_anterior = ref(0)
+const saldo_final_periodo = ref(0)
+const saldo_al_dia = ref(0)
 const editRegistroItem = ref(null)
 
 const graphql_options = ref({
@@ -432,7 +435,7 @@ const graphql_options = ref({
  * onMounted
  */
 onMounted(() => {
-  console.log('buscando los datos de la tarjeta de crédito', route.params.id)
+  // console.log('buscando los datos de la tarjeta de crédito', route.params.id)
   const dateNow = DateTime.now()
   ejercicio_fiscal.value = dateNow.year
   const mes_id = dateNow.month
@@ -443,9 +446,11 @@ onMounted(() => {
 
   api.get(`/cuentas/${route.params.id}`).then((response) => {
     cuenta.value = response?.data.data ?? {}
-    console.log('cuenta', cuenta.value)
+    // console.log('cuenta', cuenta.value)
     dia_corte.value = cuenta.value.dia_corte
     obtenerSaldoAnterior()
+    obtenerSaldoTarjeta()
+    obtenerSaldoTarjetaAlDia()
     obtener_fecha_inicio()
     obtener_fecha_fin()
     // variables.fechaInicio = fecha_inicio.value
@@ -503,7 +508,7 @@ const sumatoriaAbonos = computed({
 const suma_msi = computed({
   get() {
     return listaRegistrosMsi.value.reduce((accumulator, registro) => {
-      return accumulator + registro.importe * -1
+      return accumulator + registro.importe
     }, 0)
   }
 })
@@ -512,11 +517,7 @@ const saldo_final = computed({
     return parseFloat(saldo_anterior.value) + parseFloat(sumaMovimientos.value)
   }
 })
-const saldo_total = computed({
-  get() {
-    return 0
-  }
-})
+
 const ejercicio_inicial_id = computed({
   get() {
     return mes.value.id - 1 <= 0
@@ -566,6 +567,18 @@ const fechaFinPeriodo = computed({
     )}-${dia_fin}`
   }
 })
+const fecha_registro = computed({
+  get() {
+    const begin_date = DateTime.fromISO(fechaInicioPeriodo.value)
+    const end_date = DateTime.fromISO(fechaFinPeriodo.value)
+    const today = DateTime.now()
+    console.log(begin_date)
+    console.log(end_date)
+    return begin_date <= today && today <= end_date
+      ? undefined
+      : fechaFinPeriodo.value
+  }
+})
 /**
  *
  */
@@ -610,13 +623,16 @@ const {
 } = useLazyQuery(LISTA_REGISTROS_TARJETA)
 
 onResultListaRegistros(({ data }) => {
-  console.log('lista de registros', data)
+  // console.log('lista de registros', data)
   listaRegistros.value = data?.listaRegistrosTarjeta.filter(
     (registro) => !registro.isMsi
   )
   listaRegistrosMsi.value = data?.listaRegistrosTarjeta.filter(
     (registro) => registro.isMsi
   )
+  listaRegistrosMsi.value.forEach((registro) => {
+    registro.importe = registro.importe * -1
+  })
 })
 onErrorListaRegistros((error) => {
   console.error('response', error)
@@ -713,7 +729,6 @@ function obtenerSaldoAnterior() {
   const fecha = `${ejercicio_inicial_id.value}-${(
     '0' + mes_inicial_id.value
   ).slice(-2)}-${dia}`
-  console.log('fecha para obtener saldos', fecha)
   api
     .get('/cuentas/obtener_saldo_tarjeta', {
       params: {
@@ -729,14 +744,60 @@ function obtenerSaldoAnterior() {
       console.error(error)
     })
 }
+
+function obtenerSaldoTarjeta() {
+  console.log('fecha para obtener saldos', fechaFinPeriodo.value)
+  api
+    .get('/saldo_tarjeta_credito', {
+      params: {
+        cuenta_id: route.params.id,
+        fecha_final: fechaFinPeriodo.value,
+        is_detalle: 0
+      }
+    })
+    .then(({ data }) => {
+      console.log('data', data)
+      let saldo_data = data.data[0].saldo || 0.0 * -1
+      console.log('saldo_data', saldo_data)
+      let saldo = parseFloat(saldo_data) * -1
+      saldo = saldo === -0.0 ? 0.0 : saldo
+      saldo_final_periodo.value = saldo
+    })
+    .catch((error) => {
+      console.error(error)
+    })
+}
+function obtenerSaldoTarjetaAlDia() {
+  const fecha_actual = DateTime.now().toFormat('yyyy-MM-dd')
+  console.log('fecha actual', fecha_actual)
+  api
+    .get('/saldo_tarjeta_credito', {
+      params: {
+        cuenta_id: route.params.id,
+        fecha_final: fecha_actual,
+        is_detalle: 0
+      }
+    })
+    .then(({ data }) => {
+      let saldo = parseFloat(data.data[0].saldo) * -1
+      saldo_al_dia.value = saldo
+    })
+    .catch((error) => {
+      console.error(error)
+    })
+}
 function onChangeMes(mes) {
-  console.log('Cambiando mes', mes.id)
+  // console.log('Cambiando mes', mes.id)
   obtenerListaRegistros()
   obtenerSaldoAnterior()
+  obtenerSaldoTarjeta()
+  obtenerSaldoTarjetaAlDia()
 }
 function onChangeEjercicio(ejercicio_fiscal) {
   console.log('cambio de ejercicio', ejercicio_fiscal)
   obtenerListaRegistros()
+  obtenerSaldoTarjeta()
+  obtenerSaldoTarjetaAlDia()
 }
 /**
  * Lista de registros de la tarjeta
@@ -750,8 +811,6 @@ function obtenerListaRegistros() {
   const fechaFin = `${ejercicio_final_id.value}-${(
     '0' + mes_final_id.value
   ).slice(-2)}-${dia_fin}`
-  console.log('fechaInicio', fechaInicio)
-  console.log('fechaFin', fechaFin)
   loadListaRegistros(
     null,
     {

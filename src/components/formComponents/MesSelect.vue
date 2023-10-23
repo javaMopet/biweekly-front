@@ -71,15 +71,15 @@ function onChangeMes(value) {
   emit('update:modelValue', value)
 }
 function prevMonth() {
-  console.log(mes.value)
+  // console.log(mes.value)
   const mesPrevio = mes.value.id - 1
   if (!!mesPrevio) {
-    console.log(mesPrevio)
+    // console.log(mesPrevio)
     mes.value = mesOptions.value.find((option) => option.id === mesPrevio)
   }
 }
 function nextMont() {
-  console.log(mes.value)
+  // console.log(mes.value)
   const mesSiguiente = mes.value.id + 1
   if (!!mesSiguiente && mesSiguiente < 13) {
     mes.value = mesOptions.value.find((option) => option.id === mesSiguiente)

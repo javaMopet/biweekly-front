@@ -64,11 +64,6 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
-  opcional: {
-    type: Boolean,
-    required: false,
-    default: true
-  },
   readonly: {
     type: Boolean,
     required: false,

@@ -391,6 +391,7 @@ function cargarMovimientosBancomer(wb) {
       const importe =
         tipo_afectacion === 'C' ? importeCargoAbono * -1 : importeCargoAbono
       const item = {
+        id: index,
         fecha,
         consecutivo: index,
         importe,

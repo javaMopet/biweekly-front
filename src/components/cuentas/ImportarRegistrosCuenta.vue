@@ -1,7 +1,7 @@
 <template>
   <q-card class="my-card" dense style="width: 80vw; min-width: 80vw">
     <q-card-section
-      class="row inline fit q-py-xs justify-between items-center dialog-title"
+      class="row inline fit justify-between items-center dialog-title"
     >
       <div class="dialog__title--name">{{ cuenta.nombre }}</div>
       <div class="">
@@ -143,6 +143,7 @@
         dense
         selection="multiple"
         v-model:selected="registrosSelected"
+        table-header-class="bg-accent text-white text-condensed"
         no-data-label="No existen datos disponibles"
         hide-pagination
       >
@@ -186,16 +187,20 @@
         <template #bottom-row>
           <q-tr>
             <q-td class="text-bold" colspan="4">Total Movimientos:</q-td>
-            <q-td align="right"> a</q-td>
+            <q-td align="right" class="text-bold">
+              {{ formato.toCurrency(sumatoriaMovimientos) }}</q-td
+            >
           </q-tr>
         </template>
       </q-table>
     </q-card-section>
-
     <q-card-actions align="right">
-      <div class="row">
-        <q-btn flat label="Cancelar" color="primary" v-close-popup />
-        <q-btn label="Guardar" color="primary" @click="saveItems" />
+      <div class="column float-right">
+        <!-- <div class="row">Importe total movimientos:</div> -->
+        <div class="row q-gutter-x-md float-right">
+          <q-btn flat label="Cancelar" color="primary" v-close-popup />
+          <q-btn label="Guardar" color="primary" @click="saveItems" />
+        </div>
       </div>
     </q-card-actions>
   </q-card>
@@ -213,6 +218,7 @@ import { api } from 'src/boot/axios'
 import { DateTime } from 'luxon'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import DateInput from '../formComponents/DateInput.vue'
+import { format } from 'accounting-js'
 
 /**
  * Composables
@@ -367,6 +373,7 @@ function obtenerMovimientosSantander(wb) {
           ? parseFloat(row.deposito)
           : 0
       const item = {
+        id: index,
         consecutivo: index + 1,
         tipo_afectacion,
         fecha: fecha,
@@ -409,6 +416,7 @@ function obtenerMovimientosBancomer(wb) {
         ? parseFloat(abono)
         : 0
       const item = {
+        id: index,
         consecutivo: index + 1,
         tipo_afectacion,
         fecha: fecha,
@@ -450,6 +458,7 @@ function obtenerMovimientosEfectivo(wb) {
       const tipo_afectacion = importe >= 0 ? 'A' : 'C'
 
       const item = {
+        id: index,
         consecutivo: row.consecutivo,
         tipo_afectacion,
         fecha: fecha,
@@ -465,7 +474,7 @@ function obtenerMovimientosEfectivo(wb) {
 }
 
 function saveItems() {
-  console.log('guardando los movimientos de forma masiva', listaRegistros.value)
+  console.table(listaRegistrosFiltrados.value)
   const containsErrors = validarMovimientos()
   if (containsErrors) {
     setTimeout(() => {
@@ -474,7 +483,7 @@ function saveItems() {
   } else {
     var lista_registros = []
 
-    listaRegistros.value.forEach((item) => {
+    listaRegistrosFiltrados.value.forEach((item) => {
       const fecha = DateTime.fromFormat(item.fecha, 'dd/MM/yyyy')
       const registro = {
         estado_registro_id: 2, //cerrado
@@ -513,10 +522,10 @@ function saveItemsAfterValidate(lista_registros) {
 }
 
 function validarMovimientos() {
-  if (listaRegistros.value.length <= 0) {
+  if (listaRegistrosFiltrados.value.length <= 0) {
     addError(0, null, 'No hay datos para guardar')
   }
-  listaRegistros.value.forEach((item) => {
+  listaRegistrosFiltrados.value.forEach((item) => {
     if (!item.categoria) {
       addError(1, item.consecutivo, 'Favor de agregar categoria')
     }
@@ -543,9 +552,9 @@ function eliminarSeleccionados() {
 }
 
 function deleteRow(props) {
-  const rowIndex = props.rowIndex
+  const index = listaRegistros.value.findIndex((r) => r.id == props.row.id)
 
-  listaRegistros.value.splice(rowIndex, 1)
+  listaRegistros.value.splice(index, 1)
 }
 function fileClear() {
   listaRegistros.value.length = 0
@@ -568,6 +577,14 @@ const listaRegistrosFiltrados = computed({
       const fecha_registro = DateTime.fromFormat(registro.fecha, 'dd/MM/yyyy')
       return fecha_registro >= start_date && fecha_registro <= end_date
     })
+  }
+})
+
+const sumatoriaMovimientos = computed({
+  get() {
+    return listaRegistrosFiltrados.value.reduce((accumulator, registro) => {
+      return accumulator + parseFloat(registro.importe)
+    }, 0)
   }
 })
 

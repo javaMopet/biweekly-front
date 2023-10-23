@@ -33,7 +33,7 @@ export function useFormato() {
     return strTime
   }
 
-  function fromISOtoDate(date) {
+  function convertFromISOtoDate(date) {
     return DateTime.fromISO(date)
   }
   function formatoFechaFromISO(date) {
@@ -67,6 +67,7 @@ export function useFormato() {
     convertDateFromIsoToInput,
     convertDateFromInputToIso,
     dateNowToInput,
-    convertDateTimeToInput
+    convertDateTimeToInput,
+    convertFromISOtoDate
   }
 }
