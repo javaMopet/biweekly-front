@@ -157,6 +157,12 @@
 .bg-main-background {
   background: $main-background !important;
 }
+.text-table-summary {
+  color: $table-summary !important;
+}
+.bg-table-summary {
+  background: $table-summary !important;
+}
 /* *************************** */
 .dialog__title--closeButton {
   opacity: 0.7;

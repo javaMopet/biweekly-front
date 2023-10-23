@@ -210,9 +210,10 @@
               </q-td>
             </template>
             <template #bottom-row>
-              <q-tr class="text-bold">
+              <q-tr class="text-bold bg-table-summary">
                 <q-td colspan="2">Total meses sin intereses:</q-td>
                 <q-td align="right">{{ formato.toCurrency(suma_msi) }}</q-td>
+                <q-td colspan="3"></q-td>
               </q-tr>
             </template>
           </q-table>
@@ -263,6 +264,31 @@
                 </div>
               </div>
             </template>
+            <template #body-cell-concepto="props">
+              <q-td key="concepto" :props="props">
+                {{ props.row.concepto }}
+                <q-popup-edit
+                  v-model="props.row.concepto"
+                  title="Editar concepto"
+                  buttons
+                  label-set="Guardar"
+                  label-cancel="Cancelar"
+                  @save="saveConcepto(props)"
+                  v-slot="scope"
+                  max-width="150px"
+                >
+                  <!-- @before-hide="actualizarObservaciones(props)"
+              -->
+                  <q-input
+                    v-model="scope.value"
+                    @keyup.enter="scope.set"
+                    type="text"
+                    label="Favor de ingresar el concepto"
+                    autofocus
+                  />
+                </q-popup-edit>
+              </q-td>
+            </template>
             <template #body-cell-acciones="props">
               <q-td :props="props">
                 <div class="row">
@@ -307,7 +333,7 @@
               </q-td>
             </template>
             <template v-slot:bottom-row>
-              <q-tr class="text-bold">
+              <q-tr class="text-bold bg-table-summary">
                 <q-td colspan="2"> Totales: </q-td>
                 <q-td align="right">
                   {{ formato.toCurrency(sumatoriaCargos) }}
@@ -315,6 +341,7 @@
                 <q-td align="right">
                   {{ formato.toCurrency(sumatoriaAbonos) }}
                 </q-td>
+                <q-td colspan="3"></q-td>
               </q-tr>
             </template>
           </q-table>
@@ -633,6 +660,9 @@ onResultListaRegistros(({ data }) => {
   listaRegistrosMsi.value.forEach((registro) => {
     registro.importe = registro.importe * -1
   })
+
+  obtenerSaldoTarjeta()
+  obtenerSaldoTarjetaAlDia()
 })
 onErrorListaRegistros((error) => {
   console.error('response', error)
@@ -906,6 +936,7 @@ function registroUpdated() {
     1200
   )
   refetchListaRegistros()
+
   showForm.value = false
 }
 function cargaMasivaSaved() {
@@ -922,6 +953,11 @@ function pagosRegistrados() {
 }
 function obtenerMensajePaginacion(firstRowIndex, endRowIndex, totalRowsNumber) {
   return `Número de movimientos en el periodo: ${totalRowsNumber}`
+}
+
+function saveConcepto(props) {
+  console.log('guardando el concepto')
+  console.dir(props.row)
 }
 
 const mesOptions = ref([

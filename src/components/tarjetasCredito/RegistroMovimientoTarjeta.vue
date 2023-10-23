@@ -194,8 +194,9 @@ function saveItem() {
   console.log('onsubmit', editedFormItem.value)
   const isMsi = editedFormItem.value.isMsi
   const numero_msi = isMsi ? parseInt(editedFormItem.value.numeroMsi) : 0
-  const importe = parseFloat(editedFormItem.value.importe) * -1
-  if (importe > 0) {
+  const importe = parseFloat(editedFormItem.value.importe) * -1 || 0
+  console.log('importe', importe)
+  if (importe !== 0) {
     const tipoAfectacion = importe >= 0 ? 'A' : 'C'
     const input = {
       estadoRegistroTarjetaId: 1,
