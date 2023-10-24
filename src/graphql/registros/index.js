@@ -37,6 +37,10 @@ export const LISTA_REGISTROS = gql`
           nombre
         }
       }
+      traspasoDetalle {
+        id
+        traspasoId
+      }
     }
   }
 `

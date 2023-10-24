@@ -71,6 +71,7 @@
             v-model="cuentaDestino"
             label="Cuenta Destino"
             :filter-array="['1', '2']"
+            :rules="[(val) => !!val || 'Favor de ingresar la cuenta destino']"
           ></CuentaSelect>
         </div>
         <div>
@@ -201,9 +202,12 @@ onErrorCreateTransferencia((error) => {
 })
 
 registrosCrud.onDoneCreate(({ data }) => {
-  console.log('REgistro created', data)
   const item = data.registroCreate.registro
   emit('itemSaved', item)
+})
+traspasosCrud.onDoneTraspasoCreate(({ data }) => {
+  // const item = data.registroCreate.registro
+  emit('itemSaved')
 })
 registrosCrud.onDoneUpdate(({ data }) => {
   console.log('Registro update', data)
@@ -257,12 +261,27 @@ function onChangeTipoMovimiento(value) {
 function saveItem() {
   if (isTraspaso.value) {
     const userId = SessionStorage.getItem('user').id
+    const inputDetalle = []
+
     const input = {
       fecha: formato.convertDateFromInputToIso(editedFormItem.value.fecha),
-      observaciones: editedFormItem.value.observaciones
+      observaciones: editedFormItem.value.observaciones,
+      userId
     }
+    const importe = parseFloat(editedFormItem.value.importe)
 
-    traspasosCrud.createTraspaso({ input, inputDetalle })
+    inputDetalle.push({
+      cuentaId: parseInt(editedFormItem.value.cuenta.id),
+      tipoCuentaTraspasoId: 2,
+      importe: importe
+    })
+    inputDetalle.push({
+      cuentaId: parseInt(cuentaDestino.value.id),
+      tipoCuentaTraspasoId: 1,
+      importe
+    })
+
+    traspasosCrud.traspasoCreate({ input, inputDetalle })
   } else {
     const importe = parseFloat(editedFormItem.value.importe)
     const tipoAfectacion = importe < 0 ? 'C' : 'A'

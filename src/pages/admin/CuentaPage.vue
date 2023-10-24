@@ -116,7 +116,7 @@
             </div>
             <q-separator spaced inset vertical />
             <div class="col column items-center">
-              <span class="tarjeta__resumen-etiqueta"> Saldo final</span>
+              <span class="tarjeta__resumen-etiqueta"> Saldo al día</span>
               <span class="tarjeta__resumen-valor">
                 {{ formato.toCurrency(parseFloat(cuenta.saldo)) }}
               </span>
@@ -251,21 +251,16 @@
                         >
                           <q-item-section>Editar...</q-item-section>
                         </q-item>
-                        <q-item
-                          clickable
-                          v-close-popup
-                          @click="mesesSinInteres(props)"
-                        >
-                          <q-item-section>Meses Sin Intereses</q-item-section>
-                        </q-item>
                         <q-separator />
                         <q-item
                           clickable
                           v-close-popup
                           @click="deleteItem(props)"
                         >
-                          <q-item-section class="text-negative"
-                            >Eliminar</q-item-section
+                          <q-item-section class="text-negative">
+                            <span v-if="props.row.traspasoDetalle">
+                              Eliminar Traspaso</span
+                            ><span v-else>Eliminar</span></q-item-section
                           >
                         </q-item>
                       </q-list>
@@ -329,6 +324,7 @@ import RegistroMovimiento from 'src/components/movimientos/RegistroMovimiento.vu
 import MesSelect from 'src/components/formComponents/MesSelect.vue'
 import { OBTENER_SALDO_A_FECHA } from 'src/graphql/cuentas'
 import ImportarRegistrosCuenta from 'src/components/cuentas/ImportarRegistrosCuenta.vue'
+import { useTraspasosCrud } from 'src/composables/useTraspasosCrud'
 
 const route = useRoute()
 const router = useRouter()
@@ -336,6 +332,7 @@ const formato = useFormato()
 const notificacion = useNotificacion()
 const registrosCrud = useRegistrosCrud()
 const $q = useQuasar()
+const traspasosCrud = useTraspasosCrud()
 
 /**
  * state
@@ -548,10 +545,11 @@ onErrorObtenerSaldo((error) => {
 function editItem(item) {
   console.log('editando item...', item.rowIndex, item.row)
   registroEditedItem.value = JSON.parse(JSON.stringify(item.row))
+  const categoria = registroEditedItem.value.categoria
   registroEditedItem.value.importe = (
-    registroEditedItem.value.categoria.tipoMovimientoId === '2'
+    categoria?.tipoMovimientoId === '2'
       ? registroEditedItem.value.importe * -1
-      : registroEditedItem.value.importe
+      : registroEditedItem.value.importe || registroEditedItem.value.importe
   ).toString()
   console.log('fecha', registroEditedItem.value.fecha)
   registroEditedItem.value.fecha = formato.convertDateFromIsoToInput(
@@ -564,13 +562,17 @@ function editItem(item) {
 
 function deleteItem(props_row) {
   const item = props_row.row
+  const message = !item.traspasoDetalle
+    ? `Va a eliminar un movimiento con un importe de: ${formato.toCurrency(
+        item.importe
+      )} ¿Desea continuar con la eliminación?`
+    : `La eliminación del traspaso afectara también la cuenta destino ¿Desea continuar con la eliminación del traspaso?`
+
   deleteItem.value = $q
     .dialog({
       title: 'Confirmar',
       style: 'width:500px',
-      message: `Va a eliminar un movimiento con un importe de: ${formato.toCurrency(
-        item.importe
-      )} ¿Desea continuar con la eliminación?`,
+      message,
       ok: {
         push: true,
         color: 'positive',
@@ -585,15 +587,31 @@ function deleteItem(props_row) {
       persistent: true
     })
     .onOk(() => {
-      registrosCrud.deleteRegistro({
-        id: item.id
-      })
+      confirmarEliminar(item)
     })
     .onCancel(() => {})
     .onDismiss(() => {})
 }
+function confirmarEliminar(item) {
+  if (!item.traspasoDetalle) {
+    registrosCrud.deleteRegistro({
+      id: item.id
+    })
+  } else {
+    traspasosCrud.traspasoDelete({
+      id: item.traspasoDetalle.traspasoId
+    })
+  }
+}
 
 registrosCrud.onDoneDelete(({ data }) => {
+  loadOrRefetchListaRegistros()
+  notificacion.mostrarNotificacionPositiva(
+    'Registro eliminado correctamente.',
+    1000
+  )
+})
+traspasosCrud.onDoneTraspasoDelete(({ data }) => {
   loadOrRefetchListaRegistros()
   notificacion.mostrarNotificacionPositiva(
     'Registro eliminado correctamente.',

@@ -1,5 +1,5 @@
 import { useMutation } from '@vue/apollo-composable'
-import { TRASPASO_CREATE } from 'src/graphql/traspasos'
+import { TRASPASO_CREATE, TRASPASO_DELETE } from 'src/graphql/traspasos'
 
 export function useTraspasosCrud() {
   const {
@@ -8,9 +8,18 @@ export function useTraspasosCrud() {
     onError: onErrorTraspasoCreate
   } = useMutation(TRASPASO_CREATE)
 
+  const {
+    mutate: traspasoDelete,
+    onDone: onDoneTraspasoDelete,
+    onError: onErrorTraspasoDelete
+  } = useMutation(TRASPASO_DELETE)
+
   return {
     traspasoCreate,
     onDoneTraspasoCreate,
-    onErrorTraspasoCreate
+    onErrorTraspasoCreate,
+    traspasoDelete,
+    onDoneTraspasoDelete,
+    onErrorTraspasoDelete
   }
 }
