@@ -519,7 +519,11 @@ onErrorListaRegistros((error) => {
   console.error('response', error)
 })
 
-const { result: resultSaldoAFecha, onError: onErrorObtenerSaldo } = useQuery(
+const {
+  result: resultSaldoAFecha,
+  onError: onErrorObtenerSaldo,
+  refetch: reloadSaldoAFecha
+} = useQuery(
   OBTENER_SALDO_A_FECHA,
   {
     cuentaId: route.params.id,
@@ -697,7 +701,12 @@ function registroCreated(registro) {
     1200
   )
   refetchListaRegistros()
+  obtenerMontosResumen()
   showForm.value = false
+}
+
+function obtenerMontosResumen() {
+  reloadSaldoAFecha()
 }
 
 function registroUpdated() {

@@ -352,7 +352,9 @@ function addRow(tipoMovimientoId) {
 function editRow(item) {
   editedItem.value = {
     ...item.row,
-    importeDefault: item.row.importeDefault.toString(),
+    importeDefault: !!item.row.importeDefault
+      ? item.row.importeDefault.toString()
+      : '',
     tipoMovimientoId: item.row.tipoMovimiento.id
   }
   console.log('item', editedItem.value)

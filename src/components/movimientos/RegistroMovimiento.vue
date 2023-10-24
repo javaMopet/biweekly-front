@@ -35,14 +35,8 @@
         <div></div>
 
         <div class="">
-          <CuentaSelect
-            v-if="isTransferencia"
-            v-model="cuentaOrigen"
-            label="Cuenta Origen"
-            :readonly="cuentaReadOnly"
-          ></CuentaSelect>
           <CategoriaSelect
-            v-else
+            v-if="!isTraspaso"
             v-model="editedFormItem.categoria"
             :tipo-afectacion="editedFormItem.tipoAfectacion"
             :is-cambiable="false"
@@ -71,7 +65,14 @@
             :readonly="cuentaReadOnly"
           ></CuentaSelect>
         </div>
-
+        <div class="">
+          <CuentaSelect
+            v-if="isTraspaso"
+            v-model="cuentaDestino"
+            label="Cuenta Destino"
+            :filter-array="['1', '2']"
+          ></CuentaSelect>
+        </div>
         <div>
           <q-input
             v-model="editedFormItem.observaciones"
@@ -110,14 +111,16 @@ import DateInput from '../formComponents/DateInput.vue'
 import CategoriaSelect from '../formComponents/CategoriaSelect.vue'
 import CuentaSelect from '../formComponents/CuentaSelect.vue'
 import { useFormato } from 'src/composables/utils/useFormato'
-import { DateTime } from 'luxon'
 import PriceInput from '../formComponents/PriceInput.vue'
 import { useRegistrosCrud } from 'src/composables/useRegistrosCrud'
+import { useTraspasosCrud } from 'src/composables/useTraspasosCrud'
+import { SessionStorage } from 'quasar'
 /**
  * composables
  */
 const formato = useFormato()
 const registrosCrud = useRegistrosCrud()
+const traspasosCrud = useTraspasosCrud()
 
 /**
  * state
@@ -136,8 +139,7 @@ const defaultItem = {
 const cuentaReadOnly = ref(true)
 
 const formItem = ref({ ...defaultItem })
-const tipoMovimiento = ref('1')
-const cuentaOrigen = ref({})
+const cuentaDestino = ref(null)
 
 /**
  * onMounted
@@ -236,9 +238,9 @@ const lblSubmit = computed({
     return !!editedFormItem.value.id ? 'Actualizar' : 'Guardar'
   }
 })
-const isTransferencia = computed({
+const isTraspaso = computed({
   get() {
-    return tipoMovimiento.value === '3'
+    return editedFormItem.value.tipoMovimientoId === '3'
   }
 })
 
@@ -249,33 +251,44 @@ const isTransferencia = computed({
 function onChangeTipoMovimiento(value) {
   editedFormItem.value.tipoAfectacion = value === '2' ? 'C' : 'A'
   editedFormItem.value.categoria = null
+  console.dir(value)
 }
 
 function saveItem() {
-  const importe = parseFloat(editedFormItem.value.importe)
-  const tipoAfectacion = importe < 0 ? 'C' : 'A'
-  const importeReal =
-    editedFormItem.value.categoria.tipoMovimientoId === '1'
-      ? importe
-      : importe * -1
-  const input = {
-    id: editedFormItem.value.id,
-    tipoAfectacion,
-    estadoRegistroId: 2,
-    categoriaId: parseInt(editedFormItem.value.categoria.id),
-    cuentaId: parseInt(editedFormItem.value.cuenta.id),
-    importe: importeReal,
-    fecha: formato.convertDateFromInputToIso(editedFormItem.value.fecha),
-    observaciones: editedFormItem.value.observaciones
-  }
-  console.log('saveItem input:', input)
-  if (!!editedFormItem.value.id) {
-    registrosCrud.updateItem({
-      id: editedFormItem.value.id,
-      input
-    })
+  if (isTraspaso.value) {
+    const userId = SessionStorage.getItem('user').id
+    const input = {
+      fecha: formato.convertDateFromInputToIso(editedFormItem.value.fecha),
+      observaciones: editedFormItem.value.observaciones
+    }
+
+    traspasosCrud.createTraspaso({ input, inputDetalle })
   } else {
-    registrosCrud.createRegistro({ input })
+    const importe = parseFloat(editedFormItem.value.importe)
+    const tipoAfectacion = importe < 0 ? 'C' : 'A'
+    const importeReal =
+      editedFormItem.value.categoria.tipoMovimientoId === '1'
+        ? importe
+        : importe * -1
+    const input = {
+      id: editedFormItem.value.id,
+      tipoAfectacion,
+      estadoRegistroId: 2,
+      categoriaId: parseInt(editedFormItem.value.categoria.id),
+      cuentaId: parseInt(editedFormItem.value.cuenta.id),
+      importe: importeReal,
+      fecha: formato.convertDateFromInputToIso(editedFormItem.value.fecha),
+      observaciones: editedFormItem.value.observaciones
+    }
+    console.log('saveItem input:', input)
+    if (!!editedFormItem.value.id) {
+      registrosCrud.updateItem({
+        id: editedFormItem.value.id,
+        input
+      })
+    } else {
+      registrosCrud.createRegistro({ input })
+    }
   }
 }
 
@@ -285,7 +298,9 @@ function onSelectCategoria(value) {
       editedFormItem.value.cuenta = value.cuentaDefault
     }
     editedFormItem.value.importe =
-      value.importeDefault === 0 ? '' : value.importeDefault.toString()
+      !value.importeDefault || value.importeDefault === 0
+        ? ''
+        : value.importeDefault.toString()
   }
 }
 
