@@ -13,12 +13,11 @@
           push
         ></q-btn>
       </div>
-      <!-- <pre>{{ editedFormItem }}</pre> -->
     </q-card-section>
 
     <q-card-section class="q-py-lg q-px-xl">
       <q-form @submit="saveItem" class="q-gutter-md">
-        <div class="">
+        <div class="q-py-lg">
           <q-btn-toggle
             v-model="editedFormItem.tipoMovimientoId"
             spread
@@ -34,13 +33,14 @@
         </div>
         <div></div>
 
-        <div class="">
+        <div>
           <CategoriaSelect
             v-if="!isTraspaso"
             v-model="editedFormItem.categoria"
             :tipo-afectacion="editedFormItem.tipoAfectacion"
             :is-cambiable="false"
             @update:model-value="onSelectCategoria"
+            :rules="[(val) => !!val || 'Favor de ingresar la categoria']"
           ></CategoriaSelect>
         </div>
         <div class="row">
@@ -49,6 +49,7 @@
               v-model="editedFormItem.fecha"
               lbl_field="Fecha"
               :opcional="false"
+              :rules="[(val) => !!val || 'Favor de ingresar la fecha']"
             ></DateInput>
           </div>
           <div class="col q-ml-xs">
@@ -56,6 +57,11 @@
               currency-code="MNX"
               v-model="editedFormItem.importe"
               :opcional="false"
+              :rules="[
+                (val) =>
+                  (!!val && val !== '0' && val !== '$0.00') ||
+                  'Favor de ingresar un valor mayor a cero'
+              ]"
             ></PriceInput>
           </div>
         </div>
@@ -97,9 +103,6 @@
         </div>
       </q-form>
     </q-card-section>
-    <!-- <q-card-section>
-      <pre>{{ editedFormItem }}</pre>
-    </q-card-section> -->
   </q-card>
 </template>
 
@@ -206,9 +209,9 @@ registrosCrud.onDoneCreate(({ data }) => {
   emit('itemSaved', item)
 })
 traspasosCrud.onDoneTraspasoCreate(({ data }) => {
-  // const item = data.registroCreate.registro
   emit('itemSaved')
 })
+
 registrosCrud.onDoneUpdate(({ data }) => {
   console.log('Registro update', data)
   const item = data.registroUpdate.registro
@@ -234,7 +237,21 @@ const actionName = computed({
   get() {
     return !!editedFormItem.value.id
       ? 'Actualizar Movimiento'
-      : 'Nuevo Movimiento'
+      : `Nuevo ${tipoMovimientoNombre.value}`
+  }
+})
+const tipoMovimientoNombre = computed({
+  get() {
+    switch (editedFormItem.value.tipoMovimientoId) {
+      case '1':
+        return 'Ingreso'
+      case '2':
+        return 'Egreso'
+      case '3':
+        return 'Traspaso'
+      default:
+        return ''
+    }
   }
 })
 const lblSubmit = computed({
@@ -259,16 +276,18 @@ function onChangeTipoMovimiento(value) {
 }
 
 function saveItem() {
-  if (isTraspaso.value) {
-    const userId = SessionStorage.getItem('user').id
-    const inputDetalle = []
+  const userId = SessionStorage.getItem('user').id
+  const categoria = editedFormItem.value.categoria
+  const importe = parseFloat(editedFormItem.value.importe)
+  console.dir(editedFormItem.value)
 
+  if (isTraspaso.value) {
+    const inputDetalle = []
     const input = {
       fecha: formato.convertDateFromInputToIso(editedFormItem.value.fecha),
       observaciones: editedFormItem.value.observaciones,
       userId
     }
-    const importe = parseFloat(editedFormItem.value.importe)
 
     inputDetalle.push({
       cuentaId: parseInt(editedFormItem.value.cuenta.id),
@@ -283,21 +302,31 @@ function saveItem() {
 
     traspasosCrud.traspasoCreate({ input, inputDetalle })
   } else {
-    const importe = parseFloat(editedFormItem.value.importe)
-    const tipoAfectacion = importe < 0 ? 'C' : 'A'
-    const importeReal =
-      editedFormItem.value.categoria.tipoMovimientoId === '1'
-        ? importe
-        : importe * -1
+    let tipoAfectacion = undefined
+    let importe_real = undefined
+    switch (categoria.tipoMovimientoId) {
+      case '1':
+        tipoAfectacion = 'A'
+        importe_real = importe
+        break
+      case '2':
+        tipoAfectacion = 'C'
+        importe_real = importe * -1
+        break
+      default:
+        break
+    }
+    console.log('importe_real', importe_real)
     const input = {
       id: editedFormItem.value.id,
       tipoAfectacion,
       estadoRegistroId: 2,
       categoriaId: parseInt(editedFormItem.value.categoria.id),
       cuentaId: parseInt(editedFormItem.value.cuenta.id),
-      importe: importeReal,
+      importe: importe_real,
       fecha: formato.convertDateFromInputToIso(editedFormItem.value.fecha),
-      observaciones: editedFormItem.value.observaciones
+      observaciones: editedFormItem.value.observaciones,
+      userId
     }
     console.log('saveItem input:', input)
     if (!!editedFormItem.value.id) {
@@ -328,8 +357,3 @@ registrosCrud.onDoneUpdate(({ data }) => {
   emit('itemUpdated')
 })
 </script>
-
-<style lang="sass" scoped>
-.my-input
-  max-width: 250px
-</style>

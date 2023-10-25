@@ -215,12 +215,12 @@
                   buttons
                   label-set="Guardar"
                   label-cancel="Cancelar"
-                  @save="saveObs(props)"
+                  @update:model-value="
+                    saveObs(props.row.id, props.row, props.row.observaciones)
+                  "
                   v-slot="scope"
                   max-width="150px"
                 >
-                  <!-- @before-hide="actualizarObservaciones(props)"
-              -->
                   <q-input
                     v-model="scope.value"
                     @keyup.enter="scope.set"
@@ -287,13 +287,13 @@
 
   <Teleport to="#modal">
     <q-dialog v-model="showForm" persistent>
-      <RegistroMovimiento
+      <FormCuentaRegistro
         :cuenta-id="cuenta.id"
         :edited-item="registroEditedItem"
-        @item-saved="registroCreated"
+        @item-saved="itemSaved"
         @item-updated="registroUpdated"
         :fecha="fecha_registro"
-      ></RegistroMovimiento>
+      ></FormCuentaRegistro>
     </q-dialog>
   </Teleport>
   <Teleport to="#modal">
@@ -319,8 +319,7 @@ import { useFormato } from 'src/composables/utils/useFormato'
 import { useRegistrosCrud } from 'src/composables/useRegistrosCrud'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { useQuasar } from 'quasar'
-import CategoriaSelect from 'src/components/formComponents/CategoriaSelect.vue'
-import RegistroMovimiento from 'src/components/movimientos/RegistroMovimiento.vue'
+import FormCuentaRegistro from 'src/components/movimientos/FormCuentaRegistro.vue'
 import MesSelect from 'src/components/formComponents/MesSelect.vue'
 import { OBTENER_SALDO_A_FECHA } from 'src/graphql/cuentas'
 import ImportarRegistrosCuenta from 'src/components/cuentas/ImportarRegistrosCuenta.vue'
@@ -377,27 +376,34 @@ onMounted(() => {
     (mesOption) => mesOption.id === mes_id
   )
   mes.value = mes_value
-
-  api.get(`/cuentas/${route.params.id}`).then((response) => {
-    cuenta.value = response?.data.data ?? {}
-    dia_corte.value = cuenta.value.dia_corte
-    obtener_fecha_inicio()
-    obtener_fecha_fin()
-    // console.log('fecha_inicio', fecha_inicio.value)
-    // console.log('fecha_fin', fecha_fin.value)
-    cargaListaRegistros(
-      null,
-      {
-        cuentaId: route.params.id.toString(),
-        categoriaId: null,
-        fechaInicio: fecha_inicio.value,
-        fechaFin: fecha_fin.value
-      },
-      graphqlOptions
-    )
-  })
+  cargarDatosCuenta(route.params.id)
 })
 
+function cargarDatosCuenta(cuenta_id, is_inicio) {
+  api.get(`/cuentas/${cuenta_id}`).then((response) => {
+    cuenta.value = response?.data.data ?? {}
+    dia_corte.value = cuenta.value.dia_corte
+    if (is_inicio) {
+      console.log('is inicio')
+      obtener_fecha_inicio()
+      obtener_fecha_fin()
+      cargaListaRegistros(
+        null,
+        {
+          cuentaId: route.params.id.toString(),
+          categoriaId: null,
+          fechaInicio: fecha_inicio.value,
+          fechaFin: fecha_fin.value
+        },
+        graphqlOptions
+      )
+    }
+    fetchOrRefetchSaldoFinalPeriodo()
+  })
+}
+function fetchOrRefetchSaldoFinalPeriodo() {
+  refetchSaldoAFecha()
+}
 /**
  * computed
  */
@@ -409,10 +415,10 @@ const sumaMovimientos = computed({
     }, 0)
   }
 })
-
-const saldo_final = computed({
+const saldo_final_periodo = computed({
   get() {
-    return parseFloat(saldo_anterior.value) + parseFloat(sumaMovimientos.value)
+    console.log(resultSaldoAFecha.value)
+    return resultSaldoAFecha.value?.obtenerSaldoAFecha ?? 0
   }
 })
 
@@ -519,7 +525,7 @@ onErrorListaRegistros((error) => {
 const {
   result: resultSaldoAFecha,
   onError: onErrorObtenerSaldo,
-  refetch: reloadSaldoAFecha
+  refetch: refetchSaldoAFecha
 } = useQuery(
   OBTENER_SALDO_A_FECHA,
   {
@@ -529,12 +535,6 @@ const {
   graphqlOptions
 )
 
-const saldo_final_periodo = computed({
-  get() {
-    console.log(resultSaldoAFecha.value)
-    return resultSaldoAFecha.value?.obtenerSaldoAFecha ?? 0
-  }
-})
 onErrorObtenerSaldo((error) => {
   console.log(error)
 })
@@ -610,6 +610,7 @@ registrosCrud.onDoneDelete(({ data }) => {
     'Registro eliminado correctamente.',
     1000
   )
+  cargarDatosCuenta(route.params.id, false)
 })
 traspasosCrud.onDoneTraspasoDelete(({ data }) => {
   loadOrRefetchListaRegistros()
@@ -617,6 +618,7 @@ traspasosCrud.onDoneTraspasoDelete(({ data }) => {
     'Registro eliminado correctamente.',
     1000
   )
+  cargarDatosCuenta(route.params.id, false)
 })
 
 function obtener_fecha_inicio() {
@@ -682,14 +684,34 @@ function addItem() {
   showForm.value = true
 }
 
-function mesesSinInteres(item) {
-  showFormMSI.value = true
-  editRegistroItem.value = item.row
+function saveObs(id, row, observaciones) {
+  console.log('observaciones', observaciones)
+  const input = {
+    ...row,
+    observaciones: observaciones,
+    cuentaId: row.cuenta.id,
+    categoriaId: row.categoria.id,
+    cuenta: undefined,
+    categoria: undefined,
+    __typename: undefined,
+    registroTarjeta: undefined,
+    traspasoDetalle: undefined
+  }
+
+  console.log('input', input)
+  registrosCrud.updateItem({
+    id,
+    input
+  })
 }
 
-function saveObs(props) {
-  console.log('actualizando.....', props)
-}
+registrosCrud.onErrorUpdate((response) => {
+  console.trace(response)
+})
+
+registrosCrud.onDoneUpdate((response) => {
+  console.log('updated ', response)
+})
 
 function confirmQuitarMsi(id) {
   api
@@ -712,19 +734,19 @@ function confirmQuitarMsi(id) {
     })
 }
 
-function registroCreated(registro) {
-  console.log('El registro fue guardardo correctamente', registro)
+function itemSaved(registro) {
   notificacion.mostrarNotificacionPositiva(
     'Se ha ingresado un nuevo registro.',
     1200
   )
   refetchListaRegistros()
   obtenerMontosResumen()
+  cargarDatosCuenta(route.params.id, false)
   showForm.value = false
 }
 
 function obtenerMontosResumen() {
-  reloadSaldoAFecha()
+  refetchSaldoAFecha()
 }
 
 function registroUpdated() {
