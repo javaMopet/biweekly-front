@@ -27,7 +27,7 @@
           size="1.2rem"
         >
           <q-menu>
-            <q-list style="min-width: 100px">
+            <q-list style="min-width: 150px">
               <q-item clickable v-close-popup @click="logout">
                 <q-item-section>Cerrar Sesion</q-item-section>
               </q-item>

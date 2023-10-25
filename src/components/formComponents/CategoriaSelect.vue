@@ -1,64 +1,66 @@
 <template>
-  <div class="row q-gutter-x-sm">
-    <div class="col">
-      <q-select
-        outlined
-        color="secondary"
-        v-model="categoria"
-        :options="filteredOptions"
-        option-label="nombre"
-        :label="tipoMovimientoLabel"
-        use-input
-        fill-input
-        hide-selected
-        input-debounce="2"
-        @filter="filterFn"
-        behavior="menu"
-        clearable=""
-        :rules="rules"
-        lazyRules
-        dense
-        map-options
-        :readonly="readonly"
-        :autofocus="autofocus"
-      >
-        <template #after>
-          <q-btn color="more-button" round flat dense icon="more_vert">
-            <q-menu>
-              <q-list style="min-width: 100px">
-                <q-item v-close-popup v-if="isCambiable">
-                  <q-item-section>
-                    <q-toggle
-                      :label="lblChangeTipoMovimiento"
-                      v-model="shift"
-                      @update:model-value="toogleTipoAfectacion"
-                      color="green"
-                      keep-color
-                  /></q-item-section>
-                </q-item>
-                <q-item
-                  clickable
-                  @click="addItemCategoria(props)"
-                  v-close-popup
-                >
-                  <q-item-section class="text-teal">
-                    Nueva categoría
-                  </q-item-section>
-                </q-item>
-              </q-list>
-            </q-menu>
+  <div class="col">
+    <q-select
+      v-if="mostrarCategorias"
+      outlined
+      color="secondary"
+      v-model="categoria"
+      :options="filteredOptions"
+      option-label="nombre"
+      :label="tipoMovimientoLabel"
+      use-input
+      fill-input
+      hide-selected
+      input-debounce="2"
+      @filter="filterFn"
+      behavior="menu"
+      clearable=""
+      :rules="rules"
+      lazyRules
+      dense
+      map-options
+      :readonly="readonly"
+      :autofocus="autofocus"
+    >
+      <template #before-options="props">
+        <div class="row justify-end">
+          <q-btn
+            dense
+            class="text-condensed"
+            color="primary"
+            outline=""
+            icon="add"
+            flat
+            rounded
+            no-caps
+            label="Agregar"
+            @click="addItemCategoria(props)"
+          >
           </q-btn>
-        </template>
-        <template v-slot:no-option>
-          <q-item>
-            <q-item-section class="text-grey"> No results </q-item-section>
-          </q-item>
-        </template>
-      </q-select>
-    </div>
-    <div class="col-auto" v-if="agregar">
-      <q-btn color="accent" icon="add" @click="agregarCategoria" />
-    </div>
+        </div>
+      </template>
+      <!-- <template #after>
+        <q-btn color="more-button" round flat dense icon="more_vert">
+          <q-menu>
+            <q-list style="min-width: 100px">
+              <q-item clickable @click="addItemCategoria(props)" v-close-popup>
+                <q-item-section class="text-teal">
+                  Nueva categoría
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </q-menu>
+        </q-btn>
+      </template> -->
+      <template v-slot:no-option>
+        <q-item>
+          <q-item-section class="text-grey"> No results </q-item-section>
+        </q-item>
+      </template>
+    </q-select>
+  </div>
+  <div class="col-auto" v-if="agregar">
+    <q-btn color="accent" icon="add" @click="agregarCategoria" />
   </div>
 
   <Teleport to="#modal">
@@ -72,17 +74,15 @@
 </template>
 
 <script setup>
-import { useQuery } from '@vue/apollo-composable'
-// import { LISTA_CATEGORIAS } from 'src/graphql/categorias'
 import { ref, toRefs, watch, onMounted, computed, Teleport } from 'vue'
 import RegistroCategoria from '../categorias/RegistroCategoria.vue'
-
 import { useCategoriaCrud } from '/src/composables/useCategoriaCrud.js'
 
 /**
  *
  */
 const categoriaCrud = useCategoriaCrud()
+
 /**
  * onMounted
  */
@@ -99,7 +99,6 @@ onMounted(() => {
  */
 const filteredOptions = ref([])
 const showRegistroCategoria = ref(false)
-const shift = ref(false)
 const tipoMovimientoId = ref('1')
 const editedCategoriaParam = ref({ tipoMovimientoId: tipoMovimientoId.value })
 
@@ -189,9 +188,14 @@ const graphql_options = ref({
 
 //   }
 // })
+const mostrarCategorias = computed({
+  get() {
+    return tipoMovimientoId.value === '1' || tipoMovimientoId.value === '2'
+  }
+})
 const lblChangeTipoMovimiento = computed({
   get() {
-    return tipoMovimientoId.value === '2' ? 'Ingreso' : 'Egreso'
+    return tipoMovimientoId.value === '2' ? 'Ingreso' : 'Gasto'
   }
 })
 const categoria = computed({
@@ -218,7 +222,11 @@ const optionsList = computed({
 })
 const tipoMovimientoLabel = computed({
   get() {
-    return tipoMovimientoId.value === '2' ? 'Egreso' : 'Ingreso'
+    return tipoMovimientoId.value === '1'
+      ? 'Ingreso'
+      : tipoMovimientoId.value === '2'
+      ? 'Gasto'
+      : 'Traspaso'
   }
 })
 // onErrorListaCuentas((error) => {

@@ -37,6 +37,7 @@ export function useCategoriaCrud() {
       return resultadoLista.value?.listaCategorias ?? []
     }
   })
+
   onDoneCreate(({ data }) => {
     refetchListaCategorias()
   })

@@ -280,6 +280,7 @@
               </q-tr>
             </template>
           </q-table>
+          <!-- <pre>{{ fecha_inicio }} {{ fecha_fin }}</pre> -->
         </q-card-section>
       </q-card>
     </div>
@@ -376,7 +377,9 @@ onMounted(() => {
     (mesOption) => mesOption.id === mes_id
   )
   mes.value = mes_value
-  cargarDatosCuenta(route.params.id)
+  obtener_fecha_inicio()
+  obtener_fecha_fin()
+  cargarDatosCuenta(route.params.id, true)
 })
 
 function cargarDatosCuenta(cuenta_id, is_inicio) {
@@ -385,8 +388,6 @@ function cargarDatosCuenta(cuenta_id, is_inicio) {
     dia_corte.value = cuenta.value.dia_corte
     if (is_inicio) {
       console.log('is inicio')
-      obtener_fecha_inicio()
-      obtener_fecha_fin()
       cargaListaRegistros(
         null,
         {

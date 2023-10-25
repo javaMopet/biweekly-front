@@ -1,16 +1,15 @@
 <template>
   <q-card class="my-card" style="width: 520px">
-    <q-card-section
-      class="row inline fit justify-between items-center dialog-title"
-    >
+    <q-card-section class="row justify-between items-start dialog-title">
       <div class="dialog__title--name">{{ actionName }}</div>
-      <div class="">
+      <div class="dialog-closebutton">
         <q-btn
-          round
           icon="close"
-          class="dialog__title--closeButton"
           v-close-popup
           push
+          class="dialog__title--closeButton"
+          round
+          glossy
         ></q-btn>
       </div>
     </q-card-section>
@@ -92,7 +91,14 @@
           />
         </div>
         <div class="col row justify-end q-gutter-x-md">
-          <q-btn label="Cancelar" flat v-close-popup dense />
+          <q-btn
+            label="Cancelar"
+            flat
+            v-close-popup
+            color="negative-pastel"
+            push
+            no-caps
+          />
           <q-btn
             :label="lblSubmit"
             type="submit"

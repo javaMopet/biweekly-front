@@ -154,10 +154,10 @@
         </template> -->
         <template #body-cell-categoria="props">
           <q-td :props="props">
-            <CategoriaSelect
-              v-model="props.row.categoria"
+            <TipoMovimientoSelect
+              v-model="props.row.tipoMovimiento"
               :tipo-afectacion="props.row.tipo_afectacion"
-            ></CategoriaSelect>
+            ></TipoMovimientoSelect>
           </q-td>
         </template>
         <template #body-cell-importe="props">
@@ -219,6 +219,7 @@ import { DateTime } from 'luxon'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import DateInput from '../formComponents/DateInput.vue'
 import { format } from 'accounting-js'
+import TipoMovimientoSelect from '../formComponents/TipoMovimientoSelect.vue'
 
 /**
  * Composables
@@ -406,7 +407,6 @@ function obtenerMovimientosBancomer(wb) {
     let fecha = row.fecha.toString()
     const fechaObject = DateTime.fromFormat(fecha, 'dd/MM/yyyy')
     if (fechaObject.isValid) {
-      console.log('row', row.cargo, row.abono)
       const cargo = row.cargo?.replace(',', '')
       const abono = row.abono?.replace(',', '')
       const tipo_afectacion = !!cargo ? 'C' : !!abono ? 'A' : 'N/A'
@@ -428,7 +428,7 @@ function obtenerMovimientosBancomer(wb) {
       listaRegistros.value.push(item)
     }
   })
-  console.log(listaRegistros.value)
+  console.table(listaRegistros.value)
 }
 function obtenerMovimientosEfectivo(wb) {
   const data = utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {

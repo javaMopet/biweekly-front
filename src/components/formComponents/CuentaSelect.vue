@@ -1,40 +1,29 @@
 <template>
-  <div class="row q-gutter-x-sm">
-    <div class="col">
-      <q-select
-        outlined
-        color="secondary"
-        v-model="cuenta"
-        :options="filteredOptions"
-        option-label="nombre"
-        :label="props.label"
-        use-input
-        fill-input
-        hide-selected
-        input-debounce="0"
-        @filter="filterFn"
-        behavior="menu"
-        clearable=""
-        lazy-rules
-        :rules="rules"
-        dense
-        :readonly="readonly"
-      >
-        <!-- <template v-slot:no-option>
-          <q-item>
-            <q-item-section class="text-grey"> No results </q-item-section>
-          </q-item>
-        </template> -->
-      </q-select>
-    </div>
-    <div v-if="agregar" class="q-mt-xs" style="border: 0px solid red">
-      <q-btn color="accent" outline icon="add" dense @click="registrarCuenta" />
-    </div>
+  <div class="col">
+    <q-select
+      outlined
+      color="secondary"
+      v-model="cuenta"
+      :options="filteredOptions"
+      option-label="nombre"
+      :label="props.label"
+      use-input
+      fill-input
+      hide-selected
+      input-debounce="0"
+      @filter="filterFn"
+      behavior="menu"
+      clearable=""
+      lazy-rules
+      :rules="rules"
+      dense
+      :readonly="readonly"
+    >
+    </q-select>
   </div>
-  <!-- <div>
-    <pre>{{ options }}</pre>
-    <pre>{{ resultadoLista }}</pre>
-  </div> -->
+  <div v-if="agregar" class="q-mt-xs" style="border: 0px solid red">
+    <q-btn color="accent" outline icon="add" dense @click="registrarCuenta" />
+  </div>
 
   <Teleport to="#modal">
     <q-dialog v-model="form_cuenta_show" persistent>
@@ -44,11 +33,16 @@
 </template>
 
 <script setup>
-import { useQuery } from '@vue/apollo-composable'
-import { LISTA_CUENTAS_REDUCED } from 'src/graphql/cuentas'
+// import { useQuery } from '@vue/apollo-composable'
+// import { LISTA_CUENTAS_REDUCED } from 'src/graphql/cuentas'
 import { ref, computed } from 'vue'
 import RegistroCuenta from '../cuentas/RegistroCuenta.vue'
+import { useCuentaCrud } from 'src/composables/useCuentaCrud'
 
+/**
+ * composable
+ */
+const cuentaCrud = useCuentaCrud()
 /**
  * state
  */
@@ -109,17 +103,7 @@ const props = defineProps({
  * emits
  */
 const emit = defineEmits(['update:modelValue'])
-/**
- * graphql
- */
-const graphql_options = ref({
-  fetchPolicy: 'network-only'
-})
-const { result: resultadoLista, onError: onErrorListaCuentas } = useQuery(
-  LISTA_CUENTAS_REDUCED,
-  null, //arguments
-  graphql_options
-)
+
 /**
  * computed
  */
@@ -131,18 +115,15 @@ const cuenta = computed({
     emit('update:modelValue', val)
   }
 })
-const options = computed({
+const listaOptions = computed({
   get() {
     return (
-      resultadoLista.value?.listaCuentas.filter((option) => {
-        console.log(props.filterArray.includes(option.tipoCuenta.id))
+      cuentaCrud.listaCuentasReduced.value?.filter((option) => {
+        // console.log(props.filterArray.includes(option.tipoCuenta.id))
         return props.filterArray.includes(option.tipoCuenta.id)
       }) ?? []
     )
   }
-})
-onErrorListaCuentas((error) => {
-  console.log('error', error)
 })
 /**
  * methods
@@ -150,14 +131,14 @@ onErrorListaCuentas((error) => {
 function filterFn(val, update) {
   if (val === '') {
     update(() => {
-      filteredOptions.value = options.value
+      filteredOptions.value = listaOptions.value
     })
     return
   }
 
   update(() => {
     const needle = val.toLowerCase()
-    filteredOptions.value = options.value.filter(
+    filteredOptions.value = listaOptions.value.filter(
       (v) => v.nombre.toLowerCase().indexOf(needle) > -1
     )
   })
