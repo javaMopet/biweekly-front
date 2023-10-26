@@ -257,12 +257,12 @@
 
   <Teleport to="#modal">
     <q-dialog v-model="showFormItem" persistent>
-      <RegistroMovimiento
+      <FormCuentaRegistro
         :edited-item="editedItem"
         :edited-index="editedIndex"
         @movimientoSaved="movimientoSaved"
         @movimientoUpdated="movimientoUpdated"
-      ></RegistroMovimiento>
+      ></FormCuentaRegistro>
     </q-dialog>
   </Teleport>
   <Teleport to="#modal">
@@ -279,15 +279,14 @@
 import { useMutation } from '@vue/apollo-composable'
 import { ref, onMounted } from 'vue'
 import { MOVIMIENTO_DELETE } from '/src/graphql/movimientos'
-import RegistroMovimiento from 'src/components/movimientos/RegistroMovimiento.vue'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { useQuasar } from 'quasar'
 import { DateTime } from 'luxon'
 import { useFormato } from 'src/composables/utils/useFormato'
 import { api } from 'src/boot/axios'
-import PriceInput from 'src/components/formComponents/PriceInput.vue'
 import ListaMovimientos from 'src/components/movimientos/ListaMovimientos.vue'
 import MesSelect from 'src/components/formComponents/MesSelect.vue'
+import FormCuentaRegistro from 'src/components/movimientos/FormCuentaRegistro.vue'
 
 /**
  * composables

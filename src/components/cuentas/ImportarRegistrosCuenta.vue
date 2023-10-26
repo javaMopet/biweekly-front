@@ -213,7 +213,6 @@
  */
 import { ref, computed, onMounted } from 'vue'
 import { read, utils } from 'xlsx'
-import CategoriaSelect from '../formComponents/CategoriaSelect.vue'
 import { useFormato } from 'src/composables/utils/useFormato'
 import { api } from 'src/boot/axios'
 import { DateTime } from 'luxon'
