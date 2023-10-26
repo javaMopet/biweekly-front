@@ -1,16 +1,21 @@
 <template>
   <div class="row inline fit">
+    <!-- <pre>
+ {{ tipoMovimientoId }} - {{ props.tipoAfectacion }} - {{ tipoAfectacion }}</pre
+    > -->
     <CategoriaSelect
       v-if="mostrarCategoria"
       v-model="categoria"
-      :tipo-afectacion="props.tipoAfectacion"
+      :tipo-afectacion="tipoAfectacion"
       :agregar="false"
+      @update:model-value="onSelectCategoriaCuenta"
     ></CategoriaSelect>
     <CuentaSelect
       v-else
       v-model="cuenta"
       label="Cuenta Destino"
       :filter-array="['1', '2']"
+      @update:model-value="onSelectCategoriaCuenta"
     ></CuentaSelect>
     <q-btn
       round
@@ -19,7 +24,7 @@
       flat
       class="text-condensed more-button"
     >
-      <q-menu>
+      <q-menu dark>
         <q-list style="min-width: 100px">
           <q-item v-close-popup>
             <q-item-section>
@@ -27,43 +32,70 @@
                 v-model="tipoMovimientoId"
                 val="1"
                 label="Ingreso"
-                v-close-popup
+                checked-icon="task_alt"
+                unchecked-icon="panorama_fish_eye"
+                color="positive-pastel"
+                @update:model-value="onChangeTipoMovimiento"
+                dark
               />
               <q-radio
                 v-model="tipoMovimientoId"
                 val="2"
                 label="Egreso"
-                v-close-popup
+                checked-icon="task_alt"
+                unchecked-icon="panorama_fish_eye"
+                color="negative-pastel"
+                @update:model-value="onChangeTipoMovimiento"
+                dark
               />
               <q-radio
                 v-model="tipoMovimientoId"
                 val="3"
                 label="Traspaso"
-                v-close-popup
+                checked-icon="task_alt"
+                unchecked-icon="panorama_fish_eye"
+                color="contrast"
+                @update:model-value="onChangeTipoMovimiento"
+                dark
               />
+            </q-item-section>
+          </q-item>
+          <q-item clickable @click="agregarCategoria" v-if="mostrarCategoria">
+            <q-item-section class="text-positive-pastel">
+              Agregar categoría
             </q-item-section>
           </q-item>
         </q-list>
       </q-menu>
     </q-btn>
   </div>
+  <Teleport to="#modal">
+    <q-dialog v-model="showRegistroCategoria" persistent>
+      <RegistroCategoria
+        :edited-item="editedCategoriaParam"
+        @categoriaSaved="onCategoriaSaved"
+      ></RegistroCategoria>
+    </q-dialog>
+  </Teleport>
 </template>
 
 <script setup>
-import { computed, ref, onMounted, defineProps } from 'vue'
+import { computed, ref, onMounted, toRef } from 'vue'
 import CategoriaSelect from './CategoriaSelect.vue'
 import CuentaSelect from './CuentaSelect.vue'
+import RegistroCategoria from '../categorias/RegistroCategoria.vue'
 
-/**
- *
- */
-const tipoMovimientoId = ref('1')
-const categoria = ref()
-const cuenta = ref()
 /**
  * props
  */
 const props = defineProps({
+  modelValue: {
+    type: Object,
+    required: true,
+    default: () => {
+      return {}
+    }
+  },
   tipoAfectacion: {
     type: String,
     required: false,
@@ -76,19 +108,78 @@ const props = defineProps({
   }
 })
 /**
+ * state
+ */
+const tipoMovimientoId = ref('1')
+const categoria = ref()
+const cuenta = ref()
+const tipoAfectacion = ref(props.tipoAfectacion)
+const showRegistroCategoria = ref(false)
+const editedCategoriaParam = ref({ tipoMovimientoId: tipoMovimientoId.value })
+/**
  * onMounted
  */
 onMounted(() => {
   // console.log(props.tipoAfectacion)
+  tipoMovimientoId.value = props.tipoAfectacion === 'A' ? '1' : '2'
 })
+/**
+ * emits
+ */
+const emit = defineEmits(['update:modelValue'])
 /**
  * computed
  */
+const tipoMovimiento = computed({
+  get() {
+    return props.modelValue
+  },
+  set(val) {
+    emit('update:modelValue', val)
+  }
+})
 const mostrarCategoria = computed({
   get() {
     return tipoMovimientoId.value === '1' || tipoMovimientoId.value === '2'
   }
 })
+// const tipoAfectacion = computed({
+//   get() {
+//     return tipoMovimientoId.value === '1' ? 'A' : 'C'
+//   }
+// })
+function onChangeTipoMovimiento(val) {
+  console.log('val', val)
+  switch (val) {
+    case '1':
+      tipoAfectacion.value = 'A'
+      break
+    case '2':
+      tipoAfectacion.value = 'C'
+    default:
+      break
+  }
+}
+function onSelectCategoriaCuenta(val) {
+  console.dir(val)
+  console.dir(tipoMovimiento)
+  console.dir(tipoMovimientoId.value)
+  tipoMovimiento.value = {
+    tipoMovimientoId: tipoMovimientoId.value,
+    value: val
+  }
+}
+function agregarCategoria() {
+  editedCategoriaParam.value = {
+    tipoMovimientoId: tipoMovimientoId.value,
+    cuentaContable: null,
+    cuentaDefault: null,
+    icono: 'insert_emoticon',
+    color: '#019A9D'
+  }
+  showRegistroCategoria.value = true
+}
+function onCategoriaSaved() {}
 </script>
 
 <style lang="scss" scoped></style>

@@ -1,16 +1,15 @@
 <template>
   <q-card class="my-card" style="width: 500px">
-    <q-card-section
-      class="row inline fit justify-between items-center dialog-title"
-    >
+    <q-card-section class="row justify-between items-start dialog-title">
       <div class="dialog__title--name">{{ actionName }}</div>
-      <div class="">
+      <div class="dialog-closebutton">
         <q-btn
           round
           icon="close"
           class="dialog__title--closeButton"
           v-close-popup
           push
+          glossy
         ></q-btn>
       </div>
     </q-card-section>
@@ -186,6 +185,7 @@ import CuentaSelect from '../formComponents/CuentaSelect.vue'
 import PriceInput from '../formComponents/PriceInput.vue'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { useCategoriaCrud } from 'src/composables/useCategoriaCrud'
+import { SessionStorage } from 'quasar'
 
 /**
  * composables
@@ -299,6 +299,7 @@ function saveItem() {
   console.log('save item')
   const cuenta_contable_id = editedFormItem.value.cuentaContable?.id
   const cuentaDefaultId = editedFormItem.value.cuentaDefault?.id
+  const userId = SessionStorage.getItem('user').id
   const input = {
     ...editedFormItem.value,
     cuentaContableId: parseInt(cuenta_contable_id),
@@ -314,6 +315,7 @@ function saveItem() {
   console.log('guardando item:', input)
   if (!editedFormItem.value.id) {
     console.log('guardando categoria nueva', input)
+    input.userId = userId
     categoriaCrud.createCategoria({
       input
     })
@@ -331,6 +333,7 @@ categoriaCrud.onDoneCreate(({ data }) => {
   if (!!data) {
     notificacion.mostrarNotificacionPositiva('Categoría creada correctamente.')
     const itemSaved = data.categoriaCreate.categoria
+    // console.table(categoriaCrud.listaCategorias.value)
     emit('categoriaSaved', itemSaved)
   }
 })

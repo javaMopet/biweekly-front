@@ -363,3 +363,23 @@
     background: rgba(244, 245, 247, 0.432) !important;
   }
 }
+/* ************************************** */
+.addNew-button {
+  opacity: 0.3;
+  color: $secondary-button;
+  background: lighten($color: $toolbar-button, $amount: 15);
+  font-size: 0.7rem;
+  padding-inline: 10px;
+  letter-spacing: -0.0025rem;
+  margin: 2px 2px 2px 2px;
+  &:hover {
+    opacity: 0.8;
+    //color: $secondary !important;
+    background: lighten($color: $secondary, $amount: 1);
+    transition: all 0.05 ease;
+    cursor: pointer;
+  }
+  i {
+    margin-right: 0px;
+  }
+}

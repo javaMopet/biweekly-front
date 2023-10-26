@@ -30,8 +30,6 @@
             push
           />
         </div>
-        <div></div>
-
         <div>
           <CategoriaSelect
             v-if="!isTraspaso"
@@ -40,6 +38,7 @@
             :is-cambiable="false"
             @update:model-value="onSelectCategoria"
             :rules="[(val) => !!val || 'Favor de ingresar la categoria']"
+            :agregar="true"
           ></CategoriaSelect>
         </div>
         <div class="row">

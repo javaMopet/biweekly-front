@@ -14,26 +14,23 @@
       input-debounce="2"
       @filter="filterFn"
       behavior="menu"
-      clearable=""
       :rules="rules"
       lazyRules
       dense
       map-options
       :readonly="readonly"
       :autofocus="autofocus"
+      clearable
     >
-      <template #before-options="props">
-        <div class="row justify-end">
+      <template #after="props" v-if="agregar">
+        <div class="row justify-end" @click.prevent="">
           <q-btn
             dense
-            class="text-condensed"
-            color="primary"
-            outline=""
+            class="addNew-button"
+            color="secondary-button"
             icon="add"
-            flat
-            rounded
+            round
             no-caps
-            label="Agregar"
             @click="addItemCategoria(props)"
           >
           </q-btn>
@@ -58,9 +55,6 @@
         </q-item>
       </template>
     </q-select>
-  </div>
-  <div class="col-auto" v-if="agregar">
-    <q-btn color="accent" icon="add" @click="agregarCategoria" />
   </div>
 
   <Teleport to="#modal">
@@ -250,9 +244,7 @@ function filterFn(val, update) {
     )
   })
 }
-function agregarCategoria() {
-  showRegistroCategoria.value = true
-}
+
 function toogleTipoAfectacion(val) {
   categoria.value = null
   tipoMovimientoId.value = tipoMovimientoId.value === '1' ? '2' : '1'

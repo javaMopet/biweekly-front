@@ -1,16 +1,15 @@
 <template>
   <q-card class="my-card" dense style="width: 80vw; min-width: 80vw">
-    <q-card-section
-      class="row inline fit justify-between items-center dialog-title"
-    >
+    <q-card-section class="row justify-between items-start dialog-title">
       <div class="dialog__title--name">{{ cuenta.nombre }}</div>
-      <div class="">
+      <div class="dialog-closebutton">
         <q-btn
           round
           icon="close"
           class="dialog__title--closeButton"
           v-close-popup
           push
+          glossy
         ></q-btn>
       </div>
     </q-card-section>
@@ -61,12 +60,14 @@
                 v-model="fecha_inicio"
                 lbl_field="Fecha"
                 :opcional="false"
+                style="width: 140px"
               ></DateInput>
               <span class="text-condensed">Hasta:</span>
               <DateInput
                 v-model="fecha_fin"
                 lbl_field="Fecha"
                 :opcional="false"
+                style="width: 140px"
               ></DateInput>
             </div>
           </q-toolbar>
@@ -381,7 +382,8 @@ function obtenerMovimientosSantander(wb) {
         concepto: row.concepto,
         importe,
         saldo: row.saldo,
-        referencia: row.referencia
+        referencia: row.referencia,
+        tipoMovimiento: {}
         // saved: false
       }
       listaRegistros.value.push(item)
@@ -423,7 +425,8 @@ function obtenerMovimientosBancomer(wb) {
         concepto: row.concepto,
         importe,
         saldo: row.saldo,
-        saved: false
+        saved: false,
+        tipoMovimiento: {}
       }
       listaRegistros.value.push(item)
     }
@@ -501,24 +504,24 @@ function saveItems() {
 }
 
 function saveItemsAfterValidate(lista_registros) {
-  console.log('lista de registros a guardar', lista_registros)
-  api
-    .post('/registros/create_multiple', {
-      lista_registros
-    })
-    .then((response) => {
-      console.log('guardado correctamente')
-      console.log('response', response)
-      notificacion.mostrarNotificacionPositiva(
-        'Los registros han sido guardados correctamente.',
-        1200
-      )
-      emit('itemsSaved')
-    })
-    .catch((error) => {
-      console.error(error)
-      console.error('esto es un error')
-    })
+  console.table(lista_registros)
+  // api
+  //   .post('/registros/create_multiple', {
+  //     lista_registros
+  //   })
+  //   .then((response) => {
+  //     console.log('guardado correctamente')
+  //     console.log('response', response)
+  //     notificacion.mostrarNotificacionPositiva(
+  //       'Los registros han sido guardados correctamente.',
+  //       1200
+  //     )
+  //     emit('itemsSaved')
+  //   })
+  //   .catch((error) => {
+  //     console.error(error)
+  //     console.error('esto es un error')
+  //   })
 }
 
 function validarMovimientos() {

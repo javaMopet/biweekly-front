@@ -2,7 +2,8 @@ import { useMutation, useQuery } from '@vue/apollo-composable'
 import {
   LISTA_CATEGORIAS,
   CATEGORIA_CREATE,
-  CATEGORIA_UPDATE
+  CATEGORIA_UPDATE,
+  CATEGORIA_DELETE
 } from 'src/graphql/categorias'
 
 import { ref, computed } from 'vue'
@@ -16,7 +17,7 @@ export function useCategoriaCrud() {
   })
   const {
     result: resultadoLista,
-    onError: onErrorListaCuentas,
+    onError: onErrorListaCategorias,
     refetch: refetchListaCategorias
   } = useQuery(LISTA_CATEGORIAS, null, graphql_options)
 
@@ -32,6 +33,12 @@ export function useCategoriaCrud() {
     onError: onErrorUpdateCategoria
   } = useMutation(CATEGORIA_UPDATE)
 
+  const {
+    mutate: deleteCategoria,
+    onDone: onDoneDeleteCategoria,
+    onError: onErrorDeleteCategoria
+  } = useMutation(CATEGORIA_DELETE)
+
   const listaCategorias = computed({
     get() {
       return resultadoLista.value?.listaCategorias ?? []
@@ -39,6 +46,7 @@ export function useCategoriaCrud() {
   })
 
   onDoneCreate(({ data }) => {
+    console.log('refrescando categorias')
     refetchListaCategorias()
   })
   onErrorCreate((error) => {
@@ -46,9 +54,9 @@ export function useCategoriaCrud() {
     console.log('error', error.graphQLErrors[0].extensions)
   })
 
-  onErrorListaCuentas((error) => {
-    console.log(error)
-  })
+  // onErrorListaCuentas((error) => {
+  //   console.log(error)
+  // })
 
   onDoneUpdate(({ data }) => {
     refetchListaCategorias()
@@ -63,6 +71,9 @@ export function useCategoriaCrud() {
     createCategoria,
     updateCategoria,
     onDoneCreate,
-    onDoneUpdate
+    onDoneUpdate,
+    onDoneDeleteCategoria,
+    onErrorListaCategorias,
+    onErrorDeleteCategoria
   }
 }

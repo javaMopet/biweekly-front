@@ -1,48 +1,21 @@
 <template>
-  <q-toolbar class="q-my-xs">
-    <q-btn-dropdown
-      class="q-ml-lg"
-      split
-      icon="add_circle"
-      push
-      glossy
-      no-caps
-      label="Agregar"
-      color="primary-button"
-      text-color="accent-light"
-      @click="addRow('2')"
-    >
-      <q-list>
-        <q-item
-          v-for="tipoMovimiento in listaTiposMovimiento"
-          v-bind:key="tipoMovimiento.id"
-          clickable
-          v-close-popup
-          @click="addRow(tipoMovimiento.id)"
-        >
-          <q-item-section avatar>
-            <q-avatar
-              size="40px"
-              font-size="25px"
-              :color="tipoMovimiento.nombre_color"
-              text-color="white"
-              :icon="tipoMovimiento.icono"
-            >
-            </q-avatar>
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>
-              <span class="text-primary">{{
-                tipoMovimiento.nombre
-              }}</span></q-item-label
-            >
-          </q-item-section>
-        </q-item>
-      </q-list>
-    </q-btn-dropdown>
-  </q-toolbar>
-  <q-space style="height: 10px" />
   <div class="row fit q-gutter-sm" style="border: 0px solid red">
+    <q-toolbar class="" dense fit>
+      <div class="row items-center q-ml-sm q-gutter-x-sm">
+        <div class="q-pa-md q-gutter-sm">
+          <q-breadcrumbs
+            class="breadcrum-component"
+            active-color="primary"
+            separator=">"
+            separator-color="primary"
+          >
+            <q-breadcrumbs-el icon="home" to="/" label="Inicio" />
+            <q-breadcrumbs-el label="Categorias" icon="category" />
+          </q-breadcrumbs>
+        </div>
+      </div>
+      <q-toolbar-title> </q-toolbar-title>
+    </q-toolbar>
     <div class="col q-pl-xs">
       <q-table
         dense
@@ -53,22 +26,37 @@
         :rows-per-page-options="[0]"
         hide-header
         class="bg-primary-light"
+        hide-pagination
       >
         <template #top-left>
-          <div class="text-h6 text-bold text-table-title">Ingresos</div>
+          <div class="row items-center">
+            <div class="page-title q-pr-md">Ingresos</div>
+            <q-btn
+              icon="add"
+              label="Agregar"
+              no-caps
+              @click="addRow('1')"
+              push
+              class="addNew-button"
+              rounded
+              outline
+            />
+          </div>
         </template>
-        <template v-slot:top-right>
-          <q-input
-            outlined
-            dense
-            debounce="300"
-            v-model="filterIngresos"
-            placeholder="Buscar Ingresos"
-          >
-            <template v-slot:append>
-              <q-icon name="search" />
-            </template>
-          </q-input>
+        <template #top-right>
+          <div class="row item-center q-gutter-x-md">
+            <q-input
+              outlined
+              dense
+              debounce="300"
+              v-model="filterIngresos"
+              placeholder="Buscar Ingresos"
+            >
+              <template v-slot:append>
+                <q-icon name="search" />
+              </template>
+            </q-input>
+          </div>
         </template>
         <template #body-cell-icono="props">
           <q-td
@@ -127,6 +115,7 @@
     </div>
     <div class="col">
       <q-table
+        class="my-sticky-header-table"
         dense
         :rows="listaCategoriasEgresos"
         :columns="columns"
@@ -134,10 +123,22 @@
         :filter="filterGastos"
         :rows-per-page-options="[0]"
         hide-header
-        class="bg-primary-light"
+        hide-pagination
       >
         <template #top-left>
-          <div class="text-h6 text-bold text-table-title">Gastos</div>
+          <div class="row items-center">
+            <div class="page-title q-pr-md">Gastos</div>
+            <q-btn
+              icon="add"
+              label="Agregar"
+              no-caps
+              @click="addRow('1')"
+              push
+              class="addNew-button"
+              rounded
+              outline
+            />
+          </div>
         </template>
         <template v-slot:top-right>
           <q-input
@@ -220,19 +221,19 @@
 </template>
 
 <script setup>
-import { useMutation, useQuery } from '@vue/apollo-composable'
 import { ref, computed, onMounted } from 'vue'
-import { LISTA_CATEGORIAS, CATEGORIA_DELETE } from '/src/graphql/categorias'
 import { LISTA_TIPOS_MOVIMIENTO } from 'src/graphql/movimientos'
 import RegistroCategoria from 'src/components/categorias/RegistroCategoria.vue'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { useQuasar } from 'quasar'
+import { useCategoriaCrud } from 'src/composables/useCategoriaCrud'
+import { useQuery } from '@vue/apollo-composable'
 /**
  * composables
  */
 const notificacion = useNotificacion()
 const $q = useQuasar()
-
+const categoriasCrud = useCategoriaCrud()
 /**
  * state
  */
@@ -262,12 +263,6 @@ const options = ref({
 })
 
 const {
-  result: resultListaCategorias,
-  onError: onErrorListaCategorias,
-  refetch: refetchListaCategorias
-} = useQuery(LISTA_CATEGORIAS, null, options)
-
-const {
   result: resultListaTiposMovimientos,
   onError: onErrorListaTiposMovimiento
 } = useQuery(LISTA_TIPOS_MOVIMIENTO, null, options)
@@ -275,20 +270,14 @@ const {
 // onResultCategorias(({ data }) => {
 //   listaCategorias.value = JSON.parse(JSON.stringify(data.listaCategorias))
 // })
-onErrorListaCategorias((error) => {
+categoriasCrud.onErrorListaCategorias((error) => {
   console.error(error)
 })
 onErrorListaTiposMovimiento((error) => {
   console.error(error)
 })
 
-const {
-  mutate: deleteCategoria,
-  onDone: onDoneDeleteCategoria,
-  onError: onErrorDeleteCategoria
-} = useMutation(CATEGORIA_DELETE)
-
-onDoneDeleteCategoria(({ data }) => {
+categoriasCrud.onDoneDeleteCategoria(({ data }) => {
   if (!!data) {
     console.log('item deleted ', data)
     const deletedItem = data.categoriaDelete.categoria
@@ -297,7 +286,7 @@ onDoneDeleteCategoria(({ data }) => {
     refetchListaCategorias()
   }
 })
-onErrorDeleteCategoria((error) => {
+categoriasCrud.onErrorDeleteCategoria((error) => {
   console.error(error)
 })
 /**
@@ -306,7 +295,7 @@ onErrorDeleteCategoria((error) => {
 const listaCategoriasIngresos = computed({
   get() {
     return (
-      resultListaCategorias.value?.listaCategorias.filter(
+      categoriasCrud.listaCategorias.value.filter(
         (categoria) => categoria.tipoMovimientoId === '1'
       ) ?? []
     )
@@ -314,7 +303,7 @@ const listaCategoriasIngresos = computed({
 })
 const listaCategoriasEgresos = computed({
   get() {
-    return resultListaCategorias.value?.listaCategorias.filter(
+    return categoriasCrud.listaCategorias.value.filter(
       (categoria) => categoria.tipoMovimientoId === '2'
     )
   }
@@ -509,6 +498,30 @@ const columns = [
 .edit_button {
   &:hover {
     color: $info !important;
+  }
+}
+.my-sticky-header-table {
+  /* height or max-height is important */
+  height: calc(100vh - 125px);
+
+  .q-table__top,
+  .q-table__bottom,
+  thead tr:first-child th {
+    /* bg color is important for th; just specify one */
+    background-color: $primary-light;
+  }
+  thead tr th {
+    position: sticky;
+    z-index: 1;
+  }
+  thead tr:first-child th {
+    top: 0;
+  }
+
+  /* this is when the loading indicator appears */
+  &.q-table--loading thead tr:last-child th {
+    /* height of all previous header rows */
+    top: 48px;
   }
 }
 </style>

@@ -292,7 +292,7 @@
         :cuenta-id="cuenta.id"
         :edited-item="registroEditedItem"
         @item-saved="itemSaved"
-        @item-updated="registroUpdated"
+        @item-updated="onItemUpdated"
         :fecha="fecha_registro"
       ></FormCuentaRegistro>
     </q-dialog>
@@ -712,6 +712,10 @@ registrosCrud.onErrorUpdate((response) => {
 
 registrosCrud.onDoneUpdate((response) => {
   console.log('updated ', response)
+  notificacion.mostrarNotificacionPositiva(
+    'Campo observación actualizado.',
+    700
+  )
 })
 
 function confirmQuitarMsi(id) {
@@ -750,12 +754,14 @@ function obtenerMontosResumen() {
   refetchSaldoAFecha()
 }
 
-function registroUpdated() {
+function onItemUpdated() {
   notificacion.mostrarNotificacionPositiva(
     'Se ha actualizado el registro correctamente.',
     1200
   )
   refetchListaRegistros()
+  obtenerMontosResumen()
+  cargarDatosCuenta(route.params.id, false)
   showForm.value = false
 }
 function itemsSaved() {
