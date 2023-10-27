@@ -105,3 +105,34 @@ export const REGISTRO_DELETE = gql`
     }
   }
 `
+
+export const IMPORTAR_REGISTROS = gql`
+  mutation importarRegistros(
+    $registrosInput: [RegistroInput!]!
+    $traspasosInput: [TraspasoInput!]!
+  ) {
+    importarRegistros(
+      registrosInput: $registrosInput
+      traspasosInput: $traspasosInput
+    ) {
+      registros {
+        id
+        estadoRegistroId
+        tipoAfectacion
+        fecha
+        importe
+        observaciones
+        importe
+        cuenta {
+          id
+          nombre
+        }
+        categoria {
+          id
+          nombre
+          tipoMovimientoId
+        }
+      }
+    }
+  }
+`

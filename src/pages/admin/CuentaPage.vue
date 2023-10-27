@@ -143,6 +143,7 @@
               <q-tr>
                 <div class="q-gutter-x-md">
                   <q-btn
+                    no-caps
                     color="primary"
                     label="Agregar"
                     @click="addItem"
@@ -387,11 +388,10 @@ function cargarDatosCuenta(cuenta_id, is_inicio) {
     cuenta.value = response?.data.data ?? {}
     dia_corte.value = cuenta.value.dia_corte
     if (is_inicio) {
-      console.log('is inicio')
       cargaListaRegistros(
         null,
         {
-          cuentaId: route.params.id.toString(),
+          cuentaId: route.params.id?.toString() || 0,
           categoriaId: null,
           fechaInicio: fecha_inicio.value,
           fechaFin: fecha_fin.value
@@ -418,7 +418,6 @@ const sumaMovimientos = computed({
 })
 const saldo_final_periodo = computed({
   get() {
-    console.log(resultSaldoAFecha.value)
     return resultSaldoAFecha.value?.obtenerSaldoAFecha ?? 0
   }
 })
@@ -514,9 +513,7 @@ const {
 } = useLazyQuery(LISTA_REGISTROS)
 
 onResultListaRegistros(({ data }) => {
-  // console.log('lista de registros', data)
   listaRegistros.value = data?.obtenerRegistros ?? []
-  console.log(listaRegistros.value)
 })
 
 onErrorListaRegistros((error) => {
@@ -634,7 +631,6 @@ function obtener_fecha_fin() {
 }
 
 function onChangeMes(mes) {
-  console.log('Cambiando mes', mes.id)
   obtener_fecha_inicio()
   obtener_fecha_fin()
   obtenerListaRegistros()

@@ -220,11 +220,14 @@ import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import DateInput from '../formComponents/DateInput.vue'
 import { format } from 'accounting-js'
 import TipoMovimientoSelect from '../formComponents/TipoMovimientoSelect.vue'
+import { SessionStorage } from 'quasar'
+import { useRegistrosCrud } from 'src/composables/useRegistrosCrud'
 
 /**
  * Composables
  */
 const notificacion = useNotificacion()
+const registrosCrud = useRegistrosCrud()
 /**
  * state
  */
@@ -475,6 +478,57 @@ function obtenerMovimientosEfectivo(wb) {
   console.log(listaRegistros.value)
 }
 
+function obtenerRegistros() {
+  var registrosInput = []
+  var opciones = ['1', '2']
+  const userId = SessionStorage.getItem('user').id
+  listaRegistrosFiltrados.value.forEach((item) => {
+    console.log('recorriendo arreglo')
+    console.dir(item.tipoMovimiento)
+    if (opciones.indexOf(item.tipoMovimiento.tipoMovimientoId) !== -1) {
+      const fecha = DateTime.fromFormat(item.fecha, 'dd/MM/yyyy')
+      registrosInput.push({
+        estadoRegistroId: 2, //cerrado
+        tipoAfectacion: item.tipo_afectacion,
+        cuentaId: props.cuenta.id,
+        categoriaId: item.tipoMovimiento.value.id,
+        importe: parseFloat(item.importe),
+        fecha: fecha.toISODate(),
+        observaciones: item.concepto,
+        userId
+      })
+    }
+  })
+  return registrosInput
+}
+function obtenerTraspasos() {
+  var traspasosInput = []
+  listaRegistrosFiltrados.value.forEach((item) => {
+    const fecha = DateTime.fromFormat(item.fecha, 'dd/MM/yyyy')
+    const userId = SessionStorage.getItem('user').id
+    if (item.tipoMovimiento.tipoMovimientoId === '3') {
+      traspasosInput.push({
+        fecha,
+        observaciones: 'Traspaso entre cuentas',
+        userId,
+        traspasoDetalles: [
+          {
+            cuentaId: parseInt(item.tipoMovimiento.value.id),
+            tipoCuentaTraspasoId: 1,
+            importe: item.importe * -1
+          },
+          {
+            cuentaId: parseInt(props.cuenta.id),
+            tipoCuentaTraspasoId: 2,
+            importe: item.importe
+          }
+        ]
+      })
+    }
+  })
+  return traspasosInput
+}
+
 function saveItems() {
   console.table(listaRegistrosFiltrados.value)
   const containsErrors = validarMovimientos()
@@ -483,52 +537,59 @@ function saveItems() {
       errorsList.value.length = 0
     }, 7000)
   } else {
-    var lista_registros = []
-
-    listaRegistrosFiltrados.value.forEach((item) => {
-      const fecha = DateTime.fromFormat(item.fecha, 'dd/MM/yyyy')
-      const registro = {
-        estado_registro_id: 2, //cerrado
-        tipo_afectacion: item.tipo_afectacion,
-        cuenta_id: props.cuenta.id,
-        categoria_id: item.categoria.id,
-        importe: parseFloat(item.importe),
-        fecha: fecha.toISODate(),
-        observaciones: item.concepto
-      }
-      lista_registros.push(registro)
-    })
-    saveItemsAfterValidate(lista_registros)
+    var registrosInput = obtenerRegistros()
+    var traspasosInput = obtenerTraspasos()
+    saveItemsAfterValidate(registrosInput, traspasosInput)
   }
 }
 
-function saveItemsAfterValidate(lista_registros) {
-  console.table(lista_registros)
-  // api
-  //   .post('/registros/create_multiple', {
-  //     lista_registros
-  //   })
-  //   .then((response) => {
-  //     console.log('guardado correctamente')
-  //     console.log('response', response)
-  //     notificacion.mostrarNotificacionPositiva(
-  //       'Los registros han sido guardados correctamente.',
-  //       1200
-  //     )
-  //     emit('itemsSaved')
-  //   })
-  //   .catch((error) => {
-  //     console.error(error)
-  //     console.error('esto es un error')
-  //   })
+function saveItemsAfterValidate(registrosInput, traspasosInput) {
+  console.table(registrosInput)
+  console.table(traspasosInput)
+
+  registrosCrud.importarRegistros({
+    registrosInput,
+    traspasosInput
+  })
 }
+registrosCrud.onDoneImportarRegistros(({ data }) => {
+  console.dir(data)
+  afterSaveItems()
+})
+
+function afterSaveItems() {
+  notificacion.mostrarNotificacionPositiva(
+    'Los movimientos se guardaron correctamente.',
+    1700
+  )
+  emit('itemsSaved')
+}
+
+registrosCrud.onErrorImportarRegistros((error) => {
+  notificacion.mostrarNotificacionNegativa(
+    'Ocurrió un error el intentar guardar los movimientos',
+    1500
+  )
+  console.log('Ocurrió un error')
+  console.table('error', error.graphQLErrors[0])
+  console.table('error', error.graphQLErrors[0].extensions)
+})
 
 function validarMovimientos() {
   if (listaRegistrosFiltrados.value.length <= 0) {
     addError(0, null, 'No hay datos para guardar')
   }
   listaRegistrosFiltrados.value.forEach((item) => {
-    if (!item.categoria) {
+    if (!!item.tipoMovimiento) {
+      const tipoMovimiento = item.tipoMovimiento
+      if (!tipoMovimiento.value) {
+        addError(
+          1,
+          item.consecutivo,
+          'Favor de ingresar los valores requeridos'
+        )
+      }
+    } else {
       addError(1, item.consecutivo, 'Favor de agregar categoria')
     }
   })
@@ -645,6 +706,15 @@ const columns = [
 function closeErrors() {
   errorsList.value.length = 0
 }
+// deprecated
+// api
+//   .post('/registros/create_multiple', { lista_registros
+//   })
+//   .then((response) => { console.log('guardado correctamente')
+//   })
+//   .catch((error) => { console.error(error)
+//     console.error('esto es un error')
+//   })
 </script>
 
 <style lang="scss">
