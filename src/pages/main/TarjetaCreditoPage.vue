@@ -237,6 +237,7 @@
               <div class="">
                 <div class="row q-gutter-x-md">
                   <q-btn
+                    no-caps
                     color="primary"
                     label="Agregar"
                     @click="addItem"

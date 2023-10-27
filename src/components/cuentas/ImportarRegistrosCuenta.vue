@@ -489,7 +489,9 @@ function obtenerRegistros() {
       const fecha = DateTime.fromFormat(item.fecha, 'dd/MM/yyyy')
       registrosInput.push({
         estadoRegistroId: 2, //cerrado
-        tipoAfectacion: item.tipo_afectacion,
+        tipoAfectacion: obtenerTipoAfectacionCategoria(
+          item.tipoMovimiento.tipoMovimientoId
+        ),
         cuentaId: props.cuenta.id,
         categoriaId: item.tipoMovimiento.value.id,
         importe: parseFloat(item.importe),
@@ -501,6 +503,10 @@ function obtenerRegistros() {
   })
   return registrosInput
 }
+function obtenerTipoAfectacionCategoria(tipoMovimientoId) {
+  return tipoMovimientoId === '1' ? 'A' : 'C'
+}
+
 function obtenerTraspasos() {
   var traspasosInput = []
   listaRegistrosFiltrados.value.forEach((item) => {
