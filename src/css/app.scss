@@ -383,3 +383,47 @@
     margin-right: 0px;
   }
 }
+/******************************* */
+.cuenta__title {
+  letter-spacing: -0.025rem !important;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+/* ************************************* */
+.form-input__label {
+  font-family: 'DM Sans', sans-serif;
+  color: $input-label;
+  font-size: 0.85rem !important;
+  letter-spacing: -0.0025rem;
+  font-weight: 500;
+}
+
+/***************************************** */
+.errors-message {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 100;
+  width: 98%;
+  box-shadow: rgba(124, 113, 113, 0.76) 5px 14px 28px,
+    rgba(112, 93, 93, 0.74) 5px 10px 10px;
+
+  &__closeBtn {
+    font-size: 0.6rem;
+    margin-left: 20px;
+  }
+  &__title {
+    font-weight: 600;
+    color: $negative-pastel;
+    font-size: 0.85rem;
+    padding-top: 20px;
+  }
+  &__item {
+    font-size: 0.8rem !important;
+    margin-top: 0px;
+    padding-bottom: 1px;
+    color: lighten($color: $negative, $amount: 25);
+    min-height: 25px !important;
+  }
+}

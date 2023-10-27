@@ -1,113 +1,125 @@
 <template>
-  <q-card
-    class="my-card"
-    dense
-    style="width: 80vw; min-width: 80vw; border: 0px solid red"
-  >
-    <!-- <pre>{{ fecha_desde }} - {{ fecha_hasta }}</pre> -->
-    <q-card-section
-      style="border: 0px solid red"
-      class="row inline fit q-py-sm justify-between items-center dialog-title"
-    >
-      <div class="dialog__title--name" style="border: 0px solid green">
-        Tarjeta de crédito - {{ cuenta.nombre }}
+  <q-card class="my-card" dense style="width: 80%; min-width: 80%">
+    <q-card-section class="row justify-between items-start dialog-title">
+      <div class="dialog__title--name">
+        Tarjeta de crédito &nbsp;&nbsp;~ {{ cuenta.nombre }} ~
       </div>
-      <div class="">
+      <div class="dialog-closebutton">
         <q-btn
           round
-          flat
-          dense
           icon="close"
-          class="float-right"
-          color="accent "
+          class="dialog__title--closeButton"
           v-close-popup
-          vertical-top
+          push
+          glossy
         ></q-btn>
       </div>
     </q-card-section>
     <q-card-section>
-      <div class="column justify-between q-gutter-y-sm">
-        <!-- <div class="row items-center q-gutter-x-sm">
-          <span> Carga tu archivo con movimientos: </span>
-        </div> -->
-        <div class="row">
-          <q-toolbar class="q-gutter-x-md">
-            <div class="row q-pr-lg">
-              <div class="load__file-text text-condensed" style="width: 130px">
-                Selecciona un archivo en formato Excel:
-              </div>
-              <q-file
-                v-model="archivoExcel"
-                label="Carga archivo Excel"
-                accept=".xlsx,.xls"
-                @input="updateFile"
-                dense
-                style="width: 350px"
-                max-files="1"
-                outlined
-                label-color="accent"
-                clearable
-                @clear="fileClear"
-              >
-                <template #prepend>
-                  <q-icon color="primary" name="cloud_upload" />
-                </template>
-              </q-file>
-              <q-btn
-                v-if="isSelected"
-                label="Eliminar"
-                @click="eliminarSeleccionados"
-                outline
-                color="primary"
-              />
+      <q-toolbar class="q-gutter-x-md">
+        <div class="row q-pr-lg justify-between">
+          <div class="column">
+            <div class="load__file-text text-condensed">
+              Selecciona un archivo en formato Excel:
             </div>
-            <q-separator vertical inset></q-separator>
-            <div class="row items-center q-gutter-x-md">
-              <span class="text-condensed"> Desde:</span>
-              <DateInput
-                v-model="fecha_inicio"
-                lbl_field="Fecha"
-                :opcional="false"
-              ></DateInput>
-              <span class="text-condensed">Hasta:</span>
-              <DateInput
-                v-model="fecha_fin"
-                lbl_field="Fecha"
-                :opcional="false"
-              ></DateInput>
-            </div>
-          </q-toolbar>
+            <q-file
+              v-model="archivoExcel"
+              label="Carga archivo Excel"
+              accept=".xlsx,.xls"
+              @input="updateFile"
+              dense
+              style="width: 300px"
+              max-files="1"
+              outlined
+              label-color="accent"
+              clearable
+              @clear="fileClear"
+            >
+              <template #prepend>
+                <q-icon color="primary" name="cloud_upload" />
+              </template>
+              <template #before>
+                <q-img src="/icons/excel2.png" width="24px" />
+              </template>
+            </q-file>
+          </div>
+          <q-btn
+            v-if="isSelected"
+            label="Eliminar"
+            @click="eliminarSeleccionados"
+            outline
+            color="primary"
+          />
         </div>
-        <transition name="fade">
-          <div class="row bg-pink-1" v-if="isErrors">
-            <div class="column">
-              <div class="row q-gutter-x-md q-pl-sm q-pt-sm">
-                <q-icon name="warning" size="1.5rem" color="negative" />
-                <span class="text-caption text-dark"
+        <q-separator vertical></q-separator>
+        <div class="row items-center q-gutter-x-md">
+          <div class="column">
+            <span class="form-input__label"> Desde:</span>
+            <DateInput
+              v-model="fecha_inicio"
+              lbl_field="Fecha"
+              :opcional="false"
+              style="width: 140px"
+            ></DateInput>
+          </div>
+          <div class="column">
+            <span class="form-input__label">Hasta:</span>
+            <DateInput
+              v-model="fecha_fin"
+              lbl_field="Fecha"
+              :opcional="false"
+              style="width: 140px"
+            ></DateInput>
+          </div>
+        </div>
+      </q-toolbar>
+
+      <transition name="fade">
+        <div class="errors-message bg-pink-1" v-if="isErrors">
+          <div class="row">
+            <div class="col-1">
+              <div
+                class="row justify-center items-start q-pt-md"
+                style="height: 100%"
+              >
+                <q-icon name="warning" size="3rem" color="negative" />
+              </div>
+            </div>
+            <div class="col-10">
+              <div class="q-py-sm">
+                <span class="errors-message__title"
                   >El formulario contiene los siguientes errores:</span
                 >
               </div>
               <q-list dense>
-                <q-item :inset-level="0.5" dense>
-                  <q-item-section
-                    avatar
-                    dense
-                    style="min-width: 25px !important; width: 25px !important"
-                  >
-                    <q-icon color="primary" name="arrow_right" />
-                  </q-item-section>
-                  <q-item-section class="text-subtitle2"
-                    >Debes seleccionar la categoría en todos los
-                    movimientos</q-item-section
-                  >
+                <q-item
+                  dense
+                  v-for="item in errorItems"
+                  :key="item.id"
+                  class="errors-message__item"
+                >
+                  {{ !item.numeroLinea ? '' : `No. Línea ${item.numeroLinea}` }}
+                  -> {{ item.message }}
                 </q-item>
               </q-list>
             </div>
+            <div class="col">
+              <div class="column items-end">
+                <q-btn
+                  color="primary"
+                  icon="close"
+                  dense
+                  flat
+                  class="errors-message__closeBtn"
+                  @click="closeErrors"
+                />
+              </div>
+            </div>
           </div>
-        </transition>
-      </div>
+        </div>
+      </transition>
     </q-card-section>
-    <q-card-section style="max-height: 70vh; height: 70vh" class="scroll">
+    <q-card-section style="max-height: 70vh; height: 60vh" class="scroll">
       <q-table
         :rows="listaRegistroFiltrados"
         :columns="columns"
@@ -117,6 +129,9 @@
         selection="multiple"
         v-model:selected="registrosSelected"
         table-header-class="text-condensed bg-primary-light text-accent"
+        no-data-label="No existen datos disponibles"
+        hide-pagination
+        class="my-sticky-header-table"
       >
         <template #body-cell-concepto="props">
           <q-td :props="props" :class="props.row.clase">
@@ -188,7 +203,6 @@ import { api } from 'src/boot/axios'
 import { DateTime } from 'luxon'
 import DateInput from '../formComponents/DateInput.vue'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
-import ListaMovimientos from '../movimientos/ListaMovimientos.vue'
 
 /**
  * state
@@ -197,9 +211,9 @@ const archivoExcel = ref(null)
 const registrosSelected = ref([])
 const listaRegistrosTarjeta = ref([])
 const todos = ref()
-const isErrors = ref(false)
 const fecha_inicio = ref('01/01/1900')
 const fecha_fin = ref('01/01/1900')
+const errorItems = ref([])
 /**
  * composables
  */
@@ -337,6 +351,14 @@ function cargarMovimientosSantander(wb) {
 
   console.table(listaRegistrosTarjeta.value)
 }
+/**
+ * computed
+ */
+const isErrors = computed({
+  get() {
+    return errorItems.value.length > 0
+  }
+})
 const listaRegistroFiltrados = computed({
   get() {
     const start_date = DateTime.fromFormat(fecha_inicio.value, 'dd/MM/yyyy')
@@ -405,12 +427,10 @@ function cargarMovimientosBancomer(wb) {
 }
 
 function guardarMovimientos() {
-  console.table(listaRegistroFiltrados)
   const containsErrors = validarMovimientos()
   if (containsErrors) {
-    isErrors.value = true
     setTimeout(() => {
-      isErrors.value = false
+      errorItems.value = []
     }, 6000)
   } else {
     var lista_registros_tarjeta = []
@@ -447,17 +467,35 @@ function guardarMovimientos() {
     console.log('items guardados')
   }
 }
-
+/**
+ * Funcion utilizada para validar los movimiento al momento de guardar
+ */
 function validarMovimientos() {
-  let containsErrors = false
-  containsErrors = listaRegistroFiltrados.value.length <= 0
-  listaRegistroFiltrados.value.forEach((item) => {
-    if (!item.categoria) {
-      containsErrors = true
-    }
-  })
-  return containsErrors
+  errorItems.value = []
+  if (listaRegistroFiltrados.value.length <= 0) {
+    errorItems.value.push({
+      id: 1,
+      numeroLinea: undefined,
+      message: 'Favor de ingresar los datos que desea guardar.'
+    })
+  } else {
+    console.table(listaRegistroFiltrados.value)
+    listaRegistroFiltrados.value.forEach((item, index) => {
+      if (!item.categoria) {
+        errorItems.value.push({
+          id: index,
+          numeroLinea: item.id,
+          message: 'Favor de ingresar la categoria.'
+        })
+      }
+    })
+  }
+  return errorItems.value.length > 0
 }
+
+/**
+ * Funcion utilizada para eliminar varios movimientos seleccionados
+ */
 function eliminarSeleccionados() {
   console.log('eliminar seleccionados', registrosSelected.value)
   registrosSelected.value.forEach((item) => {
@@ -543,6 +581,9 @@ const columns = [
     style: 'width:100px'
   }
 ]
+function closeErrors() {
+  errorItems.value = []
+}
 </script>
 
 <style lang="scss">
@@ -559,7 +600,7 @@ const columns = [
   opacity: 1;
 }
 .fade-enter-active {
-  transition: all 2s ease;
+  transition: all 0.5s ease-in;
 }
 .fade-leave-from {
   opacity: 1;
@@ -570,15 +611,41 @@ const columns = [
 .fade-leave-active {
   transition: all 0.5s ease-out;
 }
-// .importe_negativo {
-//   color: red;
-// }
-// .importe_positivo {
-//   color: green;
-// }
 
 .registro_positivo {
   color: $negative !important;
   font-weight: 700;
+}
+
+.my-sticky-header-table {
+  /* height or max-height is important */
+  height: 100%;
+
+  .q-table__top,
+  .q-table__bottom,
+  thead tr:first-child th {
+    /* bg color is important for th; just specify one */
+    background-color: $main-background;
+  }
+
+  thead tr th {
+    position: sticky;
+    z-index: 1;
+  }
+  thead tr:first-child th {
+    top: 0;
+  }
+
+  /* this is when the loading indicator appears */
+  &.q-table--loading thead tr:last-child th {
+    /* height of all previous header rows */
+    top: 48px;
+  }
+
+  /* prevent scrolling behind sticky top row on focus */
+  tbody {
+    /* height of all previous header rows */
+    scroll-margin-top: 48px;
+  }
 }
 </style>

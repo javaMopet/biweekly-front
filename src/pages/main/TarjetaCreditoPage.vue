@@ -20,7 +20,7 @@
       <q-toolbar-title> </q-toolbar-title>
       <q-btn
         color="primary"
-        icon="fa-solid fa-circle-left"
+        icon="las la-arrow-circle-left"
         @click="router.go(-1)"
         flat
         rounded
@@ -34,9 +34,7 @@
         width="50px"
         height="50px"
       />
-      <div class="row cuenta__title inline">
-        Tarjeta de crédito {{ cuenta.nombre }}
-      </div>
+      <span class="cuenta__title">Tarjeta de crédito {{ cuenta.nombre }}</span>
     </div>
   </q-card>
   <div class="main-content">

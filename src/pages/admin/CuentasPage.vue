@@ -452,11 +452,7 @@ function mostrarNotificacion(action, cuenta) {
   font-size: 0.75rem !important;
   font-weight: 600 !important;
 }
-.cuenta__title {
-  letter-spacing: -0.025rem !important;
-  font-size: 1.2rem;
-  font-weight: 600;
-}
+
 .cuenta__subtitle {
   letter-spacing: -0.025rem !important;
   font-size: 0.75rem;

@@ -25,7 +25,11 @@ $info: #1c5685;
 $warning: #ecd13b;
 
 // $primary-text: darken ($primary, 50%);
-$primary-text: lighten ($primary, 90%);
+//$primary-text: lighten ($primary, 10%);
+$primary-text: lighten(
+  $color: $primary,
+  $amount: 30
+);
 $primary-icon: darken ($primary, 90%);
 $primary-light: #f2f2f2;
 $secondary-light: #fdbf8b;
@@ -63,6 +67,7 @@ $breadcrum: #ae6449;
 $main-background: #f2f2f2;
 
 $table-summary: #f9f0fd5b;
+$input-label: hsl(199, 52%, 29%);
 
 /************************** other ****************** */
 // https://hookagency.com/blog/website-color-schemes-2020/

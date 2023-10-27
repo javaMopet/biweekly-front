@@ -1,7 +1,9 @@
 <template>
-  <q-card class="my-card" dense style="width: 80vw; min-width: 80vw">
+  <q-card class="my-card" dense style="width: 80%; min-width: 80%">
     <q-card-section class="row justify-between items-start dialog-title">
-      <div class="dialog__title--name">{{ cuenta.nombre }}</div>
+      <div class="dialog__title--name">
+        Cuenta &nbsp;&nbsp;~ {{ cuenta.nombre }} ~
+      </div>
       <div class="dialog-closebutton">
         <q-btn
           round
@@ -14,126 +16,126 @@
       </div>
     </q-card-section>
     <q-card-section>
-      <div class="column justify-between q-gutter-y-sm">
-        <!-- <div class="row items-center q-gutter-x-sm">
-          <span> Carga tu archivo con movimientos: </span>
-        </div> -->
-        <div class="row">
-          <q-toolbar class="q-gutter-x-md">
-            <div class="row q-pr-lg justify-between">
-              <div class="load__file-text text-condensed" style="width: 135px">
-                Selecciona un archivo en formato Excel:
-              </div>
-              <q-file
-                v-model="archivoExcel"
-                label="Carga archivo Excel"
-                accept=".xlsx,.xls"
-                @input="updateFile"
-                dense
-                style="width: 350px"
-                max-files="1"
-                outlined
-                no-caps
-                label-color="primary"
-                clearable
-                @clear="fileClear"
-              >
-                <template #prepend>
-                  <q-icon color="primary" name="cloud_upload" />
-                </template>
-                <template #append>
-                  <q-img src="/icons/excel2.png" width="24px" />
-                </template>
-              </q-file>
-              <q-btn
-                v-if="isSelected"
-                label="Eliminar"
-                @click="eliminarSeleccionados"
-                outline
-                color="primary"
-              />
+      <q-toolbar class="q-gutter-x-md">
+        <div class="row q-pr-lg justify-between">
+          <div class="column">
+            <div class="load__file-text text-condensed">
+              Selecciona un archivo en formato Excel:
             </div>
-            <q-separator vertical inset></q-separator>
-            <div class="row items-center q-gutter-x-md">
-              <span class="text-condensed"> Desde:</span>
-              <DateInput
-                v-model="fecha_inicio"
-                lbl_field="Fecha"
-                :opcional="false"
-                style="width: 140px"
-              ></DateInput>
-              <span class="text-condensed">Hasta:</span>
-              <DateInput
-                v-model="fecha_fin"
-                lbl_field="Fecha"
-                :opcional="false"
-                style="width: 140px"
-              ></DateInput>
-            </div>
-          </q-toolbar>
-        </div>
-        <q-page-sticky
-          position="top"
-          style="z-index: 100; width: 600px"
-          :offset="[508, 68]"
-          expand
-        >
-          <transition name="fade">
-            <div
-              class="row bg-pink-1"
-              v-if="errorsList.length > 0"
-              style="width: 600px"
+            <q-file
+              v-model="archivoExcel"
+              label="Carga archivo Excel"
+              accept=".xlsx,.xls"
+              @input="updateFile"
+              dense
+              style="width: 300px"
+              max-files="1"
+              outlined
+              no-caps
+              label-color="primary"
+              clearable
+              @clear="fileClear"
             >
-              <div class="column">
-                <div class="row q-gutter-x-md q-pl-sm q-pt-sm justify-between">
-                  <div class="row inline items-center q-gutter-x-md">
-                    <q-icon name="warning" size="1.5rem" color="negative" />
-                    <span class="text-subtitle2 text-dark"
-                      >El formulario contiene errores:</span
-                    >
-                  </div>
-                  <q-btn
-                    class="q-mr-xs"
-                    color="more-button"
-                    icon="close"
-                    dense
-                    round
-                    flat
-                    @click="closeErrors"
-                  />
-                </div>
-                <q-list>
-                  <q-item
-                    :inset-level="0.5"
-                    dense
-                    v-for="error in errorsList"
-                    :key="error.code"
-                    class="col"
-                    style="width: 600px"
+              <template #prepend>
+                <q-icon color="primary" name="cloud_upload" />
+              </template>
+              <template #before>
+                <q-img src="/icons/excel2.png" width="24px" />
+              </template>
+            </q-file>
+          </div>
+          <q-btn
+            v-if="isSelected"
+            label="Eliminar"
+            @click="eliminarSeleccionados"
+            outline
+            color="primary"
+          />
+        </div>
+        <q-separator vertical></q-separator>
+        <div class="row items-center q-gutter-x-md">
+          <div class="column">
+            <span class="form-input__label"> Desde:</span>
+            <DateInput
+              v-model="fecha_inicio"
+              lbl_field="Fecha"
+              :opcional="false"
+              style="width: 140px"
+            ></DateInput>
+          </div>
+          <div class="column">
+            <span class="form-input__label">Hasta:</span>
+            <DateInput
+              v-model="fecha_fin"
+              lbl_field="Fecha"
+              :opcional="false"
+              style="width: 140px"
+            ></DateInput>
+          </div>
+        </div>
+      </q-toolbar>
+
+      <q-page-sticky
+        position="top"
+        style="z-index: 100; width: 600px"
+        :offset="[508, 68]"
+        expand
+      >
+        <transition name="fade">
+          <div
+            class="row bg-pink-1"
+            v-if="errorsList.length > 0"
+            style="width: 600px"
+          >
+            <div class="column">
+              <div class="row q-gutter-x-md q-pl-sm q-pt-sm justify-between">
+                <div class="row inline items-center q-gutter-x-md">
+                  <q-icon name="warning" size="1.5rem" color="negative" />
+                  <span class="text-subtitle2 text-dark"
+                    >El formulario contiene errores:</span
                   >
-                    <q-item-section
-                      avatar
-                      dense
-                      style="min-width: 25px !important; width: 25px !important"
-                    >
-                      <q-icon color="primary" name="arrow_right" />
-                    </q-item-section>
-                    <q-item-section class="text-subtitle2 row inline">
-                      <div class="row inline">
-                        <span class="q-mr-md" v-if="error.numero_linea"
-                          >Línea: {{ error.numero_linea }}</span
-                        ><span class="errors__item--message">{{
-                          error.message
-                        }}</span>
-                      </div></q-item-section
-                    >
-                  </q-item>
-                </q-list>
+                </div>
+                <q-btn
+                  class="q-mr-xs"
+                  color="more-button"
+                  icon="close"
+                  dense
+                  round
+                  flat
+                  @click="closeErrors"
+                />
               </div>
+              <q-list>
+                <q-item
+                  :inset-level="0.5"
+                  dense
+                  v-for="error in errorsList"
+                  :key="error.code"
+                  class="col"
+                  style="width: 600px"
+                >
+                  <q-item-section
+                    avatar
+                    dense
+                    style="min-width: 25px !important; width: 25px !important"
+                  >
+                    <q-icon color="primary" name="arrow_right" />
+                  </q-item-section>
+                  <q-item-section class="text-subtitle2 row inline">
+                    <div class="row inline">
+                      <span class="q-mr-md" v-if="error.numero_linea"
+                        >Línea: {{ error.numero_linea }}</span
+                      ><span class="errors__item--message">{{
+                        error.message
+                      }}</span>
+                    </div></q-item-section
+                  >
+                </q-item>
+              </q-list>
             </div>
-          </transition>
-        </q-page-sticky>
-      </div>
+          </div>
+        </transition>
+      </q-page-sticky>
     </q-card-section>
     <q-card-section style="max-height: 70vh; height: 70vh" class="scroll">
       <q-table
@@ -144,15 +146,11 @@
         dense
         selection="multiple"
         v-model:selected="registrosSelected"
-        table-header-class="bg-accent text-white text-condensed"
+        table-header-class="text-accent text-condensed bg-primary-light"
         no-data-label="No existen datos disponibles"
         hide-pagination
+        class="my-sticky-header-table"
       >
-        <!-- <template #body-cell-tipoAfectacion="props">
-          <q-td :props="props">
-            {{ props.row.tipoAfectacion.nombre }}
-          </q-td>
-        </template> -->
         <template #body-cell-categoria="props">
           <q-td :props="props">
             <TipoMovimientoSelect
@@ -759,5 +757,35 @@ function closeErrors() {
   font-weight: 600;
   letter-spacing: -0.025rem;
   color: $negative-pastel;
+}
+.my-sticky-header-table {
+  /* height or max-height is important */
+  height: 100%;
+
+  .q-table__top,
+  .q-table__bottom,
+  thead tr:first-child th {
+    /* bg color is important for th; just specify one */
+    background-color: $main-background;
+  }
+
+  thead tr th {
+    position: sticky;
+    z-index: 1;
+  }
+  thead tr:first-child th {
+    top: 0;
+  }
+  /* this is when the loading indicator appears */
+  &.q-table--loading thead tr:last-child th {
+    /* height of all previous header rows */
+    top: 48px;
+  }
+
+  /* prevent scrolling behind sticky top row on focus */
+  tbody {
+    /* height of all previous header rows */
+    scroll-margin-top: 48px;
+  }
 }
 </style>

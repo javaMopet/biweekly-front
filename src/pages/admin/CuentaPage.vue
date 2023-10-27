@@ -23,9 +23,10 @@
         </div>
       </div>
       <q-toolbar-title> </q-toolbar-title>
+      <!-- icon="las la-arrow-alt-circle-left" -->
       <q-btn
         color="primary"
-        icon="fa-solid fa-circle-left"
+        icon="las la-arrow-circle-left"
         @click="router.go(-1)"
         flat
         rounded
@@ -40,7 +41,7 @@
         width="50px"
         height="50px"
       />
-      <div class="row cuenta__title inline">Cuenta {{ cuenta.nombre }}</div>
+      <span class="cuenta__title">Cuenta {{ cuenta.nombre }}</span>
     </div>
   </q-card>
   <div class="main-content">
