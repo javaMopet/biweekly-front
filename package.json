@@ -17,6 +17,7 @@
     "axios": "^0.21.1",
     "dotenv": "^16.0.3",
     "dotenv-expand": "^9.0.0",
+    "font-awesome": "^4.7.0",
     "luxon": "^3.3.0",
     "pinia": "^2.0.11",
     "quasar": "^2.6.0",

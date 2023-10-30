@@ -22,7 +22,7 @@
             spread
             no-caps
             color="disable-button"
-            text-color="gray-2"
+            text-color="gray-3"
             toggle-color="toggle-button"
             toggle-text-color="info"
             :options="tiposMovimientoOptions"
