@@ -183,22 +183,27 @@
             />
           </q-td>
         </template>
-        <template #bottom-row>
+        <!-- <template #bottom-row>
           <q-tr>
             <q-td class="text-bold" colspan="4">Total Movimientos:</q-td>
             <q-td align="right" class="text-bold">
               {{ formato.toCurrency(sumatoriaMovimientos) }}</q-td
             >
           </q-tr>
-        </template>
+        </template> -->
       </q-table>
     </q-card-section>
-    <q-card-actions align="right">
-      <div class="column float-right">
-        <!-- <div class="row">Importe total movimientos:</div> -->
-        <div class="row q-gutter-x-md float-right">
-          <q-btn flat label="Cancelar" color="primary" v-close-popup />
-          <q-btn label="Guardar" color="primary" @click="saveItems" />
+    <q-card-actions>
+      <div class="row inline justify-between items-center fit q-pa-md">
+        <div class="">
+          <span class="text-bold text-primary"> Importe Total:</span>
+          <span class="q-pl-md text-secondary text-bold">{{
+            formato.toCurrency(sumatoriaMovimientos)
+          }}</span>
+        </div>
+        <div class="row q-gutter-lg q-pa-sm">
+          <q-btn flat label="Cancelar" v-close-popup />
+          <q-btn label="Guardar" color="primary-button" @click="saveItems" />
         </div>
       </div>
     </q-card-actions>

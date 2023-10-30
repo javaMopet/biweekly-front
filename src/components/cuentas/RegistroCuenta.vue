@@ -2,6 +2,7 @@
   <q-card class="my-card" style="width: 450px">
     <q-card-section
       class="row inline fit q-py-sm justify-between items-center dialog-title"
+      style="border: 1px solid red"
     >
       <div class="dialog__title--name">{{ actionName }}</div>
       <div class="">

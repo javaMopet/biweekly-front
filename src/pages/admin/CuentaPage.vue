@@ -1,6 +1,6 @@
 <template>
-  <q-card flat>
-    <q-toolbar class="bg-grey-1 text-primary" fit dense>
+  <q-card flat class="bg-main-background">
+    <q-toolbar class="text-primary" fit dense>
       <div class="row items-center q-ml-sm q-gutter-x-sm">
         <div class="q-pa-md q-gutter-sm">
           <q-breadcrumbs
@@ -35,13 +35,16 @@
       ></q-btn>
     </q-toolbar>
 
-    <div class="q-pl-xl q-pt-lg q-gutter-sm row inline items-center">
-      <q-img
-        :src="`/icons/${cuenta.banco?.icono ?? 'cash.png'}`"
-        width="50px"
-        height="50px"
-      />
-      <span class="cuenta__title">Cuenta {{ cuenta.nombre }}</span>
+    <div class="row inline fit items-center justify-between q-px-xl q-pt-md">
+      <div class="row items-center q-gutter-md">
+        <q-img
+          :src="`/icons/${cuenta.banco?.icono ?? 'cash.png'}`"
+          width="50px"
+          height="50px"
+        />
+        <span class="cuenta__title">{{ cuenta.nombre }}</span>
+      </div>
+      <span class="cuenta__title text-accent">Cuenta</span>
     </div>
   </q-card>
   <div class="main-content">
@@ -866,14 +869,5 @@ const columns = [
   font-size: 0.75rem;
   font-weight: 500;
   letter-spacing: -0.025rem;
-}
-
-.table-title {
-  font-family: 'Raleway', sans-serif;
-  font-weight: 500;
-  font-feature-settings: 'lnum';
-  font-size: 1.4rem;
-  color: #212934;
-  letter-spacing: -0.035rem;
 }
 </style>

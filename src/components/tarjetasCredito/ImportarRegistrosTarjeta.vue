@@ -180,11 +180,7 @@
         </div>
         <div class="row q-gutter-lg q-pa-sm">
           <q-btn flat label="Cancelar" v-close-popup />
-          <q-btn
-            label="Guardar"
-            color="primary-button"
-            @click="guardarMovimientos"
-          />
+          <q-btn label="Guardar" color="primary-button" @click="saveItems" />
         </div>
       </div>
     </q-card-actions>
@@ -426,7 +422,7 @@ function cargarMovimientosBancomer(wb) {
   })
 }
 
-function guardarMovimientos() {
+function saveItems() {
   const containsErrors = validarMovimientos()
   if (containsErrors) {
     setTimeout(() => {

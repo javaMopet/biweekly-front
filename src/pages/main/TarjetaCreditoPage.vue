@@ -1,6 +1,6 @@
 <template>
-  <q-card flat>
-    <q-toolbar class="bg-grey-1 text-primary" fit dense>
+  <q-card flat class="bg-main-background">
+    <q-toolbar class="text-primary" fit dense>
       <div class="row items-center q-ml-sm q-gutter-x-sm">
         <div class="q-pa-md q-gutter-sm">
           <q-breadcrumbs class="breadcrum-component">
@@ -28,13 +28,17 @@
         label="Regresar"
       ></q-btn>
     </q-toolbar>
-    <div class="q-pl-xl q-pt-lg q-gutter-sm row inline items-center">
-      <q-img
-        :src="`/icons/${cuenta.banco?.icono ?? 'cash.png'}`"
-        width="50px"
-        height="50px"
-      />
-      <span class="cuenta__title">Tarjeta de crédito {{ cuenta.nombre }}</span>
+
+    <div class="row inline fit items-center justify-between q-px-xl q-pt-md">
+      <div class="row items-center q-gutter-md">
+        <q-img
+          :src="`/icons/${cuenta.banco?.icono ?? 'cash.png'}`"
+          width="50px"
+          height="50px"
+        />
+        <span class="cuenta__title">{{ cuenta.nombre }}</span>
+      </div>
+      <span class="cuenta__title text-accent">Tarjeta de crédito </span>
     </div>
   </q-card>
   <div class="main-content">
@@ -785,9 +789,7 @@ function obtenerSaldoTarjeta() {
       }
     })
     .then(({ data }) => {
-      console.log('data', data)
       let saldo_data = data.data[0].saldo || 0.0 * -1
-      console.log('saldo_data', saldo_data)
       let saldo = parseFloat(saldo_data) * -1
       saldo = saldo === -0.0 ? 0.0 : saldo
       saldo_final_periodo.value = saldo
@@ -798,7 +800,6 @@ function obtenerSaldoTarjeta() {
 }
 function obtenerSaldoTarjetaAlDia() {
   const fecha_actual = DateTime.now().toFormat('yyyy-MM-dd')
-  console.log('fecha actual', fecha_actual)
   api
     .get('/saldo_tarjeta_credito', {
       params: {
@@ -808,7 +809,8 @@ function obtenerSaldoTarjetaAlDia() {
       }
     })
     .then(({ data }) => {
-      let saldo = parseFloat(data.data[0].saldo) * -1
+      let saldo = parseFloat(data.data[0].saldo) * -1 || 0.0
+      console.log(saldo)
       saldo_al_dia.value = saldo
     })
     .catch((error) => {

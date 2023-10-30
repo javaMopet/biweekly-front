@@ -1,10 +1,8 @@
 <template>
   <q-card class="my-card" style="width: 450px">
-    <q-card-section
-      class="row inline fit q-py-sm justify-between items-center dialog-title"
-    >
+    <q-card-section class="row justify-between items-start dialog-title">
       <div class="dialog__title--name">{{ actionName }}</div>
-      <div class="">
+      <div class="dialog-closebutton">
         <q-btn
           round
           icon="close"
