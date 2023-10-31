@@ -441,7 +441,6 @@ watch(loadingArbol, (newValue, oldValue) => {
 
 <style lang="scss" scoped>
 .font-tree {
-  // font-family: 'Chivo Mono', monospace;
   font-family: 'Mulish', sans-serif;
   font-size: 0.8rem;
   font-weight: 600;

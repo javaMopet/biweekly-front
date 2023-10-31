@@ -1,17 +1,15 @@
 <template>
   <q-card class="my-card" style="width: 500px">
-    <q-card-section class="row inline fit q-py-sm justify-between dialog-title">
+    <q-card-section class="row justify-between items-start dialog-title">
       <div class="dialog__title--name">{{ cuenta.nombre }}</div>
-      <div class="">
+      <div class="dialog-closebutton">
         <q-btn
-          round
-          flat
-          dense
           icon="close"
-          class="float-right"
-          color="accent"
           v-close-popup
-          vertical-top
+          push
+          class="dialog__title--closeButton"
+          round
+          glossy
         ></q-btn>
       </div>
     </q-card-section>
@@ -53,6 +51,7 @@
             <DateInput
               v-model="formItem.fecha"
               label="Introduce una fecha válida"
+              :rules="[(val) => !!val || 'Favor de ingresar la fecha']"
             ></DateInput>
           </div>
           <div class="col column q-ml-sm">
@@ -60,6 +59,11 @@
             <PriceInput
               v-model="formItem.saldo_periodo"
               :readonly="true"
+              :rules="[
+                (val) =>
+                  (!!val && val !== '0' && val !== '$0.00') ||
+                  'Favor de ingresar un valor mayor a cero'
+              ]"
             ></PriceInput>
           </div>
         </div>
@@ -87,10 +91,6 @@
         </div>
       </q-form>
     </q-card-section>
-    <q-card-section>
-      <pre>{{ fecha_inicio }}</pre>
-      <pre>{{ fecha_fin }}</pre>
-    </q-card-section>
   </q-card>
 </template>
 
@@ -105,6 +105,7 @@ import { LISTA_REGISTROS_TARJETA } from 'src/graphql/registrosTarjeta'
 import { DateTime } from 'luxon'
 import { api } from 'src/boot/axios'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
+import { SessionStorage } from 'quasar'
 
 /**
  * composables
@@ -173,7 +174,6 @@ onMounted(() => {
  * funciones
  */
 function generarPago() {
-  console.log('Generando el pago de la tarjeta')
   cargaListaRegistrosTarjeta(
     null,
     {
@@ -188,10 +188,10 @@ function generarPago() {
 }
 onResultListaRegistros(({ data }) => {
   const listaRegistros = data?.listaRegistrosTarjeta ?? []
-  console.log('data', listaRegistros)
   const fecha = formato.convertDateFromInputToIso(formItem.value.fecha)
-  console.log('data', fecha)
+  const user_id = SessionStorage.getItem('user').id
 
+  console.dir(user_id)
   var lista_registros = []
   listaRegistros.forEach((item) => {
     const registro = {
@@ -202,11 +202,12 @@ onResultListaRegistros(({ data }) => {
       importe: parseFloat(item.importe),
       fecha,
       observaciones: item.concepto,
-      registro_id: item.id
+      registro_id: item.id,
+      user_id
     }
     lista_registros.push(registro)
   })
-  console.log('listaregistros', lista_registros)
+  console.table(lista_registros)
 
   api
     .post('/registros_tarjeta/create_pago', {

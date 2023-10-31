@@ -13,7 +13,6 @@
         ></q-btn>
       </div>
     </q-card-section>
-
     <q-card-section class="q-py-lg q-px-xl">
       <q-form @submit="saveItem" class="q-gutter-md">
         <div class="q-py-lg">

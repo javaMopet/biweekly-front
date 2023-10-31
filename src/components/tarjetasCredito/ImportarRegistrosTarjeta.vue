@@ -552,14 +552,6 @@ const columns = [
     filter: true
   },
   {
-    name: 'categoria',
-    label: 'Categoria',
-    field: 'categoria',
-    sortable: true,
-    align: 'left',
-    style: 'width:450px;max-width:450px'
-  },
-  {
     name: 'importe',
     label: 'Importe',
     field: 'importe',
@@ -567,6 +559,14 @@ const columns = [
     align: 'right',
     // format: (val, row) => `${formato.toCurrency(parseFloat(val))}`,
     style: 'width:150px'
+  },
+  {
+    name: 'categoria',
+    label: 'Categoria',
+    field: 'categoria',
+    sortable: true,
+    align: 'left',
+    style: 'width:450px;max-width:450px'
   },
   {
     name: 'acciones',

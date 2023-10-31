@@ -10,6 +10,7 @@
         :rows-per-page-options="[0]"
         separator="horizontal"
         hide-pagination
+        class="my-sticky-header-table-ingreso"
       >
         <template #top-left>
           <div class="row inline q-gutter-x-md items-center">
@@ -22,6 +23,7 @@
               outlined
               color="secondary"
               label-color="dark"
+              @update:model-value="onChangeEjercicio"
             >
               <template #prepend>
                 <q-icon name="calendar_month" />
@@ -34,7 +36,7 @@
           </div>
         </template>
         <template #top-right>
-          <div class="row" style="border: 0px solid red">
+          <div class="row bg-accent-light">
             <q-input
               outlined
               dense
@@ -62,11 +64,13 @@
             class="text-primary"
             :style="`border-left: 6px solid ${props.row.color}`"
           >
-            <q-icon :name="props.row.icono" size="22px" color="blue-grey-6" />
+            <div class="row items-center">
+              <q-icon :name="props.row.icono" size="22px" color="blue-grey-6" />
 
-            <span class="q-pl-sm movimientos__columna-categoria">
-              {{ props.value }}</span
-            >
+              <span class="q-pl-sm movimientos__columna-categoria">
+                {{ props.value }}</span
+              >
+            </div>
           </q-td>
         </template>
         <template v-slot:body-cell="props">
@@ -217,8 +221,8 @@
           >
             <q-icon :name="props.row.icono" size="22px" color="dark" />
             <span class="q-pl-sm movimientos__columna-categoria">
-              {{ props.value }}</span
-            >
+              {{ props.value }}
+            </span>
           </q-td>
         </template>
         <template v-slot:body-cell="props">
@@ -413,7 +417,6 @@ function editRow(item) {
   showFormItem.value = true
 }
 function obtenerColumnas(ejercicio_fiscal, mes) {
-  // console.log('Obteniendo columnas del ejercicio y mes', ejercicio_fiscal, mes)
   api
     .get('/columnas', {
       params: {
@@ -427,25 +430,17 @@ function obtenerColumnas(ejercicio_fiscal, mes) {
       columnsSaldos.value = JSON.parse(JSON.stringify(data.data))
 
       columnsIngresos.value.forEach((column) => {
-        // console.log('column', column)
         if (column.name != 'nombre_categoria') {
           column.format = (val, row) =>
             !!val ? `${formato.toCurrency(val)}` : ''
         } else {
-          // column.style = 'background-color: #aebbc7'
-          // column.style = 'background-color: #c8d7ca'
-          // column.classes = 'categoria_background'
         }
       })
       columnsEgresos.value.forEach((column) => {
-        // console.log('column', column)
         if (column.name != 'nombre_categoria') {
           column.format = (val, row) =>
             !!val ? `${formato.toCurrency(val)}` : ''
         } else {
-          // column.style = 'background-color: #aebbc7'
-          // column.style = 'background-color: #c8d7ca'
-          // column.classes = 'categoria_background'
         }
       })
       columnsSaldos.value.forEach((element) => {
@@ -455,7 +450,6 @@ function obtenerColumnas(ejercicio_fiscal, mes) {
         }
         element.classes = 'table__body-totals'
       })
-      // console.log('columnas saldos', columnsSaldos.value)
     })
     .catch((error) => {
       console.log('error', error)
@@ -465,6 +459,7 @@ function obtenerMovimientos() {
   api
     .get('/movimientos', {
       params: {
+        ejercicioFiscalId: ejercicio_fiscal.value,
         tipoMovimientoId: 2,
         isSaldos: 0
       }
@@ -480,7 +475,8 @@ function obtenerMovimientos() {
     .get('/movimientos', {
       params: {
         tipoMovimientoId: 1,
-        isSaldos: 0
+        isSaldos: 0,
+        ejercicioFiscalId: ejercicio_fiscal.value
       }
     })
     .then(({ data }) => {
@@ -495,7 +491,8 @@ function obtenerIngresosEgresosSaldos() {
     .get('/movimientos', {
       params: {
         tipoMovimientoId: 1,
-        isSaldos: 1
+        isSaldos: 1,
+        ejercicioFiscalId: ejercicio_fiscal.value
       }
     })
     .then(({ data }) => {
@@ -509,7 +506,8 @@ function obtenerIngresosEgresosSaldos() {
     .get('/movimientos', {
       params: {
         tipoMovimientoId: 2,
-        isSaldos: 1
+        isSaldos: 1,
+        ejercicioFiscalId: ejercicio_fiscal.value
       }
     })
     .then(({ data }) => {
@@ -524,15 +522,13 @@ function obtenerSaldosMovimientos() {
   api
     .get('/saldos_movimientos', {
       params: {
-        ejercicio_fiscal_id: 2023,
+        ejercicioFiscalId: ejercicio_fiscal.value,
+        mesId: mes.value.id,
         isSaldos: 0
       }
     })
     .then(({ data }) => {
-      // console.log('response data', data.data)
       listaSaldosMovimientos.value = JSON.parse(JSON.stringify(data.data))
-
-      // console.log('ingresos data', listaMovimientosIngreso.value)
     })
     .catch((error) => {
       console.log('error', error)
@@ -543,15 +539,13 @@ function obtenerSaldosCuentas() {
   api
     .get('/saldos_cuentas', {
       params: {
-        ejercicio_fiscal_id: 2023,
+        ejercicioFiscalId: ejercicio_fiscal.value,
+        mesId: mes.value.id,
         isSaldos: 0
       }
     })
     .then(({ data }) => {
-      // console.log('response data', data.data)
       listaSaldosCuentas.value = JSON.parse(JSON.stringify(data.data))
-
-      // console.log('ingresos data', listaMovimientosIngreso.value)
     })
     .catch((error) => {
       console.log('error', error)
@@ -576,7 +570,8 @@ function obtenerSaldosFinales() {
   api
     .get('/saldos_finales', {
       params: {
-        ejercicio_fiscal_id: 2023,
+        ejercicioFiscalId: ejercicio_fiscal.value,
+        mesId: mes.value.id,
         isSaldos: 0
       }
     })
@@ -640,6 +635,13 @@ function onRegistroCreated(itemCreated) {
 function onChangeMes(value) {
   obtenerColumnas(ejercicio_fiscal.value, value.id)
 }
+function onChangeEjercicio(newValue) {
+  console.dir(mes.value)
+  // obtenerColumnas(newValue, mes.value.id)
+  mes.value = mesOptions.value[0]
+  cargarDatos()
+  obtenerColumnas(ejercicio_fiscal.value, mes.value.id)
+}
 /**
  * GRAPHQL
  */
@@ -683,16 +685,46 @@ onErrorDeleteMovimiento((error) => {
     transition: all 0.3s;
   }
 }
-
-.my-sticky-header-table {
+.my-sticky-header-table-ingreso {
   /* height or max-height is important */
-  height: calc(100vh - 530px);
+  height: 250px;
+  min-height: 250px;
 
   .q-table__top,
   .q-table__bottom,
   thead tr:first-child th {
     /* bg color is important for th; just specify one */
-    // background-color: $accent-light;
+    background-color: $main-background;
+  }
+
+  thead tr th {
+    position: sticky;
+    z-index: 1;
+  }
+  thead tr:first-child th {
+    top: 0;
+  }
+  /* this is when the loading indicator appears */
+  &.q-table--loading thead tr:last-child th {
+    /* height of all previous header rows */
+    top: 48px;
+  }
+
+  /* prevent scrolling behind sticky top row on focus */
+  tbody {
+    /* height of all previous header rows */
+    scroll-margin-top: 48px;
+  }
+}
+.my-sticky-header-table {
+  /* height or max-height is important */
+  height: calc(100vh - 580px);
+
+  .q-table__top,
+  .q-table__bottom,
+  thead tr:first-child th {
+    /* bg color is important for th; just specify one */
+    background-color: $main-background;
   }
   thead tr th {
     position: sticky;
@@ -709,25 +741,31 @@ onErrorDeleteMovimiento((error) => {
   }
 }
 .table__body-preBalance {
+  // Final cash balance
+  font-family: 'Roboto Condensed', 'Open Sans', sans-serif;
   background-color: rgb(230, 200, 230) !important;
   font-weight: 600 !important;
   font-size: 0.9rem !important;
 }
 .table__body-netBalance {
+  font-family: 'Roboto Condensed', 'Open Sans', sans-serif;
   background-color: rgb(245, 231, 209) !important;
+  font-size: 1.2rem;
 }
 
 .table__body-totals {
-  background-color: #d9e6f8 !important;
-  font-weight: 600 !important;
-  font-size: 0.8rem !important;
+  font-family: 'Roboto Condensed', 'Open Sans', sans-serif;
+  font-weight: bold;
+  background-color: #e8edf7 !important;
+  font-size: 0.85rem !important;
   font-style: italic;
 }
 
 .movimientos__celda--importe {
-  font-size: 0.78rem !important;
-  font-weight: 600 !important;
-  color: #212364;
+  font-family: 'Roboto Condensed', 'Open Sans', sans-serif;
+  font-size: 0.85rem !important;
+  font-weight: 400 !important;
+  color: $primary;
 }
 .movimientos__headers-font {
   font-size: 0.65rem;
@@ -739,10 +777,11 @@ onErrorDeleteMovimiento((error) => {
   background-color: #eaecea !important;
 }
 .movimientos__columna-categoria {
-  font-weight: 600 !important;
+  // font-family: 'Raleway', sans-serif;
+  // font-weight: 500 !important;
   font-size: 0.78rem;
-  color: $dark;
-  letter-spacing: -0.015rem;
+  color: $categoria;
+  // letter-spacing: -0.0025rem;
 }
 .categoria_background {
   background-color: #f3f6f9 !important;
