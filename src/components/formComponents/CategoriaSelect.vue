@@ -96,7 +96,6 @@ const showRegistroCategoria = ref(false)
 const tipoMovimientoId = ref('1')
 const editedCategoriaParam = ref({ tipoMovimientoId: tipoMovimientoId.value })
 
-const { tipoAfectacion } = toRefs(props)
 /**
  * props
  */
@@ -137,6 +136,8 @@ const props = defineProps({
     default: true
   }
 })
+
+const { tipoAfectacion } = toRefs(props)
 /**
  * emits
  */

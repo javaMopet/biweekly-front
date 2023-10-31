@@ -1,5 +1,5 @@
 <template>
-  <q-card class="my-card" style="width: 520px">
+  <q-card class="my-card" style="width: 630px">
     <q-card-section class="row justify-between items-start dialog-title">
       <div class="dialog__title--name">{{ actionName }}</div>
       <div class="dialog-closebutton">
@@ -18,6 +18,7 @@
       <q-form @submit="saveItem" class="q-gutter-md">
         <div class="q-py-lg">
           <q-btn-toggle
+            class="text-condensed"
             v-model="editedFormItem.tipoMovimientoId"
             spread
             no-caps
