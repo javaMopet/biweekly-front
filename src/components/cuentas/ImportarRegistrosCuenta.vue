@@ -733,24 +733,7 @@ function closeErrors() {
     transition: all ease-in 0.15s;
   }
 }
-.fade-enter-from {
-  opacity: 0;
-}
-.fade-enter-to {
-  opacity: 1;
-}
-.fade-enter-active {
-  transition: all 2s ease;
-}
-.fade-leave-from {
-  opacity: 1;
-}
-.fade-leave-to {
-  opacity: 0;
-}
-.fade-leave-active {
-  transition: all 0.5s ease-out;
-}
+
 .importe_negativo {
   color: red;
 }

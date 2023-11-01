@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="z-index: 5">
     <q-input
       v-model="inputValue"
       type="text"
@@ -22,6 +22,12 @@
       </template>
     </q-input>
   </div>
+
+  <transition name="fade">
+    <div class="level2" v-if="isError">
+      <div class="price-error">Ingresar un precio distinto de 0</div>
+    </div>
+  </transition>
 </template>
 
 <script setup>
@@ -90,6 +96,11 @@ const props = defineProps({
     default: () => {
       return []
     }
+  },
+  isError: {
+    type: Boolean,
+    required: false,
+    default: false
   }
 })
 /**
@@ -169,4 +180,37 @@ function setCurrency(code) {
   selectedCurrency.value = currencies.value[code] || {}
 }
 </script>
-<style lang="scss" scoped></style>
+
+<style lang="scss" scoped>
+.level15 {
+  margin: 0 auto;
+  position: relative;
+}
+.level2 {
+  position: absolute;
+  right: 150px;
+  top: 50px;
+}
+.price-error {
+  background: $negative-pastel;
+  color: white;
+  position: fixed;
+  // left: 8px;
+  z-index: 1;
+  border-radius: 5px;
+  padding: 3px;
+  padding-right: 15px;
+  box-shadow: rgba(124, 113, 113, 0.76) 5px 14px 28px,
+    rgba(112, 93, 93, 0.74) 5px 10px 10px;
+  &::before {
+    content: '';
+    width: 0;
+    height: 0;
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+    border-bottom: 15px solid $negative-pastel;
+    position: relative;
+    top: -25px;
+  }
+}
+</style>

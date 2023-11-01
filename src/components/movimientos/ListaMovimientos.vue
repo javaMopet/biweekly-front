@@ -2,36 +2,31 @@
   <q-card
     class="my-card no-shadow no-border"
     flat
-    style="width: 920px; min-width: 980px; border: 0px solid red"
+    style="width: 920px; min-width: 980px; height: 70%; min-height: 70%"
   >
-    <q-card-section
-      class="bg-main-menu row inline fit q-py-sm justify-between items-center"
-    >
-      <div class="row items-center q-gutter-x-md">
+    <q-card-section class="row justify-between items-start dialog-title">
+      <div class="row">
         <q-avatar
           size="38px"
           font-size="23px"
           text-color="white"
           :icon="categoria.icono"
-          :style="`background-color: ${categoria.color} !important`"
+          :style="`background-color: ${categoria.color} !important;transform: translateY(-5px)`"
         />
-        <div class="text-subtitle1 text-accent-light">
+        <div class="dialog__title--name">
           {{ categoria.nombre }}
         </div>
       </div>
-      <div class="">
+      <div class="dialog-closebutton">
         <q-btn
-          round
-          flat
-          dense
           icon="close"
-          class="float-right"
-          color="accent"
           v-close-popup
-          vertical-top
+          push
+          class="dialog__title--closeButton"
+          round
+          glossy
         ></q-btn>
       </div>
-      <!-- <pre>{{ categoria }}</pre> -->
     </q-card-section>
     <transition name="fade">
       <div class="row bg-pink-1" v-if="errorsList.length > 0">
@@ -64,9 +59,79 @@
         </div>
       </div>
     </transition>
-    <q-card-section style="border: 0px solid red">
+    <q-card-section>
+      <!-- <pre>{{ errors }}</pre> -->
       <q-table
-        style="width: 100%; border: 0px solid red"
+        :rows="listaEncabezado"
+        :columns="columns"
+        row-key="name"
+        :rows-per-page-options="[0]"
+        hide-header
+        dense
+        separator="cell"
+        style="height: 88px"
+      >
+        <template #top-row>
+          <q-tr>
+            <q-td></q-td>
+            <q-td style="width: 150px"
+              ><DateInput
+                v-model="formItem.fecha"
+                lbl_field="Fecha"
+                :optional="false"
+                :rango-fecha-inicio="categoria.fecha_inicio_formato"
+                :rango-fecha-fin="categoria.fecha_fin_formato"
+              ></DateInput
+            ></q-td>
+            <q-td style="width: 180px">
+              <PriceInput
+                v-model="formItem.importe"
+                :autofocus="true"
+                :is-error="errors.isPriceError"
+              ></PriceInput
+            ></q-td>
+            <q-td>
+              <CuentaSelect
+                v-model="formItem.cuenta"
+                :agregar="false"
+                :filter-array="['1', '2']"
+              ></CuentaSelect
+            ></q-td>
+            <q-td>
+              <q-input
+                v-model="formItem.observaciones"
+                type="textarea"
+                label="observaciones"
+                dense
+                outlined
+                color="secondary"
+                rows="1"
+                lazy-rules
+            /></q-td>
+            <q-td
+              colspan="3"
+              style="
+                border: 0px solid red;
+                text-align: start;
+                vertical-align: top;
+                padding-top: 10px;
+              "
+            >
+              <div class="row items-center">
+                <q-icon
+                  name="add_circle"
+                  class="btn-add"
+                  clickable
+                  @click="addItem"
+                >
+                  <q-tooltip :offset="[10, 10]"> Add New </q-tooltip>
+                </q-icon>
+              </div></q-td
+            >
+          </q-tr>
+        </template>
+      </q-table>
+      <q-table
         :rows="listaRegistros"
         :columns="columns"
         row-key="name"
@@ -74,126 +139,10 @@
         hide-pagination
         hide-header
         dense
-        separator="none"
-        flat
-        table-class="myClass"
+        class="my-sticky-header-table"
+        separator="cell"
       >
-        <template #top-left
-          ><q-icon name="add_circle" class="btn-add" clickable @click="addItem">
-            <q-tooltip :offset="[10, 10]"> Add New </q-tooltip>
-          </q-icon></template
-        >
-        <template #body-cell-estatus="props">
-          <q-td class="" style="border: 0px solid red">
-            <q-icon
-              v-if="props.row.saved"
-              name="done"
-              color="positive"
-              size="20px"
-            />
-            <q-icon v-else name="close" color="negative" size="20px" />
-          </q-td>
-        </template>
-        <template #body-cell-fecha="props">
-          <q-td style="width: 150px" class="bg-white">
-            <DateInput
-              v-model="props.row.fecha"
-              lbl_field="Fecha"
-              :optional="false"
-              :rango-fecha-inicio="categoria.fecha_inicio_formato"
-              :rango-fecha-fin="categoria.fecha_fin_formato"
-              v-if="!props.row.saved"
-            ></DateInput>
-            <!-- v-model="props.row.registro.fecha_formato" -->
-            <q-item-label v-else>{{ props.row.fecha }}</q-item-label>
-          </q-td>
-        </template>
-        <template #body-cell-importe="props">
-          <q-td style="width: 160px">
-            <PriceInput
-              v-model="props.row.importe"
-              :readonly="props.row.saved"
-              :autofocus="true"
-            ></PriceInput>
-          </q-td>
-          <!-- " -->
-        </template>
-        <template #body-cell-cuenta="props">
-          <q-td style="width: 240px; min-width: 240px; max-width: 240px">
-            <CuentaSelect
-              v-model="props.row.cuenta"
-              :agregar="false"
-              :readonly="props.row.saved"
-              :filter-array="['1', '2']"
-            ></CuentaSelect>
-          </q-td>
-          <!-- :is-valid="isCuentaValida(props.row.cuentaValida)" -->
-        </template>
-        <template #body-cell-observaciones="props">
-          <q-td>
-            <q-input
-              v-model="props.row.observaciones"
-              type="textarea"
-              label="observaciones"
-              dense
-              outlined
-              color="secondary"
-              :readonly="props.row.saved"
-              rows="1"
-              lazy-rules
-            />
-          </q-td>
-        </template>
-        <template #body-cell-acciones="props">
-          <q-td
-            class=""
-            style="width: 110px; height: 50px; border: 0px solid green"
-            :props="props"
-          >
-            <div class="row inline items-start justify-start">
-              <div class="col justify-start items-start">
-                <q-btn
-                  v-if="props.row.saved"
-                  color="contrast"
-                  flat
-                  icon="edit"
-                  @click="updateItem(props.row)"
-                />
-                <q-btn
-                  v-else
-                  color="info"
-                  flat
-                  icon="save"
-                  @click="saveItem(props.row)"
-                />
-              </div>
-              <div class="col">
-                <q-btn
-                  color="negative"
-                  icon="delete"
-                  flat
-                  @click="deleteItem(props)"
-                />
-              </div>
-            </div>
-          </q-td>
-        </template>
-        <!-- <template #bottom="props">
-          <div class="col" align="right" style="border: 0px solid red">
-            <q-btn
-              color="secondary"
-              icon="add"
-              @click="addItem(props)"
-              dense
-              push
-              class="shadow-3"
-            />
-          </div>
-        </template> -->
       </q-table>
-    </q-card-section>
-    <q-card-section>
-      <!-- <pre>{{ listaRegistros }}</pre> -->
     </q-card-section>
   </q-card>
 </template>
@@ -222,8 +171,19 @@ const notificacion = useNotificacion()
  * state
  */
 const categoria = ref({})
+const listaEncabezado = ref([])
 const listaRegistros = ref([])
 const errorsList = ref([])
+const defaultFormItem = {
+  fecha: '10/10/2023',
+  importe: '',
+  cuenta: null,
+  observaciones: ''
+}
+const formItem = ref({ ...defaultFormItem })
+const errors = ref({
+  isPriceError: false
+})
 
 const props = defineProps({
   cellData: {
@@ -245,26 +205,30 @@ const columns = [
     label: '',
     field: '',
     sortable: true,
-    align: 'left'
+    align: 'left',
+    style: 'width:20px'
   },
   {
     name: 'fecha',
     label: 'Fecha',
     field: (row) => formato.formatoFecha(row.fecha),
     sortable: true,
-    align: 'center'
+    align: 'center',
+    style: 'width:150px'
   },
   {
     name: 'importe',
     label: 'Importe',
-    // field: (row) => row.registro.importe,
+    field: (row) => row.importe,
+    format: (val, row) => `${formato.toCurrency(parseFloat(val))}`,
     sortable: true,
-    align: 'left'
+    align: 'left',
+    style: 'width:180px'
   },
   {
     name: 'cuenta',
     label: 'Cuenta',
-    field: 'cuenta',
+    field: (row) => row.cuenta?.nombre || '',
     sortable: true,
     align: 'left'
   },
@@ -284,22 +248,44 @@ const columns = [
   }
 ]
 
-function addItem() {
-  const fecha = obtenerFechaDefault()
-  const importe = !!categoria.value.importeDefault
-    ? categoria.value.importeDefault.toString()
-    : ''
+function addItem(val) {
+  const fecha = formItem.value.fecha
+  const importe = formItem.value.importe
+  const cuenta = formItem.value.cuenta
 
-  const item = {
-    categoriaId: props.cellData.categoriaId,
-    cuentaValida: true,
-    estadoRegistroId: 1,
-    importe,
-    fecha,
-    cuenta: categoria.value.cuentaDefault,
-    observaciones: ''
+  const observaciones = formItem.value.observaciones
+  const validar = true
+  if (entradaValida()) {
+    console.log('agreagndo .............')
+    const row = {
+      categoriaId: props.cellData.categoriaId,
+      cuentaValida: true,
+      estadoRegistroId: 1,
+      importe: importe,
+      fecha,
+      cuenta,
+      observaciones
+    }
+    listaRegistros.value.push(row)
+
+    // resetForm()
   }
-  listaRegistros.value.push(item)
+}
+function entradaValida() {
+  errors.value.isPriceError = false
+  const importe = parseFloat(formItem.value.importe)
+  if (!importe || importe === 0) {
+    errors.value.isPriceError = true
+    setTimeout(() => {
+      errors.value.isPriceError = false
+    }, 2500)
+  }
+
+  return !errors.value.isPriceError
+}
+
+function resetForm() {
+  formItem.value = { ...defaultFormItem }
 }
 
 function obtenerFechaDefault() {
@@ -454,8 +440,6 @@ onResultListaRegistros(({ data }) => {
       element.importe = importe.toString()
       element.saved = true
     })
-  } else {
-    addItem()
   }
 })
 
@@ -547,5 +531,38 @@ function buscarMovimientos() {
 }
 .fade-leave-active {
   transition: all 0.5s ease-out;
+}
+
+.my-sticky-header-table {
+  /* height or max-height is important */
+  height: 300px;
+  z-index: 10;
+
+  .q-table__top,
+  .q-table__bottom,
+  thead tr:first-child th {
+    /* bg color is important for th; just specify one */
+    background-color: $main-background;
+  }
+
+  thead tr th {
+    position: sticky;
+    z-index: 1;
+  }
+  thead tr:first-child th {
+    top: 0;
+  }
+
+  /* this is when the loading indicator appears */
+  &.q-table--loading thead tr:last-child th {
+    /* height of all previous header rows */
+    top: 48px;
+  }
+
+  /* prevent scrolling behind sticky top row on focus */
+  tbody {
+    /* height of all previous header rows */
+    scroll-margin-top: 48px;
+  }
 }
 </style>

@@ -1,6 +1,7 @@
 <template>
   <div class="column">
     <div class="column">
+      <!-- Lista del detalle de ingresos -->
       <q-table
         dense
         :rows="listaMovimientosIngreso"
@@ -10,7 +11,9 @@
         :rows-per-page-options="[0]"
         separator="horizontal"
         hide-pagination
-        class="my-sticky-header-table-ingreso"
+        :class="{
+          'my-sticky-header-table-ingreso': listaMovimientosIngreso.length > 4
+        }"
       >
         <template #top-left>
           <div class="row inline q-gutter-x-md items-center">
