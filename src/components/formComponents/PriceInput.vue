@@ -21,13 +21,14 @@
         <div class="text-subtitle1">{{ editingLabel }}</div>
       </template>
     </q-input>
+    <transition name="fade">
+      <div class="level2" v-if="isError">
+        <div class="level1">
+          <div class="price-error">Ingresar un precio distinto de 0</div>
+        </div>
+      </div>
+    </transition>
   </div>
-
-  <transition name="fade">
-    <div class="level2" v-if="isError">
-      <div class="price-error">Ingresar un precio distinto de 0</div>
-    </div>
-  </transition>
 </template>
 
 <script setup>
@@ -182,26 +183,27 @@ function setCurrency(code) {
 </script>
 
 <style lang="scss" scoped>
-.level15 {
-  margin: 0 auto;
-  position: relative;
+.level1 {
+  margin: 5px auto;
+  position: fixed;
+  z-index: 5000;
 }
 .level2 {
-  position: absolute;
-  right: 150px;
-  top: 50px;
+  position: fixed;
+  z-index: 5;
 }
 .price-error {
   background: $negative-pastel;
   color: white;
   position: fixed;
   // left: 8px;
-  z-index: 1;
+  z-index: 5;
   border-radius: 5px;
   padding: 3px;
   padding-right: 15px;
   box-shadow: rgba(124, 113, 113, 0.76) 5px 14px 28px,
     rgba(112, 93, 93, 0.74) 5px 10px 10px;
+  font-size: 0.8rem;
   &::before {
     content: '';
     width: 0;

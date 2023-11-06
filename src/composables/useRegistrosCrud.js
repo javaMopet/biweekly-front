@@ -4,6 +4,7 @@ import {
   REGISTRO_CREATE,
   REGISTRO_UPDATE,
   REGISTRO_DELETE,
+  REGISTROS_DELETE,
   IMPORTAR_REGISTROS
 } from 'src/graphql/registros'
 
@@ -22,9 +23,9 @@ export function useRegistrosCrud() {
   } = useMutation(REGISTRO_CREATE)
 
   const {
-    mutate: updateItem,
-    onDone: onDoneUpdate,
-    onError: onErrorUpdate
+    mutate: registroUpdate,
+    onDone: onDoneRegistroUpdate,
+    onError: onErrorRegistroUpdate
   } = useMutation(REGISTRO_UPDATE)
 
   const {
@@ -32,6 +33,12 @@ export function useRegistrosCrud() {
     onDone: onDoneDelete,
     onError: onErrorDelete
   } = useMutation(REGISTRO_DELETE)
+
+  const {
+    mutate: registrosDelete,
+    onDone: onDoneRegistrosDelete,
+    onError: onErrorRegistrosDelete
+  } = useMutation(REGISTROS_DELETE)
 
   const {
     mutate: importarRegistros,
@@ -49,8 +56,11 @@ export function useRegistrosCrud() {
     deleteRegistro,
     onDoneDelete,
     onErrorDelete,
-    updateItem,
-    onDoneUpdate,
-    onErrorUpdate
+    registroUpdate,
+    onDoneRegistroUpdate,
+    onErrorRegistroUpdate,
+    registrosDelete,
+    onDoneRegistrosDelete,
+    onErrorRegistrosDelete
   }
 }

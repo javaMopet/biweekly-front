@@ -24,7 +24,7 @@ export function useCategoriaCrud() {
   const {
     mutate: createCategoria,
     onDone: onDoneCreate,
-    onError: onErrorCreate
+    onError: onErrorCreateCategoria
   } = useMutation(CATEGORIA_CREATE)
 
   const {
@@ -49,7 +49,7 @@ export function useCategoriaCrud() {
     console.log('refrescando categorias')
     refetchListaCategorias()
   })
-  onErrorCreate((error) => {
+  onErrorCreateCategoria((error) => {
     console.log('error', error.graphQLErrors[0])
     console.log('error', error.graphQLErrors[0].extensions)
   })
@@ -62,8 +62,11 @@ export function useCategoriaCrud() {
     refetchListaCategorias()
   })
   onErrorUpdateCategoria((error) => {
-    console.log('error', error.graphQLErrors[0])
-    console.log('error', error.graphQLErrors[0].extensions)
+    console.dir(error)
+    // const problems = error.graphQLErrors[0].extensions.problems
+    // if (!!problems) {
+    //   console.table(problems)
+    // }
   })
 
   return {
@@ -74,6 +77,9 @@ export function useCategoriaCrud() {
     onDoneUpdate,
     onDoneDeleteCategoria,
     onErrorListaCategorias,
-    onErrorDeleteCategoria
+    onErrorCreateCategoria,
+    onErrorUpdateCategoria,
+    onErrorDeleteCategoria,
+    refetchListaCategorias
   }
 }

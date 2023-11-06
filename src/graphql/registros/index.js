@@ -105,6 +105,17 @@ export const REGISTRO_DELETE = gql`
     }
   }
 `
+export const REGISTROS_DELETE = gql`
+  mutation registrosDelete($ids: String!) {
+    registrosDelete(ids: $ids) {
+      registros {
+        id
+        cuentaId
+        estadoRegistroId
+      }
+    }
+  }
+`
 
 export const IMPORTAR_REGISTROS = gql`
   mutation importarRegistros(

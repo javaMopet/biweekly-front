@@ -380,7 +380,7 @@ function deleteRow(item) {
 function categoriaSaved(itemSaved) {
   showFormItem.value = false
   mostrarNotificacion('guardó', itemSaved)
-  refetchListaCategorias()
+  categoriasCrud.refetchListaCategorias()
 }
 function categoriaUpdated(itemUpdated, indice) {
   console.log('se actualizó el item con indice: ', indice)
@@ -389,17 +389,13 @@ function categoriaUpdated(itemUpdated, indice) {
   // listaCategorias.value[indice] = itemUpdated
   editedItem.value = { ...defaultItem }
   editedIndex.value = null
-  refetchListaCategorias()
+  categoriasCrud.refetchListaCategorias()
 }
 function mostrarNotificacion(action, cuenta) {
   notificacion.mostrarNotificacionPositiva(
     `La categoria "${cuenta.nombre}" se ${action} correctamente`,
     2500
   )
-}
-
-function loadOrRefetchListaCategorias() {
-  load() || refetchListaCategorias()
 }
 
 const columns = [

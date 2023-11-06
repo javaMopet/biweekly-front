@@ -706,11 +706,11 @@ function saveObs(id, row, observaciones) {
   })
 }
 
-registrosCrud.onErrorUpdate((response) => {
+registrosCrud.onErrorRegistroUpdate((response) => {
   console.trace(response)
 })
 
-registrosCrud.onDoneUpdate((response) => {
+registrosCrud.onDoneRegistroUpdate((response) => {
   console.log('updated ', response)
   notificacion.mostrarNotificacionPositiva(
     'Campo observación actualizado.',

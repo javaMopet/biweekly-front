@@ -1,9 +1,10 @@
 <template>
   <q-card
-    class="my-card no-shadow no-border"
+    class="my-card no-shadow no-border bg-main-background"
     flat
-    style="width: 920px; min-width: 980px; height: 70%; min-height: 70%"
+    style="width: 1100px; min-width: 1100px; overflow: hidden"
   >
+    <!-- <pre>{{ categoria }}</pre> -->
     <q-card-section class="row justify-between items-start dialog-title">
       <div class="row">
         <q-avatar
@@ -28,6 +29,7 @@
         ></q-btn>
       </div>
     </q-card-section>
+
     <transition name="fade">
       <div class="row bg-pink-1" v-if="errorsList.length > 0">
         <div class="column">
@@ -59,96 +61,217 @@
         </div>
       </div>
     </transition>
+    <!-- <q-toolbar class="q-pl-lg q-mt-md" style="border: 0px solid red">
+      <q-btn
+        v-if="isSelected"
+        no-caps
+        label="Eliminar"
+        icon="las la-trash-alt"
+        color="negative-pastel"
+        outline
+        @click="deleteSelectedItems"
+      />
+    </q-toolbar> -->
     <q-card-section>
-      <!-- <pre>{{ errors }}</pre> -->
-      <q-table
-        :rows="listaEncabezado"
-        :columns="columns"
-        row-key="name"
-        :rows-per-page-options="[0]"
-        hide-header
+      <q-card
+        class="my-card"
+        style="height: 100%; border: 0px solid red; padding: 0px !important"
+        flat
         dense
-        separator="cell"
-        style="height: 88px"
       >
-        <template #top-row>
-          <q-tr>
-            <q-td></q-td>
-            <q-td style="width: 150px"
-              ><DateInput
-                v-model="formItem.fecha"
-                lbl_field="Fecha"
-                :optional="false"
-                :rango-fecha-inicio="categoria.fecha_inicio_formato"
-                :rango-fecha-fin="categoria.fecha_fin_formato"
-              ></DateInput
-            ></q-td>
-            <q-td style="width: 180px">
-              <PriceInput
-                v-model="formItem.importe"
-                :autofocus="true"
-                :is-error="errors.isPriceError"
-              ></PriceInput
-            ></q-td>
-            <q-td>
-              <CuentaSelect
-                v-model="formItem.cuenta"
-                :agregar="false"
-                :filter-array="['1', '2']"
-              ></CuentaSelect
-            ></q-td>
-            <q-td>
-              <q-input
-                v-model="formItem.observaciones"
-                type="textarea"
-                label="observaciones"
-                dense
-                outlined
-                color="secondary"
-                rows="1"
-                lazy-rules
-            /></q-td>
-            <q-td
-              colspan="3"
-              style="
-                border: 0px solid red;
-                text-align: start;
-                vertical-align: top;
-                padding-top: 10px;
-              "
-            >
-              <div class="row items-center">
-                <q-icon
-                  name="add_circle"
-                  class="btn-add"
-                  clickable
-                  @click="addItem"
+        <q-card-section style="max-height: 70vh; height: 70vh" class="scroll">
+          <q-table
+            :rows="listaRegistros"
+            :columns="columns"
+            row-key="id"
+            :rows-per-page-options="[0]"
+            hide-pagination
+            dense
+            class="my-sticky-header-table"
+            separator="cell"
+            selection="multiple"
+            v-model:selected="selectedItems"
+            no-data-label="No hay registros para esta categoria y periodo"
+          >
+            <template #top>
+              <q-th fit style="width: 100%">
+                <q-toolbar class="">
+                  <div class="column" style="width: 80px">
+                    <span class="tarjeta__resumen-etiqueta">Periodo:</span
+                    ><span class="tarjeta__resumen-valor"
+                      >Del:
+                      {{
+                        formato.convertDateFromIsoToInput(
+                          props.cellData.fecha_inicio
+                        )
+                      }}
+                      Al:
+                      {{
+                        formato.convertDateFromIsoToInput(
+                          props.cellData.fecha_fin
+                        )
+                      }}</span
+                    >
+                  </div>
+                  <q-toolbar-title> </q-toolbar-title>
+                </q-toolbar>
+                <q-toolbar
+                  class="row items-between"
+                  style="width: 100%; padding: 0px !important"
                 >
-                  <q-tooltip :offset="[10, 10]"> Add New </q-tooltip>
-                </q-icon>
-              </div></q-td
+                  <q-btn
+                    v-if="isSelected"
+                    no-caps
+                    icon="las la-trash-alt"
+                    color="negative-pastel"
+                    @click="deleteSelectedItems"
+                  />
+                  <q-toolbar-title></q-toolbar-title>
+                  <span
+                    v-if="isEditing"
+                    :class="{
+                      'bg-accent-light': isEditing,
+                      'text-primary': true
+                    }"
+                    style="padding-top: 10px; padding-bottom: 10px; width: 30%"
+                  >
+                    Actualizando ...</span
+                  >
+
+                  <!-- <q-btn
+                    v-if="isEditing"
+                    no-caps
+                    label="Actualizar"
+                    icon="update"
+                    color="negative-pastel"
+                    @click="deleteSelectedItems"
+                  /> -->
+                </q-toolbar>
+              </q-th>
+              <q-th :class="{ 'bg-accent-light': isEditing }">
+                <q-td style="min-width: 32px; max-width: 32px"></q-td>
+                <q-td style="width: 135px"
+                  ><DateInput
+                    v-model="formItem.fecha"
+                    lbl_field="Fecha"
+                    :optional="false"
+                    :rango-fecha-inicio="categoria.fecha_inicio_formato"
+                    :rango-fecha-fin="categoria.fecha_fin_formato"
+                  ></DateInput
+                ></q-td>
+                <q-td style="width: 160px">
+                  <PriceInput
+                    v-model="formItem.importe"
+                    :autofocus="true"
+                    :is-error="errors.isPriceError"
+                  ></PriceInput>
+                </q-td>
+                <q-td style="width: 200px; max-width: 200px; min-width: 200px">
+                  <CuentaSelect
+                    v-model="formItem.cuenta"
+                    :agregar="false"
+                    :filter-array="['1', '2']"
+                  ></CuentaSelect
+                ></q-td>
+                <q-td style="min-width: 412px; width: 412px">
+                  <q-input
+                    v-model="formItem.observaciones"
+                    type="textarea"
+                    label="observaciones"
+                    dense
+                    outlined
+                    color="secondary"
+                    rows="1"
+                    lazy-rules
+                /></q-td>
+                <q-td
+                  style="vertical-align: middle; border: 0px solid red"
+                  align="center"
+                >
+                  <q-btn
+                    v-if="!editingItem"
+                    class="button-new"
+                    icon="add_circle"
+                    @click="saveItem"
+                    flat
+                  >
+                    <!-- icon="las la-plus-square" -->
+                    <q-tooltip
+                      :offset="[-35, -65]"
+                      class="bg-accent"
+                      transition-duration="900"
+                    >
+                      Guardar Nuevo
+                    </q-tooltip>
+                  </q-btn>
+                  <q-btn
+                    v-else
+                    class="button-save"
+                    icon="save"
+                    @click="saveItem"
+                    flat
+                  >
+                    <!-- icon="las la-save" -->
+                    <q-tooltip :offset="[10, 10]" class="bg-accent">
+                      Actualizar
+                    </q-tooltip>
+                  </q-btn>
+
+                  <q-btn
+                    v-if="editingItem"
+                    class="button-cancel"
+                    icon="las la-ban"
+                    @click="cancelEditItem(props)"
+                    flat
+                  >
+                    <q-tooltip :offset="[10, 10]" class="bg-accent">
+                      Cancelar
+                    </q-tooltip></q-btn
+                  >
+                </q-td>
+                <!-- </q-tr> -->
+              </q-th>
+            </template>
+            <template v-slot:body-cell-acciones="props">
+              <q-td :props="props">
+                <q-btn
+                  v-if="!editingItem"
+                  class="button-edit"
+                  icon="edit"
+                  @click="editItem(props)"
+                  dense
+                  flat
+                >
+                  <!-- icon="las la-edit" -->
+                  <q-tooltip :offset="[10, 10]" class="bg-accent">
+                    Editar
+                  </q-tooltip>
+                </q-btn>
+              </q-td>
+            </template>
+            <!-- <template #no-data>No se han agregado datos</template> -->
+          </q-table>
+        </q-card-section>
+        <q-card-actions vertical>
+          <div class="row q-pl-lg q-gutter-x-md">
+            <span class="text-condensed text-primary">
+              Importe total registros:</span
             >
-          </q-tr>
-        </template>
-      </q-table>
-      <q-table
-        :rows="listaRegistros"
-        :columns="columns"
-        row-key="name"
-        :rows-per-page-options="[0]"
-        hide-pagination
-        hide-header
-        dense
-        class="my-sticky-header-table"
-        separator="cell"
-      >
-      </q-table>
+            <span class="text-bold">
+              {{ formato.toCurrency(sumatoriaRegistros) }}</span
+            >
+          </div>
+          <div class="row inline justify-between items-center fit q-pa-md">
+            <div class=""></div>
+          </div>
+        </q-card-actions>
+      </q-card>
     </q-card-section>
   </q-card>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useLazyQuery, useQuery } from '@vue/apollo-composable'
 import DateInput from '../formComponents/DateInput.vue'
 import { DateTime } from 'luxon'
@@ -159,6 +282,7 @@ import { useFormato } from 'src/composables/utils/useFormato'
 import CuentaSelect from '../formComponents/CuentaSelect.vue'
 import { useRegistrosCrud } from 'src/composables/useRegistrosCrud'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
+import { SessionStorage, useQuasar } from 'quasar'
 
 /**
  * composables
@@ -166,6 +290,7 @@ import { useNotificacion } from 'src/composables/utils/useNotificacion'
 const formato = useFormato()
 const registrosCrud = useRegistrosCrud()
 const notificacion = useNotificacion()
+const $q = useQuasar()
 
 /**
  * state
@@ -175,7 +300,7 @@ const listaEncabezado = ref([])
 const listaRegistros = ref([])
 const errorsList = ref([])
 const defaultFormItem = {
-  fecha: '10/10/2023',
+  fecha: '',
   importe: '',
   cuenta: null,
   observaciones: ''
@@ -184,6 +309,8 @@ const formItem = ref({ ...defaultFormItem })
 const errors = ref({
   isPriceError: false
 })
+const selectedItems = ref([])
+const editingItem = ref(null)
 
 const props = defineProps({
   cellData: {
@@ -195,56 +322,62 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['registroCreated'])
+const emit = defineEmits(['registroCreated', 'registroUpdated'])
 
-onMounted(() => {})
+onMounted(() => {
+  setFechaInicial()
+})
 
 const columns = [
   {
-    name: 'estatus',
-    label: '',
-    field: '',
-    sortable: true,
-    align: 'left',
-    style: 'width:20px'
-  },
-  {
     name: 'fecha',
     label: 'Fecha',
-    field: (row) => formato.formatoFecha(row.fecha),
+    field: 'fecha',
     sortable: true,
     align: 'center',
-    style: 'width:150px'
+    // style: 'min-width:140px'
+    style: 'width:15%',
+    headerStyle: 'width: 15%'
   },
   {
     name: 'importe',
     label: 'Importe',
     field: (row) => row.importe,
-    format: (val, row) => `${formato.toCurrency(parseFloat(val))}`,
+    format: (val, row) => `${obtenerFormatoImporte(val)}`,
     sortable: true,
-    align: 'left',
-    style: 'width:180px'
+    align: 'right',
+    // style: 'min-width:160px'
+    style: 'width:15%',
+    headerStyle: 'width: 15%'
   },
   {
     name: 'cuenta',
     label: 'Cuenta',
     field: (row) => row.cuenta?.nombre || '',
     sortable: true,
-    align: 'left'
+    align: 'left',
+    // style: 'min-width:200px'
+    style: 'width:20%',
+    headerStyle: 'width: 20%'
   },
   {
     name: 'observaciones',
     label: 'Observaciones',
     field: (row) => row.observaciones,
     sortable: true,
-    align: 'left'
+    align: 'left',
+    style: 'text-wrap: wrap; min-width:40%;max-width:40%',
+    headerStyle: 'width:40%'
+    // style: 'min-width:200px;max-width:200px;text-wrap: wrap'
   },
   {
     name: 'acciones',
     label: 'Acciones',
     field: '',
     sortable: false,
-    align: 'center'
+    align: 'center',
+    // style: 'width:80px;min-width:80px;max-width:80px'
+    style: 'width:15%;min-width:10%'
   }
 ]
 
@@ -256,8 +389,8 @@ function addItem(val) {
   const observaciones = formItem.value.observaciones
   const validar = true
   if (entradaValida()) {
-    console.log('agreagndo .............')
     const row = {
+      identifier: listaRegistros.value.length,
       categoriaId: props.cellData.categoriaId,
       cuentaValida: true,
       estadoRegistroId: 1,
@@ -269,8 +402,30 @@ function addItem(val) {
     listaRegistros.value.push(row)
 
     // resetForm()
+    console.table(listaRegistros.value)
   }
 }
+
+function editItem(props) {
+  const rowIndex = props.rowIndex
+  const row = props.row
+  editingItem.value = {
+    rowIndex,
+    row
+  }
+  console.log(row.categoria.tipoMovimientoId)
+  const importe =
+    row.categoria.tipoMovimientoId === '2'
+      ? parseFloat(row.importe) * -1
+      : parseFloat(row.importe)
+  formItem.value = {
+    fecha: row.fecha,
+    importe: importe.toString(),
+    cuenta: row.cuenta,
+    observaciones: row.observaciones
+  }
+}
+
 function entradaValida() {
   errors.value.isPriceError = false
   const importe = parseFloat(formItem.value.importe)
@@ -284,9 +439,61 @@ function entradaValida() {
   return !errors.value.isPriceError
 }
 
+function cancelEditItem() {
+  editingItem.value = null
+  formItem.value = { ...defaultFormItem }
+  setFechaInicial()
+}
+
 function resetForm() {
   formItem.value = { ...defaultFormItem }
 }
+function deleteSelectedItems() {
+  console.log('Eliminacion....')
+  console.dir(selectedItems.value)
+  console.table(selectedItems.value)
+
+  const message = `Va a eliminar permanentemente ${selectedItems.value.length} registros. ¿Está seguro que desea continuar con la eliminación?`
+  $q.dialog({
+    title: 'Confirmar',
+    style: 'width:500px',
+    message,
+    ok: {
+      push: true,
+      color: 'positive',
+      label: 'Continuar'
+    },
+    cancel: {
+      push: true,
+      color: 'negative',
+      flat: true,
+      label: 'cancelar'
+    },
+    persistent: true
+  })
+    .onOk(() => {
+      confirmarEliminarSelectedItems()
+    })
+    .onCancel(() => {})
+    .onDismiss(() => {})
+}
+function confirmarEliminarSelectedItems() {
+  const ids = selectedItems.value.map((selected) => selected.id)
+  console.log(ids.toString())
+  registrosCrud.registrosDelete({ ids: ids.toString() })
+}
+
+registrosCrud.onErrorRegistrosDelete((error) => {
+  console.trace(error)
+})
+registrosCrud.onDoneRegistrosDelete(({ data }) => {
+  console.log('data', data)
+  notificacion.mostrarNotificacionPositiva(
+    'los registros se eliminaron correctamente'
+  )
+  selectedItems.value = []
+  reloadListaRegistros()
+})
 
 function obtenerFechaDefault() {
   const fechaInicio = DateTime.fromISO(props.cellData.fecha_inicio)
@@ -302,32 +509,49 @@ function obtenerFechaDefault() {
   }
   return fecha
 }
+
+function setFechaInicial() {
+  console.log('fecha_inicio', props.cellData.fecha_inicio)
+  formItem.value.fecha = formato.convertDateFromIsoToInput(
+    props.cellData.fecha_inicio
+  )
+}
 /**
  * Methods
  */
 const row_to_insert = ref(null)
 
-function saveItem(row) {
-  if (isInputItemValid(row)) {
-    console.log('categoria', categoria.value.tipoMovimiento.id)
+/**
+ *
+ *
+ */
+function saveItem() {
+  if (entradaValida()) {
     if (['1', '2'].includes(categoria.value.tipoMovimiento.id)) {
       const tipoAfectacion =
         categoria.value.tipoMovimiento.id === '1' ? 'A' : 'C'
       const importe =
         tipoAfectacion === 'C'
-          ? parseFloat(row.importe) * -1
-          : parseFloat(row.importe)
+          ? parseFloat(formItem.value.importe) * -1
+          : parseFloat(formItem.value.importe)
       const input = {
-        categoriaId: row.categoriaId,
+        id: editingItem.value?.row.id ?? undefined,
+        categoriaId: categoria.value.id,
         estadoRegistroId: 2,
         tipoAfectacion,
-        cuentaId: parseInt(row.cuenta.id),
+        cuentaId: parseInt(formItem.value.cuenta.id),
         importe,
-        fecha: formato.convertDateFromInputToIso(row.fecha),
-        observaciones: row.observaciones
+        fecha: formato.convertDateFromInputToIso(formItem.value.fecha),
+        observaciones: formItem.value.observaciones,
+        userId: SessionStorage.getItem('user').id
       }
-      row_to_insert.value = row
-      registrosCrud.createRegistro({ input })
+      if (!!editingItem.value) {
+        const id = editingItem.value.row.id
+        console.dir(id)
+        registrosCrud.registroUpdate({ id, input })
+      } else {
+        registrosCrud.createRegistro({ input })
+      }
     }
   }
 }
@@ -354,27 +578,51 @@ function addError(code, message) {
 }
 
 registrosCrud.onDoneCreate(({ data }) => {
-  afterSaveItem('Ingreso', data.ingresoCreate)
+  console.log('data', data)
+  const itemSaved = data.registroCreate.registro
+  afterSaveItem('Ingreso', itemSaved)
+})
+
+registrosCrud.onDoneRegistroUpdate(({ data }) => {
+  console.log('data', data)
+  const itemUpdated = data.registroUpdate.registro
+  afterUpdateItem('Ingreso', itemUpdated)
 })
 
 function afterSaveItem(tipoRegistro, itemSaved) {
-  row_to_insert.value.saved = true
-  notificacion.mostrarNotificacionPositiva(`${tipoRegistro} guardado.`, 1000)
+  console.log('item saved')
+  // row_to_insert.value.saved = true
+  listaRegistros.value.push(itemSaved)
+  notificacion.mostrarNotificacionPositiva(
+    `El registro se guardado correctamente.`,
+    1500
+  )
   emit('registroCreated', itemSaved)
+  resetForm()
+}
+function afterUpdateItem(itemUpdated) {
+  // const rowIndex = editingItem.value.rowIndex
+  // listaRegistros.value[rowIndex] = itemUpdated
+  notificacion.mostrarNotificacionPositiva(
+    `El registro se actualizó correctamente.`,
+    1500
+  )
+  reloadListaRegistros()
+  emit('registroUpdated', itemUpdated)
+  editingItem.value = null
+  resetForm()
 }
 
 registrosCrud.onErrorCreate((error) => {
-  console.error(error)
+  console.log('error', error.graphQLErrors[0])
+  console.log('error', error.graphQLErrors[0].extensions)
+  console.table('error', error.graphQLErrors[0].extensions.problems)
 })
 function obtenerFechaISO(fecha_formato) {
   const date = !!fecha_formato
     ? DateTime.fromFormat(fecha_formato, 'dd/MM/yyyy')
     : null
   return date?.toISODate()
-}
-function updateItem(row) {
-  registrosCrud.updateItem()
-  row.saved = false
 }
 
 function deleteItem(item) {
@@ -394,6 +642,11 @@ function confirmarEliminacion(item) {
 
 function validarPrecio(value) {
   // console.log('validar precio', value)
+}
+function obtenerFormatoImporte(val) {
+  return formato.toCurrency(
+    parseFloat(categoria.value.tipoMovimiento.id === '2' ? val * -1 : val)
+  )
 }
 /**
  * graphql
@@ -417,7 +670,8 @@ const {
 const {
   onError: onErrorListaRegistros,
   onResult: onResultListaRegistros,
-  load: cargaListaRegistros
+  load: loadListaRegistros,
+  refetch: reloadListaRegistros
 } = useLazyQuery(
   LISTA_REGISTROS,
   {
@@ -435,9 +689,9 @@ onResultListaRegistros(({ data }) => {
     listaRegistros.value = JSON.parse(JSON.stringify(data.obtenerRegistros))
     listaRegistros.value.forEach((element) => {
       element.fecha = formato.convertDateFromIsoToInput(element.fecha)
-      const importe =
-        element.tipoAfectacion === 'C' ? element.importe * -1 : element.importe
-      element.importe = importe.toString()
+      // const importe =
+      //   element.tipoAfectacion === 'C' ? element.importe * -1 : element.importe
+      element.importe = element.importe.toString()
       element.saved = true
     })
   }
@@ -469,6 +723,12 @@ const isCuentaValida = (cuentaValida) => {
   return cuentaValida
 }
 
+const isEditing = computed({
+  get() {
+    return !!editingItem.value
+  }
+})
+
 // const listaRegistros = computed({
 //   get() {
 //     const listaRetorno =
@@ -491,12 +751,33 @@ const isCuentaValida = (cuentaValida) => {
 //     return resultListaEgresos.value?.obtenerEgresos ?? []
 //   }
 // })
-
+const isSelected = computed({
+  get() {
+    return selectedItems.value.length > 0
+  }
+})
+/**
+ * Obtener la sumatoria de registros
+ */
+const sumatoriaRegistros = computed({
+  get() {
+    return listaRegistros.value.reduce((accumulator, registro) => {
+      return (
+        accumulator +
+        parseFloat(
+          categoria.value.tipoMovimiento.id === '2'
+            ? registro.importe * -1
+            : registro.importe
+        )
+      )
+    }, 0)
+  }
+})
 /**
  * Buscar movimientos de acuerdo a la categoria y perido ingresados como propiedades
  */
 function buscarMovimientos() {
-  cargaListaRegistros()
+  loadListaRegistros()
 }
 </script>
 
@@ -535,8 +816,7 @@ function buscarMovimientos() {
 
 .my-sticky-header-table {
   /* height or max-height is important */
-  height: 300px;
-  z-index: 10;
+  height: 100%;
 
   .q-table__top,
   .q-table__bottom,
@@ -551,6 +831,13 @@ function buscarMovimientos() {
   }
   thead tr:first-child th {
     top: 0;
+  }
+  tbody tr {
+    &.q-tr {
+      // background: $primary;
+      position: fixed;
+      z-index: 1;
+    }
   }
 
   /* this is when the loading indicator appears */

@@ -18,6 +18,7 @@
       :rules="rules"
       dense
       :readonly="readonly"
+      :style="props.style"
     >
     </q-select>
   </div>
@@ -97,6 +98,11 @@ const props = defineProps({
     default: () => {
       return []
     }
+  },
+  style: {
+    type: String,
+    required: false,
+    default: ''
   }
 })
 /**

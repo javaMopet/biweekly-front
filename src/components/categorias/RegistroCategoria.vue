@@ -24,7 +24,7 @@
             color="disable-button"
             text-color="gray-2"
             toggle-color="toggle-button"
-            toggle-text-color="info"
+            toggle-text-color="toggle-text-button"
             :options="tiposMovimientoOptions"
             @update:model-value="onChangeTipoMovimiento"
             push
@@ -115,12 +115,22 @@
                           v-model="editedFormItem.color"
                           no-footer
                           :palette="[
-                            '#019A9D',
                             '#D9B801',
+                            '#019A9D',
+                            '#9c592d',
                             '#E8045A',
                             '#B2028A',
-                            '#2A0449',
-                            '#1ad560'
+                            '#6d3ee6',
+                            '#ffd04f',
+                            '#227fd6',
+                            '#1ad560',
+                            '#e6763e',
+                            '#45c5f7',
+                            '#02c46a',
+                            '#4a0f36',
+                            '#fa75ce',
+                            '#b9d422',
+                            '#0f4d40'
                           ]"
                           default-view="palette"
                           class="my-picker"
@@ -306,6 +316,7 @@ function saveItem() {
     cuentaDefaultId: parseInt(cuentaDefaultId),
     tipoMovimientoId: parseInt(editedFormItem.value.tipoMovimientoId),
     importeDefault: parseFloat(editedFormItem.value.importeDefault ?? '0'),
+    userId,
     orden: 1000,
     tipoMovimiento: undefined,
     cuentaContable: undefined,
@@ -314,14 +325,11 @@ function saveItem() {
   }
   console.log('guardando item:', input)
   if (!editedFormItem.value.id) {
-    console.log('guardando categoria nueva', input)
-    input.userId = userId
     categoriaCrud.createCategoria({
       input
     })
   } else {
     const id = editedFormItem.value.id
-    console.log('actualizando categoria', id, input)
     categoriaCrud.updateCategoria({
       id,
       input
@@ -344,6 +352,21 @@ categoriaCrud.onDoneUpdate(({ data }) => {
     emit('categoriaUpdated', itemUpdated, props.editedIndex)
   }
 })
+categoriaCrud.onErrorCreateCategoria((error) => {
+  // console.log('error', error)
+  // console.log('error', error.graphQLErrors[0].extensions)
+})
+categoriaCrud.onErrorUpdateCategoria((error) => {
+  // console.log('error', error)
+  // console.log('error', error.graphQLErrors[0].extensions)
+  showError('actualizar')
+})
+function showError(action) {
+  notificacion.mostrarNotificacionNegativa(
+    `Error al intentar ${action} la categoría, favor de intentar nuevamente.`,
+    1600
+  )
+}
 /**
  * onMounted
  */

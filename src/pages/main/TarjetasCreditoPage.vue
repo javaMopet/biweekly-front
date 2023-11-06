@@ -68,6 +68,9 @@
           </template>
           <template #item="props">
             <q-card class="tarjeta__cuenta q-ma-sm clickable" clickable>
+              <q-inner-loading :showing="loadingCard[props.rowIndex]">
+                <q-spinner-ball size="50px" color="primary" />
+              </q-inner-loading>
               <q-card-section>
                 <div class="column" style="border: 0px solid red">
                   <div
@@ -224,7 +227,7 @@ const formato = useFormato()
 /**
  * state
  */
-
+const loadingCard = ref([])
 /**
  * GRAPHQL
  */
@@ -361,6 +364,7 @@ function editRow(item) {
   showFormItem.value = true
 }
 function abrirMovimientos(props_row) {
+  loadingCard.value[props_row.rowIndex] = true
   router.push(`/tarjetas_credito/${props_row.row.id}`)
 }
 

@@ -32,11 +32,17 @@ $primary-text: lighten(
 );
 $primary-icon: darken ($primary, 90%);
 $primary-light: #f2f2f2;
-$secondary-light: #fdbf8b;
+$secondary-light: lighten(
+  $color: $secondary,
+  $amount: 42
+);
 $contrast: #c4943a;
 $contrast-light: #2f4211;
 
-$accent-light: #e9e8f0;
+$accent-light: darken(
+  $color: #e9e8f0,
+  $amount: 5
+);
 $accent-contrast: #e4f599;
 $positive-pastel: #34b47a;
 $negative-pastel: #f43737;
@@ -55,7 +61,11 @@ $secondary-button: #2c5382;
 /*$primary-button: #00AAC1;*/
 // $toggle-button: #4b9972;
 // $toggle-button: #b4d9df;
-$toggle-button: #cae2d5;
+$toggle-button: lighten(
+  $color: $secondary,
+  $amount: 5
+);
+$toogle-text-button: rgb(251, 255, 233);
 $toolbar-button: #4b9972;
 $disable-button: #e7e7e7;
 $main-menu: #d5dde5;

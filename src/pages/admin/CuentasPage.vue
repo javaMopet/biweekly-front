@@ -101,6 +101,9 @@
           </template>
           <template #item="props">
             <q-card class="cuenta__card-main text-primary q-ma-sm clickable">
+              <q-inner-loading :showing="loadingAccount[props.rowIndex]">
+                <q-spinner-ball size="50px" color="primary" />
+              </q-inner-loading>
               <q-card-section>
                 <div class="row justify-around q-gutter-x-lg">
                   <div class="column" @click="abrirMovimientos(props)">
@@ -311,6 +314,7 @@ const showFormItem = ref(false)
 const editedItem = ref({ ...defaultItem })
 const editedIndex = ref(null)
 const rowIndexDelete = ref(null)
+const loadingAccount = ref([])
 
 /**
  * computed
@@ -389,6 +393,7 @@ function editRow(item) {
   showFormItem.value = true
 }
 function abrirMovimientos(props_row) {
+  loadingAccount.value[props_row.rowIndex] = true
   router.push(`/cuentas/${props_row.row.id}`)
 }
 function deleteRow(item) {

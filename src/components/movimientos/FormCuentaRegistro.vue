@@ -13,8 +13,8 @@
         ></q-btn>
       </div>
     </q-card-section>
-    <q-card-section class="q-py-lg q-px-xl">
-      <q-form @submit="saveItem" class="q-gutter-md">
+    <q-card-section class="q-pt-xl q-px-xl">
+      <q-form @submit="saveItem" class="q-gutter-y-md form-componente__body">
         <div class="q-py-lg">
           <q-btn-toggle
             class="text-condensed"
@@ -22,9 +22,9 @@
             spread
             no-caps
             color="disable-button"
-            text-color="gray-3"
+            text-color="gray-2"
             toggle-color="toggle-button"
-            toggle-text-color="info"
+            toggle-text-color="toggle-text-button"
             :options="tiposMovimientoOptions"
             @update:model-value="onChangeTipoMovimiento"
             push
@@ -251,7 +251,7 @@ const tipoMovimientoNombre = computed({
       case '1':
         return 'Ingreso'
       case '2':
-        return 'Egreso'
+        return 'Gasto'
       case '3':
         return 'Traspaso'
       default:
