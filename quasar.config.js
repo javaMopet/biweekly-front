@@ -119,6 +119,11 @@ module.exports = configure(function (/* ctx */) {
       // you can manually specify Quasar components/directives to be available everywhere:
       //
       // components: [],
+      // components: ['QModal'],
+      // optional if you want to use
+      // directive `v-close-overlay`
+      // directives: ['CloseOverlay'],
+
       // directives: [],
 
       // Quasar plugins

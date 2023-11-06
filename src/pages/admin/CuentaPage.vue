@@ -292,7 +292,15 @@
   </div>
 
   <Teleport to="#modal">
-    <q-dialog v-model="showForm" persistent>
+    <q-dialog
+      v-model="showForm"
+      persistent
+      transition-show="jump-up"
+      transition-hide="jump-down"
+    >
+      <!-- style="z-index: 1"
+    v-if="showForm"
+    class="fixed-center shadow-15" -->
       <FormCuentaRegistro
         :cuenta-id="cuenta.id"
         :edited-item="registroEditedItem"
@@ -303,7 +311,12 @@
     </q-dialog>
   </Teleport>
   <Teleport to="#modal">
-    <q-dialog v-model="showFormCarga" persistent>
+    <q-dialog
+      v-model="showFormCarga"
+      persistent
+      transition-show="jump-down"
+      transition-hide="jump-down"
+    >
       <ImportarRegistrosCuenta
         :cuenta="cuenta"
         @items-saved="itemsSaved"

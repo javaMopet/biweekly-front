@@ -24,4 +24,5 @@ export default boot(async ({ app /*, router, ...*/ }) => {
     // clientB,
   }
   app.provide(ApolloClients, apolloClients)
+  // app.use
 })

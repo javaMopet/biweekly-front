@@ -354,7 +354,12 @@
   </div>
 
   <Teleport to="#modal">
-    <q-dialog v-model="showForm" persistent>
+    <q-dialog
+      v-model="showForm"
+      persistent
+      transition-show="jump-up"
+      transition-hide="jump-down"
+    >
       <RegistroMovimientoTarjeta
         :cuenta-id="cuenta.id"
         :registro-edited-item="registroEditedItem"
@@ -365,7 +370,12 @@
     </q-dialog>
   </Teleport>
   <Teleport to="#modal">
-    <q-dialog v-model="showFormMSI" persistent>
+    <q-dialog
+      v-model="showFormMSI"
+      persistent
+      transition-show="jump-up"
+      transition-hide="jump-down"
+    >
       <RegistroMesesSinInteres
         :registro-tarjeta="editRegistroItem"
         @registroUpdated="registroMsiUpdated"
@@ -373,7 +383,12 @@
     </q-dialog>
   </Teleport>
   <Teleport to="#modal">
-    <q-dialog v-model="showFormCarga" persistent>
+    <q-dialog
+      v-model="showFormCarga"
+      persistent
+      transition-show="jump-up"
+      transition-hide="jump-down"
+    >
       <ImportarRegistrosTarjeta
         :cuenta="cuenta"
         @items-saved="cargaMasivaSaved"
@@ -383,7 +398,12 @@
     </q-dialog>
   </Teleport>
   <Teleport to="#modal">
-    <q-dialog v-model="showPagosTarjeta" persistent>
+    <q-dialog
+      v-model="showPagosTarjeta"
+      persistent
+      transition-show="jump-up"
+      transition-hide="jump-down"
+    >
       <PagosTarjeta
         :cuenta="cuenta"
         :saldo-periodo-anterior="parseFloat(saldo_anterior)"

@@ -217,7 +217,7 @@ traspasosCrud.onDoneTraspasoCreate(({ data }) => {
   emit('itemSaved')
 })
 
-registrosCrud.onDoneUpdate(({ data }) => {
+registrosCrud.onDoneRegistroUpdate(({ data }) => {
   console.log('Registro update', data)
   const item = data.registroUpdate.registro
   emit('itemUpdated', item)
@@ -357,8 +357,8 @@ function onSelectCategoria(value) {
   }
 }
 
-registrosCrud.onDoneUpdate(({ data }) => {
-  console.log('data', data)
-  emit('itemUpdated')
-})
+// registrosCrud.onDoneUpdate(({ data }) => {
+//   console.log('data', data)
+//   emit('itemUpdated')
+// })
 </script>

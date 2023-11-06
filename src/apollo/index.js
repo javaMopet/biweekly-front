@@ -1,4 +1,4 @@
-import { createHttpLink, InMemoryCache } from '@apollo/client/core'
+import { createHttpLink, HttpLink, InMemoryCache } from '@apollo/client/core'
 import { onError } from '@apollo/client/link/error'
 import { setContext } from '@apollo/client/link/context'
 import { useSessionStore } from 'src/stores/sessionStore.js'
@@ -24,6 +24,11 @@ export /* async */ function getClientOptions(/* {app, router, ...} */ options) {
         authorization: user.token ? `Bearer ${user.token}` : ''
       }
     }
+  })
+
+  const httpLink = new HttpLink({
+    // You should use an absolute URL here
+    uri: 'http://localhost:3020/graphql'
   })
 
   return Object.assign(
