@@ -68,10 +68,15 @@ export function useBancosCrud() {
     logErrorMessages(error)
   })
 
+  onErrorDeleteBanco((error) => {
+    logErrorMessages(error)
+  })
+
   return {
     listaBancos,
     createBanco,
     updateBanco,
+    deleteBanco,
     onDoneCreateBanco,
     onDoneUpdateBanco,
     onDoneDeleteBanco,

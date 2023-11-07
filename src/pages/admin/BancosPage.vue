@@ -127,11 +127,12 @@
 <script setup>
 import { useQuery, useMutation } from '@vue/apollo-composable'
 import { ref, computed, onMounted } from 'vue'
-import { LISTA_BANCOS, BANCO_DELETE } from '/src/graphql/bancos'
+import { LISTA_BANCOS } from '/src/graphql/bancos'
 import { useQuasar } from 'quasar'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { useFormato } from 'src/composables/utils/useFormato'
 import FormRegistroBanco from 'src/components/bancos/FormRegistroBanco.vue'
+import { useBancosCrud } from 'src/composables/useBancosCrud'
 
 /**
  * composables
@@ -139,6 +140,7 @@ import FormRegistroBanco from 'src/components/bancos/FormRegistroBanco.vue'
 const $q = useQuasar()
 const notificacion = useNotificacion()
 const formato = useFormato()
+const bancosCrud = useBancosCrud()
 
 /**
  * GRAPHQL
@@ -153,13 +155,7 @@ const {
   refetch: refetchListaBancos
 } = useQuery(LISTA_BANCOS, null, graphql_options)
 
-const {
-  mutate: deleteBanco,
-  onDone: onDoneDeleteBanco,
-  onError: onErrorDeleteBanco
-} = useMutation(BANCO_DELETE)
-
-onDoneDeleteBanco(({ data }) => {
+bancosCrud.onDoneDeleteBanco(({ data }) => {
   if (!!data) {
     console.log('item deleted ', data)
     const deletedItem = data.bancoDelete.banco
@@ -167,9 +163,9 @@ onDoneDeleteBanco(({ data }) => {
     refetchListaBancos()
   }
 })
-onErrorDeleteBanco((error) => {
-  console.error(error)
-})
+// onErrorDeleteBanco((error) => {
+//   console.error(error)
+// })
 onErrorListaBancos((error) => {
   console.error(error)
 })
@@ -283,7 +279,7 @@ function deleteRow(item) {
     persistent: true
   })
     .onOk(() => {
-      deleteBanco({ id: item.row.id })
+      bancosCrud.deleteBanco({ id: item.row.id })
     })
     .onCancel(() => {})
     .onDismiss(() => {})
