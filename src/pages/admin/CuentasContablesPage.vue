@@ -182,7 +182,12 @@
     </div>
 
     <Teleport to="#modal">
-      <q-dialog v-model="showFormItem" persistent>
+      <q-dialog
+        v-model="showFormItem"
+        persistent
+        transition-show="jump-up"
+        transition-hide="jump-down"
+      >
         <RegistroCuentaContable
           :edited-item="editedItem"
           @cuentaContableSaved="cuentaContableSaved"
@@ -196,20 +201,19 @@
 <script setup>
 import { useQuery, useMutation } from '@vue/apollo-composable'
 import { ref, computed, watch } from 'vue'
-import {
-  ARBOL_CUENTAS_CONTABLES,
-  ITEM_DELETE
-} from '/src/graphql/cuentasContableGql'
+import { ARBOL_CUENTAS_CONTABLES } from '/src/graphql/cuentasContables'
 import RegistroCuentaContable from 'src/components/cuentasContables/RegistroCuentaContable.vue'
 import { useNotificacion } from 'src/composables/utils/useNotificacion.js'
 import { useQuasar } from 'quasar'
 import { useRouter } from 'vue-router'
+import { useCuentasContablesCrud } from 'src/composables/useCuentasContablesCrud'
 
 /**
  * composables
  */
 const notificacion = useNotificacion()
 const $q = useQuasar()
+const cuentasContablesCrud = useCuentasContablesCrud()
 const $router = useRouter()
 /**
  * state
@@ -402,13 +406,7 @@ const {
   loading: loadingArbol
 } = useQuery(ARBOL_CUENTAS_CONTABLES, null, graphql_options)
 
-const {
-  mutate: deleteCuentaContable,
-  onDone: onDoneDeleteCuentaContable,
-  onError: onErrorDeleteCuentaContable
-} = useMutation(ITEM_DELETE)
-
-onDoneDeleteCuentaContable(({ data }) => {
+cuentasContablesCrud.onDoneDeleteCuentaContable(({ data }) => {
   console.log('data', data)
   const item_padre = searchTree(
     arbolCuentas.value[0],
@@ -425,7 +423,7 @@ onDoneDeleteCuentaContable(({ data }) => {
     2000
   )
 })
-onErrorDeleteCuentaContable((error) => {
+cuentasContablesCrud.onErrorDeleteCuentaContable((error) => {
   console.error(error)
 })
 onErrorArbolCuentasContables((error) => {

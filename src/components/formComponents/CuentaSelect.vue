@@ -27,7 +27,12 @@
   </div>
 
   <Teleport to="#modal">
-    <q-dialog v-model="form_cuenta_show" persistent>
+    <q-dialog
+      v-model="form_cuenta_show"
+      persistent
+      transition-show="jump-up"
+      transition-hide="jump-down"
+    >
       <RegistroCuenta></RegistroCuenta>
     </q-dialog>
   </Teleport>

@@ -23,7 +23,7 @@
             no-caps
             color="disable-button"
             text-color="gray-2"
-            toggle-color="toggle-button"
+            :toggle-color="active_color"
             toggle-text-color="toggle-text-button"
             :options="tiposMovimientoOptions"
             @update:model-value="onChangeTipoMovimiento"
@@ -112,9 +112,8 @@
 </template>
 
 <script setup>
-import { useQuery, useMutation } from '@vue/apollo-composable'
+import { useMutation } from '@vue/apollo-composable'
 import { ref, computed, onMounted } from 'vue'
-import { LISTA_TIPOS_MOVIMIENTO } from '/src/graphql/movimientos'
 import { TRANSFERENCIA_CREATE } from 'src/graphql/transferencias'
 import DateInput from '../formComponents/DateInput.vue'
 import CategoriaSelect from '../formComponents/CategoriaSelect.vue'
@@ -124,12 +123,14 @@ import PriceInput from '../formComponents/PriceInput.vue'
 import { useRegistrosCrud } from 'src/composables/useRegistrosCrud'
 import { useTraspasosCrud } from 'src/composables/useTraspasosCrud'
 import { SessionStorage } from 'quasar'
+import { useTiposMovimientoDao } from 'src/composables/useTiposMovimientoDao'
 /**
  * composables
  */
 const formato = useFormato()
 const registrosCrud = useRegistrosCrud()
 const traspasosCrud = useTraspasosCrud()
+const tiposMovimientoDao = useTiposMovimientoDao()
 
 /**
  * state
@@ -192,8 +193,6 @@ const emit = defineEmits(['itemSaved', 'itemUpdated'])
 const options = ref({
   fetchPolicy: 'network-only'
 })
-const { onResult: onResultTiposMovimiento, result: resultTiposMovimiento } =
-  useQuery(LISTA_TIPOS_MOVIMIENTO, null, options)
 
 const {
   mutate: createTransferencia,
@@ -225,11 +224,7 @@ registrosCrud.onDoneRegistroUpdate(({ data }) => {
 /**
  * computed
  */
-const tiposMovimientoOptions = computed({
-  get() {
-    return resultTiposMovimiento.value?.listaTiposMovimiento ?? []
-  }
-})
+
 const editedFormItem = computed({
   get() {
     return !!props.editedItem.cuenta ? props.editedItem : formItem.value
@@ -270,6 +265,24 @@ const isTraspaso = computed({
   }
 })
 
+const color = new Map([
+  ['1', 'ingreso-button'],
+  ['2', 'egreso-button'],
+  ['3', 'traspaso-button']
+])
+
+const active_color = computed({
+  get() {
+    return color.get(editedFormItem.value.tipoMovimientoId)
+  }
+})
+const tiposMovimientoOptions = computed({
+  get() {
+    return (tiposMovimientoDao.listaTiposMovimiento.value ?? []).filter(
+      (tipoMovimiento) => tipoMovimiento.id != '3'
+    )
+  }
+})
 /**
  * METHODS
  */

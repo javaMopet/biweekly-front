@@ -59,23 +59,33 @@
   </div>
 
   <Teleport to="#modal">
-    <q-dialog v-model="form_cuenta_show" persistent>
+    <q-dialog
+      v-model="form_cuenta_show"
+      persistent
+      transition-show="jump-up"
+      transition-hide="jump-down"
+    >
       <RegistroCuenta></RegistroCuenta>
     </q-dialog>
   </Teleport>
 </template>
 
 <script setup>
-import { useQuery } from '@vue/apollo-composable'
-import { LISTA_BANCOS } from 'src/graphql/bancos'
 import { ref, computed } from 'vue'
 import RegistroCuenta from '../cuentas/RegistroCuenta.vue'
+import { useBancosCrud } from 'src/composables/useBancosCrud'
+import { logErrorMessages } from '@vue/apollo-util'
 
+/**
+ * composable
+ */
+const bancosCrud = useBancosCrud()
 /**
  * state
  */
 const filteredOptions = ref([])
 const form_cuenta_show = ref(false)
+
 /**
  * props
  */
@@ -125,17 +135,7 @@ const props = defineProps({
  * emits
  */
 const emit = defineEmits(['update:modelValue'])
-/**
- * graphql
- */
-const graphql_options = ref({
-  fetchPolicy: 'network-only'
-})
-const { result: resultadoLista, onError: onErrorListar } = useQuery(
-  LISTA_BANCOS,
-  null, //arguments
-  graphql_options
-)
+
 /**
  * computed
  */
@@ -147,13 +147,12 @@ const cuenta = computed({
     emit('update:modelValue', val)
   }
 })
-const options = computed({
-  get() {
-    return resultadoLista.value?.listaBancos ?? []
-  }
-})
-onErrorListar((error) => {
-  console.log('error', error)
+
+// onErrorListar((error) => {
+//   console.log('error', error)
+// })
+bancosCrud.onErrorListaBancos((error) => {
+  logErrorMessages(error)
 })
 /**
  * methods
@@ -161,21 +160,23 @@ onErrorListar((error) => {
 function filterFn(val, update) {
   if (val === '') {
     update(() => {
-      filteredOptions.value = options.value
+      filteredOptions.value = bancosCrud.listaBancos.value
     })
     return
   }
 
   update(() => {
     const needle = val.toLowerCase()
-    filteredOptions.value = options.value.filter(
+    filteredOptions.value = bancosCrud.listaBancos.value.filter(
       (v) => v.nombre.toLowerCase().indexOf(needle) > -1
     )
   })
 }
+
+/**
+ * Mostrar registro de cuentas
+ */
 function registrarCuenta() {
   form_cuenta_show.value = true
 }
 </script>
-
-<style lang="scss" scoped></style>

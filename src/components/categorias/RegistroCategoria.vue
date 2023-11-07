@@ -23,7 +23,7 @@
             no-caps
             color="disable-button"
             text-color="gray-2"
-            toggle-color="toggle-button"
+            :toggle-color="active_color"
             toggle-text-color="toggle-text-button"
             :options="tiposMovimientoOptions"
             @update:model-value="onChangeTipoMovimiento"
@@ -72,12 +72,12 @@
           <div></div>
           <div>
             <div class="col">
-              <CuentaContableSelect
+              <!-- <CuentaContableSelect
                 v-model="editedFormItem.cuentaContable"
                 :subnivel="cuentaContableOptions.cuentaContableSubnivel"
                 :clasificacion="cuentaContableOptions.clasificacion"
                 :tipo-afectacion="cuentaContableOptions.tipoAfectacion"
-              ></CuentaContableSelect>
+              ></CuentaContableSelect> -->
             </div>
           </div>
           <div class="">
@@ -168,7 +168,11 @@
   </q-card>
 
   <Teleport to="#modal">
-    <q-dialog v-model="show_icon_picker">
+    <q-dialog
+      v-model="show_icon_picker"
+      transition-show="jump-up"
+      transition-hide="jump-down"
+    >
       <q-card
         class="my-card"
         style="max-height: 65vh; max-width: 60vw; width: 900px"
@@ -186,22 +190,21 @@
 </template>
 
 <script setup>
-import { useQuery } from '@vue/apollo-composable'
 import { ref, computed, onMounted } from 'vue'
-import { LISTA_TIPOS_MOVIMIENTO } from 'src/graphql/movimientos'
 import IconPicker from '/src/components/IconPicker.vue'
-import CuentaContableSelect from '../formComponents/CuentaContableSelect.vue'
 import CuentaSelect from '../formComponents/CuentaSelect.vue'
 import PriceInput from '../formComponents/PriceInput.vue'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { useCategoriaCrud } from 'src/composables/useCategoriaCrud'
 import { SessionStorage } from 'quasar'
+import { useTiposMovimientoDao } from 'src/composables/useTiposMovimientoDao'
 
 /**
  * composables
  */
 const notificacion = useNotificacion()
 const categoriaCrud = useCategoriaCrud()
+const tiposMovimientoDao = useTiposMovimientoDao()
 /**
  * state
  */
@@ -253,7 +256,7 @@ const emit = defineEmits(['categoriaSaved', 'categoriaUpdated'])
  */
 const tiposMovimientoOptions = computed({
   get() {
-    return (resultTipoMovimiento.value?.listaTiposMovimiento ?? []).filter(
+    return (tiposMovimientoDao.listaTiposMovimiento.value ?? []).filter(
       (tipoMovimiento) => tipoMovimiento.id != '3'
     )
   }
@@ -276,6 +279,17 @@ const actionName = computed({
 const lblSubmit = computed({
   get() {
     return !!editedFormItem.value.id ? 'Actualizar' : 'Guardar'
+  }
+})
+const color = new Map([
+  ['1', 'ingreso-button'],
+  ['2', 'egreso-button'],
+  ['3', 'traspaso-button']
+])
+
+const active_color = computed({
+  get() {
+    return color.get(editedFormItem.value.tipoMovimientoId)
   }
 })
 
@@ -336,31 +350,30 @@ function saveItem() {
     })
   }
 }
-categoriaCrud.onDoneCreate(({ data }) => {
-  console.log('saved data...', data)
-  if (!!data) {
-    notificacion.mostrarNotificacionPositiva('Categoría creada correctamente.')
-    const itemSaved = data.categoriaCreate.categoria
-    // console.table(categoriaCrud.listaCategorias.value)
-    emit('categoriaSaved', itemSaved)
-  }
-})
-categoriaCrud.onDoneUpdate(({ data }) => {
-  if (!!data) {
-    console.log('updated data...', data)
-    const itemUpdated = data.categoriaUpdate.categoria
-    emit('categoriaUpdated', itemUpdated, props.editedIndex)
-  }
-})
-categoriaCrud.onErrorCreateCategoria((error) => {
-  // console.log('error', error)
-  // console.log('error', error.graphQLErrors[0].extensions)
-})
-categoriaCrud.onErrorUpdateCategoria((error) => {
-  // console.log('error', error)
-  // console.log('error', error.graphQLErrors[0].extensions)
-  showError('actualizar')
-})
+// categoriaCrud.onDoneCreate(({ data }) => {
+//   console.log('saved data...', data)
+//   if (!!data) {
+//     notificacion.mostrarNotificacionPositiva('Categoría creada correctamente.')
+//     const itemSaved = data.categoriaCreate.categoria
+//     emit('categoriaSaved', itemSaved)
+//   }
+// })
+// categoriaCrud.onDoneUpdate(({ data }) => {
+//   if (!!data) {
+//     console.log('updated data...', data)
+//     const itemUpdated = data.categoriaUpdate.categoria
+//     emit('categoriaUpdated', itemUpdated, props.editedIndex)
+//   }
+// })
+// categoriaCrud.onErrorCreateCategoria((error) => {
+//   // console.log('error', error)
+//   // console.log('error', error.graphQLErrors[0].extensions)
+// })
+// categoriaCrud.onErrorUpdateCategoria((error) => {
+//   // console.log('error', error)
+//   // console.log('error', error.graphQLErrors[0].extensions)
+//   showError('actualizar')
+// })
 function showError(action) {
   notificacion.mostrarNotificacionNegativa(
     `Error al intentar ${action} la categoría, favor de intentar nuevamente.`,
@@ -380,8 +393,6 @@ onMounted(() => {
 const options = ref({
   fetchPolicy: 'network-only'
 })
-const { onResult: onResultTipoMovimiento, result: resultTipoMovimiento } =
-  useQuery(LISTA_TIPOS_MOVIMIENTO, null, options)
 
 /**
  * icon picker

@@ -70,7 +70,12 @@
     </q-btn>
   </div>
   <Teleport to="#modal">
-    <q-dialog v-model="showRegistroCategoria" persistent>
+    <q-dialog
+      v-model="showRegistroCategoria"
+      persistent
+      transition-show="jump-up"
+      transition-hide="jump-down"
+    >
       <RegistroCategoria
         :edited-item="editedCategoriaParam"
         @categoriaSaved="onCategoriaSaved"

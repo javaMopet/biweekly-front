@@ -65,7 +65,7 @@ export const CUENTA_CONTABLE_UPDATE = gql`
   }
 `
 
-export const ITEM_DELETE = gql`
+export const CUENTA_CONTABLE_DELETE = gql`
   mutation cuentaContableDelete($id: ID!) {
     cuentaContableDelete(id: $id) {
       cuentaContable {

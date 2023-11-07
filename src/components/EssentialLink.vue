@@ -107,7 +107,7 @@ export default {
   // height: 30px;
 }
 .menu__link--name {
-  font-size: 1rem !important;
+  font-size: 0.9rem !important;
   font-weight: 300 !important;
   letter-spacing: -0.025rem;
   color: $main-menu;
@@ -119,7 +119,8 @@ export default {
 
 .main-menu__active .menu__link--name {
   // color: $secondary !important;
-  color: $primary !important;
+  color: $input-label !important;
   font-weight: 400 !important;
+  font-size: 0.9rem !important;
 }
 </style>

@@ -28,20 +28,27 @@ export /* async */ function getClientOptions(/* {app, router, ...} */ options) {
 
   const httpLink = new HttpLink({
     // You should use an absolute URL here
-    uri: 'http://localhost:3020/graphql'
+    uri: process.env.GRAPHQL_URL
   })
 
   return Object.assign(
     // General options.
     {
-      link: errorLink.concat(authLink).concat(
-        createHttpLink({
-          uri: process.env.GRAPHQL_URL
-        })
-      ),
+      link: errorLink.concat(authLink).concat(httpLink),
       cache: new InMemoryCache(),
       defaultOptions: {
-        fetchPolicy: 'no-cache'
+        fetchPolicy: 'no-cache',
+        watchQuery: {
+          fetchPolicy: 'cache-and-network',
+          errorPolicy: 'ignore'
+        },
+        query: {
+          fetchPolicy: 'network-only',
+          errorPolicy: 'all'
+        },
+        mutate: {
+          errorPolicy: 'all'
+        }
       }
     },
     // Specific Quasar mode options.

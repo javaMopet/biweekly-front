@@ -1,23 +1,17 @@
 <template>
-  <q-card class="my-card" style="width: 450px">
-    <q-card-section
-      class="bg-main-menu row inline fit q-py-sm justify-between items-center"
-    >
+  <div class="my-card" style="width: 400px; min-width: 400px">
+    <div class="row justify-between items-center dialog-title q-px-md">
       <div class="text-subtitle1 text-accent-light">{{ actionName }}</div>
-      <div class="">
+      <div class="dialog-closebutton">
         <q-btn
-          round
-          flat
-          dense
           icon="close"
-          class="float-right"
-          color="accent"
           v-close-popup
-          vertical-top
+          class="dialog__title--closeButton"
+          round
         ></q-btn>
       </div>
-    </q-card-section>
-    <q-card-section class="">
+    </div>
+    <div class="q-pa-sm">
       <q-form @submit="saveItem" class="">
         <div class="q-gutter-xs">
           <div class="column items-center">
@@ -26,13 +20,13 @@
               style="width: 85%; border: 0px solid red"
             >
               <div>
-                <div class="row input-label">Nombre del banco:</div>
+                <div class="row input-label items-center">
+                  <span style="color: red">*</span>&nbsp;Nombre del banco:
+                </div>
                 <q-input
                   v-model="editedFormItem.nombre"
                   type="text"
-                  label="Ingresa el nombre"
                   dense
-                  filled
                   color="positive"
                   autofocus
                   lazy-rules
@@ -41,6 +35,8 @@
                       (val && val.length > 0) ||
                       'Favor de ingresar el nombre de la Banco'
                   ]"
+                  flat
+                  placeholder="Ingresa el nombre"
                 />
               </div>
 
@@ -49,10 +45,10 @@
                 <q-input
                   v-model="editedFormItem.icono"
                   type="text"
-                  label="Nombre de la imágen"
-                  outlined
+                  placeholder="Ingresa Nombre de imágen"
                   color="positive"
                   dense
+                  flat
                 ></q-input>
               </div>
             </div>
@@ -61,9 +57,9 @@
             <q-btn
               label="Cancelar"
               v-close-popup
-              color=""
-              flat
+              color="negative"
               class="q-ml-sm"
+              flat
               dense
             />
             <q-btn
@@ -75,16 +71,20 @@
           </div>
         </div>
       </q-form>
-    </q-card-section>
+    </div>
     <q-card-section class="q-gutter-sm" align="right"> </q-card-section>
-  </q-card>
+  </div>
 </template>
 
 <script setup>
-import { useQuery, useMutation } from '@vue/apollo-composable'
-import { ref, reactive, computed, onMounted } from 'vue'
-import { BANCO_CREATE, BANCO_UPDATE } from 'src/graphql/bancos'
+import { ref, computed, onMounted } from 'vue'
+import { useBancosCrud } from 'src/composables/useBancosCrud'
 
+/**
+ * composable
+ */
+
+const bancosCrud = useBancosCrud()
 /**
  * state
  */
@@ -95,52 +95,6 @@ const formItem = ref({
   tipoBanco: {
     id: '1'
   }
-})
-
-const bancoContableProps = reactive({
-  subnivel: 0,
-  tipoAfectacion: 'C',
-  clasificacion: ''
-})
-
-/**
- * GRAPHQL
- */
-const graphql_options = ref({
-  fetchPolicy: 'network-only'
-})
-
-const {
-  mutate: createBanco,
-  onDone: onDoneCreateBanco,
-  onError: onErrorCreateBanco
-} = useMutation(BANCO_CREATE)
-const {
-  mutate: updateBanco,
-  onDone: onDoneUpdateBanco,
-  onError: onErrorUpdateBanco
-} = useMutation(BANCO_UPDATE)
-
-onDoneCreateBanco(({ data }) => {
-  console.log('saved data...', data)
-  if (!!data) {
-    const itemSaved = data.bancoCreate.banco
-    emit('itemSaved', itemSaved)
-  }
-})
-onErrorCreateBanco((error) => {
-  console.log(error)
-  console.error(error)
-})
-onDoneUpdateBanco(({ data }) => {
-  if (!!data) {
-    console.log('updated data...', data)
-    const itemUpdated = data.bancoUpdate.banco
-    emit('itemUpdated', itemUpdated)
-  }
-})
-onErrorUpdateBanco((error) => {
-  console.error(error)
 })
 
 /**
@@ -204,18 +158,43 @@ function saveItem() {
   }
   if (!editedFormItem.value.id) {
     console.log('guardando banco nueva', input)
-    createBanco({
+    bancosCrud.createBanco({
       input
     })
   } else {
     const id = editedFormItem.value.id
     console.log('actualizando banco', id, input)
-    updateBanco({
+    bancosCrud.updateBanco({
       id,
       input
     })
   }
 }
+/**
+ * GRAPHQL
+ */
+
+bancosCrud.onDoneCreateBanco(({ data }) => {
+  console.log('saved data...', data)
+  if (!!data) {
+    const itemSaved = data.bancoCreate.banco
+    emit('itemSaved', itemSaved)
+  }
+})
+bancosCrud.onErrorCreateBanco((error) => {
+  console.log(error)
+  console.error(error)
+})
+bancosCrud.onDoneUpdateBanco(({ data }) => {
+  if (!!data) {
+    console.log('updated data...', data)
+    const itemUpdated = data.bancoUpdate.banco
+    emit('itemUpdated', itemUpdated)
+  }
+})
+bancosCrud.onErrorUpdateBanco((error) => {
+  console.error(error)
+})
 </script>
 
 <style lang="scss">

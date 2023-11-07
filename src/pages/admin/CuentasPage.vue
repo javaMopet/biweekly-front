@@ -230,7 +230,12 @@
       </div>
 
       <Teleport to="#modal">
-        <q-dialog v-model="showFormItem" persistent>
+        <q-dialog
+          v-model="showFormItem"
+          persistent
+          transition-show="jump-up"
+          transition-hide="jump-down"
+        >
           <RegistroCuenta
             :edited-item="editedItem"
             :edited-index="editedIndex"

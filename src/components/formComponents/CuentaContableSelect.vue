@@ -57,7 +57,12 @@
   </div>
 
   <Teleport to="#modal">
-    <q-dialog v-model="form_cuentaContable_show" persistent>
+    <q-dialog
+      v-model="form_cuentaContable_show"
+      persistent
+      transition-show="jump-up"
+      transition-hide="jump-down"
+    >
       <RegistroCuentaContable
         v-model="cuentaContable"
         :edited-item="formEditedItem"
@@ -69,7 +74,7 @@
 
 <script setup>
 import { useQuery } from '@vue/apollo-composable'
-import { LISTA_CUENTAS_CONTABLES } from 'src/graphql/cuentasContableGql'
+import { LISTA_CUENTAS_CONTABLES } from 'src/graphql/cuentasContables'
 import { ref, computed } from 'vue'
 import RegistroCuentaContable from '../cuentasContables/RegistroCuentaContable.vue'
 
@@ -141,7 +146,7 @@ const emit = defineEmits(['update:modelValue'])
  * graphql
  */
 const graphql_options = ref({
-  fetchPolicy: 'network-only'
+  fetchPolicy: 'cache-and-network'
 })
 const { result: resultadoLista, onError: onErrorListaCuentas } = useQuery(
   LISTA_CUENTAS_CONTABLES,

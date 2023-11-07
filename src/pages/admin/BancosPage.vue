@@ -1,5 +1,21 @@
 <template>
-  <div class="column q-ma-md" style="border: 0px solid red">
+  <q-toolbar class="" dense fit>
+    <div class="row items-center q-ml-sm q-gutter-x-sm">
+      <div class="q-pa-md q-gutter-sm">
+        <q-breadcrumbs
+          class="breadcrum-component"
+          active-color="primary"
+          separator=">"
+          separator-color="primary"
+        >
+          <q-breadcrumbs-el label="Home" icon="home" to="/home" />
+          <q-breadcrumbs-el label="Bancos" icon="account_balance" />
+        </q-breadcrumbs>
+      </div>
+    </div>
+    <q-toolbar-title> </q-toolbar-title>
+  </q-toolbar>
+  <div class="column q-mx-md" style="border: 0px solid red">
     <div class="row fit" style="border: 0px solid red">
       <q-table
         grid
@@ -12,22 +28,21 @@
         :rows-per-page-options="[0]"
         hide-pagination
       >
-        <template v-slot:top-left>
+        <template #top-left>
+          <div class="page-title">Bancos</div>
+        </template>
+        <template v-slot:top-right>
           <div class="q-pa-md">
             <q-btn
-              color="primary-button"
-              text-color="accent-light"
-              icon="add_circle"
-              label="Agregar"
+              color="primary"
+              label="Nuevo"
               @click="addItem"
               push
               glossy
               no-caps
+              text-color="white"
             />
           </div>
-        </template>
-
-        <template v-slot:top-right>
           <q-input
             outlined
             dense
@@ -41,18 +56,16 @@
           </q-input>
         </template>
         <template #item="props">
-          <q-card class="text-primary q-ma-sm">
+          <q-card class="text-primary q-ma-sm" style="width: 290px">
             <q-card-section>
               <div class="row q-gutter-x-lg items-center">
                 <div class="column">
-                  <!-- <q-avatar size="60px" color="white"> -->
                   <q-img :src="`/icons/${props.row.icono}`" width="50px" />
-                  <!-- </q-avatar> -->
                 </div>
-                <div class="column">
-                  <div class="row cuenta__title">
-                    {{ props.row.nombre }}
-                  </div>
+                <div class="column" style="width: 125px">
+                  <!-- <div class="row cuenta__title"> -->
+                  {{ props.row.nombre }}
+                  <!-- </div> -->
                   <div class="row cuenta__subtitle"></div>
                 </div>
                 <div class="column">
@@ -86,33 +99,6 @@
                 </div>
               </div>
             </q-card-section>
-
-            <!-- <q-card-section>
-              <div
-                class="text-subtitle text-grey-8 text-bold q-mt-xs"
-                align="right"
-              ></div>
-              <span class="cuenta__card--descripcion"> </span>
-            </q-card-section> -->
-
-            <!-- <q-separator inset /> -->
-
-            <!-- <q-card-actions>
-              <q-btn
-                round
-                color="primary"
-                flat
-                icon="edit"
-                @click="editRow(props)"
-              />
-              <q-btn
-                round
-                flat
-                icon="delete"
-                class="q-ml-sm"
-                @click="deleteRow(props)"
-              />
-            </q-card-actions> -->
           </q-card>
         </template>
         <template #body-cell-icono="props">
@@ -122,19 +108,19 @@
     </div>
 
     <Teleport to="#modal">
-      <q-dialog v-model="showFormRegisterItem" persistent>
-        <RegistroBancoForm
+      <q-dialog
+        v-model="showFormRegisterItem"
+        persistent
+        transition-show="jump-up"
+        transition-hide="jump-down"
+      >
+        <FormRegistroBanco
           :edited-item="editedItem"
           @itemSaved="itemSaved"
           @itemUpdated="itemUpdated"
-        ></RegistroBancoForm>
-        <!-- :edited-item="editedItem"
-          :edited-index="editedIndex"
-          @cuentaSaved="cuentaSaved"
-          @cuentaUpdated="cuentaUpdated" -->
+        ></FormRegistroBanco>
       </q-dialog>
     </Teleport>
-    <!-- <pre>{{ listaCuentas }}</pre> -->
   </div>
 </template>
 
@@ -145,7 +131,7 @@ import { LISTA_BANCOS, BANCO_DELETE } from '/src/graphql/bancos'
 import { useQuasar } from 'quasar'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { useFormato } from 'src/composables/utils/useFormato'
-import RegistroBancoForm from 'src/components/bancos/RegistroBancoForm.vue'
+import FormRegistroBanco from 'src/components/bancos/FormRegistroBanco.vue'
 
 /**
  * composables

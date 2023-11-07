@@ -1,9 +1,9 @@
 <template>
-  <q-card class="my-card" style="width: 450px">
-    <q-card-section
-      class="row inline fit q-py-sm justify-between items-center dialog-title"
-      style="border: 1px solid red"
-    >
+  <q-card
+    class="my-card"
+    style="width: 450px; height: 560px; min-height: 560px"
+  >
+    <q-card-section class="row justify-between items-start dialog-title">
       <div class="dialog__title--name">{{ actionName }}</div>
       <div class="">
         <q-btn
@@ -11,7 +11,6 @@
           icon="close"
           class="dialog__title--closeButton"
           v-close-popup
-          push
         ></q-btn>
       </div>
     </q-card-section>
@@ -26,7 +25,7 @@
               color="disable-button"
               text-color="gray-2"
               toggle-color="toggle-button"
-              toggle-text-color="primary-button"
+              toggle-text-color="accent-light"
               :options="tiposCuentaOptions"
               @update:model-value="tipoCuentaUpdated"
               push
@@ -38,11 +37,13 @@
               style="width: 85%; border: 0px solid red"
             >
               <div>
-                <div class="row input-label">{{ lbl_nombre }}</div>
+                <div class="row input-label items-center">
+                  * {{ lbl_nombre }}
+                </div>
                 <q-input
                   v-model="editedFormItem.nombre"
                   type="text"
-                  label="Ingresa el nombre"
+                  placeholder="Ingresa el nombre"
                   dense
                   outlined
                   color="positive"
@@ -60,7 +61,7 @@
                   <div class="row input-label">Banco:</div>
                   <BancoSelect v-model="editedFormItem.banco"></BancoSelect>
                 </div>
-                <div class="row input-label">Número de cuenta:</div>
+                <div class="row input-label">* Número de cuenta:</div>
                 <q-input
                   v-model="editedFormItem.identificador"
                   type="text"

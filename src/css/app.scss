@@ -168,17 +168,35 @@
 .bg-toggle-text-button {
   background: $toogle-text-button !important;
 }
+.text-ingreso-button {
+  color: $ingreso-button !important;
+}
+.bg-ingreso-button {
+  background: $ingreso-button !important;
+}
+.text-egreso-button {
+  background: $egreso-button !important;
+}
+.bg-egreso-button {
+  background: $egreso-button !important;
+}
+.text-traspaso-button {
+  background: $traspaso-button !important;
+}
+.bg-traspaso-button {
+  background: $traspaso-button !important;
+}
 /* *************************** */
 .dialog__title--closeButton {
   opacity: 0.8;
-  color: #777d88;
+  color: #576174;
   // background: lighten($color: $negative-pastel, $amount: 80);
-  background: #f3f3f3;
-  font-size: 0.6rem;
+  background: lighten($color: $primary, $amount: 65);
+  font-size: 0.45rem;
   &:hover {
     opacity: 1;
     color: white !important;
-    background: lighten($color: $negative-pastel, $amount: 5);
+    background: lighten($color: $negative, $amount: 15);
     // transform: translate(1px, -9px);
     transition: all 0.05 ease;
   }

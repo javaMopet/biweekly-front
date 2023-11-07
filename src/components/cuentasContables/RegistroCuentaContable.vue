@@ -132,7 +132,7 @@ import { ref, computed, onMounted } from 'vue'
 import {
   CUENTA_CONTABLE_CREATE,
   CUENTA_CONTABLE_UPDATE
-} from 'src/graphql/cuentasContableGql'
+} from 'src/graphql/cuentasContables'
 import { useMutation } from '@vue/apollo-composable'
 import CuentaContableSelect from '../formComponents/CuentaContableSelect.vue'
 import { api } from 'src/boot/axios'

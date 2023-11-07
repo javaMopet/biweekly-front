@@ -55,8 +55,23 @@
         </template>
         <template #header="props">
           <q-tr :props="props" class="movimientos__headers-background">
-            <q-th v-for="col in props.cols" :key="col.name" :props="props">
-              <span class="movimientos__headers-font"> {{ col.label }}</span>
+            <q-th
+              class="q-gutter-x-md"
+              v-for="col in props.cols"
+              :key="col.name"
+              :props="props"
+            >
+              <span class="movimientos__headers-font">
+                {{ col.periodo_id === 0 ? 'INGRESOS' : col.label }}</span
+              >
+              <q-btn
+                v-if="col.periodo_id === 0"
+                color="primary"
+                icon="add_circle"
+                dense
+                @click="addCategoria('1')"
+                flat
+              />
             </q-th>
           </q-tr>
         </template>
@@ -111,6 +126,11 @@
         hide-botton
         hide-pagination
       >
+        <!-- <template #header>
+          <q-th>
+            <q-td> HI </q-td>
+          </q-th>
+        </template> -->
         <template #top-right>
           <div class="bg-white">
             <q-input
@@ -128,8 +148,23 @@
         </template>
         <template #header="props">
           <q-tr :props="props" class="movimientos__headers-background">
-            <q-th v-for="col in props.cols" :key="col.name" :props="props">
-              <span class="movimientos__headers-font"> {{ col.label }}</span>
+            <q-th
+              class="q-gutter-x-md"
+              v-for="col in props.cols"
+              :key="col.name"
+              :props="props"
+            >
+              <span class="movimientos__headers-font">
+                {{ col.periodo_id === 0 ? 'EGRESOS' : col.label }}</span
+              >
+              <q-btn
+                v-if="col.periodo_id === 0"
+                color="primary"
+                icon="add_circle"
+                dense
+                @click="addCategoria('2')"
+                flat
+              />
             </q-th>
           </q-tr>
         </template>
@@ -263,7 +298,12 @@
   </div>
 
   <Teleport to="#modal">
-    <q-dialog v-model="showFormItem" persistent>
+    <q-dialog
+      v-model="showFormItem"
+      persistent
+      transition-show="jump-up"
+      transition-hide="jump-down"
+    >
       <FormCuentaRegistro
         :edited-item="editedItem"
         :edited-index="editedIndex"
@@ -273,11 +313,28 @@
     </q-dialog>
   </Teleport>
   <Teleport to="#modal">
-    <q-dialog v-model="show_movimientos" persistent>
+    <q-dialog
+      v-model="show_movimientos"
+      persistent
+      transition-show="jump-up"
+      transition-hide="jump-down"
+    >
       <ListaMovimientos
         :cell-data="cellData"
         @registro-created="onRegistroCreated"
       ></ListaMovimientos>
+    </q-dialog>
+    <q-dialog
+      v-model="showRegistroCategoria"
+      persistent
+      transition-show="jump-up"
+      transition-hide="jump-down"
+    >
+      <RegistroCategoria
+        :edited-item="registroCategoriaItem"
+        @categoriaSaved="categoriaSaved"
+        @categoriaUpdated="categoriaUpdated"
+      ></RegistroCategoria>
     </q-dialog>
   </Teleport>
 </template>
@@ -294,6 +351,7 @@ import { api } from 'src/boot/axios'
 import ListaMovimientos from 'src/components/movimientos/ListaMovimientos.vue'
 import MesSelect from 'src/components/formComponents/MesSelect.vue'
 import FormCuentaRegistro from 'src/components/movimientos/FormCuentaRegistro.vue'
+import RegistroCategoria from 'src/components/categorias/RegistroCategoria.vue'
 
 /**
  * composables
@@ -305,6 +363,16 @@ const formato = useFormato()
 /**
  * state
  */
+const defaultCategoriaItem = {
+  id: null,
+  nombre: null,
+  icono: 'insert_emoticon',
+  descripcion: null,
+  color: '#019A9D',
+  tipoMovimiento: null,
+  tipoMovimientoId: '1',
+  cuentaContable: null
+}
 const defaultItem = {
   categoria: null,
   cuenta: null,
@@ -362,6 +430,8 @@ const cellData = ref({})
 const columnsIngresos = ref([])
 const columnsEgresos = ref([])
 const columnsSaldos = ref([])
+const showRegistroCategoria = ref(false)
+const registroCategoriaItem = ref()
 /**
  * onMount
  */
@@ -413,6 +483,19 @@ function addItem2(props) {
     show_movimientos.value = true
   }
 }
+
+function addCategoria(tipoMovimientoId) {
+  console.log('Agregando nueva categoria', tipoMovimientoId)
+  console.log('tipoMovimientoId', tipoMovimientoId)
+  registroCategoriaItem.value = {
+    ...defaultCategoriaItem,
+    tipoMovimientoId: tipoMovimientoId
+  }
+  console.dir('editeditem', registroCategoriaItem.value)
+  editedIndex.value = null
+  showRegistroCategoria.value = true
+}
+
 function editRow(item) {
   editedItem.value = JSON.parse(JSON.stringify(item.row))
   editedIndex.value = item.rowIndex
@@ -431,6 +514,8 @@ function obtenerColumnas(ejercicio_fiscal, mes) {
       columnsIngresos.value = JSON.parse(JSON.stringify(data.data))
       columnsEgresos.value = JSON.parse(JSON.stringify(data.data))
       columnsSaldos.value = JSON.parse(JSON.stringify(data.data))
+
+      console.table(columnsIngresos.value)
 
       columnsIngresos.value.forEach((column) => {
         if (column.name != 'nombre_categoria') {
@@ -645,6 +730,8 @@ function onChangeEjercicio(newValue) {
   cargarDatos()
   obtenerColumnas(ejercicio_fiscal.value, mes.value.id)
 }
+function categoriaSaved() {}
+function categoriaUpdated() {}
 /**
  * GRAPHQL
  */

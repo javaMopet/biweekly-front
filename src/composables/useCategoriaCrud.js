@@ -13,12 +13,13 @@ export function useCategoriaCrud() {
    * graphql
    */
   const graphql_options = ref({
-    fetchPolicy: 'network-only'
+    // fetchPolicy: 'network-only'
+    fetchPolicy: 'cache-first'
   })
   const {
     result: resultadoLista,
-    onError: onErrorListaCategorias,
-    refetch: refetchListaCategorias
+    onError: onErrorListaCategorias
+    // refetch: refetchListaCategorias
   } = useQuery(LISTA_CATEGORIAS, null, graphql_options)
 
   const {
@@ -47,7 +48,7 @@ export function useCategoriaCrud() {
 
   onDoneCreate(({ data }) => {
     console.log('refrescando categorias')
-    refetchListaCategorias()
+    // refetchListaCategorias()
   })
   onErrorCreateCategoria((error) => {
     console.log('error', error.graphQLErrors[0])
@@ -59,7 +60,7 @@ export function useCategoriaCrud() {
   // })
 
   onDoneUpdate(({ data }) => {
-    refetchListaCategorias()
+    // refetchListaCategorias()
   })
   onErrorUpdateCategoria((error) => {
     console.dir(error)
@@ -79,7 +80,7 @@ export function useCategoriaCrud() {
     onErrorListaCategorias,
     onErrorCreateCategoria,
     onErrorUpdateCategoria,
-    onErrorDeleteCategoria,
-    refetchListaCategorias
+    onErrorDeleteCategoria
+    // refetchListaCategorias
   }
 }
