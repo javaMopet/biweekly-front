@@ -190,8 +190,9 @@
       >
         <RegistroCuentaContable
           :edited-item="editedItem"
-          @cuentaContableSaved="cuentaContableSaved"
+          @cuentaContableSaved="onCuentaContableSaved"
           @cuentaContableUpdated="cuentaContableUpdated"
+          :is-padre-default="true"
         ></RegistroCuentaContable>
       </q-dialog>
     </Teleport>
@@ -202,7 +203,7 @@
 import { useQuery, useMutation } from '@vue/apollo-composable'
 import { ref, computed, watch } from 'vue'
 import { ARBOL_CUENTAS_CONTABLES } from '/src/graphql/cuentasContables'
-import RegistroCuentaContable from 'src/components/cuentasContables/RegistroCuentaContable.vue'
+import RegistroCuentaContable from 'src/components/cuentasContables/FormRegistroCuentaContable.vue'
 import { useNotificacion } from 'src/composables/utils/useNotificacion.js'
 import { useQuasar } from 'quasar'
 import { useRouter } from 'vue-router'
@@ -219,7 +220,6 @@ const $router = useRouter()
  * state
  */
 
-// const arbolCuentas = ref([])
 const expanded = ref([])
 const selected = ref(null)
 const filter = ref('')
@@ -242,11 +242,7 @@ const arbolLleno = computed({
     return arbolCuentas.value.length > 0
   }
 })
-const arbolCuentas = computed({
-  get() {
-    return resultArbolCuentas.value?.arbolCuentasContables ?? []
-  }
-})
+
 /**
  * METHODS
  */
@@ -370,16 +366,22 @@ function searchTree(element, id) {
   return null
 }
 
-function cuentaContableSaved(itemSaved) {
+function onCuentaContableSaved(itemSaved) {
   console.log('saved', itemSaved)
   const padre = searchTree(arbolCuentas.value[0], itemSaved.padreId)
-  padre.children.push(itemSaved)
+  console.dir(padre)
+  const newChildren = JSON.parse(JSON.stringify(padre.children))
+  newChildren.push(itemSaved)
+  console.table(newChildren)
+  padre.children = newChildren
   notificacion.mostrarNotificacionPositiva(
     `La cuenta contable ${itemSaved.label} se guardó correctamente.`,
     2000
   )
   showFormItem.value = false
+  // padre.children.push(itemSaved)
 }
+
 function cuentaContableUpdated(itemUpdated) {
   console.log('updated', itemUpdated)
   const itemEdit = searchTree(arbolCuentas.value[0], itemUpdated.id)
@@ -405,6 +407,12 @@ const {
   onError: onErrorArbolCuentasContables,
   loading: loadingArbol
 } = useQuery(ARBOL_CUENTAS_CONTABLES, null, graphql_options)
+
+const arbolCuentas = computed({
+  get() {
+    return resultArbolCuentas.value?.arbolCuentasContables ?? []
+  }
+})
 
 cuentasContablesCrud.onDoneDeleteCuentaContable(({ data }) => {
   console.log('data', data)

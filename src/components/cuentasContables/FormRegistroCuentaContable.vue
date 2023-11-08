@@ -1,19 +1,15 @@
 <template>
-  <q-card class="my-card" style="width: 400px">
+  <div class="my-card" style="width: 400px">
     <q-card-section
-      class="bg-main-menu row inline fit q-py-sm justify-between items-center"
+      class="row justify-between items-center dialog-title q-px-md"
     >
       <div class="text-subtitle1 text-accent-light">{{ actionName }}</div>
       <div class="">
         <q-btn
-          round
-          flat
-          dense
           icon="close"
-          class="float-right"
-          color="accent"
           v-close-popup
-          vertical-top
+          class="dialog__title--closeButton"
+          round
         ></q-btn>
       </div>
       <!-- <pre>{{ editedFormItem.tipoAfectacion }}</pre> -->
@@ -62,6 +58,7 @@
               :tipo-afectacion="editedFormItem.tipoAfectacion.id"
               input-label="Padre"
               :readonly="isReadonly"
+              :disable="isPadreDefault"
             ></CuentaContableSelect>
           </div>
           <div class="col">
@@ -110,38 +107,35 @@
           <q-btn
             label="Cancelar"
             v-close-popup
-            color="secondary"
+            color="negative-pastel"
             flat
             class="q-ml-sm"
           />
           <q-btn
             :label="lblSubmit"
             type="submit"
-            color="primary"
+            color="primary-button"
             :disable="isError"
           />
         </div>
       </q-form>
     </q-card-section>
-  </q-card>
+  </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-
-import {
-  CUENTA_CONTABLE_CREATE,
-  CUENTA_CONTABLE_UPDATE
-} from 'src/graphql/cuentasContables'
-import { useMutation } from '@vue/apollo-composable'
 import CuentaContableSelect from '../formComponents/CuentaContableSelect.vue'
 import { api } from 'src/boot/axios'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
+import { useCuentasContablesCrud } from 'src/composables/useCuentasContablesCrud'
+import { logErrorMessages } from '@vue/apollo-util'
 
 /**
  * composables
  */
 const notificacion = useNotificacion()
+const cuentasContablesCrud = useCuentasContablesCrud()
 // import IconPicker from '/src/components/IconPicker.vue'
 /**
  * state
@@ -171,6 +165,11 @@ const props = defineProps({
     default: () => {
       return null
     }
+  },
+  isPadreDefault: {
+    type: Boolean,
+    required: true,
+    default: false
   }
 })
 /**
@@ -235,28 +234,28 @@ function saveItem() {
 
   console.log('save item', input)
   if (props.editedItem.action === 'add') {
-    insertCuentaContable({ input })
+    cuentasContablesCrud.createCuentaContable({ input })
   } else {
-    updateCuentaContable({ id, input })
+    cuentasContablesCrud.updateCuentaContable({ id, input })
   }
 }
 
 /**
  * GRAPHQL
  */
-const {
-  mutate: insertCuentaContable,
-  onDone: onDoneInsertCuentaContable,
-  onError: onErrorInsertCuentaContable
-} = useMutation(CUENTA_CONTABLE_CREATE)
+// const {
+//   mutate: insertCuentaContable,
+//   onDone: onDoneInsertCuentaContable,
+//   onError: onErrorInsertCuentaContable
+// } = useMutation(CUENTA_CONTABLE_CREATE)
 
-const {
-  mutate: updateCuentaContable,
-  onDone: onDoneUpdateCuentaContable,
-  onError: onErrorUpdateCuentaContable
-} = useMutation(CUENTA_CONTABLE_UPDATE)
+// const {
+//   mutate: updateCuentaContable,
+//   onDone: onDoneUpdateCuentaContable,
+//   onError: onErrorUpdateCuentaContable
+// } = useMutation(CUENTA_CONTABLE_UPDATE)
 
-onDoneInsertCuentaContable(({ data }) => {
+cuentasContablesCrud.onDoneCreateCuentaContable(({ data }) => {
   if (!!data) {
     const item = data.cuentaContableCreate.cuentaContable
     const itemSaved = {
@@ -267,10 +266,15 @@ onDoneInsertCuentaContable(({ data }) => {
     emit('cuentaContableSaved', itemSaved)
   }
 })
-onErrorInsertCuentaContable((error) => {
-  console.error(error)
+cuentasContablesCrud.onErrorCreateCuentaContable((error) => {
+  logErrorMessages(error)
+  // notificacion.mostrarNotificacionNegativa(
+  //   'Ocurrió un error al intentar crear la cuenta contable',
+  //   1200
+  // )
 })
-onDoneUpdateCuentaContable(({ data }) => {
+
+cuentasContablesCrud.onDoneUpdateCuentaContable(({ data }) => {
   if (!!data) {
     console.log('data', data)
     const item = data.cuentaContableUpdate.cuentaContable
@@ -282,9 +286,13 @@ onDoneUpdateCuentaContable(({ data }) => {
     emit('cuentaContableUpdated', itemUpdated)
   }
 })
-onErrorUpdateCuentaContable((error) => {
-  console.error(error)
+cuentasContablesCrud.onErrorUpdateCuentaContable((error) => {
+  notificacion.mostrarNotificacionNegativa(
+    'Ocurrió un error al intentar actualizar la cuenta contable',
+    1200
+  )
 })
+
 function identificadorIngresado(evt) {
   const value = evt.target.value
   console.log('value', value)

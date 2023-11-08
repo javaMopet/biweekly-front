@@ -61,13 +61,11 @@
         <template #body-cell-icono="props">
           <q-td
             :props="props"
-            :style="`border-left: 3px solid ${props.row.color}`"
+            :style="`border-left: 8px solid ${props.row.color}`"
             class="bg-white"
           >
-            <div
-              class="row justify-around items-center text-white bg-high-contrast"
-            >
-              <q-icon :name="props.row.icono" size="20px" />
+            <div class="row justify-around items-center text-dark">
+              <q-icon :name="props.row.icono" size="25px" />
             </div>
           </q-td>
         </template>
@@ -80,29 +78,29 @@
                 <span class="text-table-title categoria-subtitle">{{
                   props.row.cuentaContable?.nombreCompleto
                 }}</span>
+                <q-tooltip>
+                  {{ props.row.descripcion }}
+                </q-tooltip>
               </div>
-              <span class="text-positive text-condensed">{{
+              <!-- <span class="text-positive text-condensed">{{
                 props.row.descripcion
-              }}</span>
+              }}</span> -->
             </div>
           </q-td>
         </template>
         <template #body-cell-acciones="props">
           <q-td :props="props" fit class="bg-white">
             <q-btn
-              class="edit_button"
+              class="button-edit"
               icon="edit"
-              size="md"
               dense
               @click="editRow(props)"
-              rounded
-              color="more-button"
+              round
               flat
             />
             <q-btn
-              icon="delete"
-              size="md"
-              class="q-ml-sm delete_button"
+              icon="las la-trash-alt"
+              class="button-delete"
               color="accent"
               rounded
               dense
@@ -116,7 +114,6 @@
     <div class="col">
       <q-table
         class="my-sticky-header-table"
-        dense
         :rows="listaCategoriasEgresos"
         :columns="columns"
         row-key="id"
@@ -124,6 +121,7 @@
         :rows-per-page-options="[0]"
         hide-header
         hide-pagination
+        dense
       >
         <template #top-left>
           <div class="row items-center">
@@ -156,11 +154,11 @@
         <template #body-cell-icono="props">
           <q-td
             :props="props"
-            :style="`border-left: 3px solid ${props.row.color}`"
+            :style="`border-left: 8px solid ${props.row.color}`"
             class="bg-white"
           >
-            <div class="row justify-around text-white bg-high-contrast">
-              <q-icon :name="props.row.icono" size="20px" />
+            <div class="row justify-around text-dark">
+              <q-icon :name="props.row.icono" size="25px" />
             </div>
           </q-td>
         </template>
@@ -173,34 +171,33 @@
                 <span class="text-table-title categoria-subtitle">{{
                   props.row.cuentaContable?.nombreCompleto
                 }}</span>
+                <q-tooltip>
+                  {{ props.row.descripcion }}
+                </q-tooltip>
               </div>
-              <span class="text-positive text-condensed">{{
+              <!-- <span class="text-positive text-condensed">{{
                 props.row.descripcion
-              }}</span>
+              }}</span> -->
             </div>
           </q-td>
         </template>
         <template #body-cell-acciones="props">
           <q-td :props="props" fit class="bg-white">
             <q-btn
-              class="edit_button"
+              class="button-edit"
               icon="edit"
-              size="md"
               dense
               @click="editRow(props)"
               rounded
-              color="more-button"
               flat
             />
             <q-btn
-              icon="delete"
-              size="md"
-              class="q-ml-sm delete_button"
-              color="accent"
+              icon="las la-trash-alt"
+              class="button-delete"
               rounded
-              dense
               @click="deleteRow(props)"
               flat
+              dense
             />
           </q-td>
         </template>
@@ -215,12 +212,12 @@
       transition-show="jump-up"
       transition-hide="jump-down"
     >
-      <RegistroCategoria
+      <FormRegistroCategoria
         :edited-item="editedItem"
         :edited-index="editedIndex"
         @categoriaSaved="categoriaSaved"
         @categoriaUpdated="categoriaUpdated"
-      ></RegistroCategoria>
+      ></FormRegistroCategoria>
     </q-dialog>
   </Teleport>
 </template>
@@ -228,17 +225,23 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { LISTA_TIPOS_MOVIMIENTO } from 'src/graphql/movimientos'
-import RegistroCategoria from 'src/components/categorias/RegistroCategoria.vue'
+import FormRegistroCategoria from 'src/components/categorias/FormRegistroCategoria.vue'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { useQuasar } from 'quasar'
-import { useCategoriaCrud } from 'src/composables/useCategoriaCrud'
+import { useCategoriasCrud } from 'src/composables/useCategoriasCrud'
 import { useQuery } from '@vue/apollo-composable'
+import { useCategoriaStore } from 'src/stores/common/categoriaStore'
+import { logErrorMessages } from '@vue/apollo-util'
 /**
  * composables
  */
 const notificacion = useNotificacion()
 const $q = useQuasar()
-const categoriasCrud = useCategoriaCrud()
+const categoriasCrud = useCategoriasCrud()
+/**
+ * stores
+ */
+const categoriaStore = useCategoriaStore()
 /**
  * state
  */
@@ -252,7 +255,7 @@ const defaultItem = {
   tipoMovimientoId: '1',
   cuentaContable: null
 }
-// const listaCategorias = ref([])
+
 const filterIngresos = ref()
 const filterGastos = ref()
 const filterInversiones = ref()
@@ -282,17 +285,18 @@ onErrorListaTiposMovimiento((error) => {
   console.error(error)
 })
 
-categoriasCrud.onDoneDeleteCategoria(({ data }) => {
+categoriaStore.onDoneCategoriaDelete(({ data }) => {
   if (!!data) {
     console.log('item deleted ', data)
     const deletedItem = data.categoriaDelete.categoria
     rowIndexDelete.value = null
     mostrarNotificacion('elminó', deletedItem)
-    refetchListaCategorias()
+    // refetchListaCategorias()
   }
 })
-categoriasCrud.onErrorDeleteCategoria((error) => {
+categoriasCrud.onErrorCategoriaDelete((error) => {
   console.error(error)
+  logErrorMessages(error)
 })
 /**
  * computed
@@ -300,15 +304,16 @@ categoriasCrud.onErrorDeleteCategoria((error) => {
 const listaCategoriasIngresos = computed({
   get() {
     return (
-      categoriasCrud.listaCategorias.value.filter(
+      categoriaStore.listaCategorias.filter(
         (categoria) => categoria.tipoMovimientoId === '1'
       ) ?? []
     )
   }
 })
+
 const listaCategoriasEgresos = computed({
   get() {
-    return categoriasCrud.listaCategorias.value.filter(
+    return categoriaStore.listaCategorias.filter(
       (categoria) => categoria.tipoMovimientoId === '2'
     )
   }
@@ -331,7 +336,9 @@ const listaTiposMovimiento = computed({
 /**
  * onMount
  */
-onMounted(() => {})
+onMounted(() => {
+  categoriasCrud.loadOrRefetch()
+})
 /**
  * METHODS
  */
@@ -376,7 +383,7 @@ function deleteRow(item) {
     persistent: true
   })
     .onOk(() => {
-      deleteCategoria({ id: item.row.id })
+      categoriaStore.categoriaDelete(item.row.id)
     })
     .onCancel(() => {})
     .onDismiss(() => {})
@@ -384,18 +391,16 @@ function deleteRow(item) {
 
 function categoriaSaved(itemSaved) {
   showFormItem.value = false
-  mostrarNotificacion('guardó', itemSaved)
-  categoriasCrud.refetchListaCategorias()
+  // mostrarNotificacion('guardó', itemSaved)
+  // categoriasCrud.refetchListaCategorias()
 }
 function categoriaUpdated(itemUpdated, indice) {
-  console.log('se actualizó el item con indice: ', indice)
   showFormItem.value = false
-  mostrarNotificacion('actualizó', itemUpdated)
-  // listaCategorias.value[indice] = itemUpdated
   editedItem.value = { ...defaultItem }
   editedIndex.value = null
-  categoriasCrud.refetchListaCategorias()
+  // categoriasCrud.refetchListaCategorias()
 }
+
 function mostrarNotificacion(action, cuenta) {
   notificacion.mostrarNotificacionPositiva(
     `La categoria "${cuenta.nombre}" se ${action} correctamente`,
@@ -466,7 +471,7 @@ const columns = [
 ]
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @function color-texto($color) {
   @if (lightness($color) > 50) {
     @return rgb(51, 149, 162);
@@ -484,13 +489,7 @@ const columns = [
   font-size: 0.7rem;
   // letter-spacing: -0.035rem;
 }
-.bg-high-contrast {
-  background-image: linear-gradient(310deg, #7928ca 0%, #ff0080 100%);
-  padding: 5px;
-  border-radius: 0.5rem !important;
-  width: 30px;
-  height: 30px;
-}
+
 .delete_button {
   &:hover {
     color: $negative-pastel !important;

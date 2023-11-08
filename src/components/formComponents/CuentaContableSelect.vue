@@ -20,9 +20,17 @@
         lazy-rules
         :rules="rules"
         :readonly="props.readonly"
+        :disable="props.disable"
       >
         <template #after>
-          <q-btn color="more-button" round flat dense icon="more_vert">
+          <q-btn
+            color="more-button"
+            round
+            flat
+            dense
+            icon="more_vert"
+            v-if="!props.disable"
+          >
             <q-menu>
               <q-list style="min-width: 100px">
                 <q-item
@@ -63,11 +71,11 @@
       transition-show="jump-up"
       transition-hide="jump-down"
     >
-      <RegistroCuentaContable
+      <FormRegistroCuentaContable
         v-model="cuentaContable"
         :edited-item="formEditedItem"
         @cuentaContableSaved="cuentaContableSaved"
-      ></RegistroCuentaContable>
+      ></FormRegistroCuentaContable>
     </q-dialog>
   </Teleport>
 </template>
@@ -76,7 +84,7 @@
 import { useQuery } from '@vue/apollo-composable'
 import { LISTA_CUENTAS_CONTABLES } from 'src/graphql/cuentasContables'
 import { ref, computed } from 'vue'
-import RegistroCuentaContable from '../cuentasContables/RegistroCuentaContable.vue'
+import FormRegistroCuentaContable from '../cuentasContables/FormRegistroCuentaContable.vue'
 
 /**
  * state
@@ -136,6 +144,11 @@ const props = defineProps({
     default: () => {
       return []
     }
+  },
+  disable: {
+    type: Boolean,
+    required: false,
+    default: false
   }
 })
 /**

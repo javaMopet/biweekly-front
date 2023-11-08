@@ -1,5 +1,5 @@
 <template>
-  <q-card class="my-card" style="width: 500px">
+  <div class="my-card" style="width: 500px">
     <q-card-section class="row justify-between items-start dialog-title">
       <div class="dialog__title--name">{{ actionName }}</div>
       <div class="dialog-closebutton">
@@ -29,18 +29,22 @@
             @update:model-value="onChangeTipoMovimiento"
             push
             glossy
+            :disable="isEditing"
           />
           <div class="q-pt-md">
             <div class="row q-gutter-x-md">
-              <div class="col-auto">
-                <q-btn @click="selectIcon" color="primary">
-                  <q-icon
-                    color="gray"
-                    :name="editedFormItem.icono || 'extension'"
-                    class="size"
-                    size="2.5em"
-                  />
-                </q-btn>
+              <div
+                class="col-auto bg-high-contrast clickable"
+                @click="selectIcon"
+              >
+                <!-- <q-btn @click="selectIcon" color="primary"> -->
+                <q-icon
+                  color="accent-light"
+                  :name="editedFormItem.icono || 'extension'"
+                  class="size"
+                  size="2em"
+                />
+                <!-- </q-btn> -->
               </div>
               <div class="col">
                 <q-input
@@ -165,7 +169,7 @@
         </div>
       </q-form>
     </q-card-section>
-  </q-card>
+  </div>
 
   <Teleport to="#modal">
     <q-dialog
@@ -195,16 +199,16 @@ import IconPicker from '/src/components/IconPicker.vue'
 import CuentaSelect from '../formComponents/CuentaSelect.vue'
 import PriceInput from '../formComponents/PriceInput.vue'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
-import { useCategoriaCrud } from 'src/composables/useCategoriaCrud'
 import { SessionStorage } from 'quasar'
 import { useTiposMovimientoDao } from 'src/composables/useTiposMovimientoDao'
+import { useCategoriaStore } from 'src/stores/common/categoriaStore'
 
 /**
  * composables
  */
 const notificacion = useNotificacion()
-const categoriaCrud = useCategoriaCrud()
 const tiposMovimientoDao = useTiposMovimientoDao()
+const categoriaStore = useCategoriaStore()
 /**
  * state
  */
@@ -219,7 +223,6 @@ const defaultItem = {
   cuentaContable: null
 }
 const formItem = ref({ ...defaultItem })
-// const cuentaContableSubnivel = ref(0)
 const ppproxy = ref(null)
 
 const cuentaContableOptions = ref({
@@ -276,6 +279,11 @@ const actionName = computed({
       : 'Nueva Categoria'
   }
 })
+const isEditing = computed({
+  get() {
+    return !!editedFormItem.value.id
+  }
+})
 const lblSubmit = computed({
   get() {
     return !!editedFormItem.value.id ? 'Actualizar' : 'Guardar'
@@ -319,6 +327,9 @@ function obtenerCuentasContables(tipoMovimientoId) {
       break
   }
 }
+/**
+ * Guardar o actualizar una categoría.
+ */
 function saveItem() {
   console.log('save item')
   const cuenta_contable_id = editedFormItem.value.cuentaContable?.id
@@ -339,28 +350,29 @@ function saveItem() {
   }
   console.log('guardando item:', input)
   if (!editedFormItem.value.id) {
-    categoriaCrud.createCategoria({
-      input
-    })
+    categoriaStore.categoriaCreate(input)
   } else {
     const id = editedFormItem.value.id
-    categoriaCrud.updateCategoria({
+    categoriaStore.updateCategoria({
       id,
       input
     })
   }
 }
-// categoriaCrud.onDoneCreate(({ data }) => {
-//   console.log('saved data...', data)
+/**
+ *
+ */
+categoriaStore.onDoneCategoriaCreate(({ data }) => {
+  if (!!data) {
+    notificacion.mostrarNotificacionPositiva('Categoría creada correctamente.')
+    const itemSaved = data.categoriaCreate.categoria
+    emit('categoriaSaved', itemSaved)
+  }
+})
+
+// categoriaStore.onDoneUpdate(({ data }) => {
 //   if (!!data) {
-//     notificacion.mostrarNotificacionPositiva('Categoría creada correctamente.')
-//     const itemSaved = data.categoriaCreate.categoria
-//     emit('categoriaSaved', itemSaved)
-//   }
-// })
-// categoriaCrud.onDoneUpdate(({ data }) => {
-//   if (!!data) {
-//     console.log('updated data...', data)
+//     notificacion.mostrarNotificacionPositiva('Categoría actualizada.')
 //     const itemUpdated = data.categoriaUpdate.categoria
 //     emit('categoriaUpdated', itemUpdated, props.editedIndex)
 //   }

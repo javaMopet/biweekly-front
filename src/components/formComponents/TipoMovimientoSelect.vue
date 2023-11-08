@@ -76,10 +76,10 @@
       transition-show="jump-up"
       transition-hide="jump-down"
     >
-      <RegistroCategoria
+      <FormRegistroCategoria
         :edited-item="editedCategoriaParam"
         @categoriaSaved="onCategoriaSaved"
-      ></RegistroCategoria>
+      ></FormRegistroCategoria>
     </q-dialog>
   </Teleport>
 </template>
@@ -88,7 +88,7 @@
 import { computed, ref, onMounted, toRef } from 'vue'
 import CategoriaSelect from './CategoriaSelect.vue'
 import CuentaSelect from './CuentaSelect.vue'
-import RegistroCategoria from '../categorias/RegistroCategoria.vue'
+import FormRegistroCategoria from '../categorias/FormRegistroCategoria.vue'
 
 /**
  * props

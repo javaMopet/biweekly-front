@@ -1,4 +1,5 @@
 import { useMutation, useQuery } from '@vue/apollo-composable'
+import { logErrorMessages } from '@vue/apollo-util'
 import {
   LISTA_CUENTAS_CONTABLES,
   CUENTA_CONTABLE_CREATE,
@@ -23,13 +24,13 @@ export function useCuentasContablesCrud() {
 
   const {
     mutate: createCuentaContable,
-    onDone: onDoneCreate,
+    onDone: onDoneCreateCuentaContable,
     onError: onErrorCreateCuentaContable
   } = useMutation(CUENTA_CONTABLE_CREATE)
 
   const {
     mutate: updateCuentaContable,
-    onDone: onDoneUpdate,
+    onDone: onDoneUpdateCuentaContable,
     onError: onErrorUpdateCuentaContable
   } = useMutation(CUENTA_CONTABLE_UPDATE)
 
@@ -45,28 +46,29 @@ export function useCuentasContablesCrud() {
   //   }
   // })
 
-  onDoneCreate(({ data }) => {
-    console.log('refrescando cuentasContables')
-    refetchListaCuentasContables()
+  onDoneCreateCuentaContable(({ data }) => {
+    console.log('refrescando cuentasContables en el crud')
+    // refetchListaCuentasContables()
   })
   onErrorCreateCuentaContable((error) => {
-    console.log('error', error.graphQLErrors[0])
-    console.log('error', error.graphQLErrors[0].extensions)
+    console.log('surgio un error')
+    logErrorMessages(error)
+    // console.log('error', error.graphQLErrors[0])
+    // console.log('error', error.graphQLErrors[0].extensions)
   })
 
   // onErrorListaCuentas((error) => {
   //   console.log(error)
   // })
 
-  onDoneUpdate(({ data }) => {
-    refetchListaCuentasContables()
+  onDoneUpdateCuentaContable(({ data }) => {
+    console.log('refrescando cuentasContables en el crud')
+    // refetchListaCuentasContables()
   })
   onErrorUpdateCuentaContable((error) => {
-    console.dir(error)
-    // const problems = error.graphQLErrors[0].extensions.problems
-    // if (!!problems) {
-    //   console.table(problems)
-    // }
+    console.log('error', error.graphQLErrors[0])
+    console.log('error', error.graphQLErrors[0].extensions)
+    logErrorMessages(error)
   })
 
   return {
@@ -74,8 +76,8 @@ export function useCuentasContablesCrud() {
     // onErrorListaCuentasContables,
     createCuentaContable,
     updateCuentaContable,
-    onDoneCreate,
-    onDoneUpdate,
+    onDoneCreateCuentaContable,
+    onDoneUpdateCuentaContable,
     onDoneDeleteCuentaContable,
     onErrorCreateCuentaContable,
     onErrorUpdateCuentaContable,

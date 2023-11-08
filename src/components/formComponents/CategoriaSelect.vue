@@ -64,23 +64,23 @@
       transition-show="jump-up"
       transition-hide="jump-down"
     >
-      <registro-categoria
+      <FormRegistroCategoria
         :edited-item="editedCategoriaParam"
         @categoriaSaved="categoriaSaved"
-      ></registro-categoria>
+      ></FormRegistroCategoria>
     </q-dialog>
   </Teleport>
 </template>
 
 <script setup>
 import { ref, toRefs, watch, onMounted, computed, Teleport } from 'vue'
-import RegistroCategoria from '../categorias/RegistroCategoria.vue'
-import { useCategoriaCrud } from '/src/composables/useCategoriaCrud.js'
+import FormRegistroCategoria from '../categorias/FormRegistroCategoria.vue'
+import { useCategoriaStore } from 'src/stores/common/categoriaStore'
 
 /**
  *
  */
-const categoriaCrud = useCategoriaCrud()
+const categoriaStore = useCategoriaStore()
 
 /**
  * onMounted
@@ -212,7 +212,7 @@ const optionsList = computed({
       // return (resultadoLista.value?.listaCategorias ?? []).filter(
       //   (categoria) => categoria.tipoMovimientoId === tipoMovimientoId.value
       // )
-      return categoriaCrud.listaCategorias.value.filter(
+      return categoriaStore.listaCategorias.filter(
         (categoria) => categoria.tipoMovimientoId === tipoMovimientoId.value
       )
     } else {

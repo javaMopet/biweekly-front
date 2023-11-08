@@ -19,6 +19,7 @@
       dense
       :readonly="readonly"
       :style="props.style"
+      :disable="props.disable"
     >
     </q-select>
   </div>
@@ -108,6 +109,11 @@ const props = defineProps({
     type: String,
     required: false,
     default: ''
+  },
+  disable: {
+    type: Boolean,
+    required: false,
+    default: false
   }
 })
 /**

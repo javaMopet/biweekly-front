@@ -330,11 +330,11 @@
       transition-show="jump-up"
       transition-hide="jump-down"
     >
-      <RegistroCategoria
+      <FormRegistroCategoria
         :edited-item="registroCategoriaItem"
         @categoriaSaved="categoriaSaved"
         @categoriaUpdated="categoriaUpdated"
-      ></RegistroCategoria>
+      ></FormRegistroCategoria>
     </q-dialog>
   </Teleport>
 </template>
@@ -351,7 +351,7 @@ import { api } from 'src/boot/axios'
 import ListaMovimientos from 'src/components/movimientos/ListaMovimientos.vue'
 import MesSelect from 'src/components/formComponents/MesSelect.vue'
 import FormCuentaRegistro from 'src/components/movimientos/FormCuentaRegistro.vue'
-import RegistroCategoria from 'src/components/categorias/RegistroCategoria.vue'
+import FormRegistroCategoria from 'src/components/categorias/FormRegistroCategoria.vue'
 
 /**
  * composables
