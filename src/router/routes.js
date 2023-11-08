@@ -45,13 +45,13 @@ const routes = [
       },
       {
         path: 'catalogos',
-        component: () => import('pages/CatalogosPage.vue'),
-        children: [
-          {
-            path: '/main/catalogos/cuentas',
-            component: () => import('pages/CuentasPage.vue')
-          }
-        ]
+        component: () => import('pages/CatalogosPage.vue')
+        // children: [
+        //   {
+        //     path: '/main/catalogos/cuentas',
+        //     component: () => import('pages/CuentasPage.vue')
+        //   }
+        // ]
       }
     ]
   },

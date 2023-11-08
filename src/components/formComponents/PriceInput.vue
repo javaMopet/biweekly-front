@@ -118,9 +118,9 @@ const editingLabel = computed({
  * onMounted
  */
 onMounted(() => {
-  if (props.debug) {
-    debugger
-  }
+  // if (props.debug) {
+  //   debugger
+  // }
 
   localValue.value = props.modelValue
 
