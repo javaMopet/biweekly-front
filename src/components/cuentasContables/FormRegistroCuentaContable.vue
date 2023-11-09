@@ -19,6 +19,8 @@
           <div>
             <div class="row inline fit">
               <div class="col q-mr-md">
+                <!-- <pre>{{ props.editedItem.tipoAfectacion }}</pre>
+                <pre>{{ editedFormItem.tipoAfectacion }}</pre> -->
                 <q-select
                   v-model="editedFormItem.tipoAfectacion"
                   :options="tiposAfectacionOptions"
@@ -53,7 +55,7 @@
             <CuentaContableSelect
               v-model="editedFormItem.padre"
               :subnivel="1"
-              :tipo-afectacion="editedFormItem.tipoAfectacion"
+              :tipo-afectacion="editedFormItem.tipoAfectacion?.id ?? 'C'"
               input-label="Padre"
               :readonly="isReadonly"
               :disable="isPadreDefault"
@@ -126,21 +128,20 @@ import { ref, computed, onMounted } from 'vue'
 import CuentaContableSelect from '../formComponents/CuentaContableSelect.vue'
 import { api } from 'src/boot/axios'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
-import { logErrorMessages } from '@vue/apollo-util'
 import { useCuentaContableStore } from 'src/stores/common/useCuentaContableStore'
+import { useCuentasContablesCrud } from 'src/composables/useCuentasContablesCrud'
 
 /**
  * composables
  */
 const notificacion = useNotificacion()
+const cuentasContablesCrud = useCuentasContablesCrud()
 const cuentaContableStore = useCuentaContableStore()
 
-const {
-  onDoneCreateCuentaContable,
-  onErrorCreateCuentaContable,
-  onDoneUpdateCuentaContable,
-  onErrorUpdateCuentaContable
-} = cuentaContableStore
+const { onDoneUpdateCuentaContable, onErrorUpdateCuentaContable } =
+  cuentaContableStore
+
+const { onErrorCreateCuentaContable } = cuentasContablesCrud
 
 /**
  * state
@@ -192,6 +193,7 @@ const editedFormItem = computed({
     formItem.value = val
   }
 })
+
 const actionName = computed({
   get() {
     return props.editedItem.action === 'edit'
@@ -199,6 +201,7 @@ const actionName = computed({
       : 'Nueva Cuenta Contable'
   }
 })
+
 const lblSubmit = computed({
   get() {
     return props.editedItem.action === 'edit' ? 'Actualizar' : 'Guardar'
@@ -215,8 +218,11 @@ const isReadonly = computed({
  * onMounted
  */
 onMounted(() => {
-  // cargarTiposCuentaContable()
-  // cargarCuentasContables()
+  const tipoAfectacion = props.editedItem.tipoAfectacion
+  const taIndice = tiposAfectacionOptions.value.findIndex(
+    (ta) => ta.id === tipoAfectacion
+  )
+  editedFormItem.value.tipoAfectacion = tiposAfectacionOptions.value[taIndice]
 })
 
 /**
@@ -225,10 +231,10 @@ onMounted(() => {
 function saveItem() {
   const id = editedFormItem.value.id
   const padreId = parseInt(editedFormItem.value.padre.id)
-  console.dir(editedFormItem.value)
+  const tipoAfectacion = editedFormItem.value.tipoAfectacion
   const input = {
     ...editedFormItem.value,
-    tipoAfectacion: editedFormItem.value.tipoAfectacion,
+    tipoAfectacion: editedFormItem.value.tipoAfectacion.id,
     padreId,
     padre: undefined,
     action: undefined,
@@ -238,9 +244,8 @@ function saveItem() {
     __typename: undefined
   }
 
-  console.log('save item', input)
   if (props.editedItem.action === 'add') {
-    cuentaContableStore.createCuentaContable(input)
+    cuentasContablesCrud.createCuentaContable({ input })
   } else {
     cuentaContableStore.updateCuentaContable(id, input)
   }
@@ -261,13 +266,30 @@ function saveItem() {
 //   onError: onErrorUpdateCuentaContable
 // } = useMutation(CUENTA_CONTABLE_UPDATE)
 
-onDoneCreateCuentaContable(({ data }) => {
+cuentasContablesCrud.onDoneCreateCuentaContable(({ data }) => {
   if (!!data) {
+    const itemCreated = JSON.parse(
+      JSON.stringify(data.cuentaContableCreate.cuentaContable)
+    )
+    itemCreated.id = Number(itemCreated.id)
+    itemCreated.label = `${itemCreated.id} - ${itemCreated.nombre}`
+    itemCreated.selectable = true
+    if (cuentaContableStore.listaCuentasContables.length > 0) {
+      cuentaContableStore.listaCuentasContables.push(itemCreated)
+    }
+    const padreId = itemCreated.padreId
+    const itemPadre = cuentaContableStore.findTreeElementById(padreId)
+    itemPadre.children.push(itemCreated)
+    /**
+     *
+     */
     notificacion.mostrarNotificacionPositiva('Cuenta Contable creada.', 1200)
     emit('cuentaContableSaved')
   }
 })
+
 onErrorCreateCuentaContable((error) => {
+  // logErrorMessages(error)
   notificacion.mostrarNotificacionNegativa(
     'Ocurrió un error al intentar crear la cuenta contable',
     1200

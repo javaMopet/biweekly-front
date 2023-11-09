@@ -228,7 +228,6 @@ function addRow(item_padre) {
     id = begin_cta_padre.toString()
   }
 
-  console.log('id', id)
   editedItem.value = {
     action: 'add',
     id: id.toString(),
@@ -239,12 +238,7 @@ function addRow(item_padre) {
       nombreCompleto: `${item_padre.node.id} - ${item_padre.node.nombre}`
     },
     subnivel: item_padre.node.subnivel - 1,
-    tipoAfectacion:
-      item_padre.node.tipoAfectacion === 'C'
-        ? 'Cargo'
-        : item_padre.node.tipoAfectacion === 'A'
-        ? 'Abono'
-        : item_padre.node.tipoAfectacion
+    tipoAfectacion: item_padre.node.tipoAfectacion
   }
   showFormItem.value = true
 }
@@ -266,7 +260,6 @@ function editItem(item) {
 }
 
 function deleteItem(item) {
-  console.log('item', item)
   itemToDelete.value = {
     padre_id: item.node.padreId,
     item: item.node
@@ -311,8 +304,7 @@ function onSelected(val) {
   cuentaSeleccionada.value = cuentaContableStore.findTreeElementById(val)
 }
 
-function onCuentaContableSaved(itemSaved) {
-  console.log('saved', itemSaved)
+function onCuentaContableSaved() {
   showFormItem.value = false
 }
 
@@ -333,7 +325,7 @@ function cuentaContableUpdated(itemUpdated) {
  * GRAPHQL
  */
 
-onDoneDeleteCuentaContable(({ data }) => {
+onDoneDeleteCuentaContable(() => {
   notificacion.mostrarNotificacionPositiva(
     'La cuenta contable fué eliminada.',
     1200

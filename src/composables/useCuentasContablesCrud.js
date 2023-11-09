@@ -55,10 +55,9 @@ export function useCuentasContablesCrud() {
   //   }
   // })
 
-  onDoneCreateCuentaContable(({ data }) => {
-    console.log('refrescando cuentasContables en el crud')
-    // refetchListaCuentasContables()
-  })
+  // onDoneCreateCuentaContable(() => {
+
+  // })
   onErrorCreateCuentaContable((error) => {
     console.log('surgio un error')
     logErrorMessages(error)
@@ -82,8 +81,6 @@ export function useCuentasContablesCrud() {
   })
 
   return {
-    // listaCuentasContables,
-    // onErrorListaCuentasContables,
     onResultArbolCuentas,
     loadingArbolCuentas,
     loadListaCuentasContables,

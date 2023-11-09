@@ -48,11 +48,9 @@ export const useCuentaContableStore = defineStore('cuentaContableStore', () => {
     onResultArbolCuentas,
     loadingArbolCuentas,
     onResultListaCuentasContables,
-    onDoneCreateCuentaContable,
     deleteCuentaContable,
     onDoneDeleteCuentaContable,
     onDoneUpdateCuentaContable,
-    onErrorCreateCuentaContable,
     onErrorUpdateCuentaContable,
     onErrorListaCuentasContables,
     onErrorDeleteCuentaContable
@@ -63,7 +61,6 @@ export const useCuentaContableStore = defineStore('cuentaContableStore', () => {
    */
   onResultArbolCuentas(({ data }) => {
     if (!!data) {
-      console.dir(data)
       arbolCuentasContables.value = JSON.parse(
         JSON.stringify(data.arbolCuentasContables)
       )
@@ -83,42 +80,18 @@ export const useCuentaContableStore = defineStore('cuentaContableStore', () => {
     deleteCuentaContable({ id })
   }
 
-  onDoneCreateCuentaContable(({ data }) => {
-    console.log('data', data)
-    const itemCreated = JSON.parse(
-      JSON.stringify(data.cuentaContableCreate.cuentaContable)
-    )
-    itemCreated.id = Number(itemCreated.id)
-    itemCreated.label = `${itemCreated.id} - ${itemCreated.nombre}`
-    itemCreated.selectable = true
-    if (listaCuentasContables.value.length > 0) {
-      listaCuentasContables.value.push(itemCreated)
-    }
-    const padreId = itemCreated.padreId
-    const itemPadre = findTreeElementById(padreId)
-    console.log('itemPadre')
-    console.dir(itemPadre)
-    itemPadre.children.push(itemCreated)
-  })
-
   onDoneDeleteCuentaContable(({ data }) => {
-    console.log('eliminando cuenta contable del listado')
-    console.log('data', data)
     const itemDeleted = data.cuentaContableDelete.cuentaContable
     const id = itemDeleted.id
-    const indice = listaCuentasContables.value.indexOf((cc) => cc.id === id)
-    console.log('indice', indice)
+    const indice = listaCuentasContables.value.findIndex((cc) => cc.id === id)
     listaCuentasContables.value.splice(indice, 1)
+
     /* eliminar del arbol de cuentas */
     const padreId = itemDeleted.padreId
-    console.log('itemPadre', padreId)
     const itemPadre = findTreeElementById(padreId)
-    console.dir(itemPadre)
-    console.dir(itemPadre.children)
-    const childrenIndex = itemPadre.children.indexOf(
+    const childrenIndex = itemPadre.children.findIndex(
       (child) => child.id.toString() === id.toString()
     )
-    console.dir('childrenIndex', childrenIndex)
     itemPadre.children.splice(childrenIndex, 1)
   })
 
@@ -139,11 +112,9 @@ export const useCuentaContableStore = defineStore('cuentaContableStore', () => {
     listaCuentasContables,
     createCuentaContable,
     updateCuentaContable,
-    onDoneCreateCuentaContable,
     onDoneUpdateCuentaContable,
     deleteItem,
     onDoneDeleteCuentaContable,
-    onErrorCreateCuentaContable,
     onErrorUpdateCuentaContable
   }
 })
