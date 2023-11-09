@@ -12,18 +12,13 @@ export function useTiposMovimientoDao() {
   })
 
   const {
-    result: resultadoListaTiposMovimiento,
+    onResult: onResultListaTiposMovimiento,
     onError: onErrorListaTiposMovimiento,
     refetch: refetchListaTiposMovimiento
   } = useQuery(LISTA_TIPOS_MOVIMIENTO, null, graphql_options)
 
-  const listaTiposMovimiento = computed({
-    get() {
-      return resultadoListaTiposMovimiento.value?.listaTiposMovimiento ?? []
-    }
-  })
-
   return {
-    listaTiposMovimiento
+    onResultListaTiposMovimiento,
+    onErrorListaTiposMovimiento
   }
 }

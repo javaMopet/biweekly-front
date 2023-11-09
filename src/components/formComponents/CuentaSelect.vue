@@ -44,12 +44,13 @@
 // import { LISTA_CUENTAS_REDUCED } from 'src/graphql/cuentas'
 import { ref, computed } from 'vue'
 import RegistroCuenta from '../cuentas/RegistroCuenta.vue'
-import { useCuentaCrud } from 'src/composables/useCuentaCrud'
+import { useCuentaStore } from 'src/stores/common/useCuentaStore'
 
 /**
  * composable
  */
-const cuentaCrud = useCuentaCrud()
+const cuentaStore = useCuentaStore()
+
 /**
  * state
  */
@@ -135,7 +136,7 @@ const cuenta = computed({
 const listaOptions = computed({
   get() {
     return (
-      cuentaCrud.listaCuentasReduced.value?.filter((option) => {
+      cuentaStore.listaCuentasReduced?.filter((option) => {
         // console.log(props.filterArray.includes(option.tipoCuenta.id))
         return props.filterArray.includes(option.tipoCuenta.id)
       }) ?? []

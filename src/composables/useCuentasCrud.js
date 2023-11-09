@@ -8,7 +8,7 @@ import {
 
 import { ref, computed } from 'vue'
 
-export function useCuentaCrud() {
+export function useCuentasCrud() {
   /**
    * graphql
    */
@@ -16,15 +16,19 @@ export function useCuentaCrud() {
     fetchPolicy: 'network-only'
   })
 
-  const { result: resultadoListaReduced, onError: onErrorListaCuentasReduced } =
-    useQuery(
-      LISTA_CUENTAS_REDUCED,
-      null, //arguments
-      graphql_options
-    )
+  const {
+    // result: resultadoListaReduced,
+    onResult: onResultListaReduced,
+    onError: onErrorListaCuentasReduced
+  } = useQuery(
+    LISTA_CUENTAS_REDUCED,
+    null, //arguments
+    graphql_options
+  )
 
   const {
-    result: resultadoLista,
+    // result: resultadoLista,
+    onResult: onResultListaCuentas,
     onError: onErrorListaCuentas,
     refetch: refetchListaCuentas
   } = useQuery(LISTA_CUENTAS, null, graphql_options)
@@ -46,11 +50,11 @@ export function useCuentaCrud() {
       return resultadoLista.value?.listaCuentas ?? []
     }
   })
-  const listaCuentasReduced = computed({
-    get() {
-      return resultadoListaReduced.value?.listaCuentas ?? []
-    }
-  })
+  // const listaCuentasReduced = computed({
+  //   get() {
+  //     return resultadoListaReduced.value?.listaCuentas ?? []
+  //   }
+  // })
 
   onErrorListaCuentas((error) => {
     console.log('error', error)
@@ -65,7 +69,7 @@ export function useCuentaCrud() {
   })
 
   onErrorListaCuentas((error) => {
-    console.log(error)
+    logErrorMessages(error)
   })
 
   onDoneUpdate(({ data }) => {
@@ -78,7 +82,8 @@ export function useCuentaCrud() {
 
   return {
     listaCuentas,
-    listaCuentasReduced,
+    onResultListaReduced,
+    onResultListaCuentas,
     createCuenta,
     updateCuenta,
     onDoneCreate,

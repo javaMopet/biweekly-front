@@ -228,7 +228,6 @@ import { LISTA_TIPOS_MOVIMIENTO } from 'src/graphql/movimientos'
 import FormRegistroCategoria from 'src/components/categorias/FormRegistroCategoria.vue'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { useQuasar } from 'quasar'
-import { useCategoriasCrud } from 'src/composables/useCategoriasCrud'
 import { useQuery } from '@vue/apollo-composable'
 import { useCategoriaStore } from 'src/stores/common/categoriaStore'
 import { logErrorMessages } from '@vue/apollo-util'
@@ -237,7 +236,7 @@ import { logErrorMessages } from '@vue/apollo-util'
  */
 const notificacion = useNotificacion()
 const $q = useQuasar()
-const categoriasCrud = useCategoriasCrud()
+
 /**
  * stores
  */
@@ -278,9 +277,10 @@ const {
 // onResultCategorias(({ data }) => {
 //   listaCategorias.value = JSON.parse(JSON.stringify(data.listaCategorias))
 // })
-categoriasCrud.onErrorListaCategorias((error) => {
-  console.error(error)
-})
+// categoriasCrud.onErrorListaCategorias((error) => {
+//   console.error(error)
+// })
+
 onErrorListaTiposMovimiento((error) => {
   console.error(error)
 })
@@ -294,9 +294,11 @@ categoriaStore.onDoneCategoriaDelete(({ data }) => {
     // refetchListaCategorias()
   }
 })
-categoriasCrud.onErrorCategoriaDelete((error) => {
-  console.error(error)
-  logErrorMessages(error)
+categoriaStore.onErrorCategoriaDelete((error) => {
+  notificacion.mostrarNotificacionNegativa(
+    'No fue posible realizar la eliminación de la categoria',
+    1300
+  )
 })
 /**
  * computed
@@ -336,9 +338,7 @@ const listaTiposMovimiento = computed({
 /**
  * onMount
  */
-onMounted(() => {
-  categoriasCrud.loadOrRefetch()
-})
+// onMounted(() => {})
 /**
  * METHODS
  */

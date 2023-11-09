@@ -23,7 +23,8 @@ export const useCategoriaStore = defineStore('categoriaStore', () => {
   const {
     onDoneCategoriaCreate,
     onDoneCategoriaDelete,
-    onErrorCategoriaCreate
+    onErrorCategoriaCreate,
+    onErrorCategoriaDelete
   } = categoriasCrud
 
   categoriasCrud.loadOrRefetch()
@@ -57,6 +58,7 @@ export const useCategoriaStore = defineStore('categoriaStore', () => {
     categoriaCreate,
     categoriaDelete,
     onDoneCategoriaCreate,
-    onDoneCategoriaDelete
+    onDoneCategoriaDelete,
+    onErrorCategoriaDelete
   }
 })

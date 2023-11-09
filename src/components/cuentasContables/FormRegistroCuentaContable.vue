@@ -12,9 +12,7 @@
           round
         ></q-btn>
       </div>
-      <!-- <pre>{{ editedFormItem.tipoAfectacion }}</pre> -->
     </q-card-section>
-
     <q-card-section class="">
       <q-form @submit="saveItem" class="q-gutter-md">
         <div class="q-gutter-md">
@@ -55,7 +53,7 @@
             <CuentaContableSelect
               v-model="editedFormItem.padre"
               :subnivel="1"
-              :tipo-afectacion="editedFormItem.tipoAfectacion.id"
+              :tipo-afectacion="editedFormItem.tipoAfectacion"
               input-label="Padre"
               :readonly="isReadonly"
               :disable="isPadreDefault"
@@ -128,15 +126,22 @@ import { ref, computed, onMounted } from 'vue'
 import CuentaContableSelect from '../formComponents/CuentaContableSelect.vue'
 import { api } from 'src/boot/axios'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
-import { useCuentasContablesCrud } from 'src/composables/useCuentasContablesCrud'
 import { logErrorMessages } from '@vue/apollo-util'
+import { useCuentaContableStore } from 'src/stores/common/useCuentaContableStore'
 
 /**
  * composables
  */
 const notificacion = useNotificacion()
-const cuentasContablesCrud = useCuentasContablesCrud()
-// import IconPicker from '/src/components/IconPicker.vue'
+const cuentaContableStore = useCuentaContableStore()
+
+const {
+  onDoneCreateCuentaContable,
+  onErrorCreateCuentaContable,
+  onDoneUpdateCuentaContable,
+  onErrorUpdateCuentaContable
+} = cuentaContableStore
+
 /**
  * state
  */
@@ -220,9 +225,10 @@ onMounted(() => {
 function saveItem() {
   const id = editedFormItem.value.id
   const padreId = parseInt(editedFormItem.value.padre.id)
+  console.dir(editedFormItem.value)
   const input = {
     ...editedFormItem.value,
-    tipoAfectacion: editedFormItem.value.tipoAfectacion.id,
+    tipoAfectacion: editedFormItem.value.tipoAfectacion,
     padreId,
     padre: undefined,
     action: undefined,
@@ -234,9 +240,9 @@ function saveItem() {
 
   console.log('save item', input)
   if (props.editedItem.action === 'add') {
-    cuentasContablesCrud.createCuentaContable({ input })
+    cuentaContableStore.createCuentaContable(input)
   } else {
-    cuentasContablesCrud.updateCuentaContable({ id, input })
+    cuentaContableStore.updateCuentaContable(id, input)
   }
 }
 
@@ -255,38 +261,29 @@ function saveItem() {
 //   onError: onErrorUpdateCuentaContable
 // } = useMutation(CUENTA_CONTABLE_UPDATE)
 
-cuentasContablesCrud.onDoneCreateCuentaContable(({ data }) => {
+onDoneCreateCuentaContable(({ data }) => {
   if (!!data) {
-    const item = data.cuentaContableCreate.cuentaContable
-    const itemSaved = {
-      ...item,
-      label: `${item.id} - ${item.nombre}`
-    }
-    console.log('data', itemSaved)
-    emit('cuentaContableSaved', itemSaved)
+    notificacion.mostrarNotificacionPositiva('Cuenta Contable creada.', 1200)
+    emit('cuentaContableSaved')
   }
 })
-cuentasContablesCrud.onErrorCreateCuentaContable((error) => {
-  logErrorMessages(error)
-  // notificacion.mostrarNotificacionNegativa(
-  //   'Ocurrió un error al intentar crear la cuenta contable',
-  //   1200
-  // )
+onErrorCreateCuentaContable((error) => {
+  notificacion.mostrarNotificacionNegativa(
+    'Ocurrió un error al intentar crear la cuenta contable',
+    1200
+  )
 })
 
-cuentasContablesCrud.onDoneUpdateCuentaContable(({ data }) => {
+onDoneUpdateCuentaContable(({ data }) => {
   if (!!data) {
-    console.log('data', data)
-    const item = data.cuentaContableUpdate.cuentaContable
-    const itemUpdated = {
-      ...item,
-      label: `${item.id} - ${item.nombre}`
-    }
-    console.log('data', itemUpdated)
-    emit('cuentaContableUpdated', itemUpdated)
+    notificacion.mostrarNotificacionPositiva(
+      'Cuenta Contable actualizada.',
+      1200
+    )
+    emit('cuentaContableUpdated')
   }
 })
-cuentasContablesCrud.onErrorUpdateCuentaContable((error) => {
+onErrorUpdateCuentaContable((error) => {
   notificacion.mostrarNotificacionNegativa(
     'Ocurrió un error al intentar actualizar la cuenta contable',
     1200

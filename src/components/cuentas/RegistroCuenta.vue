@@ -136,11 +136,6 @@
 <script setup>
 import { useQuery, useMutation } from '@vue/apollo-composable'
 import { ref, reactive, computed, onMounted } from 'vue'
-import {
-  CUENTA_CREATE,
-  CUENTA_UPDATE,
-  LISTA_TIPOS_CUENTA
-} from 'src/graphql/cuentas'
 import CuentaContableSelect from '../formComponents/CuentaContableSelect.vue'
 import BancoSelect from '../formComponents/BancoSelect.vue'
 
@@ -161,18 +156,6 @@ const cuentaContableProps = reactive({
   tipoAfectacion: 'C',
   clasificacion: ''
 })
-
-/**
- * GRAPHQL
- */
-const graphql_options = ref({
-  fetchPolicy: 'network-only'
-})
-const { result: resultTiposCuenta, onError: onErrorTiposCuenta } = useQuery(
-  LISTA_TIPOS_CUENTA,
-  null,
-  graphql_options
-)
 
 const {
   mutate: createCuenta,

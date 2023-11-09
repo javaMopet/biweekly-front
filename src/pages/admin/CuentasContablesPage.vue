@@ -1,11 +1,28 @@
 <template>
-  <div class="row text-h5 text-secondary q-pa-md font-subtitle">
-    CUENTAS CONTABLES
-  </div>
   <div class="column items-center" style="border: 0px solid red">
+    <q-toolbar class="" dense fit>
+      <div class="row items-center q-ml-sm q-gutter-x-sm">
+        <div class="q-pa-md q-gutter-sm">
+          <q-breadcrumbs
+            class="breadcrum-component"
+            active-color="primary"
+            separator=">"
+            separator-color="primary"
+          >
+            <q-breadcrumbs-el icon="home" label="Home" to="/" />
+            <q-breadcrumbs-el
+              label="Cuentas Contables"
+              icon="account_balance"
+            />
+          </q-breadcrumbs>
+        </div>
+      </div>
+      <q-toolbar-title> </q-toolbar-title>
+    </q-toolbar>
     <div class="q-pl-sm">
-      <div class="col">
-        <div>
+      <div class="row justify-between full-width">
+        <div class="page-title">Cuentas Contables</div>
+        <div class="q-pl-md">
           <q-input
             ref="filterRef"
             outlined
@@ -13,7 +30,7 @@
             label="Buscar Cuenta Contable"
             clearable
             dense
-            style="width: 800px"
+            style="width: 400px"
             color="secondary"
           >
             <template v-slot:append>
@@ -22,11 +39,11 @@
           </q-input>
         </div>
       </div>
+
       <div class="row fit" style="border: 0px solid red">
-        <!-- <q-scroll-area style="width: 600px; height: calc(100vh - 200px)"> -->
         <q-tree
           v-if="arbolLleno"
-          :nodes="arbolCuentas"
+          :nodes="cuentaContableStore.arbolCuentasContables"
           node-key="id"
           label-key="label"
           v-model:selected="selected"
@@ -65,26 +82,7 @@
                       ? ' (Abono)'
                       : props.node.tipoAfectacion
                   }}</span>
-                  <!-- <span class="text-weight-light text-caption">
-                &nbsp;--------------&nbsp; &nbsp;-----&nbsp;&nbsp;-----&nbsp;
-                {{
-                  props.node.tipoAfectacion == 'C'
-                    ? 'Cargo'
-                    : props.node.tipoAfectacion == 'A'
-                    ? 'Abono'
-                    : props.node.tipoAfectacion
-                }}
-              </span> -->
                 </span>
-                <!-- <div class="text-weight-regular">
-              <span class="text-grey-7 text-caption">{{
-                props.node.tipoAfectacion == 'C'
-                  ? 'Cargo'
-                  : props.node.tipoAfectacion == 'A'
-                  ? 'Abono'
-                  : props.node.tipoAfectacion
-              }}</span>
-            </div> -->
               </div>
               <q-menu touch-position context-menu class="text-primary">
                 <q-list style="min-width: 100px">
@@ -103,37 +101,7 @@
                   <q-item clickable v-close-popup @click="editItem(props)">
                     <q-item-section>Editar {{ props.node.id }} </q-item-section>
                   </q-item>
-                  <!-- <q-item clickable v-close-popup @click="moverItem(props)">
-                <q-item-section
-                  >Mover Cuenta Contable {{ props.node.nombre }}</q-item-section
-                >
-              </q-item> -->
-
                   <q-separator />
-                  <!-- <q-item clickable>
-                <q-item-section>Preferences</q-item-section>
-                <q-item-section side>
-                  <q-icon name="keyboard_arrow_right" />
-                </q-item-section>
-
-                <q-menu anchor="top end" self="top start">
-                  <q-list>
-                    <q-item v-for="n in 3" :key="n" dense clickable>
-                      <q-item-section>Submenu Label</q-item-section>
-                      <q-item-section side>
-                        <q-icon name="keyboard_arrow_right" />
-                      </q-item-section>
-                      <q-menu auto-close anchor="top end" self="top start">
-                        <q-list>
-                          <q-item v-for="n in 3" :key="n" dense clickable>
-                            <q-item-section>3rd level Label</q-item-section>
-                          </q-item>
-                        </q-list>
-                      </q-menu>
-                    </q-item>
-                  </q-list>
-                </q-menu>
-              </q-item> -->
                   <q-separator />
                   <q-item
                     v-if="
@@ -169,15 +137,6 @@
             </div>
           </template>
         </q-tree>
-        <!-- </q-scroll-area> -->
-        <!-- <q-card class="my-card">
-      <q-card-section>
-        <div class="text-h6">{{ cuentaSeleccionada.label }}</div>
-        <div class="text-subtitle2">
-          Subnivel: {{ cuentaSeleccionada.subnivel }}
-        </div>
-      </q-card-section>
-    </q-card> -->
       </div>
     </div>
 
@@ -200,26 +159,26 @@
 </template>
 
 <script setup>
-import { useQuery, useMutation } from '@vue/apollo-composable'
 import { ref, computed, watch } from 'vue'
-import { ARBOL_CUENTAS_CONTABLES } from '/src/graphql/cuentasContables'
 import RegistroCuentaContable from 'src/components/cuentasContables/FormRegistroCuentaContable.vue'
 import { useNotificacion } from 'src/composables/utils/useNotificacion.js'
 import { useQuasar } from 'quasar'
 import { useRouter } from 'vue-router'
-import { useCuentasContablesCrud } from 'src/composables/useCuentasContablesCrud'
+
+import { useCuentaContableStore } from 'src/stores/common/useCuentaContableStore'
 
 /**
  * composables
  */
 const notificacion = useNotificacion()
 const $q = useQuasar()
-const cuentasContablesCrud = useCuentasContablesCrud()
 const $router = useRouter()
+const cuentaContableStore = useCuentaContableStore()
+
+const { loadingArbolCuentas, onDoneDeleteCuentaContable } = cuentaContableStore
 /**
  * state
  */
-
 const expanded = ref([])
 const selected = ref(null)
 const filter = ref('')
@@ -239,7 +198,7 @@ const itemToDelete = ref({
  */
 const arbolLleno = computed({
   get() {
-    return arbolCuentas.value.length > 0
+    return cuentaContableStore.arbolCuentasContables.length > 0
   }
 })
 
@@ -331,7 +290,7 @@ function deleteItem(item) {
       persistent: true
     })
     .onOk(() => {
-      deleteCuentaContable({ id: item.node.id })
+      cuentaContableStore.deleteItem(item.node.id)
     })
     .onCancel(() => {
       itemToDelete.value = {
@@ -349,100 +308,50 @@ function deleteItem(item) {
 
 function onSelected(val) {
   console.log('selected', val)
-  cuentaSeleccionada.value = searchTree(arbolCuentas.value[0], val)
-}
-
-function searchTree(element, id) {
-  if (element.id == id) {
-    return element
-  } else if (element.children != null) {
-    var i
-    var result = null
-    for (i = 0; result == null && i < element.children.length; i++) {
-      result = searchTree(element.children[i], id)
-    }
-    return result
-  }
-  return null
+  cuentaSeleccionada.value = cuentaContableStore.findTreeElementById(val)
 }
 
 function onCuentaContableSaved(itemSaved) {
   console.log('saved', itemSaved)
-  const padre = searchTree(arbolCuentas.value[0], itemSaved.padreId)
-  console.dir(padre)
-  const newChildren = JSON.parse(JSON.stringify(padre.children))
-  newChildren.push(itemSaved)
-  console.table(newChildren)
-  padre.children = newChildren
-  notificacion.mostrarNotificacionPositiva(
-    `La cuenta contable ${itemSaved.label} se guardó correctamente.`,
-    2000
-  )
   showFormItem.value = false
-  // padre.children.push(itemSaved)
 }
 
 function cuentaContableUpdated(itemUpdated) {
   console.log('updated', itemUpdated)
-  const itemEdit = searchTree(arbolCuentas.value[0], itemUpdated.id)
-  itemEdit.nombre = itemUpdated.nombre
-  itemEdit.label = `${itemUpdated.id} - ${itemUpdated.nombre}`
-  itemEdit.tipoAfectacion = itemUpdated.tipoAfectacion == 'Cargo' ? 'C' : 'A'
-  notificacion.mostrarNotificacionPositiva(
-    `La cuenta contable ${itemUpdated.label} se actualizó correctamente.`,
-    2000
-  )
+  // const itemEdit = searchTree(arbolCuentas.value[0], itemUpdated.id)
+  // itemEdit.nombre = itemUpdated.nombre
+  // itemEdit.label = `${itemUpdated.id} - ${itemUpdated.nombre}`
+  // itemEdit.tipoAfectacion = itemUpdated.tipoAfectacion == 'Cargo' ? 'C' : 'A'
+  // notificacion.mostrarNotificacionPositiva(
+  //   `La cuenta contable ${itemUpdated.label} se actualizó correctamente.`,
+  //   2000
+  // )
   showFormItem.value = false
 }
 
 /**
  * GRAPHQL
  */
-const graphql_options = ref({
-  fetchPolicy: 'network-only'
-})
 
-const {
-  result: resultArbolCuentas,
-  onError: onErrorArbolCuentasContables,
-  loading: loadingArbol
-} = useQuery(ARBOL_CUENTAS_CONTABLES, null, graphql_options)
-
-const arbolCuentas = computed({
-  get() {
-    return resultArbolCuentas.value?.arbolCuentasContables ?? []
-  }
-})
-
-cuentasContablesCrud.onDoneDeleteCuentaContable(({ data }) => {
-  console.log('data', data)
-  const item_padre = searchTree(
-    arbolCuentas.value[0],
-    itemToDelete.value.padre_id
-  )
-  const index = item_padre.children.indexOf(itemToDelete.value.item)
-  item_padre.children.splice(index, 1)
-  itemToDelete.value = {
-    padre_id: null,
-    item: null
-  }
+onDoneDeleteCuentaContable(({ data }) => {
   notificacion.mostrarNotificacionPositiva(
     'La cuenta contable fué eliminada.',
-    2000
+    1200
   )
 })
-cuentasContablesCrud.onErrorDeleteCuentaContable((error) => {
-  console.error(error)
-})
-onErrorArbolCuentasContables((error) => {
-  console.error(error)
-})
+
+// cuentasContablesCrud.onErrorDeleteCuentaContable((error) => {
+//   console.error(error)
+// })
+// onErrorArbolCuentasContables((error) => {
+//   console.error(error)
+// })
 /**
  * watch
  */
-watch(loadingArbol, (newValue, oldValue) => {
-  console.log('cargando arbol', newValue, oldValue)
-})
+// watch(loadingArbol, (newValue, oldValue) => {
+//   console.log('cargando arbol', newValue, oldValue)
+// })
 </script>
 
 <style lang="scss" scoped>
