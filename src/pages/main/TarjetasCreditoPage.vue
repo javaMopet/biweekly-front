@@ -27,7 +27,7 @@
           grid
           style="width: 100%"
           dense
-          :rows="listaCuentas"
+          :rows="cuentaStore.listaCuentasTarjeta"
           :columns="columns"
           row-key="id"
           :filter="filter"
@@ -212,14 +212,15 @@
 </template>
 
 <script setup>
-import { useQuery, useMutation } from '@vue/apollo-composable'
-import { ref, computed, onMounted } from 'vue'
-import { LISTA_CUENTAS, CUENTA_DELETE } from '/src/graphql/cuentas'
+import { useMutation } from '@vue/apollo-composable'
+import { ref, onMounted } from 'vue'
+import { CUENTA_DELETE } from '/src/graphql/cuentas'
 import RegistroCuenta from 'src/components/cuentas/RegistroCuenta.vue'
 import { useQuasar } from 'quasar'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { useRouter } from 'vue-router'
 import { useFormato } from 'src/composables/utils/useFormato'
+import { useCuentaStore } from 'src/stores/common/useCuentaStore'
 
 /**
  * composables
@@ -228,6 +229,7 @@ const $q = useQuasar()
 const notificacion = useNotificacion()
 const router = useRouter()
 const formato = useFormato()
+const cuentaStore = useCuentaStore()
 
 /**
  * state
@@ -236,16 +238,6 @@ const loadingCard = ref([])
 /**
  * GRAPHQL
  */
-const graphql_options = ref({
-  fetchPolicy: 'cache-and-network'
-  // fetchPolicy: 'cache-only'
-})
-const {
-  onError: onErrorListaCuentas,
-  result: resultCuentas,
-  refetch: refetchListaCuentas
-} = useQuery(LISTA_CUENTAS, null, graphql_options)
-
 const {
   mutate: deleteCuenta,
   onDone: onDoneDeleteCuenta,
@@ -265,9 +257,6 @@ onErrorDeleteCuenta((error) => {
     'No es posible eliminar esta tarjeta de crédito debido a que tiene movimientos',
     1500
   )
-})
-onErrorListaCuentas((error) => {
-  console.error(error)
 })
 /**
  * state
@@ -290,15 +279,7 @@ const editedIndex = ref(null)
 /**
  * computed
  */
-const listaCuentas = computed({
-  get() {
-    return (
-      resultCuentas.value?.listaCuentas.filter(
-        (cuenta) => cuenta.tipoCuenta.id === '3'
-      ) ?? []
-    )
-  }
-})
+
 /**
  *
  */

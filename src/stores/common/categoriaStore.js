@@ -22,6 +22,7 @@ export const useCategoriaStore = defineStore('categoriaStore', () => {
 
   const {
     onDoneCategoriaCreate,
+    // onDoneCategoriaUpdate,
     onDoneCategoriaDelete,
     onErrorCategoriaCreate,
     onErrorCategoriaDelete
@@ -32,6 +33,7 @@ export const useCategoriaStore = defineStore('categoriaStore', () => {
   function categoriaCreate(input) {
     categoriasCrud.createCategoria({ input })
   }
+
   function categoriaDelete(id) {
     categoriasCrud.deleteCategoria({ id })
   }
@@ -56,8 +58,10 @@ export const useCategoriaStore = defineStore('categoriaStore', () => {
   return {
     listaCategorias,
     categoriaCreate,
+    categoriaUpdate,
     categoriaDelete,
     onDoneCategoriaCreate,
+    // onDoneCategoriaUpdate,
     onDoneCategoriaDelete,
     onErrorCategoriaDelete
   }

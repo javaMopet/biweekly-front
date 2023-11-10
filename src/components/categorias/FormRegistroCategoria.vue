@@ -25,7 +25,7 @@
             text-color="gray-2"
             :toggle-color="active_color"
             toggle-text-color="toggle-text-button"
-            :options="tiposMovimientoOptions"
+            :options="tipoMovimientoStore.tiposMovimientoCuenta"
             @update:model-value="onChangeTipoMovimiento"
             push
             glossy
@@ -200,15 +200,17 @@ import CuentaSelect from '../formComponents/CuentaSelect.vue'
 import PriceInput from '../formComponents/PriceInput.vue'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { SessionStorage } from 'quasar'
-import { useTiposMovimientoDao } from 'src/composables/useTiposMovimientoDao'
 import { useCategoriaStore } from 'src/stores/common/categoriaStore'
+import { useTipoMovimientoStore } from 'src/stores/common/useTipoMovimientoStore'
+import { useCategoriasCrud } from 'src/composables/useCategoriasCrud'
 
 /**
  * composables
  */
 const notificacion = useNotificacion()
-const tiposMovimientoDao = useTiposMovimientoDao()
+const tipoMovimientoStore = useTipoMovimientoStore()
 const categoriaStore = useCategoriaStore()
+const categoriaCrud = useCategoriasCrud()
 /**
  * state
  */
@@ -353,12 +355,10 @@ function saveItem() {
     categoriaStore.categoriaCreate(input)
   } else {
     const id = editedFormItem.value.id
-    categoriaStore.updateCategoria({
-      id,
-      input
-    })
+    categoriaCrud.categoriaUpdate({ id, input })
   }
 }
+
 /**
  *
  */
@@ -370,13 +370,14 @@ categoriaStore.onDoneCategoriaCreate(({ data }) => {
   }
 })
 
-// categoriaStore.onDoneUpdate(({ data }) => {
-//   if (!!data) {
-//     notificacion.mostrarNotificacionPositiva('Categoría actualizada.')
-//     const itemUpdated = data.categoriaUpdate.categoria
-//     emit('categoriaUpdated', itemUpdated, props.editedIndex)
-//   }
-// })
+categoriaStore.onDoneCategoriaUpdate(({ data }) => {
+  if (!!data) {
+    notificacion.mostrarNotificacionPositiva('Categoría actualizada.')
+    const itemUpdated = data.categoriaUpdate.categoria
+    emit('categoriaUpdated', itemUpdated, props.editedIndex)
+  }
+})
+
 // categoriaCrud.onErrorCreateCategoria((error) => {
 //   // console.log('error', error)
 //   // console.log('error', error.graphQLErrors[0].extensions)

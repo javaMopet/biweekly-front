@@ -6,10 +6,15 @@ import {
   CATEGORIA_UPDATE,
   CATEGORIA_DELETE
 } from 'src/graphql/categorias'
+import { useCategoriaStore } from 'src/stores/common/categoriaStore'
 
 import { ref, watch } from 'vue'
 
 export function useCategoriasCrud() {
+  /**
+   * store
+   */
+  const categoriaStore = useCategoriaStore()
   /**
    * graphql
    */
@@ -34,7 +39,7 @@ export function useCategoriasCrud() {
 
   const {
     mutate: updateCategoria,
-    onDone: onDoneUpdate,
+    onDone: onDoneCategoriaUpdate,
     onError: onErrorUpdateCategoria
   } = useMutation(CATEGORIA_UPDATE)
 
@@ -72,9 +77,10 @@ export function useCategoriasCrud() {
   //   console.log(error)
   // })
 
-  onDoneUpdate(({ data }) => {
+  onDoneCategoriaUpdate(({ data }) => {
     // refetchListaCategorias()
   })
+
   onErrorUpdateCategoria((error) => {
     console.dir(error)
     // const problems = error.graphQLErrors[0].extensions.problems
@@ -93,7 +99,7 @@ export function useCategoriasCrud() {
     updateCategoria,
     deleteCategoria,
     onDoneCategoriaCreate,
-    onDoneUpdate,
+    onDoneCategoriaUpdate,
     onDoneCategoriaDelete,
     onErrorListaCategorias,
     onErrorCategoriaCreate,

@@ -2,8 +2,8 @@ import { logErrorMessages } from '@vue/apollo-util'
 import { defineStore } from 'pinia'
 import { useTiposMovimientoDao } from 'src/composables/useTiposMovimientoDao'
 
-import { ref } from 'vue'
-export const useTipoCuentaStore = defineStore('tipoMovimientoStore', () => {
+import { computed, ref } from 'vue'
+export const useTipoMovimientoStore = defineStore('tipoMovimientoStore', () => {
   /**
    * state
    */
@@ -17,10 +17,30 @@ export const useTipoCuentaStore = defineStore('tipoMovimientoStore', () => {
     tipoMovimientoDao
 
   onResultListaTiposMovimiento(({ data }) => {
-    console.dir(data)
-    listaTiposMovimiento.value = JSON.parse(
-      JSON.stringify(data.listaTiposMovimiento)
-    )
+    if (!!data) {
+      console.dir(data)
+      listaTiposMovimiento.value = JSON.parse(
+        JSON.stringify(data.listaTiposMovimiento)
+      )
+    }
+  })
+  /**
+   * computed
+   */
+  const tiposMovimientoCuenta = computed({
+    get() {
+      return listaTiposMovimiento.value.filter(
+        (tipoMovimiento) => tipoMovimiento.id !== '3'
+      )
+    }
+  })
+
+  const tiposMovimientoTarjeta = computed({
+    get() {
+      return listaTiposMovimiento.value.filter(
+        (tipoMovimiento) => tipoMovimiento.id !== '3'
+      )
+    }
   })
 
   /**
@@ -30,5 +50,5 @@ export const useTipoCuentaStore = defineStore('tipoMovimientoStore', () => {
     logErrorMessages(error)
   })
 
-  return { listaTiposMovimiento }
+  return { listaTiposMovimiento, tiposMovimientoCuenta, tiposMovimientoTarjeta }
 })

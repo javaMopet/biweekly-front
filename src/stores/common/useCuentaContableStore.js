@@ -18,7 +18,6 @@ export const useCuentaContableStore = defineStore('cuentaContableStore', () => {
   /**
    * methods
    */
-
   function findTreeElementById(id) {
     return searchTree(arbolCuentasContables.value[0], id)
   }
@@ -37,13 +36,6 @@ export const useCuentaContableStore = defineStore('cuentaContableStore', () => {
     return null
   }
 
-  function createCuentaContable(input) {
-    cuentasContablesCrud.createCuentaContable({ input })
-  }
-  function updateCuentaContable(id, input) {
-    cuentasContablesCrud.updateCuentaContable({ id, input })
-  }
-
   const {
     onResultArbolCuentas,
     loadingArbolCuentas,
@@ -59,6 +51,11 @@ export const useCuentaContableStore = defineStore('cuentaContableStore', () => {
   /**
    * graphql
    */
+
+  function loadOrRefetchListaCuentas(variables) {
+    cuentasContablesCrud.loadListaCuentas(variables)
+  }
+
   onResultArbolCuentas(({ data }) => {
     if (!!data) {
       arbolCuentasContables.value = JSON.parse(
@@ -68,10 +65,11 @@ export const useCuentaContableStore = defineStore('cuentaContableStore', () => {
   })
 
   onResultListaCuentasContables(({ data }) => {
+    console.log(data)
     if (!!data) {
-      console.dir(data)
+      console.dir('loading lista de cuentas contables...', data)
       listaCuentasContables.value = JSON.parse(
-        JSON.stringify(data.listaCuentasContables)
+        JSON.stringify(data.listaCuentasContables ?? [])
       )
     }
   })
@@ -109,9 +107,8 @@ export const useCuentaContableStore = defineStore('cuentaContableStore', () => {
     arbolCuentasContables,
     loadingArbolCuentas,
     findTreeElementById,
+    loadOrRefetchListaCuentas,
     listaCuentasContables,
-    createCuentaContable,
-    updateCuentaContable,
     onDoneUpdateCuentaContable,
     deleteItem,
     onDoneDeleteCuentaContable,

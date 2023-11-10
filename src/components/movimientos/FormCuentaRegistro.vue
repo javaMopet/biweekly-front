@@ -25,7 +25,7 @@
             text-color="gray-2"
             :toggle-color="active_color"
             toggle-text-color="toggle-text-button"
-            :options="tiposMovimientoOptions"
+            :options="tipoMovimientoStore.listaTiposMovimiento"
             @update:model-value="onChangeTipoMovimiento"
             push
           />
@@ -123,14 +123,15 @@ import PriceInput from '../formComponents/PriceInput.vue'
 import { useRegistrosCrud } from 'src/composables/useRegistrosCrud'
 import { useTraspasosCrud } from 'src/composables/useTraspasosCrud'
 import { SessionStorage } from 'quasar'
-import { useTiposMovimientoDao } from 'src/composables/useTiposMovimientoDao'
+import { useTipoMovimientoStore } from 'src/stores/common/useTipoMovimientoStore'
+
 /**
  * composables
  */
 const formato = useFormato()
 const registrosCrud = useRegistrosCrud()
 const traspasosCrud = useTraspasosCrud()
-const tiposMovimientoDao = useTiposMovimientoDao()
+const tipoMovimientoStore = useTipoMovimientoStore()
 
 /**
  * state
@@ -276,13 +277,7 @@ const active_color = computed({
     return color.get(editedFormItem.value.tipoMovimientoId)
   }
 })
-const tiposMovimientoOptions = computed({
-  get() {
-    return (tiposMovimientoDao.listaTiposMovimiento.value ?? []).filter(
-      (tipoMovimiento) => tipoMovimiento.id != '3'
-    )
-  }
-})
+
 /**
  * METHODS
  */

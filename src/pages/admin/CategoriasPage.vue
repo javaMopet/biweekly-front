@@ -89,7 +89,7 @@
           </q-td>
         </template>
         <template #body-cell-acciones="props">
-          <q-td :props="props" fit class="bg-white">
+          <q-td :props="props" fit class="bg-white q-gutter-x-md">
             <q-btn
               class="button-edit"
               icon="edit"
@@ -182,7 +182,7 @@
           </q-td>
         </template>
         <template #body-cell-acciones="props">
-          <q-td :props="props" fit class="bg-white">
+          <q-td :props="props" fit class="bg-white q-gutter-x-md">
             <q-btn
               class="button-edit"
               icon="edit"

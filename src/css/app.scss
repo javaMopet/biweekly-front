@@ -203,11 +203,11 @@
 }
 
 .dialog__title--name {
-  font-size: 1.1rem !important;
+  font-size: 1rem !important;
   font-weight: 600;
   color: $secondary-light !important;
   letter-spacing: -0.0025rem;
-  padding: 4px 10px 15px 15px;
+  padding: 4px 10px 15px 10px;
 }
 .dialog-title {
   /*padding: 10px 10px 30px 15px;*/
@@ -558,6 +558,6 @@ $save-button-color: #6e65eb;
   padding: 5px;
   border-radius: 0.5rem !important;
   width: 25px;
-  height: 42px;
+  height: 38px;
   cursor: pointer;
 }

@@ -159,12 +159,11 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed } from 'vue'
 import RegistroCuentaContable from 'src/components/cuentasContables/FormRegistroCuentaContable.vue'
 import { useNotificacion } from 'src/composables/utils/useNotificacion.js'
 import { useQuasar } from 'quasar'
 import { useRouter } from 'vue-router'
-
 import { useCuentaContableStore } from 'src/stores/common/useCuentaContableStore'
 
 /**
@@ -206,23 +205,24 @@ const arbolLleno = computed({
  * METHODS
  */
 function addRow(item_padre) {
-  // console.log('Agregando Item  al padre:', item_padre.node)
-  // console.log('subnivel:', item_padre.node.subnivel)
+  // cuentaContableStore.loadOrRefetchListaCuentas({
+  //   subnivel: null, //parseInt(props.subnivel),
+  //   clasificacion: null, // props.clasificacion,
+  //   tipoAfectacion: null //props.tipoAfectacion
+  // })
   const subnivel_padre = item_padre.node.subnivel
-
   const begin_cta_padre = item_padre.node.id
     .toString()
     .substring(0, 5 - subnivel_padre)
-  // console.log('begin_cta_padre:', begin_cta_padre)
 
   const numero_hijos = !!item_padre.node.children
     ? item_padre.node.children.length
     : 0
-  // console.log('numero de hijos', numero_hijos)
+
   let id = ''
   if (subnivel_padre < 2 && numero_hijos > 0) {
     const last_item = item_padre.node.children[numero_hijos - 1]
-    // console.log('last item encontrado', last_item)
+
     id = parseInt(last_item.id) + 1
   } else {
     id = begin_cta_padre.toString()
@@ -242,18 +242,17 @@ function addRow(item_padre) {
   }
   showFormItem.value = true
 }
+/**
+ * Funcion utiliza para iniciar la edición de un elemento.
+ * @param {} item
+ */
 function editItem(item) {
   console.log('item to edit...', item.node)
   editedItem.value = {
     ...item.node,
     id: item.node.id.toString(),
     action: 'edit',
-    tipoAfectacion:
-      item.node.tipoAfectacion === 'C'
-        ? 'Cargo'
-        : item.node.tipoAfectacion === 'A'
-        ? 'Abono'
-        : 'Other',
+    tipoAfectacion: item.node.tipoAfectacion,
     children: undefined
   }
   showFormItem.value = true
@@ -308,8 +307,8 @@ function onCuentaContableSaved() {
   showFormItem.value = false
 }
 
-function cuentaContableUpdated(itemUpdated) {
-  console.log('updated', itemUpdated)
+function cuentaContableUpdated() {
+  console.log('onCuentaContableUpdated')
   // const itemEdit = searchTree(arbolCuentas.value[0], itemUpdated.id)
   // itemEdit.nombre = itemUpdated.nombre
   // itemEdit.label = `${itemUpdated.id} - ${itemUpdated.nombre}`

@@ -23,7 +23,7 @@
           grid
           style="width: 100%"
           dense
-          :rows="cuentaStore.listaCuentas"
+          :rows="cuentaStore.listaCuentasAhorro"
           :columns="columns"
           row-key="id"
           :filter="filter"

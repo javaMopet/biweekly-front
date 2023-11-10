@@ -98,8 +98,16 @@
                 {{ periodoInicio }} - {{ periodoFin }}</span
               >
             </div>
-            <!-- <q-separator spaced inset vertical />
+            <q-separator spaced inset vertical />
             <div class="col column items-center">
+              <span class="tarjeta__resumen-etiqueta">
+                Saldo al final del periodo</span
+              >
+              <span class="tarjeta__resumen-valor">
+                {{ formato.toCurrency(saldo_final_periodo) }}
+              </span>
+            </div>
+            <!--<div class="col column items-center">
               <span class="tarjeta__resumen-etiqueta">
                 Suma de movimientos del periodo
               </span>
@@ -110,15 +118,7 @@
           </div>
           <q-separator spaced inset horizontal />
           <div class="row">
-            <div class="col column items-center">
-              <span class="tarjeta__resumen-etiqueta">
-                Saldo al final del periodo</span
-              >
-              <span class="tarjeta__resumen-valor">
-                {{ formato.toCurrency(saldo_final_periodo) }}
-              </span>
-            </div>
-            <q-separator spaced inset vertical />
+            <!-- <q-separator spaced inset vertical /> -->
             <div class="col column items-center">
               <span class="tarjeta__resumen-etiqueta"> Saldo al día</span>
               <span class="tarjeta__resumen-valor">

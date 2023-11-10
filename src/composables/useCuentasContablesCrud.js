@@ -8,7 +8,7 @@ import {
   CUENTA_CONTABLE_DELETE
 } from 'src/graphql/cuentasContables'
 
-import { ref, computed } from 'vue'
+import { ref, computed, reactive } from 'vue'
 
 export function useCuentasContablesCrud() {
   /**
@@ -17,18 +17,21 @@ export function useCuentasContablesCrud() {
   const graphql_options = ref({
     fetchPolicy: 'cache-and-network'
   })
+  const options = reactive({
+    fetchPolicy: 'cache-first'
+  })
 
   const {
     onResult: onResultArbolCuentas,
     loading: loadingArbolCuentas,
     onError: onErrorArbolCuentasContables
-  } = useQuery(ARBOL_CUENTAS_CONTABLES, null, graphql_options)
+  } = useQuery(ARBOL_CUENTAS_CONTABLES, null, options)
 
   const {
-    load: loadListaCuentasContables,
+    load: loadList,
     onResult: onResultListaCuentasContables,
     onError: onErrorListaCuentasContables,
-    refetch: refetchListaCuentasContables
+    refetch: refetchList
   } = useLazyQuery(LISTA_CUENTAS_CONTABLES, null, graphql_options)
 
   const {
@@ -49,41 +52,37 @@ export function useCuentasContablesCrud() {
     onError: onErrorDeleteCuentaContable
   } = useMutation(CUENTA_CONTABLE_DELETE)
 
-  // const listaCuentasContables = computed({
-  //   get() {
-  //     return resultadoListaCuentasContables.value?.listaCuentasContables ?? []
-  //   }
-  // })
-
-  // onDoneCreateCuentaContable(() => {
-
-  // })
   onErrorCreateCuentaContable((error) => {
     console.log('surgio un error')
     logErrorMessages(error)
-    // console.log('error', error.graphQLErrors[0])
-    // console.log('error', error.graphQLErrors[0].extensions)
+    console.log('error', error.graphQLErrors[0])
+    console.log('error', error.graphQLErrors[0]?.extensions)
   })
 
-  // onErrorListaCuentas((error) => {
-  //   console.log(error)
-  // })
+  function loadListaCuentas(variables) {
+    loadList(null, variables, options)
+  }
+
+  function loadOrRefetchListaCuentas(variables) {
+    loadList(null, variables, graphql_options) ||
+      refetchList(null, variables, graphql_options)
+  }
 
   onDoneUpdateCuentaContable(({ data }) => {
     console.log('refrescando cuentasContables en el crud')
-    // refetchListaCuentasContables()
   })
 
   onErrorUpdateCuentaContable((error) => {
-    console.log('error', error.graphQLErrors[0])
-    console.log('error', error.graphQLErrors[0].extensions)
     logErrorMessages(error)
+    console.log('error', error.graphQLErrors[0])
+    console.log('error', error.graphQLErrors[0]?.extensions)
   })
 
   return {
     onResultArbolCuentas,
     loadingArbolCuentas,
-    loadListaCuentasContables,
+    loadListaCuentas,
+    loadOrRefetchListaCuentas,
     onResultListaCuentasContables,
     createCuentaContable,
     updateCuentaContable,

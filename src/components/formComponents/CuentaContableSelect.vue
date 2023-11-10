@@ -53,15 +53,6 @@
         </template>
       </q-select>
     </div>
-    <!-- <div class="q-mt-xs" style="border: 0px solid red" v-if="props.isAlta">
-      <q-btn
-        color="accent"
-        outline
-        icon="add"
-        dense
-        @click="registrarCuentaContable"
-      />
-    </div> -->
   </div>
 
   <Teleport to="#modal">
@@ -81,10 +72,9 @@
 </template>
 
 <script setup>
-import { useQuery } from '@vue/apollo-composable'
-import { LISTA_CUENTAS_CONTABLES } from 'src/graphql/cuentasContables'
 import { ref, computed } from 'vue'
 import FormRegistroCuentaContable from '../cuentasContables/FormRegistroCuentaContable.vue'
+// import { useCuentaContableStore } from 'src/stores/common/useCuentaContableStore'
 
 /**
  * state
@@ -92,6 +82,10 @@ import FormRegistroCuentaContable from '../cuentasContables/FormRegistroCuentaCo
 const filteredOptions = ref([])
 const form_cuentaContable_show = ref(false)
 const formEditedItem = ref(null)
+/**
+ * composables
+ */
+// const cuentaContableStore = useCuentaContableStore()
 /**
  * props
  */
@@ -155,21 +149,7 @@ const props = defineProps({
  * emits
  */
 const emit = defineEmits(['update:modelValue'])
-/**
- * graphql
- */
-const graphql_options = ref({
-  fetchPolicy: 'cache-and-network'
-})
-const { result: resultadoLista, onError: onErrorListaCuentas } = useQuery(
-  LISTA_CUENTAS_CONTABLES,
-  {
-    subnivel: null, //parseInt(props.subnivel),
-    clasificacion: null, // props.clasificacion,
-    tipoAfectacion: null //props.tipoAfectacion
-  },
-  graphql_options
-)
+
 /**
  * computed
  */
@@ -181,19 +161,19 @@ const cuentaContable = computed({
     emit('update:modelValue', val)
   }
 })
+
 const options = computed({
   get() {
-    return (resultadoLista.value?.listaCuentasContables ?? []).filter(
-      (cc) =>
-        cc.subnivel === props.subnivel &&
-        cc.tipoAfectacion === props.tipoAfectacion &&
-        cc.id.toString().startsWith(props.clasificacion)
-    )
+    return []
+    // (cuentaContableStore.listaCuentasContables ?? []).filter(
+    //   (cc) =>
+    //     cc.subnivel === props.subnivel &&
+    //     cc.tipoAfectacion === props.tipoAfectacion &&
+    //     cc.id.toString().startsWith(props.clasificacion)
+    // )
   }
 })
-onErrorListaCuentas((error) => {
-  console.log('error', error)
-})
+
 /**
  * methods
  */
@@ -212,6 +192,7 @@ function filterFn(val, update) {
     )
   })
 }
+
 function addItemCuentaContable() {
   console.log('registrar una cuenta contable')
 
@@ -231,6 +212,7 @@ function addItemCuentaContable() {
   }
   form_cuentaContable_show.value = true
 }
+
 function cuentaContableSaved(item) {
   form_cuentaContable_show.value = false
   cuentaContable.value = item

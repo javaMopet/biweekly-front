@@ -1,9 +1,7 @@
 <template>
   <div class="my-card" style="width: 400px">
-    <q-card-section
-      class="row justify-between items-center dialog-title q-px-md"
-    >
-      <div class="text-subtitle1 text-accent-light">{{ actionName }}</div>
+    <q-card-section class="row justify-between items-start dialog-title">
+      <div class="dialog__title--name">{{ actionName }}</div>
       <div class="">
         <q-btn
           icon="close"
@@ -36,6 +34,7 @@
                   outlined
                   color="secondary"
                   dense
+                  :readonly="isReadonly"
                 />
               </div>
               <div class="col">
@@ -57,9 +56,9 @@
               :subnivel="1"
               :tipo-afectacion="editedFormItem.tipoAfectacion?.id ?? 'C'"
               input-label="Padre"
-              :readonly="isReadonly"
-              :disable="isPadreDefault"
             ></CuentaContableSelect>
+            <!-- :readonly="isReadonly"
+              :disable="isPadreDefault" -->
           </div>
           <div class="col">
             <q-input
@@ -197,7 +196,7 @@ const editedFormItem = computed({
 const actionName = computed({
   get() {
     return props.editedItem.action === 'edit'
-      ? 'Actualizar la Cuenta Contable'
+      ? 'Actualizar Cuenta Contable'
       : 'Nueva Cuenta Contable'
   }
 })
@@ -247,25 +246,13 @@ function saveItem() {
   if (props.editedItem.action === 'add') {
     cuentasContablesCrud.createCuentaContable({ input })
   } else {
-    cuentaContableStore.updateCuentaContable(id, input)
+    cuentasContablesCrud.updateCuentaContable({ id, input })
   }
 }
 
 /**
  * GRAPHQL
  */
-// const {
-//   mutate: insertCuentaContable,
-//   onDone: onDoneInsertCuentaContable,
-//   onError: onErrorInsertCuentaContable
-// } = useMutation(CUENTA_CONTABLE_CREATE)
-
-// const {
-//   mutate: updateCuentaContable,
-//   onDone: onDoneUpdateCuentaContable,
-//   onError: onErrorUpdateCuentaContable
-// } = useMutation(CUENTA_CONTABLE_UPDATE)
-
 cuentasContablesCrud.onDoneCreateCuentaContable(({ data }) => {
   if (!!data) {
     const itemCreated = JSON.parse(
@@ -285,6 +272,34 @@ cuentasContablesCrud.onDoneCreateCuentaContable(({ data }) => {
      */
     notificacion.mostrarNotificacionPositiva('Cuenta Contable creada.', 1200)
     emit('cuentaContableSaved')
+  }
+})
+cuentasContablesCrud.onDoneUpdateCuentaContable(({ data }) => {
+  if (!!data) {
+    console.log('updated', data)
+    const itemUpdated = JSON.parse(
+      JSON.stringify(data.cuentaContableUpdate.cuentaContable)
+    )
+    itemUpdated.label = `${itemUpdated.id} - ${itemUpdated.nombre}`
+    itemUpdated.selectable = itemUpdated.subnivel === 0
+    const itemPadre = cuentaContableStore.findTreeElementById(
+      itemUpdated.padreId
+    )
+    const itemIndex = itemPadre.children.findIndex(
+      (cc) => cc.id === Number(itemUpdated.id)
+    )
+    console.log('itemIndex', itemIndex)
+    itemPadre.children[itemIndex] = itemUpdated
+    console.log('itemUpdated', itemUpdated)
+
+    /**
+     *
+     */
+    notificacion.mostrarNotificacionPositiva(
+      'Cuenta Contable actualizada correctamente.',
+      1200
+    )
+    emit('cuentaContableUpdated')
   }
 })
 

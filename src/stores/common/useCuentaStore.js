@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { useCuentasCrud } from 'src/composables/useCuentasCrud'
 
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 export const useCuentaStore = defineStore('cuentaStore', () => {
   /**
    * state
@@ -23,6 +23,20 @@ export const useCuentaStore = defineStore('cuentaStore', () => {
     console.dir(data)
     listaCuentas.value = JSON.parse(JSON.stringify(data.listaCuentas))
   })
+  /**
+   * computed
+   */
+  const listaCuentasAhorro = computed({
+    get() {
+      return listaCuentas.value.filter((c) => c.tipoCuenta.id !== '3') ?? []
+    }
+  })
+
+  const listaCuentasTarjeta = computed({
+    get() {
+      return listaCuentas.value.filter((c) => c.tipoCuenta.id === '3') ?? []
+    }
+  })
 
   /**
    * Manejo de errores
@@ -30,6 +44,8 @@ export const useCuentaStore = defineStore('cuentaStore', () => {
 
   return {
     listaCuentas,
-    listaCuentasReduced
+    listaCuentasReduced,
+    listaCuentasAhorro,
+    listaCuentasTarjeta
   }
 })

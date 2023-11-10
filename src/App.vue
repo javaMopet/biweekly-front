@@ -18,7 +18,7 @@ html,
 body {
   margin: 0;
   font-family: 'DM Sans', sans-serif;
-  font-size: 1rem;
+  // font-size: 14px; // se establece el tamaño de rem
   font-weight: 400;
   line-height: 1.5;
   color: #67748e;
