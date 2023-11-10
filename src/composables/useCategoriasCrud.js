@@ -32,13 +32,13 @@ export function useCategoriasCrud() {
   } = useLazyQuery(LISTA_CATEGORIAS, null, graphql_options)
 
   const {
-    mutate: createCategoria,
+    mutate: categoriaCreate,
     onDone: onDoneCategoriaCreate,
     onError: onErrorCategoriaCreate
   } = useMutation(CATEGORIA_CREATE)
 
   const {
-    mutate: updateCategoria,
+    mutate: categoriaUpdate,
     onDone: onDoneCategoriaUpdate,
     onError: onErrorUpdateCategoria
   } = useMutation(CATEGORIA_UPDATE)
@@ -95,8 +95,8 @@ export function useCategoriasCrud() {
 
   return {
     onResultListaCategorias,
-    createCategoria,
-    updateCategoria,
+    categoriaCreate,
+    categoriaUpdate,
     deleteCategoria,
     onDoneCategoriaCreate,
     onDoneCategoriaUpdate,

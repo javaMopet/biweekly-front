@@ -6,22 +6,21 @@ import {
   BANCO_UPDATE,
   BANCO_DELETE
 } from 'src/graphql/bancos'
+import { useBancoStore } from 'src/stores/common/useBancoStore'
 
 import { ref, computed } from 'vue'
 
 export function useBancosCrud() {
   /**
+   * store
+   */
+  const bancoStore = useBancoStore()
+  /**
    * graphql
    */
   const graphql_options = ref({
-    // fetchPolicy: 'network-only'
-    fetchPolicy: 'cache-first'
+    fetchPolicy: 'cache-and-network'
   })
-  const {
-    result: resultadoLista,
-    onError: onErrorListaBancos
-    // refetch: refetchListaBancos
-  } = useQuery(LISTA_BANCOS, null, graphql_options)
 
   const {
     mutate: createBanco,
@@ -41,27 +40,26 @@ export function useBancosCrud() {
     onError: onErrorDeleteBanco
   } = useMutation(BANCO_DELETE)
 
-  const listaBancos = computed({
-    get() {
-      return resultadoLista.value?.listaBancos ?? []
-    }
-  })
-
   onDoneCreateBanco(({ data }) => {
     console.log('refrescando bancos')
-    // refetchListaBancos()
+    const itemCreated = data.bancoCreate.banco
+    bancoStore.bancoCreated(itemCreated)
   })
+
   onErrorCreateBanco((error) => {
     console.log('error', error.graphQLErrors[0])
     console.log('error', error.graphQLErrors[0].extensions)
   })
 
-  onErrorListaBancos((error) => {
-    logErrorMessages(error)
+  onDoneUpdateBanco(({ data }) => {
+    const itemUpdated = data.bancoUpdate.banco
+    console.log('itemUpdated', itemUpdated)
+    bancoStore.bancoUpdated(itemUpdated)
   })
 
-  onDoneUpdateBanco(({ data }) => {
-    // refetchListaBancos()
+  onDoneDeleteBanco(({ data }) => {
+    const itemDeleted = data.bancoDelete.banco
+    bancoStore.bancoDeleted(itemDeleted)
   })
 
   onErrorUpdateBanco((error) => {
@@ -69,21 +67,22 @@ export function useBancosCrud() {
   })
 
   onErrorDeleteBanco((error) => {
-    logErrorMessages(error)
+    // logErrorMessages(error)
+    console.trace(error)
+    // if (!!error.graphQLErrors[0]) {
+    //   console.trace(error.graphQLErrors[0])
+    // }
   })
 
   return {
-    listaBancos,
     createBanco,
     updateBanco,
     deleteBanco,
     onDoneCreateBanco,
     onDoneUpdateBanco,
     onDoneDeleteBanco,
-    onErrorListaBancos,
     onErrorCreateBanco,
     onErrorUpdateBanco,
     onErrorDeleteBanco
-    // refetchListaBancos
   }
 }

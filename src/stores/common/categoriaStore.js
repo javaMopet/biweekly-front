@@ -58,7 +58,7 @@ export const useCategoriaStore = defineStore('categoriaStore', () => {
   return {
     listaCategorias,
     categoriaCreate,
-    categoriaUpdate,
+    // categoriaUpdate,
     categoriaDelete,
     onDoneCategoriaCreate,
     // onDoneCategoriaUpdate,

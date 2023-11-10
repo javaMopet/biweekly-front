@@ -224,7 +224,6 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { LISTA_TIPOS_MOVIMIENTO } from 'src/graphql/movimientos'
 import FormRegistroCategoria from 'src/components/categorias/FormRegistroCategoria.vue'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { useQuasar } from 'quasar'
@@ -265,25 +264,6 @@ const showFormItem = ref(false)
 /**
  * GRAPHQL
  */
-const options = ref({
-  fetchPolicy: 'network-only'
-})
-
-const {
-  result: resultListaTiposMovimientos,
-  onError: onErrorListaTiposMovimiento
-} = useQuery(LISTA_TIPOS_MOVIMIENTO, null, options)
-
-// onResultCategorias(({ data }) => {
-//   listaCategorias.value = JSON.parse(JSON.stringify(data.listaCategorias))
-// })
-// categoriasCrud.onErrorListaCategorias((error) => {
-//   console.error(error)
-// })
-
-onErrorListaTiposMovimiento((error) => {
-  console.error(error)
-})
 
 categoriaStore.onDoneCategoriaDelete(({ data }) => {
   if (!!data) {
@@ -291,7 +271,6 @@ categoriaStore.onDoneCategoriaDelete(({ data }) => {
     const deletedItem = data.categoriaDelete.categoria
     rowIndexDelete.value = null
     mostrarNotificacion('elminó', deletedItem)
-    // refetchListaCategorias()
   }
 })
 categoriaStore.onErrorCategoriaDelete((error) => {

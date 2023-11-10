@@ -364,15 +364,21 @@ function saveItem() {
  */
 categoriaStore.onDoneCategoriaCreate(({ data }) => {
   if (!!data) {
-    notificacion.mostrarNotificacionPositiva('Categoría creada correctamente.')
+    notificacion.mostrarNotificacionPositiva(
+      'Categoría creada correctamente.',
+      1200
+    )
     const itemSaved = data.categoriaCreate.categoria
     emit('categoriaSaved', itemSaved)
   }
 })
 
-categoriaStore.onDoneCategoriaUpdate(({ data }) => {
+categoriaCrud.onDoneCategoriaUpdate(({ data }) => {
   if (!!data) {
-    notificacion.mostrarNotificacionPositiva('Categoría actualizada.')
+    notificacion.mostrarNotificacionPositiva(
+      'Categoría actualizada correctamente.',
+      1200
+    )
     const itemUpdated = data.categoriaUpdate.categoria
     emit('categoriaUpdated', itemUpdated, props.editedIndex)
   }

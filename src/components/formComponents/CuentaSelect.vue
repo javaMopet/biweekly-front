@@ -40,8 +40,6 @@
 </template>
 
 <script setup>
-// import { useQuery } from '@vue/apollo-composable'
-// import { LISTA_CUENTAS_REDUCED } from 'src/graphql/cuentas'
 import { ref, computed } from 'vue'
 import RegistroCuenta from '../cuentas/RegistroCuenta.vue'
 import { useCuentaStore } from 'src/stores/common/useCuentaStore'

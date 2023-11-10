@@ -21,7 +21,7 @@
         grid
         style="width: 100%"
         dense
-        :rows="listaBancos"
+        :rows="bancoStore.listaBancos"
         :columns="columns"
         row-key="id"
         :filter="filter"
@@ -125,14 +125,13 @@
 </template>
 
 <script setup>
-import { useQuery, useMutation } from '@vue/apollo-composable'
-import { ref, computed, onMounted } from 'vue'
-import { LISTA_BANCOS } from '/src/graphql/bancos'
+import { ref, onMounted } from 'vue'
 import { useQuasar } from 'quasar'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { useFormato } from 'src/composables/utils/useFormato'
 import FormRegistroBanco from 'src/components/bancos/FormRegistroBanco.vue'
 import { useBancosCrud } from 'src/composables/useBancosCrud'
+import { useBancoStore } from 'src/stores/common/useBancoStore'
 
 /**
  * composables
@@ -141,34 +140,26 @@ const $q = useQuasar()
 const notificacion = useNotificacion()
 const formato = useFormato()
 const bancosCrud = useBancosCrud()
+const bancoStore = useBancoStore()
 
 /**
  * GRAPHQL
  */
-const graphql_options = ref({
-  fetchPolicy: 'cache-and-network'
-  // fetchPolicy: 'cache-only'
-})
-const {
-  onError: onErrorListaBancos,
-  result: resultListaBancos,
-  refetch: refetchListaBancos
-} = useQuery(LISTA_BANCOS, null, graphql_options)
 
 bancosCrud.onDoneDeleteBanco(({ data }) => {
   if (!!data) {
     console.log('item deleted ', data)
     const deletedItem = data.bancoDelete.banco
     mostrarNotificacion('elminó', deletedItem)
-    refetchListaBancos()
   }
 })
-// onErrorDeleteBanco((error) => {
-//   console.error(error)
-// })
-onErrorListaBancos((error) => {
-  console.error(error)
+bancosCrud.onErrorDeleteBanco((error) => {
+  notificacion.mostrarNotificacionNegativa(
+    'No es posible eliminar este banco, favor de verificar.',
+    1600
+  )
 })
+
 /**
  * state
  */
@@ -188,14 +179,6 @@ const editedItem = ref({ ...defaultItem })
 const editedIndex = ref(null)
 const rowIndexDelete = ref(null)
 
-/**
- * computed
- */
-const listaBancos = computed({
-  get() {
-    return resultListaBancos.value?.listaBancos ?? []
-  }
-})
 /**
  *
  */
@@ -288,13 +271,11 @@ function deleteRow(item) {
 function itemSaved(itemSaved) {
   showFormRegisterItem.value = false
   mostrarNotificacion('guardó', itemSaved)
-  refetchListaBancos()
 }
 function itemUpdated(itemUpdated) {
   showFormRegisterItem.value = false
   mostrarNotificacion('actualizó', itemUpdated)
   editedItem.value = { ...defaultItem }
-  refetchListaBancos()
 }
 function mostrarNotificacion(action, cuenta) {
   notificacion.mostrarNotificacionPositiva(
