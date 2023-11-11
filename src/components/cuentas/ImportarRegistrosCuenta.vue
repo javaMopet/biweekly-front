@@ -1,5 +1,9 @@
 <template>
-  <q-card class="my-card" dense style="width: 80%; min-width: 80%">
+  <q-card
+    class="my-card"
+    dense
+    style="width: 80%; min-width: 80%; max-width: 80%"
+  >
     <q-card-section class="row justify-between items-start dialog-title">
       <div class="dialog__title--name">
         Cuenta &nbsp;&nbsp;~ {{ cuenta.nombre }} ~

@@ -17,7 +17,7 @@
     <q-card-section class="">
       <q-form @submit="saveItem" class="">
         <div class="q-gutter-xs">
-          <div class="q-my-md" v-if="tiposCuentaOptions.length > 1">
+          <div class="q-my-md">
             <q-btn-toggle
               v-model="editedFormItem.tipoCuenta.id"
               spread
@@ -26,7 +26,7 @@
               text-color="gray-2"
               toggle-color="toggle-button"
               toggle-text-color="accent-light"
-              :options="tiposCuentaOptions"
+              :options="tipoMovimientoStore.listaTiposMovimiento"
               @update:model-value="tipoCuentaUpdated"
               push
             />
@@ -134,10 +134,16 @@
 </template>
 
 <script setup>
-import { useQuery, useMutation } from '@vue/apollo-composable'
+import { useMutation } from '@vue/apollo-composable'
 import { ref, reactive, computed, onMounted } from 'vue'
 import CuentaContableSelect from '../formComponents/CuentaContableSelect.vue'
 import BancoSelect from '../formComponents/BancoSelect.vue'
+import { useTipoMovimientoStore } from 'src/stores/common/useTipoMovimientoStore'
+
+/**
+ * composable
+ */
+const tipoMovimientoStore = useTipoMovimientoStore()
 
 /**
  * state
@@ -157,42 +163,31 @@ const cuentaContableProps = reactive({
   clasificacion: ''
 })
 
-const {
-  mutate: createCuenta,
-  onDone: onDoneCreateCuenta,
-  onError: onErrorCreateCuenta
-} = useMutation(CUENTA_CREATE)
-const {
-  mutate: updateCuenta,
-  onDone: onDoneUpdateCuenta,
-  onError: onErrorUpdateCuenta
-} = useMutation(CUENTA_UPDATE)
+// onDoneCreateCuenta(({ data }) => {
+//   console.log('saved data...', data)
+//   if (!!data) {
+//     const itemSaved = data.cuentaCreate.cuenta
+//     emit('cuentaSaved', itemSaved)
+//   }
+// })
+// onErrorCreateCuenta((error) => {
+//   console.log(error)
+//   console.error(error)
+// })
+// onDoneUpdateCuenta(({ data }) => {
+//   if (!!data) {
+//     console.log('updated data...', data)
+//     const itemUpdated = data.cuentaUpdate.cuenta
+//     emit('cuentaUpdated', itemUpdated)
+//   }
+// })
+// onErrorUpdateCuenta((error) => {
+//   console.error(error)
+// })
 
-onDoneCreateCuenta(({ data }) => {
-  console.log('saved data...', data)
-  if (!!data) {
-    const itemSaved = data.cuentaCreate.cuenta
-    emit('cuentaSaved', itemSaved)
-  }
-})
-onErrorCreateCuenta((error) => {
-  console.log(error)
-  console.error(error)
-})
-onDoneUpdateCuenta(({ data }) => {
-  if (!!data) {
-    console.log('updated data...', data)
-    const itemUpdated = data.cuentaUpdate.cuenta
-    emit('cuentaUpdated', itemUpdated)
-  }
-})
-onErrorUpdateCuenta((error) => {
-  console.error(error)
-})
-
-onErrorTiposCuenta((error) => {
-  console.error(error)
-})
+// onErrorTiposCuenta((error) => {
+//   console.error(error)
+// })
 /**
  * props
  */
@@ -219,17 +214,17 @@ const emit = defineEmits(['cuentaSaved', 'cuentaUpdated'])
 /**
  * computed
  */
-const tiposCuentaOptions = computed({
-  get() {
-    return editedFormItem.value.tipoCuenta.id === '3'
-      ? resultTiposCuenta.value?.listaTiposCuenta.filter(
-          (tipoCuenta) => tipoCuenta.id === editedFormItem.value.tipoCuenta.id
-        ) ?? []
-      : resultTiposCuenta.value?.listaTiposCuenta.filter(
-          (tipoCuenta) => tipoCuenta.id != '3'
-        ) ?? []
-  }
-})
+// const tiposCuentaOptions = computed({
+//   get() {
+//     return editedFormItem.value.tipoCuenta.id === '3'
+//       ? resultTiposCuenta.value?.listaTiposCuenta.filter(
+//           (tipoCuenta) => tipoCuenta.id === editedFormItem.value.tipoCuenta.id
+//         ) ?? []
+//       : resultTiposCuenta.value?.listaTiposCuenta.filter(
+//           (tipoCuenta) => tipoCuenta.id != '3'
+//         ) ?? []
+//   }
+// })
 const editedFormItem = computed({
   get() {
     return !!props.editedItem ? props.editedItem : formItem.value

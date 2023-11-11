@@ -73,13 +73,13 @@
 <script setup>
 import { ref, computed } from 'vue'
 import RegistroCuenta from '../cuentas/RegistroCuenta.vue'
-import { useBancosCrud } from 'src/composables/useBancosCrud'
 import { logErrorMessages } from '@vue/apollo-util'
+import { useBancoStore } from 'src/stores/common/useBancoStore'
 
 /**
  * composable
  */
-const bancosCrud = useBancosCrud()
+const bancoStore = useBancoStore()
 /**
  * state
  */
@@ -151,23 +151,23 @@ const cuenta = computed({
 // onErrorListar((error) => {
 //   console.log('error', error)
 // })
-bancosCrud.onErrorListaBancos((error) => {
-  logErrorMessages(error)
-})
+// bancosCrud.onErrorListaBancos((error) => {
+//   logErrorMessages(error)
+// })
 /**
  * methods
  */
 function filterFn(val, update) {
   if (val === '') {
     update(() => {
-      filteredOptions.value = bancosCrud.listaBancos.value
+      filteredOptions.value = bancoStore.listaBancos
     })
     return
   }
 
   update(() => {
     const needle = val.toLowerCase()
-    filteredOptions.value = bancosCrud.listaBancos.value.filter(
+    filteredOptions.value = bancoStore.listaBancos.filter(
       (v) => v.nombre.toLowerCase().indexOf(needle) > -1
     )
   })

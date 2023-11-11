@@ -1,11 +1,6 @@
-import { useMutation, useQuery } from '@vue/apollo-composable'
+import { useMutation } from '@vue/apollo-composable'
 import { logErrorMessages } from '@vue/apollo-util'
-import {
-  LISTA_BANCOS,
-  BANCO_CREATE,
-  BANCO_UPDATE,
-  BANCO_DELETE
-} from 'src/graphql/bancos'
+import { BANCO_CREATE, BANCO_UPDATE, BANCO_DELETE } from 'src/graphql/bancos'
 import { useBancoStore } from 'src/stores/common/useBancoStore'
 
 import { ref, computed } from 'vue'
@@ -47,8 +42,9 @@ export function useBancosCrud() {
   })
 
   onErrorCreateBanco((error) => {
-    console.log('error', error.graphQLErrors[0])
-    console.log('error', error.graphQLErrors[0].extensions)
+    console.trace(error)
+    // console.log('error', error.graphQLErrors[0])
+    // console.log('error', error.graphQLErrors[0].extensions)
   })
 
   onDoneUpdateBanco(({ data }) => {

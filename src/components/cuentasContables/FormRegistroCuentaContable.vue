@@ -56,9 +56,9 @@
               :subnivel="1"
               :tipo-afectacion="editedFormItem.tipoAfectacion?.id ?? 'C'"
               input-label="Padre"
+              :readonly="isReadonly"
+              :disable="isPadreDefault"
             ></CuentaContableSelect>
-            <!-- :readonly="isReadonly"
-              :disable="isPadreDefault" -->
           </div>
           <div class="col">
             <q-input

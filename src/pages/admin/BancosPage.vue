@@ -56,49 +56,48 @@
           </q-input>
         </template>
         <template #item="props">
-          <q-card class="text-primary q-ma-sm" style="width: 290px">
-            <q-card-section>
-              <div class="row q-gutter-x-lg items-center">
-                <div class="column">
+          <q-card
+            v-if="!props.row.deleted"
+            class="bg-white my-card q-ma-sm"
+            flat
+            bordered
+            style="width: 220px"
+          >
+            <q-card-section class="q-pa-md">
+              <div class="row items-center items-between no-wrap">
+                <div
+                  class=""
+                  style="height: 60px; max-height: 60px; min-height: 60px"
+                >
                   <q-img :src="`/icons/${props.row.icono}`" width="50px" />
                 </div>
-                <div class="column" style="width: 125px">
-                  <!-- <div class="row cuenta__title"> -->
+                <div class="q-ml-md" style="text-wrap: balance">
                   {{ props.row.nombre }}
-                  <!-- </div> -->
-                  <div class="row cuenta__subtitle"></div>
-                </div>
-                <div class="column">
-                  <q-btn color="more-button" flat icon="more_vert" round dense>
-                    <q-menu>
-                      <q-list style="min-width: 100px">
-                        <q-item
-                          clickable
-                          @click="editItem(props)"
-                          v-close-popup
-                        >
-                          <q-item-section avatar>
-                            <q-icon name="edit" color="info"
-                          /></q-item-section>
-                          <q-item-section>Editar</q-item-section>
-                        </q-item>
-                        <q-separator />
-                        <q-item
-                          clickable
-                          @click="deleteRow(props)"
-                          v-close-popup
-                        >
-                          <q-item-section avatar>
-                            <q-icon name="delete" color="negative"
-                          /></q-item-section>
-                          <q-item-section>Eliminar</q-item-section>
-                        </q-item>
-                      </q-list>
-                    </q-menu>
-                  </q-btn>
                 </div>
               </div>
             </q-card-section>
+            <q-card-actions
+              align="right"
+              style="border-top: 1px solid #cccccc"
+              class="q-py-xs"
+            >
+              <q-btn
+                flat
+                round
+                icon="las la-edit"
+                class="button-edit"
+                @click="editItem(props)"
+                ><q-tooltip> Editar </q-tooltip></q-btn
+              >
+              <q-btn
+                flat
+                round
+                icon="las la-trash-alt"
+                class="button-delete"
+                @click="deleteItem(props)"
+              />
+              <!-- <q-btn flat round color="primary" icon="share" /> -->
+            </q-card-actions>
           </q-card>
         </template>
         <template #body-cell-icono="props">
@@ -128,7 +127,6 @@
 import { ref, onMounted } from 'vue'
 import { useQuasar } from 'quasar'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
-import { useFormato } from 'src/composables/utils/useFormato'
 import FormRegistroBanco from 'src/components/bancos/FormRegistroBanco.vue'
 import { useBancosCrud } from 'src/composables/useBancosCrud'
 import { useBancoStore } from 'src/stores/common/useBancoStore'
@@ -138,7 +136,6 @@ import { useBancoStore } from 'src/stores/common/useBancoStore'
  */
 const $q = useQuasar()
 const notificacion = useNotificacion()
-const formato = useFormato()
 const bancosCrud = useBancosCrud()
 const bancoStore = useBancoStore()
 
@@ -150,7 +147,10 @@ bancosCrud.onDoneDeleteBanco(({ data }) => {
   if (!!data) {
     console.log('item deleted ', data)
     const deletedItem = data.bancoDelete.banco
-    mostrarNotificacion('elminó', deletedItem)
+    notificacion.mostrarNotificacionPositiva(
+      `El banco "${deletedItem.nombre}" se elimininó correctamente`,
+      1500
+    )
   }
 })
 bancosCrud.onErrorDeleteBanco((error) => {
@@ -172,7 +172,7 @@ const defaultItem = {
   },
   cuentaContable: null
 }
-// const listaCuentas = ref([])
+
 const filter = ref()
 const showFormRegisterItem = ref(false)
 const editedItem = ref({ ...defaultItem })
@@ -218,16 +218,21 @@ const columns = [
 /**
  * onMounted
  */
-onMounted(() => {
-  // cargarCuentas()
-})
-
-// onResultCuentas(({ data }) => {
-//   if (!!data) {
-//     console.log('response', data)
-//     listaCuentas.value = JSON.parse(JSON.stringify(data.listaCuentas))
-//   }
+// fetchPolicy: 'cache-first'
+// fetchPolicy: 'cache-and-network'
+// fetchPolicy: 'network-only'
+// Lo utilizamos con un no-cache para que no se guarde la lista en cache
+// sino más bien en el store de la aplicacion
+// const graphlOptions = reactive({
+//   fetchPolicy: 'no-cache'
 // })
+
+onMounted(() => {
+  console.log('onMounted BancosPage <<<<<....')
+  // Las variables en el segundo
+  // Las options se colocan en el 3er parámetro
+  // loadListaBancos(null, { id: null }, graphlOptions)
+})
 
 function addItem() {
   editedItem.value = {}
@@ -242,7 +247,7 @@ function editItem(item) {
   showFormRegisterItem.value = true
 }
 
-function deleteRow(item) {
+function deleteItem(item) {
   rowIndexDelete.value = item.rowIndex
   $q.dialog({
     title: 'Confirmar',
@@ -262,7 +267,10 @@ function deleteRow(item) {
     persistent: true
   })
     .onOk(() => {
-      bancosCrud.deleteBanco({ id: item.row.id })
+      bancosCrud.deleteBanco(
+        { id: item.row.id }
+        // ,{ refetchQueries: ['listaBancos'] }
+      )
     })
     .onCancel(() => {})
     .onDismiss(() => {})
@@ -270,18 +278,10 @@ function deleteRow(item) {
 
 function itemSaved(itemSaved) {
   showFormRegisterItem.value = false
-  mostrarNotificacion('guardó', itemSaved)
 }
 function itemUpdated(itemUpdated) {
   showFormRegisterItem.value = false
-  mostrarNotificacion('actualizó', itemUpdated)
   editedItem.value = { ...defaultItem }
-}
-function mostrarNotificacion(action, cuenta) {
-  notificacion.mostrarNotificacionPositiva(
-    `La cuenta "${cuenta.nombre}" se ${action} correctamente`,
-    2500
-  )
 }
 </script>
 

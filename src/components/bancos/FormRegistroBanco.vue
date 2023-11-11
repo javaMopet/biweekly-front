@@ -79,12 +79,16 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useBancosCrud } from 'src/composables/useBancosCrud'
+import { useNotificacion } from 'src/composables/utils/useNotificacion'
+import { useBancoStore } from 'src/stores/common/useBancoStore'
 
 /**
  * composable
  */
 
 const bancosCrud = useBancosCrud()
+const notificacion = useNotificacion()
+const bancoStore = useBancoStore()
 /**
  * state
  */
@@ -146,7 +150,9 @@ const lblSubmit = computed({
 /**
  * onMounted
  */
-onMounted(() => {})
+onMounted(() => {
+  console.table(bancoStore.listaBancos)
+})
 /**
  * methods
  */
@@ -178,20 +184,37 @@ bancosCrud.onDoneCreateBanco(({ data }) => {
   console.log('saved data...', data)
   if (!!data) {
     const itemSaved = data.bancoCreate.banco
+    mostrarNotificacion('guardó', itemSaved)
     emit('itemSaved', itemSaved)
+    /**
+     *
+     */
   }
 })
+bancosCrud.onDoneUpdateBanco(({ data }) => {
+  console.log('data updated', data)
+  if (!!data) {
+    const itemUpdated = data.bancoUpdate.banco
+    emit('itemUpdated', itemUpdated)
+    /**
+     *
+     */
+    mostrarNotificacion('actualizó', itemUpdated)
+  }
+})
+
+function mostrarNotificacion(action, banco) {
+  notificacion.mostrarNotificacionPositiva(
+    `El banco "${banco.nombre}" se ${action} correctamente`,
+    1500
+  )
+}
+
 bancosCrud.onErrorCreateBanco((error) => {
   console.log(error)
   console.error(error)
 })
-bancosCrud.onDoneUpdateBanco(({ data }) => {
-  if (!!data) {
-    console.log('updated data...', data)
-    const itemUpdated = data.bancoUpdate.banco
-    emit('itemUpdated', itemUpdated)
-  }
-})
+
 bancosCrud.onErrorUpdateBanco((error) => {
   console.error(error)
 })
