@@ -19,7 +19,7 @@
     <div class="col q-pl-xs">
       <q-table
         dense
-        :rows="listaCategoriasIngresos"
+        :rows="categoriaStore.listaCategoriasIngresos"
         :columns="columns"
         row-key="id"
         :filter="filterIngresos"
@@ -114,7 +114,7 @@
     <div class="col">
       <q-table
         class="my-sticky-header-table"
-        :rows="listaCategoriasEgresos"
+        :rows="categoriaStore.listaCategoriasEgresos"
         :columns="columns"
         row-key="id"
         :filter="filterGastos"
@@ -230,6 +230,7 @@ import { useQuasar } from 'quasar'
 import { useQuery } from '@vue/apollo-composable'
 import { useCategoriaStore } from 'src/stores/common/categoriaStore'
 import { logErrorMessages } from '@vue/apollo-util'
+import { useCategoriasCrud } from 'src/composables/useCategoriasCrud'
 /**
  * composables
  */
@@ -239,6 +240,7 @@ const $q = useQuasar()
 /**
  * stores
  */
+const categoriasCrud = useCategoriasCrud()
 const categoriaStore = useCategoriaStore()
 /**
  * state
@@ -265,7 +267,7 @@ const showFormItem = ref(false)
  * GRAPHQL
  */
 
-categoriaStore.onDoneCategoriaDelete(({ data }) => {
+categoriasCrud.onDoneCategoriaDelete(({ data }) => {
   if (!!data) {
     console.log('item deleted ', data)
     const deletedItem = data.categoriaDelete.categoria
@@ -273,7 +275,7 @@ categoriaStore.onDoneCategoriaDelete(({ data }) => {
     mostrarNotificacion('elminó', deletedItem)
   }
 })
-categoriaStore.onErrorCategoriaDelete((error) => {
+categoriasCrud.onErrorCategoriaDelete((error) => {
   notificacion.mostrarNotificacionNegativa(
     'No fue posible realizar la eliminación de la categoria',
     1300
@@ -282,38 +284,21 @@ categoriaStore.onErrorCategoriaDelete((error) => {
 /**
  * computed
  */
-const listaCategoriasIngresos = computed({
-  get() {
-    return (
-      categoriaStore.listaCategorias.filter(
-        (categoria) => categoria.tipoMovimientoId === '1'
-      ) ?? []
-    )
-  }
-})
 
-const listaCategoriasEgresos = computed({
-  get() {
-    return categoriaStore.listaCategorias.filter(
-      (categoria) => categoria.tipoMovimientoId === '2'
-    )
-  }
-})
+// const listaTiposMovimiento = computed({
+//   get() {
+//     const listado =
+//       resultListaTiposMovimientos.value?.listaTiposMovimiento.filter(
+//         (tipoMovimiento) => tipoMovimiento.id != '3'
+//       ) ?? []
 
-const listaTiposMovimiento = computed({
-  get() {
-    const listado =
-      resultListaTiposMovimientos.value?.listaTiposMovimiento.filter(
-        (tipoMovimiento) => tipoMovimiento.id != '3'
-      ) ?? []
+//     listado.forEach((element) => {
+//       element.nombre_color = element.id === '1' ? 'positive' : 'negative'
+//     })
 
-    listado.forEach((element) => {
-      element.nombre_color = element.id === '1' ? 'positive' : 'negative'
-    })
-
-    return listado
-  }
-})
+//     return listado
+//   }
+// })
 /**
  * onMount
  */
@@ -362,7 +347,7 @@ function deleteRow(item) {
     persistent: true
   })
     .onOk(() => {
-      categoriaStore.categoriaDelete(item.row.id)
+      categoriasCrud.categoriaDelete({ id: item.row.id })
     })
     .onCancel(() => {})
     .onDismiss(() => {})

@@ -41,6 +41,7 @@
               glossy
               no-caps
               text-color="white"
+              icon="add_circle"
             />
           </div>
           <q-input
@@ -49,6 +50,7 @@
             debounce="300"
             v-model="filter"
             placeholder="Buscar Cuenta"
+            clearable
           >
             <template v-slot:append>
               <q-icon name="search" />
@@ -200,13 +202,13 @@ const columns = [
     align: 'left'
   },
 
-  {
-    name: 'cuenta_contable',
-    label: 'Cuenta Contable',
-    field: (row) => `${row.cuentaContable.id} - ${row.cuentaContable.nombre}`,
-    sortable: true,
-    align: 'left'
-  },
+  // {
+  //   name: 'cuenta_contable',
+  //   label: 'Cuenta Contable',
+  //   field: (row) => `${row.cuentaContable.id} - ${row.cuentaContable.nombre}`,
+  //   sortable: true,
+  //   align: 'left'
+  // },
   {
     name: 'acciones',
     label: 'Acciones',

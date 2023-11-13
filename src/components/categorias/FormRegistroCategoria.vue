@@ -352,7 +352,7 @@ function saveItem() {
   }
   console.log('guardando item:', input)
   if (!editedFormItem.value.id) {
-    categoriaStore.categoriaCreate(input)
+    categoriaCrud.categoriaCreate({ input })
   } else {
     const id = editedFormItem.value.id
     categoriaCrud.categoriaUpdate({ id, input })
@@ -362,7 +362,7 @@ function saveItem() {
 /**
  *
  */
-categoriaStore.onDoneCategoriaCreate(({ data }) => {
+categoriaCrud.onDoneCategoriaCreate(({ data }) => {
   if (!!data) {
     notificacion.mostrarNotificacionPositiva(
       'Categoría creada correctamente.',

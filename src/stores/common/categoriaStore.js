@@ -1,6 +1,8 @@
+import { useQuery } from '@vue/apollo-composable'
 import { defineStore } from 'pinia'
 import { useCategoriasCrud } from 'src/composables/useCategoriasCrud'
-import { ref } from 'vue'
+import { LISTA_CATEGORIAS } from 'src/graphql/categorias'
+import { ref, computed } from 'vue'
 export const useCategoriaStore = defineStore('categoriaStore', () => {
   /**
    * state
@@ -11,7 +13,19 @@ export const useCategoriaStore = defineStore('categoriaStore', () => {
    */
   const categoriasCrud = useCategoriasCrud()
 
-  categoriasCrud.onResultListaCategorias(({ data }) => {
+  /**
+   * graphql
+   */
+  // fetchPolicy: 'network-only'
+  // fetchPolicy: 'cache-first'
+  const graphql_options = ref({
+    fetchPolicy: 'no-cache'
+  })
+
+  const { onResult: onResultListaCategorias, onError: onErrorListaCategorias } =
+    useQuery(LISTA_CATEGORIAS, null, graphql_options)
+
+  onResultListaCategorias(({ data }) => {
     if (!!data) {
       console.log('recuperando datos desde el store', data)
       listaCategorias.value = JSON.parse(
@@ -22,21 +36,10 @@ export const useCategoriaStore = defineStore('categoriaStore', () => {
 
   const {
     onDoneCategoriaCreate,
-    // onDoneCategoriaUpdate,
     onDoneCategoriaDelete,
     onErrorCategoriaCreate,
     onErrorCategoriaDelete
   } = categoriasCrud
-
-  categoriasCrud.loadOrRefetch()
-
-  function categoriaCreate(input) {
-    categoriasCrud.createCategoria({ input })
-  }
-
-  function categoriaDelete(id) {
-    categoriasCrud.deleteCategoria({ id })
-  }
 
   categoriasCrud.onDoneCategoriaCreate(({ data }) => {
     if (!!data) {
@@ -53,16 +56,28 @@ export const useCategoriaStore = defineStore('categoriaStore', () => {
     listaCategorias.value.splice(index, 1)
   })
 
-  categoriasCrud.onDoneCategoriaDelete
+  const listaCategoriasIngresos = computed({
+    get() {
+      return (
+        listaCategorias.value.filter(
+          (categoria) => categoria.tipoMovimientoId === '1'
+        ) ?? []
+      )
+    }
+  })
+
+  const listaCategoriasEgresos = computed({
+    get() {
+      return listaCategorias.value.filter(
+        (categoria) => categoria.tipoMovimientoId === '2'
+      )
+    }
+  })
 
   return {
     listaCategorias,
-    categoriaCreate,
-    // categoriaUpdate,
-    categoriaDelete,
-    onDoneCategoriaCreate,
-    // onDoneCategoriaUpdate,
-    onDoneCategoriaDelete,
-    onErrorCategoriaDelete
+    onErrorCategoriaDelete,
+    listaCategoriasIngresos,
+    listaCategoriasEgresos
   }
 })

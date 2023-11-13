@@ -53,20 +53,21 @@
               </div>
             </div>
           </div>
-          <div align="right" class="q-gutter-x-sm q-mt-lg">
+          <div align="right" class="q-gutter-x-md q-mt-lg">
             <q-btn
               label="Cancelar"
               v-close-popup
               color="negative"
               class="q-ml-sm"
+              no-caps
               flat
-              dense
+              rounded
             />
             <q-btn
               :label="lblSubmit"
               type="submit"
-              dense
               color="primary-button"
+              no-caps
             />
           </div>
         </div>

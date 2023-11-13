@@ -154,40 +154,6 @@ watch(tipoAfectacion, (newVal, oldVal) => {
   // console.log('new - old ', newVal, oldVal)
   tipoMovimientoId.value = newVal === 'A' ? '1' : '2'
 })
-/**
- * graphql
- */
-const graphql_options = ref({
-  fetchPolicy: 'network-only'
-})
-// const {
-//   result: resultadoLista,
-//   onError: onErrorListaCuentas
-//   // refetch: reloadResultadoLista
-// } = useQuery(
-//   LISTA_CATEGORIAS,
-//   null, //argumentos
-//   graphql_options //opciones
-// )
-/**
- * computed
- */
-// const valor = computed({
-//   get() {
-//     return props.modelValue
-//   },
-//   set(val) {
-//     emit('update:modelValue', val)
-//   }
-// })
-// const tipoMovimientoId =computed({
-//   get(){
-
-//   },
-//   set(val){
-
-//   }
-// })
 const mostrarCategorias = computed({
   get() {
     return tipoMovimientoId.value === '1' || tipoMovimientoId.value === '2'

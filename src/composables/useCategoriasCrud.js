@@ -1,7 +1,6 @@
-import { useLazyQuery, useMutation, useQuery } from '@vue/apollo-composable'
+import { useMutation } from '@vue/apollo-composable'
 import { logErrorMessages } from '@vue/apollo-util'
 import {
-  LISTA_CATEGORIAS,
   CATEGORIA_CREATE,
   CATEGORIA_UPDATE,
   CATEGORIA_DELETE
@@ -15,22 +14,10 @@ export function useCategoriasCrud() {
    * store
    */
   const categoriaStore = useCategoriaStore()
+
   /**
    * graphql
    */
-  const graphql_options = ref({
-    // fetchPolicy: 'network-only'
-    fetchPolicy: 'cache-first'
-  })
-
-  const {
-    onResult: onResultListaCategorias,
-    onError: onErrorListaCategorias,
-    load,
-    refetch
-    // refetch: refetchListaCategorias
-  } = useLazyQuery(LISTA_CATEGORIAS, null, graphql_options)
-
   const {
     mutate: categoriaCreate,
     onDone: onDoneCategoriaCreate,
@@ -44,7 +31,7 @@ export function useCategoriasCrud() {
   } = useMutation(CATEGORIA_UPDATE)
 
   const {
-    mutate: deleteCategoria,
+    mutate: categoriaDelete,
     onDone: onDoneCategoriaDelete,
     onError: onErrorCategoriaDelete
   } = useMutation(CATEGORIA_DELETE)
@@ -52,19 +39,10 @@ export function useCategoriasCrud() {
   /**
    * state
    */
-
-  // watch(resultadoLista, (value) => {
-  //   console.dir(value)
-  //   listaCategorias.value = JSON.parse(JSON.stringify(value?.listaCategorias))
-  //   console.dir(listaCategorias.value.length)
-  // })
-
   onDoneCategoriaCreate(({ data }) => {
     if (!!data) {
       console.log('refrescando categorias', data)
-      // console.dir(listaCategorias.value.length)
-      // listaCategorias.value.push(data.categoriaCreate.categoria)
-      // console.dir(listaCategorias.value.length)
+      categoriaStore.listaCategorias.push(data.categoriaCreate.categoria)
     }
   })
   onErrorCategoriaCreate((error) => {
@@ -72,10 +50,6 @@ export function useCategoriasCrud() {
     console.log('error', error.graphQLErrors[0])
     console.log('error', error.graphQLErrors[0]?.extensions)
   })
-
-  // onErrorListaCuentas((error) => {
-  //   console.log(error)
-  // })
 
   onDoneCategoriaUpdate(({ data }) => {
     // refetchListaCategorias()
@@ -89,23 +63,15 @@ export function useCategoriasCrud() {
     // }
   })
 
-  function loadOrRefetch() {
-    load() || refetch()
-  }
-
   return {
-    onResultListaCategorias,
     categoriaCreate,
     categoriaUpdate,
-    deleteCategoria,
+    categoriaDelete,
     onDoneCategoriaCreate,
     onDoneCategoriaUpdate,
     onDoneCategoriaDelete,
-    onErrorListaCategorias,
     onErrorCategoriaCreate,
     onErrorUpdateCategoria,
-    onErrorCategoriaDelete,
-    loadOrRefetch
-    // refetchListaCategorias
+    onErrorCategoriaDelete
   }
 }
