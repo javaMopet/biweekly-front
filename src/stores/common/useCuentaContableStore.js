@@ -1,8 +1,10 @@
+import { useQuery } from '@vue/apollo-composable'
 import { logErrorMessages } from '@vue/apollo-util'
 import { defineStore } from 'pinia'
 import { useCuentasContablesCrud } from 'src/composables/useCuentasContablesCrud'
+import { LISTA_CUENTAS_CONTABLES } from 'src/graphql/cuentasContables'
 
-import { ref } from 'vue'
+import { reactive, ref } from 'vue'
 export const useCuentaContableStore = defineStore('cuentaContableStore', () => {
   /**
    * state
@@ -14,6 +16,22 @@ export const useCuentaContableStore = defineStore('cuentaContableStore', () => {
    * composables
    */
   const cuentasContablesCrud = useCuentasContablesCrud()
+  /**
+   * graphql
+   */
+  const variablesLista = reactive({
+    subnivel: null,
+    clasificacion: null,
+    tipoAfectacion: null
+  })
+  const graphql_options = ref({
+    fetchPolicy: 'no-cache'
+  })
+  const {
+    onResult: onResultListaCuentasContables,
+    onError: onErrorListaCuentasContables,
+    loading: loadingListaCuentasContables
+  } = useQuery(LISTA_CUENTAS_CONTABLES, variablesLista, graphql_options)
 
   /**
    * methods
@@ -39,22 +57,16 @@ export const useCuentaContableStore = defineStore('cuentaContableStore', () => {
   const {
     onResultArbolCuentas,
     loadingArbolCuentas,
-    onResultListaCuentasContables,
     deleteCuentaContable,
     onDoneDeleteCuentaContable,
     onDoneUpdateCuentaContable,
     onErrorUpdateCuentaContable,
-    onErrorListaCuentasContables,
     onErrorDeleteCuentaContable
   } = cuentasContablesCrud
 
   /**
    * graphql
    */
-
-  function loadOrRefetchListaCuentas(variables) {
-    cuentasContablesCrud.loadListaCuentas(variables)
-  }
 
   onResultArbolCuentas(({ data }) => {
     if (!!data) {
@@ -65,9 +77,8 @@ export const useCuentaContableStore = defineStore('cuentaContableStore', () => {
   })
 
   onResultListaCuentasContables(({ data }) => {
-    console.log(data)
     if (!!data) {
-      console.dir('loading lista de cuentas contables...', data)
+      console.log('loading lista de cuentas contables...', data)
       listaCuentasContables.value = JSON.parse(
         JSON.stringify(data.listaCuentasContables ?? [])
       )
@@ -107,7 +118,6 @@ export const useCuentaContableStore = defineStore('cuentaContableStore', () => {
     arbolCuentasContables,
     loadingArbolCuentas,
     findTreeElementById,
-    loadOrRefetchListaCuentas,
     listaCuentasContables,
     onDoneUpdateCuentaContable,
     deleteItem,

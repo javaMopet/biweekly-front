@@ -33,13 +33,11 @@
             <div class="page-title q-pr-md">Ingresos</div>
             <q-btn
               icon="add"
-              label="Agregar"
+              label="Nuevo"
               no-caps
               @click="addRow('1')"
-              push
               class="addNew-button"
               rounded
-              outline
             />
           </div>
         </template>
@@ -128,13 +126,11 @@
             <div class="page-title q-pr-md">Gastos</div>
             <q-btn
               icon="add"
-              label="Agregar"
+              label="Nuevo"
               no-caps
-              @click="addRow('1')"
-              push
+              @click="addRow('2')"
               class="addNew-button"
               rounded
-              outline
             />
           </div>
         </template>
@@ -223,13 +219,11 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref } from 'vue'
 import FormRegistroCategoria from 'src/components/categorias/FormRegistroCategoria.vue'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { useQuasar } from 'quasar'
-import { useQuery } from '@vue/apollo-composable'
 import { useCategoriaStore } from 'src/stores/common/categoriaStore'
-import { logErrorMessages } from '@vue/apollo-util'
 import { useCategoriasCrud } from 'src/composables/useCategoriasCrud'
 /**
  * composables
@@ -253,7 +247,8 @@ const defaultItem = {
   color: '#019A9D',
   tipoMovimiento: null,
   tipoMovimientoId: '1',
-  cuentaContable: null
+  cuentaContable: null,
+  importeDefault: ''
 }
 
 const filterIngresos = ref()
@@ -261,7 +256,7 @@ const filterGastos = ref()
 const filterInversiones = ref()
 const editedItem = ref({ ...defaultItem })
 const editedIndex = ref(-1)
-const rowIndexDelete = ref(null)
+
 const showFormItem = ref(false)
 /**
  * GRAPHQL
@@ -269,12 +264,11 @@ const showFormItem = ref(false)
 
 categoriasCrud.onDoneCategoriaDelete(({ data }) => {
   if (!!data) {
-    console.log('item deleted ', data)
     const deletedItem = data.categoriaDelete.categoria
-    rowIndexDelete.value = null
     mostrarNotificacion('elminó', deletedItem)
   }
 })
+
 categoriasCrud.onErrorCategoriaDelete((error) => {
   notificacion.mostrarNotificacionNegativa(
     'No fue posible realizar la eliminación de la categoria',
@@ -328,7 +322,6 @@ function editRow(item) {
 }
 
 function deleteRow(item) {
-  rowIndexDelete.value = item.rowIndex
   $q.dialog({
     title: 'Confirmar',
     style: 'width:500px',
@@ -446,8 +439,8 @@ const columns = [
 .categoria-nombre {
   color: $categoria;
   letter-spacing: -0.025rem;
-  font-weight: 500;
-  font-size: 0.95rem;
+  font-weight: 400;
+  font-size: 0.85rem;
 }
 .categoria-subtitle {
   font-size: 0.7rem;

@@ -1,17 +1,19 @@
 <template>
   <div class="my-card" style="width: 400px; min-width: 400px">
     <div class="row justify-between items-center dialog-title q-px-md">
-      <div class="text-subtitle1 text-accent-light">{{ actionName }}</div>
+      <div class="dialog__title--name">{{ actionName }}</div>
       <div class="dialog-closebutton">
         <q-btn
+          color="primary"
           icon="close"
           v-close-popup
           class="dialog__title--closeButton"
           round
+          dense
         ></q-btn>
       </div>
     </div>
-    <div class="q-pa-sm">
+    <div class="q-pa-md">
       <q-form @submit="saveItem" class="">
         <div class="q-gutter-xs">
           <div class="column items-center">
@@ -20,9 +22,6 @@
               style="width: 85%; border: 0px solid red"
             >
               <div>
-                <div class="row input-label items-center">
-                  <span style="color: red">*</span>&nbsp;Nombre del banco:
-                </div>
                 <q-input
                   v-model="editedFormItem.nombre"
                   type="text"
@@ -35,20 +34,18 @@
                       (val && val.length > 0) ||
                       'Favor de ingresar el nombre de la Banco'
                   ]"
-                  flat
-                  placeholder="Ingresa el nombre"
+                  label="* Nombre del banco"
+                  outlined
                 />
               </div>
-
               <div>
-                <div class="row input-label">Imagen:</div>
                 <q-input
                   v-model="editedFormItem.icono"
                   type="text"
-                  placeholder="Ingresa Nombre de imágen"
+                  label="Nombre de imágen"
                   color="positive"
                   dense
-                  flat
+                  outlined
                 ></q-input>
               </div>
             </div>

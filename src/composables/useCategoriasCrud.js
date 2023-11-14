@@ -45,14 +45,36 @@ export function useCategoriasCrud() {
       categoriaStore.listaCategorias.push(data.categoriaCreate.categoria)
     }
   })
+
+  onDoneCategoriaUpdate(({ data }) => {
+    if (!!data) {
+      console.log('categoria actualizada', data)
+      const index = findItemIndexOnList(data.categoriaUpdate.categoria)
+      categoriaStore.listaCategorias[index] = {
+        ...data.categoriaUpdate.categoria
+      }
+    }
+  })
+
+  onDoneCategoriaDelete(({ data }) => {
+    if (!!data) {
+      console.log('categoria eliminada', data)
+      const index = findItemIndexOnList(data.categoriaDelete.categoria)
+      categoriaStore.listaCategorias.splice(index, 1)
+    }
+  })
+
+  function findItemIndexOnList(item) {
+    const index = categoriaStore.listaCategorias.findIndex(
+      (c) => c.id === item.id
+    )
+    return index
+  }
+
   onErrorCategoriaCreate((error) => {
     logErrorMessages(error)
     console.log('error', error.graphQLErrors[0])
     console.log('error', error.graphQLErrors[0]?.extensions)
-  })
-
-  onDoneCategoriaUpdate(({ data }) => {
-    // refetchListaCategorias()
   })
 
   onErrorUpdateCategoria((error) => {

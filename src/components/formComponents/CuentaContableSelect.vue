@@ -22,7 +22,7 @@
         :readonly="props.readonly"
         :disable="props.disable"
       >
-        <template #after>
+        <!-- <template #after>
           <q-btn
             color="more-button"
             round
@@ -35,7 +35,7 @@
               <q-list style="min-width: 100px">
                 <q-item
                   clickable
-                  @click="addItemCuentaContable(props)"
+                  @click="addNew(props)"
                   v-close-popup
                 >
                   <q-item-section class="text-teal">
@@ -45,6 +45,18 @@
               </q-list>
             </q-menu>
           </q-btn>
+        </template> -->
+        <template #after>
+          <div class="q-mx-sm" v-if="isAlta">
+            <q-btn
+              icon="add"
+              @click="addNew(props)"
+              class="q-pa-xs button-new"
+              dense
+              round
+              color="secondary-button"
+            />
+          </div>
         </template>
         <template v-slot:no-option>
           <q-item>
@@ -66,6 +78,7 @@
         v-model="cuentaContable"
         :edited-item="formEditedItem"
         @cuentaContableSaved="cuentaContableSaved"
+        :is-padre-default="false"
       ></FormRegistroCuentaContable>
     </q-dialog>
   </Teleport>
@@ -74,7 +87,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import FormRegistroCuentaContable from '../cuentasContables/FormRegistroCuentaContable.vue'
-// import { useCuentaContableStore } from 'src/stores/common/useCuentaContableStore'
+import { useCuentaContableStore } from 'src/stores/common/useCuentaContableStore'
 
 /**
  * state
@@ -85,7 +98,7 @@ const formEditedItem = ref(null)
 /**
  * composables
  */
-// const cuentaContableStore = useCuentaContableStore()
+const cuentaContableStore = useCuentaContableStore()
 /**
  * props
  */
@@ -164,13 +177,12 @@ const cuentaContable = computed({
 
 const options = computed({
   get() {
-    return []
-    // (cuentaContableStore.listaCuentasContables ?? []).filter(
-    //   (cc) =>
-    //     cc.subnivel === props.subnivel &&
-    //     cc.tipoAfectacion === props.tipoAfectacion &&
-    //     cc.id.toString().startsWith(props.clasificacion)
-    // )
+    return (cuentaContableStore.listaCuentasContables ?? []).filter(
+      (cc) =>
+        cc.subnivel === props.subnivel &&
+        cc.tipoAfectacion === props.tipoAfectacion &&
+        cc.id.toString().startsWith(props.clasificacion)
+    )
   }
 })
 
@@ -193,23 +205,18 @@ function filterFn(val, update) {
   })
 }
 
-function addItemCuentaContable() {
+function addNew() {
   console.log('registrar una cuenta contable')
-
+  const tipoAfectacion = !!props.tipoAfectacion
+    ? props.tipoAfectacion
+    : { A: 'Abono' }
   formEditedItem.value = {
-    padre: {
-      __typename: 'CuentaContable',
-      id: '212000',
-      nombre: 'Documentos por Pagar a Corto Plazo',
-      nombreCompleto: '212000 - Documentos por Pagar a Corto Plazo',
-      padreId: 210000,
-      subnivel: 1,
-      tipoAfectacion: 'A'
-    },
-    tipoAfectacion: { id: 'A', nombre: 'Abono' },
+    padre: null,
+    tipoAfectacion,
     subnivel: 0,
     action: 'add'
   }
+  console.log(formEditedItem.value)
   form_cuentaContable_show.value = true
 }
 

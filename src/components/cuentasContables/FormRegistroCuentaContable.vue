@@ -1,20 +1,22 @@
 <template>
   <div class="my-card" style="width: 400px">
-    <q-card-section class="row justify-between items-start dialog-title">
+    <div class="row justify-between items-center dialog-title q-px-md">
       <div class="dialog__title--name">{{ actionName }}</div>
-      <div class="">
+      <div class="dialog-closebutton">
         <q-btn
+          color="primary"
           icon="close"
           v-close-popup
           class="dialog__title--closeButton"
           round
+          dense
         ></q-btn>
       </div>
-    </q-card-section>
-    <q-card-section class="">
-      <q-form @submit="saveItem" class="q-gutter-md">
+    </div>
+    <div class="q-pa-lg">
+      <q-form @submit="saveItem">
         <div class="q-gutter-md">
-          <div>
+          <div class="">
             <div class="row inline fit">
               <div class="col q-mr-md">
                 <!-- <pre>{{ props.editedItem.tipoAfectacion }}</pre>
@@ -58,6 +60,11 @@
               input-label="Padre"
               :readonly="isReadonly"
               :disable="isPadreDefault"
+              :rules="[
+                (val) =>
+                  (val && val.length > 0) ||
+                  'Favor de ingresar el nombre de la Cuenta Contable'
+              ]"
             ></CuentaContableSelect>
           </div>
           <div class="col">
@@ -102,13 +109,15 @@
           </div>
           <div></div>
         </div>
-        <div align="right" class="q-gutter-sm">
+        <div align="right" class="q-gutter-x-md q-mt-lg">
           <q-btn
             label="Cancelar"
             v-close-popup
-            color="negative-pastel"
-            flat
+            color="negative"
             class="q-ml-sm"
+            flat
+            no-caps
+            rounded
           />
           <q-btn
             :label="lblSubmit"
@@ -118,7 +127,10 @@
           />
         </div>
       </q-form>
-    </q-card-section>
+    </div>
+    <!-- <q-card-section>
+      <pre>{{ editedFormItem }}</pre>
+    </q-card-section> -->
   </div>
 </template>
 
@@ -362,8 +374,3 @@ function identificadorIngresado(evt) {
   }
 }
 </script>
-
-<style lang="sass" scoped>
-.my-input
-  max-width: 250px
-</style>

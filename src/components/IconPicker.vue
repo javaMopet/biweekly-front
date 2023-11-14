@@ -1,5 +1,5 @@
 <template>
-  <div class="q-pa-lg row">
+  <div class="bg-white q-pa-lg row" style="width: 900px; min-width: 900px">
     <div>
       <q-input v-model="filter" filled label="Filtro" outlined clearable />
       <q-separator />

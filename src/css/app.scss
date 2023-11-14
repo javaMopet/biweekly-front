@@ -189,15 +189,12 @@
 /* *************************** */
 .dialog__title--closeButton {
   opacity: 0.8;
-  color: #576174;
-  // background: lighten($color: $negative-pastel, $amount: 80);
-  background: lighten($color: $primary, $amount: 65);
-  font-size: 0.45rem;
+  font-size: 0.75rem;
+  color: #9ead90 !important;
   &:hover {
     opacity: 1;
     color: white !important;
-    background: lighten($color: $negative, $amount: 15);
-    // transform: translate(1px, -9px);
+    background: lighten($color: $primary, $amount: 3);
     transition: all 0.05 ease;
   }
 }
@@ -207,13 +204,14 @@
   font-weight: 600;
   color: $secondary-light !important;
   letter-spacing: -0.0025rem;
-  padding: 4px 10px 15px 10px;
+  padding: 4px 10px 5px 10px;
 }
 .dialog-title {
   /*padding: 10px 10px 30px 15px;*/
   // background: hsl(240, 17%, 95%);
+  position: relative;
   background: $primary;
-  height: 55px !important;
+  height: 45px !important;
   // &::after {
   //   content: '';
   //   background: rgb(217, 217, 219);
@@ -391,8 +389,8 @@
 /* ************************************** */
 .addNew-button {
   opacity: 0.7;
-  color: $secondary-button;
-  background: lighten($color: $toolbar-button, $amount: 15);
+  color: lighten($color: $primary, $amount: 80);
+  background: $primary;
   font-size: 0.7rem;
   padding-inline: 10px;
   letter-spacing: -0.0025rem;
@@ -512,17 +510,19 @@
     color: $negative-pastel !important;
   }
 }
-$new-button-color: $primary-button;
+$new-button-color: #1a5f81;
 
 .button-new {
-  font-size: 0.9rem;
-  padding: 0px;
-  padding-inline: 3px;
-  color: $new-button-color;
+  font-size: 0.6rem;
+  color: $new-button-color !important;
+  box-shadow: rgba(112, 164, 194, 0.534) 2px 4px 8px,
+    rgba(121, 170, 190, 0.733) 1px 2px 4px;
   &:hover {
-    color: darken($color: $new-button-color, $amount: 10) !important;
+    background: lighten($color: $primary, $amount: 15) !important;
+    color: white !important;
   }
 }
+
 $save-button-color: #6e65eb;
 
 .button-save {

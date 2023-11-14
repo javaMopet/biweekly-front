@@ -2,7 +2,7 @@
   <div class="col">
     <q-select
       outlined
-      color="secondary"
+      color="positive"
       v-model="cuenta"
       :options="filteredOptions"
       option-label="nombre"

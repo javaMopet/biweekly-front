@@ -9,7 +9,7 @@
       placeholder="0.00"
       ref="inputEditing"
       outlined
-      color="secondary"
+      color="positive"
       dense
       :label="label"
       :readonly="readonly"

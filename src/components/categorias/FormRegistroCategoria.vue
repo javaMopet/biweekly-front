@@ -32,7 +32,7 @@
             :disable="isEditing"
           />
           <div class="q-pt-md">
-            <div class="row q-gutter-x-md">
+            <div class="row q-gutter-x-md items-center">
               <div
                 class="col-auto bg-high-contrast clickable"
                 @click="selectIcon"
@@ -47,13 +47,16 @@
                 <!-- </q-btn> -->
               </div>
               <div class="col">
+                <div class="input-label">
+                  <span class="text-red">*</span> Nombre categoria:
+                </div>
                 <q-input
                   v-model="editedFormItem.nombre"
                   type="text"
-                  label="Nombre"
+                  placeholder="Ingresa el nombre"
                   dense
                   outlined
-                  color="secondary"
+                  color="positive"
                   autofocus
                   :rules="[(val) => !!val || 'Favor de ingresar el nombre']"
                   lazyRules
@@ -62,13 +65,16 @@
             </div>
           </div>
           <div>
+            <div class="input-label">
+              <span class="text-red">*</span> Descripción:
+            </div>
             <q-input
               v-model="editedFormItem.descripcion"
               type="text"
-              label="Descripcion"
+              placeholder="Ingresa descripción"
               dense
               outlined
-              color="secondary"
+              color="positive"
               :rules="[(val) => !!val || 'Favor de ingresar la descripción']"
               lazyRules
             />
@@ -76,17 +82,21 @@
           <div></div>
           <div>
             <div class="col">
-              <!-- <CuentaContableSelect
+              <div class="input-label">Cuenta Contable:</div>
+              <CuentaContableSelect
                 v-model="editedFormItem.cuentaContable"
                 :subnivel="cuentaContableOptions.cuentaContableSubnivel"
                 :clasificacion="cuentaContableOptions.clasificacion"
                 :tipo-afectacion="cuentaContableOptions.tipoAfectacion"
-              ></CuentaContableSelect> -->
+                :is-alta="false"
+                input-label="Cuenta Contable (opcional)"
+              ></CuentaContableSelect>
             </div>
           </div>
           <div class="">
             <div class="row" style="border: 0px solid red">
               <div class="col q-mr-xs">
+                <div class="input-label">Color:</div>
                 <q-input
                   outlined
                   color="white"
@@ -146,6 +156,7 @@
                 </q-input>
               </div>
               <div class="col q-ml-xs">
+                <div class="input-label">Importe por default:</div>
                 <PriceInput
                   currency-code="MNX"
                   v-model="editedFormItem.importeDefault"
@@ -154,18 +165,32 @@
             </div>
           </div>
           <div class="">
+            <div class="input-label">Cuenta Bancaria por defecto:</div>
             <CuentaSelect
               v-model="editedFormItem.cuentaDefault"
               :opcional="true"
               :filter-array="['1', '2']"
-              label="Cuenta Bancaria por Defecto"
+              label="(opcional)"
               hint="Esta cuenta se tomará por defecto al agregar un movimiento"
             ></CuentaSelect>
           </div>
         </div>
-        <div class="col row justify-end q-pt-lg">
-          <q-btn label="Cancelar" flat v-close-popup class="q-ml-sm" />
-          <q-btn :label="lblSubmit" type="submit" color="primary-button" />
+        <div class="col row justify-end q-pt-lg q-gutter-lg">
+          <q-btn
+            label="Cancelar"
+            flat
+            v-close-popup
+            class="q-ml-sm"
+            color="negative-pastel"
+            dense
+            no-caps
+          />
+          <q-btn
+            :label="lblSubmit"
+            type="submit"
+            color="primary-button"
+            dense
+          />
         </div>
       </q-form>
     </q-card-section>
@@ -177,18 +202,11 @@
       transition-show="jump-up"
       transition-hide="jump-down"
     >
-      <q-card
-        class="my-card"
-        style="max-height: 65vh; max-width: 60vw; width: 900px"
-      >
-        <q-card-section>
-          <IconPicker
-            v-model="editedFormItem.icono"
-            @onClose="cancelIconPicker"
-            @onIconSelected="onIconSelected"
-          ></IconPicker>
-        </q-card-section>
-      </q-card>
+      <IconPicker
+        v-model="editedFormItem.icono"
+        @onClose="cancelIconPicker"
+        @onIconSelected="onIconSelected"
+      ></IconPicker>
     </q-dialog>
   </Teleport>
 </template>
@@ -203,6 +221,7 @@ import { SessionStorage } from 'quasar'
 import { useCategoriaStore } from 'src/stores/common/categoriaStore'
 import { useTipoMovimientoStore } from 'src/stores/common/useTipoMovimientoStore'
 import { useCategoriasCrud } from 'src/composables/useCategoriasCrud'
+import CuentaContableSelect from '../formComponents/CuentaContableSelect.vue'
 
 /**
  * composables
