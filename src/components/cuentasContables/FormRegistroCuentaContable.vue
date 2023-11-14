@@ -10,6 +10,7 @@
           class="dialog__title--closeButton"
           round
           dense
+          glossy
         ></q-btn>
       </div>
     </div>
@@ -34,7 +35,7 @@
                       'Favor de ingresar el tipo de afectación de la cuenta contable'
                   ]"
                   outlined
-                  color="secondary"
+                  color="positive"
                   dense
                   :readonly="isReadonly"
                 />
@@ -47,7 +48,7 @@
                   dense
                   readonly
                   outlined
-                  color="secondary"
+                  color="positive"
                 />
               </div>
             </div>
@@ -85,7 +86,7 @@
               ]"
               :readonly="isReadonly"
               outlined
-              color="secondary"
+              color="positive"
               @blur="identificadorIngresado"
             />
           </div>
@@ -104,7 +105,7 @@
                   'Favor de ingresar el nombre de la Cuenta Contable'
               ]"
               outlined
-              color="secondary"
+              color="positive"
             />
           </div>
           <div></div>

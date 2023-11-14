@@ -3,12 +3,18 @@ import {
   LISTA_CUENTAS_REDUCED,
   LISTA_CUENTAS,
   CUENTA_CREATE,
-  CUENTA_UPDATE
+  CUENTA_UPDATE,
+  CUENTA_DELETE
 } from 'src/graphql/cuentas'
+import { useCuentaStore } from 'src/stores/common/useCuentaStore'
 
-import { ref, computed } from 'vue'
+import { ref, computed, reactive } from 'vue'
 
 export function useCuentasCrud() {
+  /**
+   * composables
+   */
+  const cuentaStore = useCuentaStore()
   /**
    * graphql
    */
@@ -25,31 +31,31 @@ export function useCuentasCrud() {
     null, //arguments
     graphql_options
   )
+  const graphql_opciones = reactive({
+    fetchPolicy: 'no-cache'
+  })
+
+  const { onResult: onResultListaCuentas, onError: onErrorListaCuentas } =
+    useQuery(LISTA_CUENTAS, null, graphql_opciones)
 
   const {
-    // result: resultadoLista,
-    onResult: onResultListaCuentas,
-    onError: onErrorListaCuentas,
-    refetch: refetchListaCuentas
-  } = useQuery(LISTA_CUENTAS, null, graphql_options)
-
-  const {
-    mutate: createCuenta,
-    onDone: onDoneCreate,
-    onError: onErrorCreate
+    mutate: cuentaCreate,
+    onDone: onDoneCuentaCreate,
+    onError: onErrorCuentaCreate
   } = useMutation(CUENTA_CREATE)
 
   const {
-    mutate: updateCuenta,
-    onDone: onDoneUpdate,
-    onError: onErrorUpdateCuenta
+    mutate: cuentaUpdate,
+    onDone: onDoneCuentaUpdate,
+    onError: onErrorCuentaUpdate
   } = useMutation(CUENTA_UPDATE)
 
-  const listaCuentas = computed({
-    get() {
-      return resultadoLista.value?.listaCuentas ?? []
-    }
-  })
+  const {
+    mutate: cuentaDelete,
+    onDone: onDoneCuentaDelete,
+    onError: onErrorCuentaDelete
+  } = useMutation(CUENTA_DELETE)
+
   // const listaCuentasReduced = computed({
   //   get() {
   //     return resultadoListaReduced.value?.listaCuentas ?? []
@@ -60,33 +66,58 @@ export function useCuentasCrud() {
     console.log('error', error)
   })
 
-  onDoneCreate(({ data }) => {
-    refetchListaCuentas()
+  onDoneCuentaCreate(({ data }) => {
+    const itemSaved = data.cuentaCreate.cuenta
+    cuentaStore.listaCuentas.push(itemSaved)
   })
-  onErrorCreate((error) => {
-    console.log('error', error.graphQLErrors[0])
-    console.log('error', error.graphQLErrors[0].extensions)
+  onDoneCuentaUpdate(({ data }) => {
+    if (!!data) {
+      console.log('ejecutando onDonecuentaUpdate useCuentaCrud', data)
+      const itemUpdated = data.cuentaUpdate.cuenta
+      console.log('itemUpdated... ', itemUpdated)
+      const index = cuentaStore.listaCuentas.findIndex(
+        (c) => c.id === itemUpdated.id
+      )
+      console.log('index updated', index)
+      cuentaStore.listaCuentas[index] = itemUpdated
+    }
+  })
+  onDoneCuentaDelete(({ data }) => {
+    const itemDeleted = data.cuentaDelete.cuenta
+    const index = cuentaStore.listaCuentas.findIndex(
+      (c) => c.id === itemDeleted.id
+    )
+    console.log('index item deleted', index)
+    cuentaStore.listaCuentas.splice(index, 1)
   })
 
   onErrorListaCuentas((error) => {
     logErrorMessages(error)
   })
 
-  onDoneUpdate(({ data }) => {
-    refetchListaCuentas()
+  onErrorCuentaCreate((error) => {
+    console.trace(error)
+    // console.log('error', error.graphQLErrors[0])
+    // console.log('error', error.graphQLErrors[0]?.extensions)
   })
-  onErrorUpdateCuenta((error) => {
-    console.log('error', error.graphQLErrors[0])
-    console.log('error', error.graphQLErrors[0].extensions)
+
+  onErrorCuentaUpdate((error) => {
+    console.trace(error)
+    // console.log('error', error.graphQLErrors[0])
+    // console.log('error', error.graphQLErrors[0]?.extensions)
   })
 
   return {
-    listaCuentas,
     onResultListaReduced,
     onResultListaCuentas,
-    createCuenta,
-    updateCuenta,
-    onDoneCreate,
-    onDoneUpdate
+    cuentaCreate,
+    cuentaUpdate,
+    cuentaDelete,
+    onDoneCuentaCreate,
+    onDoneCuentaUpdate,
+    onDoneCuentaDelete,
+    onErrorCuentaCreate,
+    onErrorCuentaUpdate,
+    onErrorCuentaDelete
   }
 }

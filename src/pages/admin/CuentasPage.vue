@@ -189,7 +189,7 @@
                     align="right"
                   >
                     <span class="text-h6">
-                      {{ formato.toCurrency(props.row.saldo) }}
+                      {{ formato.toCurrency(props.row.saldo ?? 0) }}
                     </span>
                   </q-item-label>
                 </div>
@@ -238,7 +238,6 @@
         >
           <RegistroCuenta
             :edited-item="editedItem"
-            :edited-index="editedIndex"
             @cuentaSaved="cuentaSaved"
             @cuentaUpdated="cuentaUpdated"
           ></RegistroCuenta>
@@ -257,6 +256,7 @@ import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { useFormato } from 'src/composables/utils/useFormato'
 import { useRouter } from 'vue-router'
 import { useCuentaStore } from 'src/stores/common/useCuentaStore'
+import { useCuentasCrud } from 'src/composables/useCuentasCrud'
 
 /**
  * composables
@@ -266,6 +266,7 @@ const notificacion = useNotificacion()
 const formato = useFormato()
 const router = useRouter()
 const cuentaStore = useCuentaStore()
+const cuentasCrud = useCuentasCrud()
 
 /**
  * GRAPHQL
@@ -279,15 +280,17 @@ const cuentaStore = useCuentaStore()
 //   if (!!data) {
 //     console.log('item deleted ', data)
 //     const deletedItem = data.cuentaDelete.cuenta
-//     listaCuentas.value.splice(rowIndexDelete.value, 1)
-//     rowIndexDelete.value = null
 //     mostrarNotificacion('elminó', deletedItem)
 //     refetchListaCuentas()
 //   }
 // })
-// onErrorDeleteCuenta((error) => {
-//   console.error(error)
-// })
+cuentasCrud.onErrorCuentaDelete((error) => {
+  console.error(error)
+  notificacion.mostrarNotificacionNegativa(
+    'No es posible eliminar esta cuenta, favor de verificar que no contenga movimientos',
+    1600
+  )
+})
 // onErrorListaCuentas((error) => {
 //   console.error(error)
 // })
@@ -306,8 +309,6 @@ const defaultItem = {
 const filter = ref()
 const showFormItem = ref(false)
 const editedItem = ref({ ...defaultItem })
-const editedIndex = ref(null)
-const rowIndexDelete = ref(null)
 const loadingAccount = ref([])
 
 /**
@@ -376,22 +377,26 @@ function addRow(tipoCuentaId) {
   console.log('tipo de cuenta', tipoCuentaId)
   editedItem.value = { ...defaultItem }
   editedItem.value.tipoCuenta.id = tipoCuentaId.toString()
-  editedIndex.value = null
   showFormItem.value = true
 }
+/**
+ * Iniciar la edición de un item.
+ * @param {*} item
+ */
 function editRow(item) {
   editedItem.value = {
     ...item.row
   }
-  editedIndex.value = item.rowIndex
+  console.log('iniciar edicion el item', editedItem.value)
+  console.log('indice:', item.rowIndex)
   showFormItem.value = true
 }
+
 function abrirMovimientos(props_row) {
   loadingAccount.value[props_row.rowIndex] = true
   router.push(`/cuentas/${props_row.row.id}`)
 }
 function deleteRow(item) {
-  rowIndexDelete.value = item.rowIndex
   $q.dialog({
     title: 'Confirmar',
     style: 'width:500px',
@@ -410,31 +415,27 @@ function deleteRow(item) {
     persistent: true
   })
     .onOk(() => {
-      // deleteCuenta({ id: item.row.id })
+      cuentasCrud.cuentaDelete({ id: item.row.id })
     })
     .onCancel(() => {})
     .onDismiss(() => {})
 }
 
+cuentasCrud.onDoneCuentaDelete(({ data }) => {
+  const itemDeleted = data.cuentaDelete.cuenta
+  console.log('itemDeleted', itemDeleted)
+  notificacion.mostrarNotificacionPositiva(
+    `La cuenta ${itemDeleted.nombre} se eliminó correctamente`,
+    1400
+  )
+})
+
 function cuentaSaved(itemSaved) {
   showFormItem.value = false
-  listaCuentas.value.push(itemSaved)
-  mostrarNotificacion('guardó', itemSaved)
-  refetchListaCuentas()
 }
 function cuentaUpdated(itemUpdated) {
   showFormItem.value = false
-  mostrarNotificacion('actualizó', itemUpdated)
-  listaCuentas.value[editedIndex.value] = itemUpdated
   editedItem.value = { ...defaultItem }
-  editedIndex.value = null
-  refetchListaCuentas()
-}
-function mostrarNotificacion(action, cuenta) {
-  notificacion.mostrarNotificacionPositiva(
-    `La cuenta "${cuenta.nombre}" se ${action} correctamente`,
-    2500
-  )
 }
 </script>
 

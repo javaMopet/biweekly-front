@@ -10,6 +10,7 @@
           class="dialog__title--closeButton"
           round
           dense
+          glossy
         ></q-btn>
       </div>
     </div>

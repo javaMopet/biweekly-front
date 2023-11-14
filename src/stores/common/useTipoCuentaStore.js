@@ -1,8 +1,9 @@
+import { useQuery } from '@vue/apollo-composable'
 import { logErrorMessages } from '@vue/apollo-util'
 import { defineStore } from 'pinia'
 import { LISTA_TIPOS_CUENTA } from 'src/graphql/cuentas'
 
-import { ref } from 'vue'
+import { reactive, ref } from 'vue'
 export const useTipoCuentaStore = defineStore('tipoCuentaStore', () => {
   /**
    * state
@@ -11,8 +12,8 @@ export const useTipoCuentaStore = defineStore('tipoCuentaStore', () => {
   /**
    * GRAPHQL
    */
-  const graphql_options = ref({
-    fetchPolicy: 'network-only'
+  const graphql_options = reactive({
+    fetchPolicy: 'no-cache'
   })
 
   const { onResult: onResultLista, onError: onErrorLista } = useQuery(
@@ -20,6 +21,7 @@ export const useTipoCuentaStore = defineStore('tipoCuentaStore', () => {
     null,
     graphql_options
   )
+
   onResultLista(({ data }) => {
     console.dir(data)
     listaTiposCuenta.value = JSON.parse(JSON.stringify(data.listaTiposCuenta))

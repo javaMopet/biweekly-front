@@ -79,6 +79,12 @@ export const CUENTA_CREATE = gql`
           value
           icon
         }
+        banco {
+          id
+          nombre
+          icono
+        }
+        saldo
       }
     }
   }
@@ -104,6 +110,12 @@ export const CUENTA_UPDATE = gql`
           value
           icon
         }
+        banco {
+          id
+          nombre
+          icono
+        }
+        saldo
       }
     }
   }
@@ -130,6 +142,12 @@ export const CUENTA_DELETE = gql`
           value
           icon
         }
+        banco {
+          id
+          nombre
+          icono
+        }
+        saldo
       }
     }
   }

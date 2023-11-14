@@ -296,7 +296,9 @@ categoriasCrud.onErrorCategoriaDelete((error) => {
 /**
  * onMount
  */
-// onMounted(() => {})
+// onMounted(() => {
+//   // categoriaStore
+// })
 /**
  * METHODS
  */

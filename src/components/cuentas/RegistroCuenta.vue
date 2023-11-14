@@ -1,21 +1,22 @@
 <template>
-  <q-card
-    class="my-card"
-    style="width: 450px; height: 560px; min-height: 560px"
-  >
-    <q-card-section class="row justify-between items-start dialog-title">
+  <div class="my-card" style="width: 500px">
+    <div class="row justify-between items-center dialog-title q-px-md">
       <div class="dialog__title--name">{{ actionName }}</div>
-      <div class="">
+      <div class="dialog-closebutton">
         <q-btn
+          color="primary"
           round
           icon="close"
           class="dialog__title--closeButton"
           v-close-popup
+          push
+          glossy
+          dense
         ></q-btn>
       </div>
-    </q-card-section>
-    <q-card-section class="">
-      <q-form @submit="saveItem" class="">
+    </div>
+    <div class="q-pa-lg">
+      <q-form @submit="saveItem" class="q-gutter-lg">
         <div class="q-gutter-xs">
           <div class="q-my-md">
             <q-btn-toggle
@@ -26,7 +27,7 @@
               text-color="gray-2"
               toggle-color="toggle-button"
               toggle-text-color="accent-light"
-              :options="tipoMovimientoStore.listaTiposMovimiento"
+              :options="tiposCuentaOptions"
               @update:model-value="tipoCuentaUpdated"
               push
             />
@@ -37,13 +38,10 @@
               style="width: 85%; border: 0px solid red"
             >
               <div>
-                <div class="row input-label items-center">
-                  * {{ lbl_nombre }}
-                </div>
                 <q-input
                   v-model="editedFormItem.nombre"
                   type="text"
-                  placeholder="Ingresa el nombre"
+                  label="Nombre de la cuenta"
                   dense
                   outlined
                   color="positive"
@@ -58,10 +56,12 @@
               </div>
               <div v-if="isBancoRequerido">
                 <div>
-                  <div class="row input-label">Banco:</div>
-                  <BancoSelect v-model="editedFormItem.banco"></BancoSelect>
+                  <BancoSelect
+                    v-model="editedFormItem.banco"
+                    label="Banco"
+                    :rules="[(val) => !!val || 'Favor de ingresar el banco']"
+                  ></BancoSelect>
                 </div>
-                <div class="row input-label">* Número de cuenta:</div>
                 <q-input
                   v-model="editedFormItem.identificador"
                   type="text"
@@ -77,9 +77,7 @@
                   mask="####"
                 ></q-input>
               </div>
-
               <div class="">
-                <div class="row input-label">Cuenta Contable:</div>
                 <CuentaContableSelect
                   v-model="editedFormItem.cuentaContable"
                   :subnivel="cuentaContableProps.subnivel"
@@ -91,7 +89,6 @@
                 ></CuentaContableSelect>
               </div>
               <div class="column" v-if="isDiaCorteRequired">
-                <div class="col-3 input-label">Día de corte:</div>
                 <div class="">
                   <q-input
                     v-model="editedFormItem.diaCorte"
@@ -110,40 +107,44 @@
               </div>
             </div>
           </div>
-          <div align="right" class="q-gutter-x-sm q-mt-md">
+          <div class="col row justify-end q-pt-lg q-gutter-lg">
             <q-btn
               label="Cancelar"
               v-close-popup
-              color=""
-              outline
+              color="negative"
+              flat
               class="q-ml-sm"
-              push
+              no-caps
+              rounded
             />
             <q-btn
               :label="lblSubmit"
               type="submit"
-              push
+              no-caps
               color="primary-button"
             />
           </div>
         </div>
       </q-form>
-    </q-card-section>
-    <q-card-section class="q-gutter-sm" align="right"> </q-card-section>
-  </q-card>
+    </div>
+  </div>
 </template>
 
 <script setup>
-import { useMutation } from '@vue/apollo-composable'
 import { ref, reactive, computed, onMounted } from 'vue'
 import CuentaContableSelect from '../formComponents/CuentaContableSelect.vue'
 import BancoSelect from '../formComponents/BancoSelect.vue'
-import { useTipoMovimientoStore } from 'src/stores/common/useTipoMovimientoStore'
+import { useTipoCuentaStore } from 'src/stores/common/useTipoCuentaStore'
+import { useCuentasCrud } from 'src/composables/useCuentasCrud'
+import { useNotificacion } from 'src/composables/utils/useNotificacion'
 
 /**
  * composable
  */
-const tipoMovimientoStore = useTipoMovimientoStore()
+// const tipoMovimientoStore = useTipoMovimientoStore()
+const tipoCuentaStore = useTipoCuentaStore()
+const cuentasCrud = useCuentasCrud()
+const notificacion = useNotificacion()
 
 /**
  * state
@@ -163,24 +164,34 @@ const cuentaContableProps = reactive({
   clasificacion: ''
 })
 
-// onDoneCreateCuenta(({ data }) => {
-//   console.log('saved data...', data)
-//   if (!!data) {
-//     const itemSaved = data.cuentaCreate.cuenta
-//     emit('cuentaSaved', itemSaved)
-//   }
-// })
+cuentasCrud.onDoneCuentaCreate(({ data }) => {
+  console.log('saved data...', data)
+  if (!!data) {
+    const itemSaved = data.cuentaCreate.cuenta
+    mostrarNotificacion('guardó', itemSaved)
+    emit('cuentaSaved', itemSaved)
+  }
+})
+cuentasCrud.onDoneCuentaUpdate(({ data }) => {
+  if (!!data) {
+    console.log('updated data...', data)
+    const itemUpdated = data.cuentaUpdate.cuenta
+    mostrarNotificacion('actualizó', itemUpdated)
+    emit('cuentaUpdated', itemUpdated)
+  }
+})
+
+function mostrarNotificacion(action, cuenta) {
+  notificacion.mostrarNotificacionPositiva(
+    `La cuenta "${cuenta.nombre}" se ${action} correctamente`,
+    2500
+  )
+}
 // onErrorCreateCuenta((error) => {
 //   console.log(error)
 //   console.error(error)
 // })
-// onDoneUpdateCuenta(({ data }) => {
-//   if (!!data) {
-//     console.log('updated data...', data)
-//     const itemUpdated = data.cuentaUpdate.cuenta
-//     emit('cuentaUpdated', itemUpdated)
-//   }
-// })
+
 // onErrorUpdateCuenta((error) => {
 //   console.error(error)
 // })
@@ -200,11 +211,6 @@ const props = defineProps({
         id: null
       }
     }
-  },
-  editedIndex: {
-    type: Number,
-    required: false,
-    default: -1
   }
 })
 /**
@@ -214,17 +220,17 @@ const emit = defineEmits(['cuentaSaved', 'cuentaUpdated'])
 /**
  * computed
  */
-// const tiposCuentaOptions = computed({
-//   get() {
-//     return editedFormItem.value.tipoCuenta.id === '3'
-//       ? resultTiposCuenta.value?.listaTiposCuenta.filter(
-//           (tipoCuenta) => tipoCuenta.id === editedFormItem.value.tipoCuenta.id
-//         ) ?? []
-//       : resultTiposCuenta.value?.listaTiposCuenta.filter(
-//           (tipoCuenta) => tipoCuenta.id != '3'
-//         ) ?? []
-//   }
-// })
+const tiposCuentaOptions = computed({
+  get() {
+    return editedFormItem.value.tipoCuenta.id === '3'
+      ? tipoCuentaStore.listaTiposCuenta.filter(
+          (tipoCuenta) => tipoCuenta.id === editedFormItem.value.tipoCuenta.id
+        ) ?? []
+      : tipoCuentaStore.listaTiposCuenta.filter(
+          (tipoCuenta) => tipoCuenta.id != '3'
+        ) ?? []
+  }
+})
 const editedFormItem = computed({
   get() {
     return !!props.editedItem ? props.editedItem : formItem.value
@@ -307,18 +313,19 @@ function saveItem() {
   if (!editedFormItem.value.id) {
     console.log('guardando cuenta nueva', input)
     input.saldo = parseFloat(0)
-    createCuenta({
-      input
-    })
+    cuentasCrud.cuentaCreate({ input })
   } else {
     const id = editedFormItem.value.id
     console.log('actualizando cuenta', id, input)
-    updateCuenta({
-      id,
-      input
-    })
+    // input.saldo = parseFloat(0)
+    cuentasCrud.cuentaUpdate({ id, input })
   }
 }
+
+cuentasCrud.onErrorCuentaUpdate((error) => {
+  console.trace(error)
+})
+
 function tipoCuentaUpdated(value) {
   obtenerCuentasContables(value)
 }

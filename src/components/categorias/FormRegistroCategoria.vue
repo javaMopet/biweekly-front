@@ -1,20 +1,22 @@
 <template>
   <div class="my-card" style="width: 500px">
-    <q-card-section class="row justify-between items-start dialog-title">
+    <div class="row justify-between items-center dialog-title q-px-md">
       <div class="dialog__title--name">{{ actionName }}</div>
       <div class="dialog-closebutton">
         <q-btn
+          color="primary"
           round
           icon="close"
           class="dialog__title--closeButton"
           v-close-popup
           push
           glossy
+          dense
         ></q-btn>
       </div>
-    </q-card-section>
+    </div>
 
-    <q-card-section class="">
+    <div class="q-pa-lg">
       <q-form @submit="saveItem" class="q-gutter-md">
         <div class="q-gutter-md">
           <q-btn-toggle
@@ -32,28 +34,23 @@
             :disable="isEditing"
           />
           <div class="q-pt-md">
-            <div class="row q-gutter-x-md items-center">
+            <div class="row q-gutter-x-md items-start">
               <div
                 class="col-auto bg-high-contrast clickable"
                 @click="selectIcon"
               >
-                <!-- <q-btn @click="selectIcon" color="primary"> -->
                 <q-icon
                   color="accent-light"
                   :name="editedFormItem.icono || 'extension'"
                   class="size"
                   size="2em"
                 />
-                <!-- </q-btn> -->
               </div>
               <div class="col">
-                <div class="input-label">
-                  <span class="text-red">*</span> Nombre categoria:
-                </div>
                 <q-input
                   v-model="editedFormItem.nombre"
                   type="text"
-                  placeholder="Ingresa el nombre"
+                  label="* Nombre de categoría"
                   dense
                   outlined
                   color="positive"
@@ -64,115 +61,109 @@
               </div>
             </div>
           </div>
-          <div>
-            <div class="input-label">
-              <span class="text-red">*</span> Descripción:
+          <div class="row">
+            <div class="col-3 q-pr-md">
+              <q-input
+                outlined
+                color="main-menu"
+                v-model="editedFormItem.color"
+                :rules="['anyColor']"
+                class="my-input"
+                dense
+                input-style="color:white;width:10px"
+              >
+                <!-- style="min-width: 100%" -->
+                <template #default>
+                  <div
+                    :style="{
+                      backgroundColor: `${editedFormItem.color}`,
+                      height: 40 + 'px',
+                      width: 250 + 'px'
+                    }"
+                  >
+                    &nbsp;
+                  </div>
+                </template>
+                <template v-slot:append>
+                  <q-icon name="colorize" class="cursor-pointer">
+                    <q-popup-proxy
+                      cover
+                      transition-show="scale"
+                      transition-hide="scale"
+                      ref="ppproxy"
+                    >
+                      <q-color
+                        v-model="editedFormItem.color"
+                        no-footer
+                        :palette="[
+                          '#D9B801',
+                          '#019A9D',
+                          '#9c592d',
+                          '#E8045A',
+                          '#B2028A',
+                          '#6d3ee6',
+                          '#ffd04f',
+                          '#227fd6',
+                          '#1ad560',
+                          '#e6763e',
+                          '#45c5f7',
+                          '#02c46a',
+                          '#4a0f36',
+                          '#fa75ce',
+                          '#b9d422',
+                          '#0f4d40'
+                        ]"
+                        default-view="palette"
+                        class="my-picker"
+                        @update:model-value="colorSelecionado"
+                      />
+                    </q-popup-proxy>
+                  </q-icon>
+                </template>
+              </q-input>
             </div>
-            <q-input
-              v-model="editedFormItem.descripcion"
-              type="text"
-              placeholder="Ingresa descripción"
-              dense
-              outlined
-              color="positive"
-              :rules="[(val) => !!val || 'Favor de ingresar la descripción']"
-              lazyRules
-            />
+            <div class="col-9">
+              <q-input
+                v-model="editedFormItem.descripcion"
+                type="text"
+                placeholder="* Descripción"
+                dense
+                outlined
+                color="positive"
+                :rules="[(val) => !!val || 'Favor de ingresar la descripción']"
+                lazyRules
+              />
+            </div>
           </div>
           <div></div>
-          <div>
-            <div class="col">
-              <div class="input-label">Cuenta Contable:</div>
-              <CuentaContableSelect
-                v-model="editedFormItem.cuentaContable"
-                :subnivel="cuentaContableOptions.cuentaContableSubnivel"
-                :clasificacion="cuentaContableOptions.clasificacion"
-                :tipo-afectacion="cuentaContableOptions.tipoAfectacion"
-                :is-alta="false"
-                input-label="Cuenta Contable (opcional)"
-              ></CuentaContableSelect>
+          <div class="row">
+            <div class="col-5 q-pr-xs">
+              <PriceInput
+                currency-code="MNX"
+                v-model="editedFormItem.importeDefault"
+                label="Precio (opcional)"
+              ></PriceInput>
+            </div>
+            <div class="col-7">
+              <CuentaSelect
+                v-model="editedFormItem.cuentaDefault"
+                :opcional="true"
+                :filter-array="['1', '2']"
+                label="Cuenta Bancaria (opcional)"
+                hint="Esta cuenta se tomará por defecto al agregar un movimiento"
+              ></CuentaSelect>
             </div>
           </div>
-          <div class="">
-            <div class="row" style="border: 0px solid red">
-              <div class="col q-mr-xs">
-                <div class="input-label">Color:</div>
-                <q-input
-                  outlined
-                  color="white"
-                  v-model="editedFormItem.color"
-                  :rules="['anyColor']"
-                  class="my-input"
-                  dense
-                >
-                  <!-- style="min-width: 100%" -->
-                  <template #default>
-                    <div
-                      :style="{
-                        backgroundColor: `${editedFormItem.color}`,
-                        height: 40 + 'px',
-                        width: 250 + 'px'
-                      }"
-                    >
-                      &nbsp;
-                    </div>
-                  </template>
-                  <template v-slot:append>
-                    <q-icon name="colorize" class="cursor-pointer">
-                      <q-popup-proxy
-                        cover
-                        transition-show="scale"
-                        transition-hide="scale"
-                        ref="ppproxy"
-                      >
-                        <q-color
-                          v-model="editedFormItem.color"
-                          no-footer
-                          :palette="[
-                            '#D9B801',
-                            '#019A9D',
-                            '#9c592d',
-                            '#E8045A',
-                            '#B2028A',
-                            '#6d3ee6',
-                            '#ffd04f',
-                            '#227fd6',
-                            '#1ad560',
-                            '#e6763e',
-                            '#45c5f7',
-                            '#02c46a',
-                            '#4a0f36',
-                            '#fa75ce',
-                            '#b9d422',
-                            '#0f4d40'
-                          ]"
-                          default-view="palette"
-                          class="my-picker"
-                          @update:model-value="colorSelecionado"
-                        />
-                      </q-popup-proxy>
-                    </q-icon>
-                  </template>
-                </q-input>
-              </div>
-              <div class="col q-ml-xs">
-                <div class="input-label">Importe por default:</div>
-                <PriceInput
-                  currency-code="MNX"
-                  v-model="editedFormItem.importeDefault"
-                ></PriceInput>
-              </div>
-            </div>
-          </div>
-          <div class="">
-            <div class="input-label">Cuenta Bancaria por defecto:</div>
-            <CuentaSelect
-              v-model="editedFormItem.cuentaDefault"
-              :opcional="true"
-              :filter-array="['1', '2']"
-              label="(opcional)"
-              hint="Esta cuenta se tomará por defecto al agregar un movimiento"
-            ></CuentaSelect>
+
+          <div class="col">
+            <CuentaContableSelect
+              v-model="editedFormItem.cuentaContable"
+              :subnivel="cuentaContableOptions.cuentaContableSubnivel"
+              :clasificacion="cuentaContableOptions.clasificacion"
+              :tipo-afectacion="cuentaContableOptions.tipoAfectacion"
+              :is-alta="false"
+              input-label="Cuenta Contable (opcional)"
+            ></CuentaContableSelect>
           </div>
         </div>
         <div class="col row justify-end q-pt-lg q-gutter-lg">
@@ -181,19 +172,19 @@
             flat
             v-close-popup
             class="q-ml-sm"
-            color="negative-pastel"
-            dense
+            color="negative"
             no-caps
+            rounded
           />
           <q-btn
             :label="lblSubmit"
             type="submit"
             color="primary-button"
-            dense
+            no-caps
           />
         </div>
       </q-form>
-    </q-card-section>
+    </div>
   </div>
 
   <Teleport to="#modal">

@@ -19,8 +19,9 @@ export const useCuentaStore = defineStore('cuentaStore', () => {
     console.dir(data)
     listaCuentasReduced.value = JSON.parse(JSON.stringify(data.listaCuentas))
   })
+
   onResultListaCuentas(({ data }) => {
-    console.dir(data)
+    console.log('Guardando cuentas en el store')
     listaCuentas.value = JSON.parse(JSON.stringify(data.listaCuentas))
   })
   /**
