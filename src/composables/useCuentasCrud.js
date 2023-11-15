@@ -1,14 +1,10 @@
-import { useMutation, useQuery } from '@vue/apollo-composable'
+import { useMutation } from '@vue/apollo-composable'
 import {
-  LISTA_CUENTAS_REDUCED,
-  LISTA_CUENTAS,
   CUENTA_CREATE,
   CUENTA_UPDATE,
   CUENTA_DELETE
 } from 'src/graphql/cuentas'
 import { useCuentaStore } from 'src/stores/common/useCuentaStore'
-
-import { ref, computed, reactive } from 'vue'
 
 export function useCuentasCrud() {
   /**
@@ -18,25 +14,19 @@ export function useCuentasCrud() {
   /**
    * graphql
    */
-  const graphql_options = ref({
-    fetchPolicy: 'network-only'
-  })
+  // const graphql_options = ref({
+  //   fetchPolicy: 'network-only'
+  // })
 
-  const {
-    // result: resultadoListaReduced,
-    onResult: onResultListaReduced,
-    onError: onErrorListaCuentasReduced
-  } = useQuery(
-    LISTA_CUENTAS_REDUCED,
-    null, //arguments
-    graphql_options
-  )
-  const graphql_opciones = reactive({
-    fetchPolicy: 'no-cache'
-  })
-
-  const { onResult: onResultListaCuentas, onError: onErrorListaCuentas } =
-    useQuery(LISTA_CUENTAS, null, graphql_opciones)
+  // const {
+  //   // result: resultadoListaReduced,
+  //   onResult: onResultListaReduced,
+  //   onError: onErrorListaCuentasReduced
+  // } = useLazyQuery(
+  //   LISTA_CUENTAS_REDUCED,
+  //   null, //arguments
+  //   graphql_options
+  // )
 
   const {
     mutate: cuentaCreate,
@@ -61,10 +51,6 @@ export function useCuentasCrud() {
   //     return resultadoListaReduced.value?.listaCuentas ?? []
   //   }
   // })
-
-  onErrorListaCuentas((error) => {
-    console.log('error', error)
-  })
 
   onDoneCuentaCreate(({ data }) => {
     const itemSaved = data.cuentaCreate.cuenta
@@ -91,10 +77,6 @@ export function useCuentasCrud() {
     cuentaStore.listaCuentas.splice(index, 1)
   })
 
-  onErrorListaCuentas((error) => {
-    logErrorMessages(error)
-  })
-
   onErrorCuentaCreate((error) => {
     console.trace(error)
     // console.log('error', error.graphQLErrors[0])
@@ -108,8 +90,6 @@ export function useCuentasCrud() {
   })
 
   return {
-    onResultListaReduced,
-    onResultListaCuentas,
     cuentaCreate,
     cuentaUpdate,
     cuentaDelete,

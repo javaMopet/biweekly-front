@@ -22,39 +22,35 @@
       :autofocus="autofocus"
       clearable
     >
-      <template #after="props" v-if="agregar">
-        <div class="row justify-end" @click.prevent="">
-          <q-btn
-            dense
-            class="addNew-button"
-            color="secondary-button"
-            icon="add"
-            round
-            no-caps
-            @click="addItemCategoria(props)"
-          >
-          </q-btn>
-        </div>
-      </template>
-      <!-- <template #after>
-        <q-btn color="more-button" round flat dense icon="more_vert">
-          <q-menu>
-            <q-list style="min-width: 100px">
-              <q-item clickable @click="addItemCategoria(props)" v-close-popup>
-                <q-item-section class="text-teal">
-                  Nueva categoría
-                </q-item-section>
-              </q-item>
-            </q-list>
-          </q-menu>
+      <template #after>
+        <q-btn
+          color="button-new"
+          icon="add"
+          @click="addItemCategoria(props)"
+          dense
+          class="button-new"
+          glossy
+          push
+        >
+          <q-tooltip> Nueva Categoría </q-tooltip>
         </q-btn>
-      </template> -->
+      </template>
       <template v-slot:no-option>
         <q-item>
           <q-item-section class="text-grey"> No results </q-item-section>
         </q-item>
       </template>
     </q-select>
+    <!-- <div class="">
+      <q-btn
+        color="accent"
+        class="addNew-button"
+        icon="add"
+        no-caps
+        @click="addItemCategoria(props)"
+        outline
+      />
+    </div> -->
   </div>
 
   <Teleport to="#modal">

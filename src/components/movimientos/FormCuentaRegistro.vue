@@ -1,19 +1,20 @@
 <template>
-  <q-card class="my-card" style="width: 630px">
-    <q-card-section class="row justify-between items-start dialog-title">
+  <div class="my-card" style="width: 630px">
+    <div class="row justify-between items-center dialog-title q-px-md">
       <div class="dialog__title--name">{{ actionName }}</div>
       <div class="dialog-closebutton">
         <q-btn
+          color="primary"
           icon="close"
           v-close-popup
-          push
           class="dialog__title--closeButton"
           round
+          dense
           glossy
         ></q-btn>
       </div>
-    </q-card-section>
-    <q-card-section class="q-pt-xl q-px-xl">
+    </div>
+    <div class="q-px-xl q-pt-xl q-pb-lg">
       <q-form @submit="saveItem" class="q-gutter-y-md form-componente__body">
         <div class="q-py-lg">
           <q-btn-toggle
@@ -107,8 +108,8 @@
           />
         </div>
       </q-form>
-    </q-card-section>
-  </q-card>
+    </div>
+  </div>
 </template>
 
 <script setup>

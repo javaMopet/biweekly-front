@@ -43,7 +43,8 @@
                   push
                   glossy
                   no-caps
-                  label="Agregar"
+                  label="Nuevo"
+                  icon="add_circle"
                   @click="addRow(1)"
                   text-color="white"
                 >
@@ -363,7 +364,7 @@ const columns = [
  * onMounted
  */
 onMounted(() => {
-  // cargarCuentas()
+  // cuentasCrud.loadListaCuentas()
 })
 
 // onResultCuentas(({ data }) => {

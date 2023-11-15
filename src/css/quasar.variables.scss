@@ -70,10 +70,7 @@ $secondary-button: #d1deeb;
 /*$primary-button: #00AAC1;*/
 // $toggle-button: #4b9972;
 // $toggle-button: #b4d9df;
-$toggle-button: lighten(
-  $color: $secondary,
-  $amount: 5
-);
+$toggle-button: #3c99a1;
 $toogle-text-button: rgb(251, 255, 233);
 $toolbar-button: #4b9972;
 $disable-button: #e7e7e7;
@@ -91,6 +88,10 @@ $input-label: hsl(199, 52%, 29%);
 $ingreso-button: #28a86e;
 $egreso-button: #d61b4a;
 $traspaso-button: #246fdf;
+
+// $button-new: #246fdf;
+// $button-new: #324766;
+$button-new: #2c5382;
 
 /************************** other ****************** */
 // https://hookagency.com/blog/website-color-schemes-2020/

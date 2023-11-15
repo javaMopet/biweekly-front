@@ -1,4 +1,4 @@
-import { useLazyQuery, useQuery } from '@vue/apollo-composable'
+import { useQuery } from '@vue/apollo-composable'
 import { defineStore } from 'pinia'
 import { LISTA_BANCOS } from 'src/graphql/bancos'
 import { ref, reactive } from 'vue'
@@ -18,15 +18,19 @@ export const useBancoStore = defineStore('bancoStore', () => {
   })
 
   const {
-    onResult: onResultListaBancos
-    // onError: onErrorListaBancos,
+    onResult: onResultListaBancos,
+    onError: onErrorListaBancos
     // refetch: refetchListaBancos
   } = useQuery(LISTA_BANCOS, { id: 0 }, options)
 
   onResultListaBancos(({ data }) => {
     if (!!data) {
+      console.log('cargando lista de bancos al store ....')
       listaBancos.value = JSON.parse(JSON.stringify(data.listaBancos)) ?? []
     }
+  })
+  onErrorListaBancos((error) => {
+    console.trace(error)
   })
   /**
    * methods

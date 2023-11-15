@@ -67,124 +67,94 @@
             </div>
           </template>
           <template #item="props">
-            <q-card class="tarjeta__cuenta q-ma-sm clickable" clickable>
+            <div class="credit-card q-ma-sm clickable" clickable>
               <q-inner-loading :showing="loadingCard[props.rowIndex]">
                 <q-spinner-ball size="50px" color="primary" />
               </q-inner-loading>
-              <q-card-section>
-                <div class="column" style="border: 0px solid red">
+              <div class="q-pa-sm">
+                <div
+                  class="row inline fit items-center justify-between"
+                  style="border: 0px solid yellow; padding-left: 15px"
+                >
                   <div
-                    class="row inline fit items-center justify-between"
-                    style="border: 0px solid yellow; padding-left: 15px"
-                  >
-                    <div
-                      class="q-pl-md"
-                      align="right"
-                      style="border: 0px solid purple"
-                      @click="abrirMovimientos(props)"
-                    >
-                      <q-item-label align="right" class="text-grey-2 text-bold">
-                        {{ props.row.nombre }}
-                      </q-item-label>
-                    </div>
-                    <div
-                      class="col-2"
-                      align="right"
-                      style="border: 0px solid red"
-                    >
-                      <q-btn
-                        color="grey-5"
-                        icon="more_vert"
-                        flat
-                        dense
-                        round
-                        style="transform: translate(10px, -10px)"
-                      >
-                        <q-menu>
-                          <q-list style="min-width: 100px">
-                            <q-item
-                              clickable
-                              @click="editRow(props)"
-                              v-close-popup
-                            >
-                              <q-item-section avatar>
-                                <q-icon name="edit" color="info"
-                              /></q-item-section>
-                              <q-item-section>Editar</q-item-section>
-                            </q-item>
-                            <q-separator />
-                            <q-item
-                              clickable
-                              @click="deleteRow(props)"
-                              v-close-popup
-                            >
-                              <q-item-section avatar>
-                                <q-icon name="delete" color="negative"
-                              /></q-item-section>
-                              <q-item-section>Eliminar</q-item-section>
-                            </q-item>
-                          </q-list>
-                        </q-menu>
-                      </q-btn>
-                    </div>
-                  </div>
-                  <div class="column" style="border: 0px solid red">
-                    <div
-                      class="q-py-sm row inline justify-between items-center"
-                      style="
-                        padding-left: 10px;
-                        padding-top: 20px;
-                        padding-bottom: 10px;
-                      "
-                      @click="abrirMovimientos(props)"
-                    >
-                      <q-img
-                        src="/images/chip.png"
-                        width="46px"
-                        height="40px"
-                      />
-                      <div class="q-pr-lg" @click="abrirMovimientos(props)">
-                        <q-img
-                          :src="`/icons/${
-                            props.row.banco?.icono ?? 'cash.png'
-                          }`"
-                          width="60px"
-                        />
-                      </div>
-                    </div>
-                    <div
-                      class="row inline justify-start"
-                      style="border: 0px solid green; padding-left: 20px"
-                    >
-                      <div
-                        class="non-selectable q-py-xs text-grey-4 text-h6"
-                        @click="abrirMovimientos(props)"
-                      >
-                        **** **** **** {{ props.row.identificador }}
-                      </div>
-                      <q-tooltip> Abrir movimientos </q-tooltip>
-                    </div>
-                  </div>
-                  <div
-                    class="row justify-between items-center q-px-lg"
+                    class="q-pl-md"
+                    align="right"
+                    style="border: 0px solid purple"
                     @click="abrirMovimientos(props)"
                   >
-                    <span class="text-caption text-grey-6"
-                      >HORACIO PEÑA MENDOZA</span
-                    >
-                    <q-item-label
-                      align="right"
-                      caption
-                      lines="2"
-                      class="text-blue-grey-3 text-bold text-h3"
-                      ><span class="text-h6">{{
-                        formato.toCurrency(props.row.saldo)
-                      }}</span>
+                    <q-item-label class="text-primary text-bold text-subtitle1">
+                      {{ props.row.nombre }}
                     </q-item-label>
                   </div>
+                  <div class="col-3">
+                    <div class="row inline">
+                      <q-btn
+                        flat
+                        round
+                        icon="las la-edit"
+                        class="button-edit"
+                        color="primary"
+                        @click="editRow(props)"
+                      />
+                      <q-btn
+                        flat
+                        round
+                        icon="las la-trash-alt"
+                        class="button-delete"
+                        color="negative"
+                        @click="deleteRow(props)"
+                      />
+                    </div>
+                  </div>
                 </div>
-              </q-card-section>
-            </q-card>
+                <!-- images -->
+                <div
+                  class="row full-width justify-between items-center credit-card__images"
+                  @click="abrirMovimientos(props)"
+                >
+                  <q-img src="/images/chip.png" width="46px" height="40px" />
+                  <div
+                    @click="abrirMovimientos(props)"
+                    style="border: 1px solid pink"
+                  >
+                    <q-img
+                      :src="`/icons/${props.row.banco?.icono ?? 'cash.png'}`"
+                      width="60px"
+                    />
+                  </div>
+                </div>
+                <!--  -->
+                <div
+                  class="row inline justify-start"
+                  style="border: 1px solid green; padding-left: 20px"
+                >
+                  <div
+                    class="non-selectable q-py-xs text-grey-4 text-h6"
+                    @click="abrirMovimientos(props)"
+                  >
+                    **** **** **** {{ props.row.identificador }}
+                  </div>
+                  <q-tooltip> Abrir movimientos </q-tooltip>
+                </div>
+              </div>
+              <div
+                class="row justify-between items-center q-px-lg"
+                @click="abrirMovimientos(props)"
+              >
+                <span class="text-caption text-grey-6"
+                  >HORACIO PEÑA MENDOZA</span
+                >
+                <q-item-label
+                  align="right"
+                  caption
+                  lines="2"
+                  class="text-blue-grey-3 text-bold text-h3"
+                  ><span class="text-h6">{{
+                    formato.toCurrency(props.row.saldo)
+                  }}</span>
+                </q-item-label>
+              </div>
+            </div>
           </template>
           <template #body-cell-icono="props">
             <q-icon :name="props.row.icono" size="35px" color="cyan" />
@@ -202,7 +172,6 @@
       >
         <RegistroCuenta
           :edited-item="editedItem"
-          :edited-index="editedIndex"
           @cuentaSaved="cuentaSaved"
           @cuentaUpdated="cuentaUpdated"
         ></RegistroCuenta>
@@ -274,7 +243,6 @@ const defaultItem = {
 const filter = ref()
 const showFormItem = ref(false)
 const editedItem = ref({ ...defaultItem })
-const editedIndex = ref(null)
 
 /**
  * computed
@@ -339,14 +307,12 @@ function addRow(tipoCuentaId) {
   console.log('tipo de cuenta', tipoCuentaId)
   editedItem.value = { ...defaultItem }
   editedItem.value.tipoCuenta.id = tipoCuentaId.toString()
-  editedIndex.value = null
   showFormItem.value = true
 }
 function editRow(item) {
   editedItem.value = {
     ...item.row
   }
-  editedIndex.value = item.rowIndex
   showFormItem.value = true
 }
 function abrirMovimientos(props_row) {
@@ -382,15 +348,12 @@ function deleteRow(item) {
 function cuentaSaved(itemSaved) {
   console.log('tarjetaSaved', itemSaved)
   showFormItem.value = false
-  resultCuentas.value?.listaCuentas.push(itemSaved)
-  mostrarNotificacion('guardó', itemSaved)
+  // mostrarNotificacion('guardó', itemSaved)
 }
 function cuentaUpdated(itemUpdated) {
   showFormItem.value = false
-  mostrarNotificacion('actualizó', itemUpdated)
-  listaCuentas.value[editedIndex.value] = itemUpdated
+  // mostrarNotificacion('actualizó', itemUpdated)
   editedItem.value = { ...defaultItem }
-  editedIndex.value = null
 }
 function mostrarNotificacion(action, cuenta) {
   notificacion.mostrarNotificacionPositiva(

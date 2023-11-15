@@ -186,6 +186,12 @@
 .bg-traspaso-button {
   background: $traspaso-button !important;
 }
+.text-button-new {
+  background: $button-new !important;
+}
+.bg-button-new {
+  background: $button-new !important;
+}
 /* *************************** */
 .dialog__title--closeButton {
   opacity: 0.8;
@@ -250,30 +256,32 @@
   }
 }
 
-.tarjeta__cuenta {
-  width: 390px;
-  min-width: 340px;
-  // border: 1px solid white !important;
-  // background: #f2f2f2;
+.credit-card {
+  width: 350px;
+  min-width: 350px;
   box-shadow: rgba(206, 207, 209, 0.568) 1px 1px 26px,
     rgba(195, 198, 202, 0.678) 1px 1px 3px;
   border-radius: 20px;
   // background: linear-gradient(to right top, #1b2327, #345263);
-  background: url('../images/back_card7.jpg');
+  background: url('../images/credit_card2.jpg');
   background-repeat: no-repeat;
   background-size: cover;
   cursor: pointer;
-  opacity: 0.9;
 
   &:hover {
     box-shadow: rgba(104, 102, 102, 0.76) 5px 14px 28px,
       rgba(105, 102, 102, 0.74) 5px 10px 10px;
     -webkit-font-smoothing: subpixel-antialiased;
     -webkit-transform: translateZ(0) scale(1, 1);
-    // background: linear-gradient(to right bottom, #260564, #8d16a5);
     transform: translate(-1px, -2px);
     transition: all 0.25s;
-    opacity: 1;
+  }
+
+  &__images {
+    // padding-left: 25px;
+    // padding-top: 10px;
+    // padding-bottom: 10px;
+    border: 0px solid blue;
   }
 
   /*&-avatar {
@@ -339,7 +347,7 @@
   overflow: hidden;
 
   &::before {
-    background-color: #929fb1;
+    background-color: #2c5382;
     position: absolute;
     top: 0;
     left: 0;
@@ -487,12 +495,16 @@
 }
 
 .form-componente__body {
+  position: relative;
+  z-index: 1;
+  padding: 0px 25px 15px 25px;
   border: 1px solid #b2bdb6;
-  border-radius: 5px;
   background: white;
-  padding: 0px 20px 10px 20px;
+  border-radius: 5px;
+  overflow: hidden;
   &::before {
-    background-color: #929fb1;
+    // background-color: #929fb1;
+    background-color: #2c5382;
     position: absolute;
     top: 0;
     left: 0;
@@ -500,6 +512,7 @@
     content: '';
     width: 100%;
     height: 8px;
+    // border-radius: 5px;
   }
 }
 /* ************************************************** */
@@ -510,15 +523,15 @@
     color: $negative-pastel !important;
   }
 }
-$new-button-color: #1a5f81;
+// $new-button-color: #b2c8d3;
 
 .button-new {
   font-size: 0.6rem;
-  color: $new-button-color !important;
-  box-shadow: rgba(112, 164, 194, 0.534) 2px 4px 8px,
-    rgba(121, 170, 190, 0.733) 1px 2px 4px;
+  // color: $new-button-color !important;
+  // box-shadow: rgba(112, 164, 194, 0.534) 2px 4px 8px,
+  //   rgba(121, 170, 190, 0.733) 1px 2px 4px;
   &:hover {
-    background: lighten($color: $primary, $amount: 15) !important;
+    background: darken($color: $traspaso-button, $amount: 15) !important;
     color: white !important;
   }
 }

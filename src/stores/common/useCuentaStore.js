@@ -1,7 +1,8 @@
+import { useQuery } from '@vue/apollo-composable'
 import { defineStore } from 'pinia'
-import { useCuentasCrud } from 'src/composables/useCuentasCrud'
+import { LISTA_CUENTAS } from 'src/graphql/cuentas'
+import { computed, reactive, ref } from 'vue'
 
-import { computed, ref } from 'vue'
 export const useCuentaStore = defineStore('cuentaStore', () => {
   /**
    * state
@@ -11,19 +12,22 @@ export const useCuentaStore = defineStore('cuentaStore', () => {
   /**
    * composables
    */
-  const cuentasCrud = useCuentasCrud()
 
-  const { onResultListaReduced, onResultListaCuentas } = cuentasCrud
-
-  onResultListaReduced(({ data }) => {
-    console.dir(data)
-    listaCuentasReduced.value = JSON.parse(JSON.stringify(data.listaCuentas))
+  const graphql_opciones = reactive({
+    fetchPolicy: 'no-cache'
   })
+
+  const { onResult: onResultListaCuentas, onError: onErrorListaCuentas } =
+    useQuery(LISTA_CUENTAS, null, graphql_opciones)
 
   onResultListaCuentas(({ data }) => {
     console.log('Guardando cuentas en el store')
     listaCuentas.value = JSON.parse(JSON.stringify(data.listaCuentas))
   })
+  onErrorListaCuentas((error) => {
+    console.log('error', error)
+  })
+
   /**
    * computed
    */

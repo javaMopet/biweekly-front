@@ -230,7 +230,7 @@ const columns = [
 // })
 
 onMounted(() => {
-  console.log('onMounted BancosPage <<<<<....')
+  // console.log('onMounted BancosPage <<<<<....')
   // Las variables en el segundo
   // Las options se colocan en el 3er parámetro
   // loadListaBancos(null, { id: null }, graphlOptions)
