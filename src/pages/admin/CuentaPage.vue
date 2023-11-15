@@ -100,6 +100,13 @@
             </div>
             <q-separator spaced inset vertical />
             <div class="col column items-center">
+              <span class="tarjeta__resumen-etiqueta"> Saldo del periodo</span>
+              <span class="tarjeta__resumen-valor">
+                {{ formato.toCurrency(sumaMovimientos) }}
+              </span>
+            </div>
+            <q-separator spaced inset vertical />
+            <div class="col column items-center">
               <span class="tarjeta__resumen-etiqueta">
                 Saldo al final del periodo</span
               >
@@ -121,7 +128,10 @@
             <!-- <q-separator spaced inset vertical /> -->
             <div class="col column items-center">
               <span class="tarjeta__resumen-etiqueta"> Saldo al día</span>
-              <span class="tarjeta__resumen-valor">
+              <span
+                class="tarjeta__resumen-valor"
+                style="font-weight: bold !important"
+              >
                 {{ formato.toCurrency(parseFloat(cuenta.saldo)) }}
               </span>
             </div>

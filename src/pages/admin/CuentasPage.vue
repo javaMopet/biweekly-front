@@ -36,7 +36,6 @@
           <template #top-right>
             <div class="row inline items-center q-gutter-x-md">
               <div class="">
-                <!-- icon="add_circle" -->
                 <q-btn-dropdown
                   split
                   color="primary"
@@ -59,13 +58,8 @@
                       </q-item-section>
                       <q-item-section>
                         <q-item-label>Cuenta de Ahorros</q-item-label>
-                        <!-- <q-item-label caption>February 22, 2016</q-item-label> -->
                       </q-item-section>
-                      <!-- <q-item-section side>
-                    <q-icon name="info" color="amber" />
-                  </q-item-section> -->
                     </q-item>
-
                     <q-item clickable v-close-popup @click="addRow(2)">
                       <q-item-section avatar>
                         <q-avatar
@@ -76,11 +70,7 @@
                       </q-item-section>
                       <q-item-section>
                         <q-item-label>Cuenta de Efectivo</q-item-label>
-                        <!-- <q-item-label caption>February 22, 2016</q-item-label> -->
                       </q-item-section>
-                      <!-- <q-item-section side>
-                    <q-icon name="info" color="amber" />
-                  </q-item-section> -->
                     </q-item>
                   </q-list>
                 </q-btn-dropdown>
@@ -101,13 +91,20 @@
             </div>
           </template>
           <template #item="props">
-            <q-card class="cuenta__card-main text-primary q-ma-sm clickable">
-              <q-inner-loading :showing="loadingAccount[props.rowIndex]">
-                <q-spinner-ball size="50px" color="primary" />
+            <q-card class="cuenta-card text-primary q-ma-sm clickable">
+              <q-inner-loading
+                class="card-loading"
+                :showing="loadingAccount[props.rowIndex]"
+              >
+                <q-spinner-ball size="70px" color="white" />
               </q-inner-loading>
               <q-card-section>
-                <div class="row justify-around q-gutter-x-lg">
-                  <div class="column" @click="abrirMovimientos(props)">
+                <div
+                  class="row justify-around q-gutter-x-lg q-pb-md"
+                  @click="abrirMovimientos(props)"
+                  style="cursor: pointer"
+                >
+                  <div class="col-2">
                     <q-avatar size="60px">
                       <q-img
                         :src="`/icons/${props.row.banco?.icono ?? 'cash.png'}`"
@@ -116,7 +113,7 @@
                       />
                     </q-avatar>
                   </div>
-                  <div class="column" @click="abrirMovimientos(props)">
+                  <div class="col-8" @click="abrirMovimientos(props)">
                     <div class="row cuenta__title">
                       {{ props.row.nombre }}
                     </div>
@@ -142,7 +139,7 @@
                       {{ props.row.cuentaContable.nombreCompleto }}
                     </div>
                   </div>
-                  <div class="column">
+                  <!-- <div class="column">
                     <q-btn
                       color="more-button"
                       flat
@@ -176,23 +173,41 @@
                         </q-list>
                       </q-menu>
                     </q-btn>
-                  </div>
+                  </div> -->
                 </div>
                 <div
-                  class="row inline"
-                  style="border: 0px solid red; width: 100%"
-                  @click="abrirMovimientos(props)"
+                  class="row inline full-width items-center justify-between q-pt-md"
+                  style="border-top: 1px solid grey"
                 >
-                  <q-item-label
-                    style="border: 0px solid red; width: 100%"
-                    caption
-                    class="text-blue-grey-6 text-bold"
-                    align="right"
-                  >
-                    <span class="text-h6">
-                      {{ formato.toCurrency(props.row.saldo ?? 0) }}
-                    </span>
-                  </q-item-label>
+                  <div class="col" style="cursor: normal">
+                    <q-btn
+                      flat
+                      round
+                      icon="las la-edit"
+                      class="button-edit"
+                      @click="editRow(props)"
+                      ><q-tooltip> Editar </q-tooltip></q-btn
+                    >
+                    <q-btn
+                      flat
+                      round
+                      icon="las la-trash-alt"
+                      class="button-delete"
+                      @click="deleteRow(props)"
+                    />
+                  </div>
+                  <div class="col">
+                    <q-item-label
+                      style="border: 0px solid red; width: 100%"
+                      caption
+                      class="text-blue-grey-6 text-bold"
+                      align="right"
+                    >
+                      <span class="text-h6">
+                        {{ formato.toCurrency(props.row.saldo ?? 0) }}
+                      </span>
+                    </q-item-label>
+                  </div>
                 </div>
               </q-card-section>
 

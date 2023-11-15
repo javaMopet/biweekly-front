@@ -24,6 +24,7 @@
     >
       <template #after>
         <q-btn
+          v-if="props.agregar"
           color="button-new"
           icon="add"
           @click="addItemCategoria(props)"

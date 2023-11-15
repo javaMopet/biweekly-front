@@ -67,44 +67,43 @@
             </div>
           </template>
           <template #item="props">
-            <div class="credit-card q-ma-sm clickable" clickable>
-              <q-inner-loading :showing="loadingCard[props.rowIndex]">
-                <q-spinner-ball size="50px" color="primary" />
-              </q-inner-loading>
+            <div class="credit-card q-ma-sm">
               <div class="q-pa-sm">
+                <q-inner-loading
+                  class="card-loading"
+                  :showing="loadingCard[props.rowIndex]"
+                  style="border-radius: 20px"
+                >
+                  <q-spinner-ball size="90px" color="white" />
+                </q-inner-loading>
                 <div
-                  class="row inline fit items-center justify-between"
-                  style="border: 0px solid yellow; padding-left: 15px"
+                  class="row inline full-width items-center justify-between credit-card__title"
+                  style="padding-left: 15px"
                 >
                   <div
-                    class="q-pl-md"
-                    align="right"
-                    style="border: 0px solid purple"
+                    class="col text-bold text-subtitle1 q-py-sm"
                     @click="abrirMovimientos(props)"
+                    style="cursor: pointer"
                   >
-                    <q-item-label class="text-primary text-bold text-subtitle1">
-                      {{ props.row.nombre }}
-                    </q-item-label>
+                    {{ props.row.nombre }}
                   </div>
-                  <div class="col-3">
-                    <div class="row inline">
-                      <q-btn
-                        flat
-                        round
-                        icon="las la-edit"
-                        class="button-edit"
-                        color="primary"
-                        @click="editRow(props)"
-                      />
-                      <q-btn
-                        flat
-                        round
-                        icon="las la-trash-alt"
-                        class="button-delete"
-                        color="negative"
-                        @click="deleteRow(props)"
-                      />
-                    </div>
+                  <div class="row inline">
+                    <q-btn
+                      flat
+                      round
+                      icon="las la-edit"
+                      class="button-edit"
+                      color="primary"
+                      @click="editRow(props)"
+                    />
+                    <q-btn
+                      flat
+                      round
+                      icon="las la-trash-alt"
+                      class="button-delete"
+                      color="negative"
+                      @click="deleteRow(props)"
+                    />
                   </div>
                 </div>
                 <!-- images -->
@@ -112,10 +111,12 @@
                   class="row full-width justify-between items-center credit-card__images"
                   @click="abrirMovimientos(props)"
                 >
-                  <q-img src="/images/chip.png" width="46px" height="40px" />
+                  <div class="">
+                    <q-img src="/images/chip.png" width="46px" height="40px" />
+                  </div>
                   <div
+                    class="credit-card__images--logo"
                     @click="abrirMovimientos(props)"
-                    style="border: 1px solid pink"
                   >
                     <q-img
                       :src="`/icons/${props.row.banco?.icono ?? 'cash.png'}`"
@@ -123,32 +124,28 @@
                     />
                   </div>
                 </div>
-                <!--  -->
+                <!-- temination number -->
                 <div
-                  class="row inline justify-start"
-                  style="border: 1px solid green; padding-left: 20px"
+                  class="row full-width justify-center"
+                  style="cursor: pointer"
                 >
                   <div
-                    class="non-selectable q-py-xs text-grey-4 text-h6"
+                    class="non-selectable q-py-xs text-blue-grey-10 text-h6"
                     @click="abrirMovimientos(props)"
                   >
                     **** **** **** {{ props.row.identificador }}
                   </div>
-                  <q-tooltip> Abrir movimientos </q-tooltip>
                 </div>
               </div>
-              <div
-                class="row justify-between items-center q-px-lg"
-                @click="abrirMovimientos(props)"
-              >
-                <span class="text-caption text-grey-6"
+              <div class="row justify-between items-center q-px-lg q-pb-sm">
+                <span class="text-caption text-blue-grey-1"
                   >HORACIO PEÑA MENDOZA</span
                 >
                 <q-item-label
                   align="right"
                   caption
                   lines="2"
-                  class="text-blue-grey-3 text-bold text-h3"
+                  class="text-blue-grey-2 text-bold text-h3"
                   ><span class="text-h6">{{
                     formato.toCurrency(props.row.saldo)
                   }}</span>

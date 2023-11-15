@@ -134,8 +134,7 @@ const cuenta = computed({
 const listaOptions = computed({
   get() {
     return (
-      cuentaStore.listaCuentasReduced?.filter((option) => {
-        // console.log(props.filterArray.includes(option.tipoCuenta.id))
+      cuentaStore.listaCuentas?.filter((option) => {
         return props.filterArray.includes(option.tipoCuenta.id)
       }) ?? []
     )

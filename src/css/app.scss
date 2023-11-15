@@ -266,7 +266,8 @@
   background: url('../images/credit_card2.jpg');
   background-repeat: no-repeat;
   background-size: cover;
-  cursor: pointer;
+  cursor: normal;
+  position: relative;
 
   &:hover {
     box-shadow: rgba(104, 102, 102, 0.76) 5px 14px 28px,
@@ -276,12 +277,52 @@
     transform: translate(-1px, -2px);
     transition: all 0.25s;
   }
+  // &__click {
+  //   background: #2c5382;
+  //   opacity: 0;
+  //   position: absolute;
+  //   top: 0px;
+  //   left: 0px;
+  //   width: 100%;
+  //   height: 100%;
+  //   z-index: 10;
+  //   border-radius: 20px;
+  //   transition: all 0.25s ease-in;
+
+  // &:hover {
+  //   opacity: 1;
+  // }
+
+  // &--actions {
+  //   background: #6181aa;
+  //   position: relative;
+  //   display: flexbox;
+  //   top: 20px;
+  //   right: -100px;
+  //   z-index: 11;
+  //   width: 80px;
+  //   height: 80px;
+  //   opacity: 1;
+  // }
+  // }
+
+  &__title {
+    color: $dark;
+  }
 
   &__images {
+    cursor: pointer;
+    padding-inline: 20px;
     // padding-left: 25px;
     // padding-top: 10px;
     // padding-bottom: 10px;
     border: 0px solid blue;
+    &--logo {
+      border: 0px solid pink;
+      height: 85px;
+      min-height: 85px;
+      max-height: 85px;
+    }
   }
 
   /*&-avatar {
@@ -291,14 +332,14 @@
     }
   }*/
 }
-.cuenta__card-main {
+.cuenta-card {
   width: 350px;
   min-width: 340px;
   background: #f2f2f2;
   box-shadow: rgba(206, 207, 209, 0.568) 1px 1px 26px,
     rgba(195, 198, 202, 0.678) 1px 1px 3px;
   border-radius: 5px;
-  cursor: pointer;
+  cursor: normal;
 
   &:hover {
     box-shadow: rgba(104, 102, 102, 0.76) 5px 14px 28px,
@@ -573,4 +614,9 @@ $save-button-color: #6e65eb;
   width: 25px;
   height: 38px;
   cursor: pointer;
+}
+
+.card-loading {
+  opacity: 0.5;
+  background: rgb(188, 186, 224);
 }

@@ -1,193 +1,193 @@
 <template>
-  <q-card
-    class="my-card"
-    dense
-    style="width: 80%; min-width: 80%; max-width: 80%"
-  >
-    <q-card-section class="row justify-between items-start dialog-title">
+  <div class="my-card" style="width: 80%; min-width: 80%; max-width: 80%">
+    <div class="row justify-between items-center dialog-title q-px-md">
       <div class="dialog__title--name">
         Cuenta &nbsp;&nbsp;~ {{ cuenta.nombre }} ~
       </div>
       <div class="dialog-closebutton">
         <q-btn
-          round
+          color="primary"
           icon="close"
-          class="dialog__title--closeButton"
           v-close-popup
-          push
+          class="dialog__title--closeButton"
+          round
+          dense
           glossy
         ></q-btn>
       </div>
-    </q-card-section>
-    <q-card-section>
-      <q-toolbar class="q-gutter-x-md">
-        <div class="row q-pr-lg justify-between">
-          <div class="column">
-            <div class="load__file-text text-condensed">
-              Selecciona un archivo en formato Excel:
-            </div>
-            <q-file
-              v-model="archivoExcel"
-              label="Carga archivo Excel"
-              accept=".xlsx,.xls"
-              @input="updateFile"
-              dense
-              style="width: 300px"
-              max-files="1"
-              outlined
-              no-caps
-              label-color="primary"
-              clearable
-              @clear="fileClear"
-            >
-              <template #prepend>
-                <q-icon color="primary" name="cloud_upload" />
-              </template>
-              <template #before>
-                <q-img src="/icons/excel2.png" width="24px" />
-              </template>
-            </q-file>
-          </div>
-          <q-btn
-            v-if="isSelected"
-            label="Eliminar"
-            @click="eliminarSeleccionados"
-            outline
-            color="primary"
-          />
-        </div>
-        <q-separator vertical></q-separator>
-        <div class="row items-center q-gutter-x-md">
-          <div class="column">
-            <span class="form-input__label"> Desde:</span>
-            <DateInput
-              v-model="fecha_inicio"
-              lbl_field="Fecha"
-              :opcional="false"
-              style="width: 140px"
-            ></DateInput>
-          </div>
-          <div class="column">
-            <span class="form-input__label">Hasta:</span>
-            <DateInput
-              v-model="fecha_fin"
-              lbl_field="Fecha"
-              :opcional="false"
-              style="width: 140px"
-            ></DateInput>
-          </div>
-        </div>
-      </q-toolbar>
-
-      <q-page-sticky
-        position="top"
-        style="z-index: 100; width: 600px"
-        :offset="[508, 68]"
-        expand
-      >
-        <transition name="fade">
-          <div
-            class="row bg-pink-1"
-            v-if="errorsList.length > 0"
-            style="width: 600px"
-          >
+    </div>
+    <div class="main-content q-py-lg">
+      <div class="q-pa-lg cuenta-content">
+        <q-toolbar class="q-gutter-x-md">
+          <div class="row q-pr-lg justify-between">
             <div class="column">
-              <div class="row q-gutter-x-md q-pl-sm q-pt-sm justify-between">
-                <div class="row inline items-center q-gutter-x-md">
-                  <q-icon name="warning" size="1.5rem" color="negative" />
-                  <span class="text-subtitle2 text-dark"
-                    >El formulario contiene errores:</span
-                  >
-                </div>
-                <q-btn
-                  class="q-mr-xs"
-                  color="more-button"
-                  icon="close"
-                  dense
-                  round
-                  flat
-                  @click="closeErrors"
-                />
+              <div class="form-input__label">
+                Selecciona un archivo en formato Excel:
               </div>
-              <q-list>
-                <q-item
-                  :inset-level="0.5"
-                  dense
-                  v-for="error in errorsList"
-                  :key="error.code"
-                  class="col"
-                  style="width: 600px"
-                >
-                  <q-item-section
-                    avatar
-                    dense
-                    style="min-width: 25px !important; width: 25px !important"
-                  >
-                    <q-icon color="primary" name="arrow_right" />
-                  </q-item-section>
-                  <q-item-section class="text-subtitle2 row inline">
-                    <div class="row inline">
-                      <span class="q-mr-md" v-if="error.numero_linea"
-                        >Línea: {{ error.numero_linea }}</span
-                      ><span class="errors__item--message">{{
-                        error.message
-                      }}</span>
-                    </div></q-item-section
-                  >
-                </q-item>
-              </q-list>
+              <q-file
+                v-model="archivoExcel"
+                label="Carga archivo Excel"
+                accept=".xlsx,.xls"
+                @input="updateFile"
+                dense
+                style="width: 340px"
+                max-files="1"
+                outlined
+                no-caps
+                label-color="primary"
+                clearable
+                @clear="fileClear"
+              >
+                <template #prepend>
+                  <q-icon color="primary" name="cloud_upload" />
+                </template>
+                <template #before>
+                  <q-img src="/icons/excel2.png" width="24px" />
+                </template>
+              </q-file>
+            </div>
+            <q-btn
+              v-if="isSelected"
+              label="Eliminar"
+              @click="eliminarSeleccionados"
+              color="primary"
+              dense
+            />
+          </div>
+          <q-separator vertical></q-separator>
+          <div class="row items-center q-gutter-x-md">
+            <div class="column">
+              <span class="form-input__label"> Desde:</span>
+              <DateInput
+                v-model="fecha_inicio"
+                lbl_field="Fecha"
+                :opcional="false"
+                style="width: 140px"
+              ></DateInput>
+            </div>
+            <div class="column">
+              <span class="form-input__label">Hasta:</span>
+              <DateInput
+                v-model="fecha_fin"
+                lbl_field="Fecha"
+                :opcional="false"
+                style="width: 140px"
+              ></DateInput>
             </div>
           </div>
-        </transition>
-      </q-page-sticky>
-    </q-card-section>
-    <q-card-section style="max-height: 70vh; height: 70vh" class="scroll">
-      <q-table
-        :rows="listaRegistrosFiltrados"
-        :columns="columns"
-        :rows-per-page-options="[0]"
-        row-key="consecutivo"
-        dense
-        selection="multiple"
-        v-model:selected="registrosSelected"
-        table-header-class="text-accent text-condensed bg-primary-light"
-        no-data-label="No existen datos disponibles"
-        hide-pagination
-        class="my-sticky-header-table"
-      >
-        <template #body-cell-categoria="props">
-          <q-td :props="props">
-            <TipoMovimientoSelect
-              v-model="props.row.tipoMovimiento"
-              :tipo-afectacion="props.row.tipo_afectacion"
-            ></TipoMovimientoSelect>
-          </q-td>
-        </template>
-        <template #body-cell-importe="props">
-          <q-td :props="props">
-            <span
-              :class="[
-                props.row.importe > 0 ? 'importe_positivo' : 'importe_negativo'
-              ]"
+        </q-toolbar>
+
+        <q-page-sticky
+          position="top"
+          style="z-index: 100; width: 600px"
+          :offset="[508, 68]"
+          expand
+        >
+          <transition name="fade">
+            <div
+              class="row bg-pink-1"
+              v-if="errorsList.length > 0"
+              style="width: 600px"
             >
-              {{ formato.toCurrency(parseFloat(props.row.importe)) }}
-            </span>
-          </q-td>
-        </template>
-        <template #body-cell-acciones="props">
-          <q-td :props="props" fit class="bg-white">
-            <q-btn
-              icon="delete_sweep"
-              size="md"
-              class="q-ml-sm"
-              color="negative"
-              dense
-              @click="deleteRow(props)"
-              flat
-            />
-          </q-td>
-        </template>
-        <!-- <template #bottom-row>
+              <div class="column">
+                <div class="row q-gutter-x-md q-pl-sm q-pt-sm justify-between">
+                  <div class="row inline items-center q-gutter-x-md">
+                    <q-icon name="warning" size="1.5rem" color="negative" />
+                    <span class="text-subtitle2 text-dark"
+                      >El formulario contiene errores:</span
+                    >
+                  </div>
+                  <q-btn
+                    class="q-mr-xs"
+                    color="more-button"
+                    icon="close"
+                    dense
+                    round
+                    flat
+                    @click="closeErrors"
+                  />
+                </div>
+                <q-list>
+                  <q-item
+                    :inset-level="0.5"
+                    dense
+                    v-for="error in errorsList"
+                    :key="error.code"
+                    class="col"
+                    style="width: 600px"
+                  >
+                    <q-item-section
+                      avatar
+                      dense
+                      style="min-width: 25px !important; width: 25px !important"
+                    >
+                      <q-icon color="primary" name="arrow_right" />
+                    </q-item-section>
+                    <q-item-section class="text-subtitle2 row inline">
+                      <div class="row inline">
+                        <span class="q-mr-md" v-if="error.numero_linea"
+                          >Línea: {{ error.numero_linea }}</span
+                        ><span class="errors__item--message">{{
+                          error.message
+                        }}</span>
+                      </div></q-item-section
+                    >
+                  </q-item>
+                </q-list>
+              </div>
+            </div>
+          </transition>
+        </q-page-sticky>
+        <q-card-section style="max-height: 60vh; height: 60vh" class="scroll">
+          <q-table
+            :rows="listaRegistrosFiltrados"
+            :columns="columns"
+            :rows-per-page-options="[0]"
+            row-key="consecutivo"
+            dense
+            selection="multiple"
+            v-model:selected="registrosSelected"
+            table-header-class="text-accent text-condensed bg-primary-light"
+            no-data-label="No existen datos disponibles"
+            hide-pagination
+            class="my-sticky-header-table"
+          >
+            <template #body-cell-categoria="props">
+              <q-td :props="props">
+                <TipoMovimientoSelect
+                  v-model="props.row.tipoMovimiento"
+                  :tipo-afectacion="props.row.tipo_afectacion"
+                ></TipoMovimientoSelect>
+              </q-td>
+            </template>
+            <template #body-cell-importe="props">
+              <q-td :props="props">
+                <span
+                  :class="[
+                    props.row.importe > 0
+                      ? 'importe_positivo'
+                      : 'importe_negativo'
+                  ]"
+                >
+                  {{ formato.toCurrency(parseFloat(props.row.importe)) }}
+                </span>
+              </q-td>
+            </template>
+            <template #body-cell-acciones="props">
+              <q-td :props="props" fit class="bg-white">
+                <!-- icon="delete_sweep" -->
+                <q-btn
+                  icon="las la-trash-alt"
+                  size="md"
+                  class="q-ml-sm"
+                  color="negative"
+                  dense
+                  @click="deleteRow(props)"
+                  flat
+                />
+              </q-td>
+            </template>
+            <!-- <template #bottom-row>
           <q-tr>
             <q-td class="text-bold" colspan="4">Total Movimientos:</q-td>
             <q-td align="right" class="text-bold">
@@ -195,23 +195,40 @@
             >
           </q-tr>
         </template> -->
-      </q-table>
-    </q-card-section>
-    <q-card-actions>
-      <div class="row inline justify-between items-center fit q-pa-md">
-        <div class="">
-          <span class="text-bold text-primary"> Importe Total:</span>
-          <span class="q-pl-md text-secondary text-bold">{{
-            formato.toCurrency(sumatoriaMovimientos)
-          }}</span>
-        </div>
-        <div class="row q-gutter-lg q-pa-sm">
-          <q-btn flat label="Cancelar" v-close-popup />
-          <q-btn label="Guardar" color="primary-button" @click="saveItems" />
-        </div>
+          </q-table>
+        </q-card-section>
+        <q-card-actions style="border: 0px solid red">
+          <div
+            class="row justify-between items-center full-width"
+            style="border: 0px solid green"
+          >
+            <div class="" style="border: 0px solid red">
+              <span class="text-bold text-primary"> Importe Total:</span>
+              <span class="q-pl-md text-secondary text-bold">{{
+                formato.toCurrency(sumatoriaMovimientos)
+              }}</span>
+            </div>
+            <div class="row q-gutter-x-lg">
+              <q-btn
+                flat
+                label="Cancelar"
+                v-close-popup
+                no-caps
+                color="negative"
+                rounded
+              />
+              <q-btn
+                label="Guardar"
+                color="primary-button"
+                @click="saveItems"
+                no-caps
+              />
+            </div>
+          </div>
+        </q-card-actions>
       </div>
-    </q-card-actions>
-  </q-card>
+    </div>
+  </div>
 </template>
 
 <script setup>

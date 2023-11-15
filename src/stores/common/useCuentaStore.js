@@ -8,7 +8,7 @@ export const useCuentaStore = defineStore('cuentaStore', () => {
    * state
    */
   const listaCuentas = ref([])
-  const listaCuentasReduced = ref([])
+
   /**
    * composables
    */
@@ -21,9 +21,13 @@ export const useCuentaStore = defineStore('cuentaStore', () => {
     useQuery(LISTA_CUENTAS, null, graphql_opciones)
 
   onResultListaCuentas(({ data }) => {
-    console.log('Guardando cuentas en el store')
-    listaCuentas.value = JSON.parse(JSON.stringify(data.listaCuentas))
+    console.log('data', data)
+    if (!!data) {
+      console.log('Guardando cuentas en el store')
+      listaCuentas.value = JSON.parse(JSON.stringify(data.listaCuentas))
+    }
   })
+
   onErrorListaCuentas((error) => {
     console.log('error', error)
   })
@@ -49,7 +53,6 @@ export const useCuentaStore = defineStore('cuentaStore', () => {
 
   return {
     listaCuentas,
-    listaCuentasReduced,
     listaCuentasAhorro,
     listaCuentasTarjeta
   }
