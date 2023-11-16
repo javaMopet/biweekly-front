@@ -166,9 +166,6 @@ function onChangeTipoMovimiento(val) {
   }
 }
 function onSelectCategoriaCuenta(val) {
-  console.dir(val)
-  console.dir(tipoMovimiento)
-  console.dir(tipoMovimientoId.value)
   tipoMovimiento.value = {
     tipoMovimientoId: tipoMovimientoId.value,
     value: val

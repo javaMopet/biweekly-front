@@ -15,7 +15,9 @@
 // Letra para números
 // @import url('https://fonts.googleapis.com/css2?family=Kameron:wght@400;500&display=swap');
 
-@import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital@0;1&display=swap');
+// @import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital@0;1&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;500;600;700&display=swap');
 
 .text-accent-light {
   color: $accent-light !important;
@@ -83,6 +85,9 @@
 }
 .bg-categoria {
   background: $categoria !important;
+}
+.text-categoria-icon {
+  color: $categoria-icon !important;
 }
 .text-toolbar-button {
   color: $toolbar-button !important;
@@ -175,19 +180,19 @@
   background: $ingreso-button !important;
 }
 .text-egreso-button {
-  background: $egreso-button !important;
+  color: $egreso-button !important;
 }
 .bg-egreso-button {
   background: $egreso-button !important;
 }
 .text-traspaso-button {
-  background: $traspaso-button !important;
+  color: $traspaso-button !important;
 }
 .bg-traspaso-button {
   background: $traspaso-button !important;
 }
 .text-button-new {
-  background: $button-new !important;
+  color: $button-new !important;
 }
 .bg-button-new {
   background: $button-new !important;
@@ -570,6 +575,7 @@
 
 .button-new {
   font-size: 0.6rem;
+  padding-right: 5px;
   // color: $new-button-color !important;
   // box-shadow: rgba(112, 164, 194, 0.534) 2px 4px 8px,
   //   rgba(121, 170, 190, 0.733) 1px 2px 4px;
