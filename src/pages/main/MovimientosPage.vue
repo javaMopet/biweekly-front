@@ -1,300 +1,302 @@
 <template>
   <div class="column">
-    <div class="column">
-      <!-- Lista del detalle de ingresos -->
-      <q-table
-        dense
-        :rows="listaMovimientosIngreso"
-        :columns="columnsIngresos"
-        row-key="id"
-        :filter="filter"
-        :rows-per-page-options="[0]"
-        separator="horizontal"
-        hide-pagination
-        :class="{
-          'my-sticky-header-table-ingreso': listaMovimientosIngreso.length > 4
-        }"
-      >
-        <template #top-left>
-          <div class="row inline q-gutter-x-md items-center">
-            <q-select
-              v-model="ejercicio_fiscal"
-              :options="ejercicioFiscalOptions"
-              option-label="nombre"
-              label="Año"
-              dense
-              outlined
-              color="secondary"
-              label-color="dark"
-              @update:model-value="onChangeEjercicio"
-            >
-              <template #prepend>
-                <q-icon name="calendar_month" />
-              </template>
-            </q-select>
-            <MesSelect
-              v-model="mes"
-              @update:model-value="onChangeMes"
-            ></MesSelect>
-          </div>
-        </template>
-        <template #top-right>
-          <div class="row bg-accent-light">
-            <q-input
-              outlined
-              dense
-              debounce="400"
-              v-model="filter"
-              placeholder="Buscar Ingreso"
-            >
-              <template v-slot:append>
-                <q-icon name="search" />
-              </template>
-            </q-input>
-          </div>
-        </template>
-        <template #header="props">
-          <q-tr :props="props" class="movimientos__headers-background">
-            <q-th
-              class="q-gutter-x-md"
-              v-for="col in props.cols"
-              :key="col.name"
-              :props="props"
-            >
-              <span class="movimientos__headers-font">
-                {{ col.periodo_id === 0 ? 'INGRESOS' : col.label }}</span
-              >
-              <q-btn
-                v-if="col.periodo_id === 0"
-                color="primary"
-                icon="add_circle"
-                dense
-                @click="addCategoria('1')"
-                flat
-              />
-            </q-th>
-          </q-tr>
-        </template>
-        <template v-slot:body-cell-nombre_categoria="props">
-          <q-td
+    <!-- Lista del detalle de ingresos -->
+    <q-table
+      dense
+      :rows="listaMovimientosIngreso"
+      :columns="columnsT"
+      row-key="id"
+      :filter="filter"
+      :rows-per-page-options="[0]"
+      separator="horizontal"
+      hide-pagination
+      :class="{
+        'my-sticky-header-table-ingreso': listaMovimientosIngreso.length > 4
+      }"
+    >
+      <template #top-left>
+        <div class="row inline q-gutter-x-md items-center">
+          <q-select
+            v-model="ejercicio_fiscal"
+            :options="ejercicioFiscalOptions"
+            option-label="nombre"
+            label="Año"
             dense
-            :props="props"
-            class="text-primary"
-            :style="`border-left: 6px solid ${props.row.color}`"
+            outlined
+            color="secondary"
+            label-color="dark"
+            @update:model-value="onChangeEjercicio"
           >
-            <div class="row items-center">
-              <q-icon :name="props.row.icono" size="22px" color="blue-grey-6" />
-
-              <span class="q-pl-sm movimientos__columna-categoria">
-                {{ props.value }}</span
-              >
-            </div>
-          </q-td>
-        </template>
-        <template v-slot:body-cell="props">
-          <q-td dense :props="props" clickable @click="addItem2(props)">
-            <span class="movimientos__celda--importe"> {{ props.value }}</span>
-          </q-td>
-        </template>
-      </q-table>
-    </div>
-    <div class="">
-      <q-table
-        :rows="saldosIngreso"
-        :columns="columnsSaldos"
-        row-key="name"
-        hide-header
-        hide-bottom
-        separator="cell"
-        dense
-      />
-    </div>
-    <div class="row fit" style="border: 0px solid red">
-      <q-table
-        class="my-sticky-header-table"
-        style="width: 100%"
-        flat
-        bordered
-        v-model:pagination="pagination"
-        :rows-per-page-options="[0]"
-        dense
-        :rows="listaMovimientos"
-        :columns="columnsEgresos"
-        row-key="id"
-        :filter="filter"
-        separator="horizontal"
-        hide-botton
-        hide-pagination
-      >
-        <!-- <template #header>
-          <q-th>
-            <q-td> HI </q-td>
+            <template #prepend>
+              <q-icon name="calendar_month" />
+            </template>
+          </q-select>
+          <MesSelect
+            v-model="mes"
+            @update:model-value="onChangeMes"
+          ></MesSelect>
+        </div>
+      </template>
+      <template #top-right>
+        <div class="row">
+          <q-input
+            outlined
+            dense
+            debounce="400"
+            v-model="filter"
+            placeholder="Buscar Ingreso"
+          >
+            <template v-slot:append>
+              <q-icon name="search" />
+            </template>
+          </q-input>
+        </div>
+      </template>
+      <template #header="props">
+        <q-tr :props="props">
+          <q-th
+            class="bg-white q-gutter-x-md table__header"
+            v-for="col in props.cols"
+            :key="col.name"
+            :props="props"
+            dense
+          >
+            <span> {{ col.periodo_id === 0 ? 'INGRESOS' : col.label }}</span>
+            <q-btn
+              v-if="col.periodo_id === 0"
+              class="button-new"
+              label="Nuevo"
+              color="traspaso-button"
+              icon="add_circle"
+              dense
+              @click="addCategoria('1')"
+            />
           </q-th>
-        </template> -->
-        <template #top-right>
-          <div class="bg-white">
-            <q-input
-              outlined
-              dense
-              debounce="300"
-              v-model="filter"
-              placeholder="Buscar Gasto"
-            >
-              <template #append>
-                <q-icon name="search" />
-              </template>
-            </q-input>
-          </div>
-        </template>
-        <template #header="props">
-          <q-tr :props="props" class="movimientos__headers-background">
-            <q-th
-              class="q-gutter-x-md"
-              v-for="col in props.cols"
-              :key="col.name"
-              :props="props"
-            >
-              <span class="movimientos__headers-font">
-                {{ col.periodo_id === 0 ? 'EGRESOS' : col.label }}</span
-              >
-              <q-btn
-                v-if="col.periodo_id === 0"
-                color="primary"
-                icon="add_circle"
-                dense
-                @click="addCategoria('2')"
-                flat
-              />
-            </q-th>
-          </q-tr>
-        </template>
-
-        <template v-slot:body-cell-nombre_categoria="props">
-          <q-td
-            dense
-            :props="props"
-            class="text-primary"
-            :style="`border-left: 5px solid ${props.row.color}`"
-          >
-            <q-icon :name="props.row.icono" size="22px" color="blue-grey-7" />
+        </q-tr>
+      </template>
+      <template v-slot:body-cell-nombre_categoria="props">
+        <q-td
+          dense
+          :props="props"
+          class="text-primary"
+          :style="`border-left: 6px solid ${props.row.color}`"
+        >
+          <div class="row items-center">
+            <q-icon :name="props.row.icono" size="22px" color="blue-grey-6" />
 
             <span class="q-pl-sm movimientos__columna-categoria">
               {{ props.value }}</span
             >
-          </q-td>
-        </template>
-        <template v-slot:body-cell="props">
-          <q-td dense :props="props" clickable @click="addItem2(props)">
-            <span class="movimientos__celda--importe"> {{ props.value }}</span>
-          </q-td>
-        </template>
-      </q-table>
-    </div>
-    <div class="">
-      <q-table
-        :rows="saldosEgreso"
-        :columns="columnsSaldos"
-        row-key="name"
-        hide-header
-        hide-bottom
-        separator="none"
-        dense
-      />
-    </div>
-    <div class="">
-      <!-- NET CASH PROCEDS and FINAL CASH BALANCE -->
-      <q-table
-        :rows="listaSaldosMovimientos"
-        :columns="columnsIngresos"
-        row-key="name"
-        hide-header
-        hide-bottom
-        separator="none"
-        dense
-      >
-        <template #body-cell="props">
-          <q-td
+          </div>
+        </q-td>
+      </template>
+      <template v-slot:body-cell="props">
+        <q-td dense :props="props" clickable @click="addItem2(props)">
+          <span class="movimientos__celda--importe"> {{ props.value }}</span>
+        </q-td>
+      </template>
+    </q-table>
+    <!-- END Lista del detalle de ingresos -->
+  </div>
+  <!-- tabla de totales de ingresos -->
+  <q-table
+    :rows="saldosIngreso"
+    :columns="columnsT"
+    row-key="name"
+    hide-header
+    hide-bottom
+    separator="cell"
+    dense
+  >
+    <template #body="props">
+      <q-tr :props="props">
+        <q-td></q-td>
+      </q-tr>
+    </template>
+  </q-table>
+  <!-- END tabla de totales de ingresos -->
+  <div class="row fit" style="border: 0px solid red">
+    <!-- tabla de totales de egresos -->
+    <q-table
+      class="my-sticky-header-table"
+      style="width: 100%"
+      flat
+      bordered
+      v-model:pagination="pagination"
+      :rows-per-page-options="[0]"
+      dense
+      :rows="listaMovimientos"
+      :columns="columnsT"
+      row-key="id"
+      :filter="filter"
+      separator="horizontal"
+      hide-botton
+      hide-pagination
+    >
+      <!-- <template #header>
+          <q-th>
+            <q-td> HI </q-td>
+          </q-th>
+        </template> -->
+      <template #top-right>
+        <div class="bg-white">
+          <q-input
+            outlined
             dense
-            :props="props"
-            :class="{
-              'table__body-totals': props.row.categoria_id === 1,
-              'table__body-preBalance': props.row.categoria_id === 2
-            }"
+            debounce="300"
+            v-model="filter"
+            placeholder="Buscar Gasto"
           >
+            <template #append>
+              <q-icon name="search" />
+            </template>
+          </q-input>
+        </div>
+      </template>
+      <template #header="props">
+        <q-tr :props="props">
+          <q-th
+            class="bg-white table__header"
+            v-for="col in props.cols"
+            :key="col.name"
+            :props="props"
+          >
+            <span> {{ col.periodo_id === 0 ? 'EGRESOS' : col.label }}</span>
+            <q-btn
+              v-if="col.periodo_id === 0"
+              color="primary"
+              icon="add_circle"
+              dense
+              @click="addCategoria('2')"
+              flat
+            />
+          </q-th>
+        </q-tr>
+      </template>
+
+      <template v-slot:body-cell-nombre_categoria="props">
+        <q-td
+          dense
+          :props="props"
+          class="text-primary"
+          :style="`border-left: 5px solid ${props.row.color}`"
+        >
+          <q-icon :name="props.row.icono" size="22px" color="blue-grey-7" />
+
+          <span class="q-pl-sm movimientos__columna-categoria">
+            {{ props.value }}</span
+          >
+        </q-td>
+      </template>
+      <template v-slot:body-cell="props">
+        <q-td dense :props="props" clickable @click="addItem2(props)">
+          <span class="movimientos__celda--importe"> {{ props.value }}</span>
+        </q-td>
+      </template>
+    </q-table>
+  </div>
+  <div class="">
+    <q-table
+      :rows="saldosEgreso"
+      :columns="columnsT"
+      row-key="name"
+      hide-header
+      hide-bottom
+      separator="none"
+      dense
+    />
+  </div>
+  <!-- NET CASH PROCEDS and FINAL CASH BALANCE -->
+  <q-table
+    :rows="listaSaldosMovimientos"
+    :columns="columnsT"
+    row-key="name"
+    hide-header
+    hide-bottom
+    separator="none"
+    dense
+  >
+    <template #body-cell="props">
+      <q-td
+        dense
+        :props="props"
+        :class="{
+          'table__body-totals': props.row.categoria_id === 1,
+          'table__body-preBalance': props.row.categoria_id === 2
+        }"
+      >
+        {{ props.value }}
+      </q-td>
+    </template>
+  </q-table>
+  <div class="row fit" style="border: 0px solid red">
+    <!-- LISTA DE CUENTAS BANCARIAS -->
+    <q-table
+      style="width: 100%"
+      flat
+      bordered
+      v-model:pagination="pagination"
+      :rows-per-page-options="[0]"
+      dense
+      :rows="listaSaldosCuentas"
+      :columns="columnsT"
+      row-key="id"
+      :filter="filter"
+      separator="none"
+      hide-pagination
+      hide-bottom
+      hide-header
+    >
+      <template #header="props">
+        <q-tr :props="props" class="movimientos__headers-background">
+          <q-th v-for="col in props.cols" :key="col.name" :props="props">
+            <span class="movimientos__headers-font"> {{ col.label }}</span>
+          </q-th>
+        </q-tr>
+      </template>
+      <template v-slot:body-cell-nombre_categoria="props">
+        <q-td
+          dense
+          :props="props"
+          :style="`border-left: 5px solid ${props.row.color}`"
+        >
+          <q-icon :name="props.row.icono" size="22px" color="dark" />
+          <span class="q-pl-sm movimientos__columna-categoria">
             {{ props.value }}
-          </q-td>
-        </template>
-      </q-table>
-    </div>
-    <div class="row fit" style="border: 0px solid red">
-      <!-- LISTA DE CUENTAS BANCARIAS -->
-      <q-table
-        style="width: 100%"
-        flat
-        bordered
-        v-model:pagination="pagination"
-        :rows-per-page-options="[0]"
-        dense
-        :rows="listaSaldosCuentas"
-        :columns="columnsIngresos"
-        row-key="id"
-        :filter="filter"
-        separator="none"
-        hide-pagination
-        hide-bottom
-        hide-header
-      >
-        <template #header="props">
-          <q-tr :props="props" class="movimientos__headers-background">
-            <q-th v-for="col in props.cols" :key="col.name" :props="props">
-              <span class="movimientos__headers-font"> {{ col.label }}</span>
-            </q-th>
-          </q-tr>
-        </template>
-        <template v-slot:body-cell-nombre_categoria="props">
-          <q-td
-            dense
-            :props="props"
-            :style="`border-left: 5px solid ${props.row.color}`"
-          >
-            <q-icon :name="props.row.icono" size="22px" color="dark" />
-            <span class="q-pl-sm movimientos__columna-categoria">
-              {{ props.value }}
-            </span>
-          </q-td>
-        </template>
-        <template v-slot:body-cell="props">
-          <q-td dense :props="props">
-            <span class="movimientos__celda--importe"> {{ props.value }}</span>
-          </q-td>
-        </template>
-      </q-table>
-    </div>
-    <div class="">
-      <!-- Total Cash bank account & Net Balance -->
-      <q-table
-        :rows="listaSaldosFinales"
-        :columns="columnsIngresos"
-        row-key="name"
-        hide-header
-        hide-bottom
-        separator="cell"
-        dense
-      >
-        <template #body-cell="props">
-          <q-td
-            dense
-            :props="props"
-            :class="{
-              'table__body-netBalance': props.row.categoria_id === 2,
-              'table__body-preBalance': props.row.categoria_id === 1
-            }"
-          >
-            {{ props.value }}
-          </q-td>
-        </template>
-      </q-table>
-    </div>
+          </span>
+        </q-td>
+      </template>
+      <template v-slot:body-cell="props">
+        <q-td dense :props="props">
+          <span class="movimientos__celda--importe"> {{ props.value }}</span>
+        </q-td>
+      </template>
+    </q-table>
+  </div>
+  <div class="">
+    <!-- Total Cash bank account & Net Balance -->
+    <q-table
+      :rows="listaSaldosFinales"
+      :columns="columnsT"
+      row-key="name"
+      hide-header
+      hide-bottom
+      separator="cell"
+      dense
+    >
+      <template #body-cell="props">
+        <q-td
+          dense
+          :props="props"
+          :class="{
+            'table__body-netBalance': props.row.categoria_id === 2,
+            'table__body-preBalance': props.row.categoria_id === 1
+          }"
+        >
+          {{ props.value }}
+        </q-td>
+      </template>
+    </q-table>
   </div>
 
   <Teleport to="#modal">
@@ -311,8 +313,6 @@
         @movimientoUpdated="movimientoUpdated"
       ></FormCuentaRegistro>
     </q-dialog>
-  </Teleport>
-  <Teleport to="#modal">
     <q-dialog
       v-model="show_movimientos"
       persistent
@@ -427,9 +427,7 @@ const showFormItem = ref(false)
 const show_movimientos = ref(false)
 const cellData = ref({})
 
-const columnsIngresos = ref([])
-const columnsEgresos = ref([])
-const columnsSaldos = ref([])
+const columnsT = ref([])
 const showRegistroCategoria = ref(false)
 const registroCategoriaItem = ref()
 /**
@@ -496,12 +494,6 @@ function addCategoria(tipoMovimientoId) {
   showRegistroCategoria.value = true
 }
 
-function editRow(item) {
-  editedItem.value = JSON.parse(JSON.stringify(item.row))
-  editedIndex.value = item.rowIndex
-  console.log('Editar elemento...', editedItem.value, editedIndex.value)
-  showFormItem.value = true
-}
 function obtenerColumnas(ejercicio_fiscal, mes) {
   api
     .get('/columnas', {
@@ -511,38 +503,21 @@ function obtenerColumnas(ejercicio_fiscal, mes) {
       }
     })
     .then(({ data }) => {
-      columnsIngresos.value = JSON.parse(JSON.stringify(data.data))
-      columnsEgresos.value = JSON.parse(JSON.stringify(data.data))
-      columnsSaldos.value = JSON.parse(JSON.stringify(data.data))
+      columnsT.value = JSON.parse(JSON.stringify(data.data))
 
-      console.table(columnsIngresos.value)
-
-      columnsIngresos.value.forEach((column) => {
+      columnsT.value.forEach((column) => {
         if (column.name != 'nombre_categoria') {
-          column.format = (val, row) =>
-            !!val ? `${formato.toCurrency(val)}` : ''
-        } else {
+          column.format = (val) => (!!val ? `${formato.toCurrency(val)}` : '')
         }
-      })
-      columnsEgresos.value.forEach((column) => {
-        if (column.name != 'nombre_categoria') {
-          column.format = (val, row) =>
-            !!val ? `${formato.toCurrency(val)}` : ''
-        } else {
-        }
-      })
-      columnsSaldos.value.forEach((element) => {
-        if (element.name != 'nombre_categoria') {
-          element.format = (val, row) =>
-            !!val ? `${formato.toCurrency(val)}` : ''
-        }
-        element.classes = 'table__body-totals'
       })
     })
     .catch((error) => {
       console.log('error', error)
     })
 }
+/**
+ *
+ */
 function obtenerMovimientos() {
   api
     .get('/movimientos', {
@@ -756,7 +731,11 @@ onErrorDeleteMovimiento((error) => {
 })
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+body {
+  background: white;
+}
+
 @function color-texto($color) {
   @if (lightness($color) > 50) {
     @return rgb(51, 149, 162);
@@ -808,7 +787,7 @@ onErrorDeleteMovimiento((error) => {
 }
 .my-sticky-header-table {
   /* height or max-height is important */
-  height: calc(100vh - 580px);
+  height: calc(100vh - 615px);
 
   .q-table__top,
   .q-table__bottom,
@@ -830,6 +809,13 @@ onErrorDeleteMovimiento((error) => {
     top: 48px;
   }
 }
+.table__header {
+  font-size: 0.68rem !important;
+  font-weight: bold;
+  color: $dark;
+  border-bottom: 1px solid #aaaaaa !important;
+  // border: 1px solid red;
+}
 .table__body-preBalance {
   // Final cash balance
   font-family: 'Roboto Condensed', 'Open Sans', sans-serif;
@@ -843,11 +829,14 @@ onErrorDeleteMovimiento((error) => {
   font-size: 1.2rem;
 }
 
+/**
+* CSS para los totales de cada tabla
+*/
 .table__body-totals {
   font-family: 'Roboto Condensed', 'Open Sans', sans-serif;
   font-weight: bold;
-  background-color: #e8edf7 !important;
-  font-size: 0.85rem !important;
+  background-color: #213872 !important;
+  font-size: 0.8rem !important;
   font-style: italic;
 }
 

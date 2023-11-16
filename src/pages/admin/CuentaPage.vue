@@ -147,6 +147,9 @@
             table-header-class="bg-primary-light text-accent text-condensed"
             separator="horizontal"
             hide-pagination
+            :selected="selectedItems"
+            selection="multiple"
+            row-key="id"
           >
             <template #top-left>
               <q-tr class="cuenta__data-subtitle">
@@ -330,8 +333,8 @@
       <ImportarRegistrosCuenta
         :cuenta="cuenta"
         @items-saved="itemsSaved"
-        :fecha_desde="fecha_inicio"
-        :fecha_hasta="fecha_fin"
+        :fecha_desde="variables.fechaInicio"
+        :fecha_hasta="variables.fechaFin"
       ></ImportarRegistrosCuenta>
     </q-dialog>
   </Teleport>
@@ -343,7 +346,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { DateTime } from 'luxon'
 import { api } from 'src/boot/axios'
 import { LISTA_REGISTROS } from 'src/graphql/registros'
-import { useLazyQuery, useQuery } from '@vue/apollo-composable'
+import { useQuery } from '@vue/apollo-composable'
 import { useFormato } from 'src/composables/utils/useFormato'
 import { useRegistrosCrud } from 'src/composables/useRegistrosCrud'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
@@ -365,8 +368,8 @@ const traspasosCrud = useTraspasosCrud()
 /**
  * state
  */
-const fecha_inicio = ref('1900-01-01')
-const fecha_fin = ref('1900-01-01')
+// const fecha_inicio = ref('1900-01-01')
+// const fecha_fin = ref('1900-01-01')
 const dia_corte = ref(0)
 
 const listaRegistros = ref([])
@@ -380,17 +383,18 @@ const registroEditedItem = ref([
 ])
 
 const showForm = ref(false)
-const showFormMSI = ref(false)
 const showFormCarga = ref(false)
-
 const cuenta = ref({})
 const ejercicio_fiscal = ref(0)
 const mes = ref({})
-const saldo_anterior = ref(0)
-const editRegistroItem = ref(null)
+const selectedItems = ref([])
 
-const graphql_options = ref({
-  fetchPolicy: 'network-only'
+const variables = reactive({
+  categoriaId: null,
+  cuentaId: route.params.id,
+  fechaInicio: '',
+  fechaFin: '',
+  isMsi: null
 })
 
 /**
@@ -415,16 +419,16 @@ function cargarDatosCuenta(cuenta_id, is_inicio) {
     cuenta.value = response?.data.data ?? {}
     dia_corte.value = cuenta.value.dia_corte
     if (is_inicio) {
-      cargaListaRegistros(
-        null,
-        {
-          cuentaId: route.params.id?.toString() || 0,
-          categoriaId: null,
-          fechaInicio: fecha_inicio.value,
-          fechaFin: fecha_fin.value
-        },
-        graphqlOptions
-      )
+      // cargaListaRegistros(
+      //   null,
+      //   {
+      //     cuentaId: route.params.id?.toString() || 0,
+      //     categoriaId: null,
+      //     fechaInicio: fecha_inicio.value,
+      //     fechaFin: fecha_fin.value
+      //   },
+      //   graphqlOptions
+      // )
     }
     fetchOrRefetchSaldoFinalPeriodo()
   })
@@ -432,6 +436,18 @@ function cargarDatosCuenta(cuenta_id, is_inicio) {
 function fetchOrRefetchSaldoFinalPeriodo() {
   refetchSaldoAFecha()
 }
+/**
+ * graphql
+ */
+const graphqlOptions = reactive({
+  fetchPolicy: 'no-cache'
+})
+
+const {
+  onError: onErrorListaRegistros,
+  onResult: onResultListaRegistros,
+  refetch: refetchListaRegistros
+} = useQuery(LISTA_REGISTROS, variables, graphqlOptions)
 /**
  * computed
  */
@@ -509,42 +525,30 @@ const periodoFin = computed({
     return ''
   }
 })
-const isCuentaAhorros = computed({
-  get() {
-    return cuenta.value?.tipo_cuenta_id === 1
-  }
-})
 
 const fecha_registro = computed({
   get() {
-    const begin_date = DateTime.fromISO(fecha_inicio.value)
-    const end_date = DateTime.fromISO(fecha_fin.value)
+    const begin_date = DateTime.fromISO(variables.fechaInicio)
+    const end_date = DateTime.fromISO(variables.fechaFin)
     const today = DateTime.now()
 
     return begin_date <= today && today <= end_date
       ? undefined
-      : fecha_fin.value
+      : variables.fechaFin
   }
 })
-/**
- * graphql
- */
-const graphqlOptions = reactive({
-  fetchPolicy: 'no-cache'
-})
-const {
-  onError: onErrorListaRegistros,
-  onResult: onResultListaRegistros,
-  load: cargaListaRegistros,
-  refetch: refetchListaRegistros
-} = useLazyQuery(LISTA_REGISTROS)
 
 onResultListaRegistros(({ data }) => {
+  console.log('onResultListaRegistros en CuentaPage...')
   listaRegistros.value = data?.obtenerRegistros ?? []
 })
 
 onErrorListaRegistros((error) => {
-  console.error('response', error)
+  console.log(error.graphQLErrors)
+  console.log(error.networkError)
+  if (process.env.NODE_ENV !== 'production') {
+    logErrorMessages(error)
+  }
 })
 
 const {
@@ -647,12 +651,12 @@ traspasosCrud.onDoneTraspasoDelete(({ data }) => {
 })
 
 function obtener_fecha_inicio() {
-  fecha_inicio.value = `${ejercicio_fiscal.value}-${('0' + mes.value.id).slice(
-    -2
-  )}-01`
+  variables.fechaInicio = `${ejercicio_fiscal.value}-${(
+    '0' + mes.value.id
+  ).slice(-2)}-01`
 }
 function obtener_fecha_fin() {
-  fecha_fin.value = `${ejercicio_fiscal.value}-${('0' + mes.value.id).slice(
+  variables.fechaFin = `${ejercicio_fiscal.value}-${('0' + mes.value.id).slice(
     -2
   )}-${dia_corte_final.value}`
 }
@@ -670,25 +674,28 @@ function onChangeEjercicio(ejercicio_fiscal) {
  * Lista de registros de la tarjeta
  */
 function obtenerListaRegistros() {
+  console.log('obtenerListaRegistros()')
   const fechaInicio = `${ejercicio_fiscal.value}-${(
     '0' + mes_inicial_id.value
   ).slice(-2)}-01`
   const fechaFin = `${ejercicio_final_id.value}-${(
     '0' + mes_final_id.value
   ).slice(-2)}-${dia_corte_final.value}`
-  // console.log('fechaInicio', fechaInicio)
-  // console.log('fechaFin', fechaFin)
-  cargaListaRegistros(
-    null,
-    {
-      categoriaId: null,
-      cuentaId: route.params.id,
-      fechaInicio,
-      fechaFin,
-      isMsi: null
-    },
-    graphqlOptions
-  )
+
+  console.log('fechaInicio', fechaInicio)
+  console.log('fechaFin', fechaFin)
+
+  // cargaListaRegistros(
+  //   null,
+  //   {
+  //     categoriaId: null,
+  //     cuentaId: route.params.id,
+  //     fechaInicio,
+  //     fechaFin,
+  //     isMsi: null
+  //   },
+  //   graphqlOptions
+  // )
 }
 
 function importarMovimientos() {

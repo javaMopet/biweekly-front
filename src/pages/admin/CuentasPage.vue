@@ -114,18 +114,10 @@
                     </q-avatar>
                   </div>
                   <div class="col-8" @click="abrirMovimientos(props)">
-                    <div class="row cuenta__title">
+                    <div class="row cuenta-card__title">
                       {{ props.row.nombre }}
                     </div>
                     <div class="row cuenta__subtitle">
-                      <!-- **** **** **** {{ props.row.identificador }} -->
-                      <!-- <router-link
-                      :to="{
-                        name: 'cuenta',
-                        params: { id: props.row.id }
-                      }"
-                      class="tarjeta__credito--link cuenta__subtitle"
-                    > -->
                       <div
                         class="fit flex flex-left text-left non-selectable"
                         v-if="props.row.identificador !== ''"
@@ -133,7 +125,6 @@
                         **** **** **** {{ props.row.identificador }}
                       </div>
                       <q-tooltip> Abrir movimientos </q-tooltip>
-                      <!-- </router-link> -->
                     </div>
                     <div class="row text-condensed text-blue-grey-4">
                       {{ props.row.cuentaContable.nombreCompleto }}
@@ -177,7 +168,7 @@
                 </div>
                 <div
                   class="row inline full-width items-center justify-between q-pt-md"
-                  style="border-top: 1px solid grey"
+                  style="border-top: 1px solid #dddddd"
                 >
                   <div class="col" style="cursor: normal">
                     <q-btn
@@ -456,6 +447,11 @@ function cuentaUpdated(itemUpdated) {
 </script>
 
 <style lang="scss">
+.cuenta-card__title {
+  text-decoration: underline;
+  font-size: 1.1rem;
+  color: $dark;
+}
 .cuenta__card--descripcion {
   font-size: 0.8rem !important;
   // color: rgb(85, 85, 103) !important;
@@ -474,6 +470,6 @@ function cuentaUpdated(itemUpdated) {
   font-size: 0.75rem;
   font-weight: 400;
   color: $positive !important;
-  // background-color: $primary;
+  // text-decoration: underline;
 }
 </style>
