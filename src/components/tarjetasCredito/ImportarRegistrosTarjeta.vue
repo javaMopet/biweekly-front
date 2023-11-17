@@ -1,20 +1,8 @@
 <template>
   <q-card class="my-card" dense style="width: 80%; min-width: 80%">
-    <q-card-section class="row justify-between items-start dialog-title">
-      <div class="dialog__title--name">
-        Tarjeta de crédito &nbsp;&nbsp;~ {{ cuenta.nombre }} ~
-      </div>
-      <div class="dialog-closebutton">
-        <q-btn
-          round
-          icon="close"
-          class="dialog__title--closeButton"
-          v-close-popup
-          push
-          glossy
-        ></q-btn>
-      </div>
-    </q-card-section>
+    <DialogTitle
+      >Tarjeta de crédito &nbsp;&nbsp;~ {{ cuenta.nombre }} ~</DialogTitle
+    >
     <q-card-section>
       <q-toolbar class="q-gutter-x-md">
         <div class="row q-pr-lg justify-between">
@@ -199,6 +187,7 @@ import { api } from 'src/boot/axios'
 import { DateTime } from 'luxon'
 import DateInput from '../formComponents/DateInput.vue'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
+import DialogTitle from '../formComponents/modal/DialogTitle.vue'
 
 /**
  * state

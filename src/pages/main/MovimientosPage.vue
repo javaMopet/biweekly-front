@@ -7,7 +7,7 @@
     row-key="id"
     :filter="filter"
     :rows-per-page-options="[0]"
-    separator="horizontal"
+    separator="none"
     :class="{
       'my-sticky-header-table-ingreso': listaMovimientosIngreso.length > 4
     }"
@@ -87,7 +87,7 @@
       </q-td>
     </template>
     <template v-slot:body-cell="props">
-      <q-td dense :props="props" clickable @click="addItem2(props)">
+      <q-td dense :props="props" clickable @click="addItem(props)">
         <span class="movimientos__celda--importe"> {{ props.value }}</span>
       </q-td>
     </template>
@@ -120,7 +120,7 @@
     :columns="columnsT"
     row-key="id"
     :filter="filter"
-    separator="horizontal"
+    separator="none"
     hide-botton
     hide-pagination
   >
@@ -175,7 +175,7 @@
       </q-td>
     </template>
     <template v-slot:body-cell="props">
-      <q-td dense :props="props" clickable @click="addItem2(props)">
+      <q-td dense :props="props" clickable @click="addItem(props)">
         <span class="movimientos__celda--importe"> {{ props.value }}</span>
       </q-td>
     </template>
@@ -222,9 +222,6 @@
   <!--  -->
   <!-- LISTA DE CUENTAS BANCARIAS -->
   <q-table
-    style="width: 100%"
-    flat
-    bordered
     v-model:pagination="pagination"
     :rows-per-page-options="[0]"
     dense
@@ -247,7 +244,7 @@
     </template>
     <template v-slot:body-cell="props">
       <q-td dense :props="props">
-        <span class="movimientos__celda--importe"> {{ props.value }}</span>
+        <span class="cuentas__celda--importe"> {{ props.value }}</span>
       </q-td>
     </template>
   </q-table>
@@ -365,12 +362,10 @@ const defaultItem = {
 const pagination = ref({
   rowsPerPage: 0
 })
-const periodoOptions = ref([
-  { id: 1, nombre: 'Quincenal' },
-  { id: 2, nombre: 'Mensual' }
-])
-
-const periodo = ref(periodoOptions.value[0])
+// const periodoOptions = ref([
+//   { id: 1, nombre: 'Quincenal' },
+//   { id: 2, nombre: 'Mensual' }
+// ])
 
 const mesOptions = ref([
   { id: 1, nombre: 'Enero' },
@@ -434,15 +429,11 @@ function cargarDatos() {
 /**
  * METHODS
  */
-function addItem(tipo_movimiento) {
-  editedItem.value = { ...defaultItem, tipoMovimientoId: tipo_movimiento }
-  editedIndex.value = null
-  showFormItem.value = true
-}
-function addItem2(props) {
+//
+function addItem(props) {
   const row = { ...props.row }
   const col = { ...props.col }
-  // console.log('row', row)
+  console.log('row', row)
   // console.log('col', col)
   cellData.value = {
     categoriaId: row.categoria_id,
@@ -649,32 +640,6 @@ function obtenerSaldosFinales() {
     })
 }
 
-function deleteRow(item) {
-  rowIndexDelete.value = item.rowIndex
-  $q.dialog({
-    title: 'Confirmar',
-    style: 'width:500px',
-    message: ` ¿Confirme si desea eliminar la movimiento "${item.row.nombre}"?`,
-    ok: {
-      push: true,
-      color: 'positive',
-      label: 'Continuar'
-    },
-    cancel: {
-      push: true,
-      color: 'negative',
-      flat: true,
-      label: 'cancelar'
-    },
-    persistent: true
-  })
-    .onOk(() => {
-      deleteMovimiento({ id: item.row.id })
-    })
-    .onCancel(() => {})
-    .onDismiss(() => {})
-}
-
 function movimientoSaved(itemSaved) {
   showFormItem.value = false
   listaMovimientos.value.push(itemSaved)
@@ -793,19 +758,21 @@ body {
 .my-sticky-header-table {
   /* height or max-height is important */
   height: calc(100vh - 635px);
-  background: white !important;
+  // background: white !important;
 
   .q-table__top,
   .q-table__bottom,
   thead tr:first-child th {
     /* bg color is important for th; just specify one */
-    background-color: $main-background;
+    // background-color: $main-background;
     // background: white !important;
+  }
+  thead tr {
+    background: $main-background !important;
   }
   thead tr th {
     position: sticky;
     z-index: 1;
-    // background: white !important;
   }
   thead tr:first-child th {
     top: 0;
@@ -820,7 +787,7 @@ body {
 .table__header {
   font-size: 0.68rem !important;
   font-weight: bold;
-  color: $dark;
+  color: #5d6779;
   border-bottom: 1px solid #aaaaaa !important;
   // border: 1px solid red;
 }
@@ -866,6 +833,14 @@ body {
   color: #000000;
   // border: 0px solid white !important;
 }
+.cuentas__celda--importe {
+  cursor: normal;
+  font-family: 'Roboto Slab', 'Open Sans', sans-serif;
+  font-size: 0.75rem !important;
+  font-weight: 300 !important;
+  color: #123d52;
+  // border: 0px solid white !important;
+}
 .movimientos__headers-font {
   font-size: 0.65rem;
   color: #748097 !important;
@@ -877,7 +852,7 @@ body {
 }
 .movimientos__columna-categoria {
   font-family: 'DM Sans', sans-serif;
-  font-weight: 500 !important;
+  font-weight: 400 !important;
   font-size: 0.78rem;
   color: $categoria;
 }

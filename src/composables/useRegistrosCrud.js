@@ -7,8 +7,13 @@ import {
   REGISTROS_DELETE,
   IMPORTAR_REGISTROS
 } from 'src/graphql/registros'
+import { useCuentasCrud } from './useCuentasCrud'
 
 export function useRegistrosCrud() {
+  /**
+   * composables
+   */
+  const cuentaCrud = useCuentasCrud()
   /**
    * GRAPHQL
    */
@@ -18,8 +23,8 @@ export function useRegistrosCrud() {
 
   const {
     mutate: createRegistro,
-    onDone: onDoneCreate,
-    onError: onErrorCreate
+    onDone: onDoneRegistroCreate,
+    onError: onErrorRegistroCreate
   } = useMutation(REGISTRO_CREATE)
 
   const {
@@ -30,8 +35,8 @@ export function useRegistrosCrud() {
 
   const {
     mutate: deleteRegistro,
-    onDone: onDoneDelete,
-    onError: onErrorDelete
+    onDone: onDoneRegistroDelete,
+    onError: onErrorRegistroDelete
   } = useMutation(REGISTRO_DELETE)
 
   const {
@@ -46,18 +51,33 @@ export function useRegistrosCrud() {
     onError: onErrorImportarRegistros
   } = useMutation(IMPORTAR_REGISTROS)
 
+  onDoneRegistroCreate(({ data }) => {
+    console.log('registro creado', data)
+    const itemCreated = data.registroCreate.registro
+    cuentaCrud.cuentaSaldoUpdate({ cuentaId: itemCreated.cuenta.id })
+  })
+  onDoneRegistroUpdate(({ data }) => {
+    console.log('registro actualizado', data)
+    const itemUpdated = data.registroUpdate.registro
+    cuentaCrud.cuentaSaldoUpdate({ cuentaId: itemUpdated.cuenta.id })
+  })
+  onDoneRegistroDelete(({ data }) => {
+    console.log('registro actualizado', data)
+    const itemDeleted = data.registroDelete.registro
+    cuentaCrud.cuentaSaldoUpdate({ cuentaId: itemDeleted.cuenta.id })
+  })
   return {
     createRegistro,
     importarRegistros,
-    onDoneCreate,
+    onDoneRegistroCreate,
     onDoneImportarRegistros,
-    onErrorCreate,
     onErrorImportarRegistros,
     deleteRegistro,
-    onDoneDelete,
-    onErrorDelete,
+    onDoneRegistroDelete,
+    onErrorRegistroDelete,
     registroUpdate,
     onDoneRegistroUpdate,
+    onErrorRegistroCreate,
     onErrorRegistroUpdate,
     registrosDelete,
     onDoneRegistrosDelete,

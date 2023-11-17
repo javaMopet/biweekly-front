@@ -15,7 +15,8 @@
       </div>
     </div>
     <div class="q-px-xl q-pt-xl q-pb-lg">
-      <q-form @submit="saveItem" class="q-gutter-y-md form-componente__body">
+      <!-- form-componente__body -->
+      <q-form @submit="saveItem" class="q-gutter-y-md">
         <div class="q-py-lg">
           <q-btn-toggle
             class="text-condensed"
@@ -125,6 +126,7 @@ import { useRegistrosCrud } from 'src/composables/useRegistrosCrud'
 import { useTraspasosCrud } from 'src/composables/useTraspasosCrud'
 import { SessionStorage } from 'quasar'
 import { useTipoMovimientoStore } from 'src/stores/common/useTipoMovimientoStore'
+import { useNotificacion } from 'src/composables/utils/useNotificacion'
 
 /**
  * composables
@@ -133,6 +135,7 @@ const formato = useFormato()
 const registrosCrud = useRegistrosCrud()
 const traspasosCrud = useTraspasosCrud()
 const tipoMovimientoStore = useTipoMovimientoStore()
+const notificacion = useNotificacion()
 
 /**
  * state
@@ -210,10 +213,17 @@ onErrorCreateTransferencia((error) => {
   console.error(error)
 })
 
-registrosCrud.onDoneCreate(({ data }) => {
+registrosCrud.onDoneRegistroCreate(({ data }) => {
   const item = data.registroCreate.registro
   emit('itemSaved', item)
 })
+registrosCrud.onErrorRegistroCreate((error) => {
+  notificacion.mostrarNotificacionNegativa(
+    'Surgió un error al intentar guardar el movimientos',
+    1600
+  )
+})
+
 traspasosCrud.onDoneTraspasoCreate(({ data }) => {
   emit('itemSaved')
 })
@@ -344,7 +354,7 @@ function saveItem() {
     }
     console.log('saveItem input:', input)
     if (!!editedFormItem.value.id) {
-      registrosCrud.updateItem({
+      registrosCrud.registroUpdate({
         id: editedFormItem.value.id,
         input
       })

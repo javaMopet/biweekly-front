@@ -99,7 +99,10 @@ export const REGISTRO_DELETE = gql`
     registroDelete(id: $id) {
       registro {
         id
-        cuentaId
+        cuenta {
+          id
+          nombre
+        }
         estadoRegistroId
       }
     }

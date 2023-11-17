@@ -1,21 +1,12 @@
 <template>
-  <q-card class="my-card" style="width: 450px">
-    <q-card-section class="row justify-between items-start dialog-title">
-      <div class="dialog__title--name">{{ actionName }}</div>
-      <div class="dialog-closebutton">
-        <q-btn
-          round
-          icon="close"
-          class="dialog__title--closeButton"
-          v-close-popup
-          push
-        ></q-btn>
-      </div>
-    </q-card-section>
-    <q-card-section class="q-mx-lg">
-      <q-form @submit="saveItem" class="q-gutter-md">
-        <div class="column">
-          <div class="row input-label">Categoría:</div>
+  <div class="my-card" style="width: 450px; min-width: 450px">
+    <DialogTitle>{{ actionName }}</DialogTitle>
+    <div class="main-content q-pt-md" style="border: 0px solid red">
+      <q-form
+        @submit="saveItem"
+        class="q-gutter-y-md q-mt-xs form-componente__body"
+      >
+        <div style="border: 0px solid red">
           <CategoriaSelect
             v-model="editedFormItem.categoria"
             :rules="[(val) => !!val || 'Selecciona una categoría']"
@@ -25,7 +16,6 @@
 
           <div class="row inline q-gutter-x-xs">
             <div class="col column">
-              <div class="row input-label">Fecha de registro:</div>
               <DateInput
                 v-model="editedFormItem.fecha"
                 :rules="[
@@ -36,7 +26,6 @@
               ></DateInput>
             </div>
             <div class="col column">
-              <div class="row input-label">Importe:</div>
               <PriceInput
                 label="Importe"
                 v-model="editedFormItem.importe"
@@ -69,7 +58,6 @@
             />
           </div>
           <div class="">
-            <div class="row input-label">Observaciones:</div>
             <q-input
               color="secondary"
               v-model="editedFormItem.concepto"
@@ -89,9 +77,9 @@
         </div>
       </q-form>
       <!-- <pre>{{ props.fecha }}</pre> -->
-    </q-card-section>
+    </div>
     <q-card-section> </q-card-section>
-  </q-card>
+  </div>
 </template>
 
 <script setup>
@@ -101,16 +89,19 @@ import PriceInput from '../formComponents/PriceInput.vue'
 import CategoriaSelect from '../formComponents/CategoriaSelect.vue'
 import { DateTime } from 'luxon'
 import { useFormato } from 'src/composables/utils/useFormato'
-import {
-  CREATE_REGISTRO_TARJETA,
-  UPDATE_REGISTRO_TARJETA
-} from 'src/graphql/registrosTarjeta'
+// import {
+//   CREATE_REGISTRO_TARJETA,
+//   UPDATE_REGISTRO_TARJETA
+// } from 'src/graphql/registrosTarjeta'
 import { useMutation } from '@vue/apollo-composable'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
+import { useRegistrosTarjetaCrud } from 'src/composables/useRegistrosTarjetaCrud'
+import DialogTitle from '../formComponents/modal/DialogTitle.vue'
 
 /**
  * composables
  */
+const registrosTarjetaCrud = useRegistrosTarjetaCrud()
 const formato = useFormato()
 const notificacion = useNotificacion()
 
@@ -174,17 +165,17 @@ const emit = defineEmits(['registroCreated', 'registroUpdated'])
  * grapqhl
  */
 
-const {
-  mutate: createRegistroTarjeta,
-  onDone: onDoneCreateRegistroTarjeta,
-  onError: onErrorCreateRegistroTarjeta
-} = useMutation(CREATE_REGISTRO_TARJETA)
+// const {
+//   mutate: createRegistroTarjeta,
+//   onDone: onDoneCreateRegistroTarjeta,
+//   onError: onErrorCreateRegistroTarjeta
+// } = useMutation(CREATE_REGISTRO_TARJETA)
 
-const {
-  mutate: updateRegistroTarjeta,
-  onDone: onDoneUpdateRegistroTarjeta,
-  onError: onErrorUpdateRegistroTarjeta
-} = useMutation(UPDATE_REGISTRO_TARJETA)
+// const {
+//   mutate: updateRegistroTarjeta,
+//   onDone: onDoneUpdateRegistroTarjeta,
+//   onError: onErrorUpdateRegistroTarjeta
+// } = useMutation(UPDATE_REGISTRO_TARJETA)
 /**
  * Guardar movimiento a tarjeta
  */
@@ -211,7 +202,7 @@ function saveItem() {
     if (!!editedFormItem.value.id) {
       updateRegistroTarjeta({ id: editedFormItem.value.id, input })
     } else {
-      createRegistroTarjeta({ input })
+      registrosTarjetaCrud.createRegistroTarjeta({ input })
     }
   } else {
     notificacion.mostrarNotificacionNegativa(
@@ -221,16 +212,19 @@ function saveItem() {
   }
 }
 
-onDoneCreateRegistroTarjeta(({ data }) => {
+registrosTarjetaCrud.onDoneRegistroTarjetaCreate(({ data }) => {
   const item = data?.registroTarjetaCreate?.registroTarjeta
   console.log('item guardado', item)
   emit('registroCreated', item)
 })
-onErrorCreateRegistroTarjeta((error) => {
-  console.log('error', error)
-  console.log('error', error.graphQLErrors[0].extensions)
+
+registrosTarjetaCrud.onErrorRegistroTarjetaCreate((error) => {
+  console.trace(error)
+  // console.log('error', error)
+  // console.log('error', error.graphQLErrors[0].extensions)
 })
-onDoneUpdateRegistroTarjeta(({ data }) => {
+
+registrosTarjetaCrud.onDoneRegistroTarjetaUpdate(({ data }) => {
   const item = data?.registroTarjetaUpdate?.registroTarjeta
   console.log('item guardado', item)
   emit('registroUpdated', item)

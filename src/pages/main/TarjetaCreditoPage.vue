@@ -43,7 +43,7 @@
   </q-card>
   <div class="main-content">
     <div class="cuenta-content">
-      <q-toolbar>
+      <q-toolbar class="q-pt-md">
         <div class="row q-gutter-x-sm">
           <div class="row q-gutter-x-md q-px-md">
             <q-select
@@ -351,6 +351,9 @@
         </q-card-section>
       </q-card>
     </div>
+    <!-- <div class="">
+      <pre> {{ listaRegistrosVariables }} </pre>
+    </div> -->
   </div>
 
   <Teleport to="#modal">
@@ -360,16 +363,14 @@
       transition-show="jump-up"
       transition-hide="jump-down"
     >
-      <RegistroMovimientoTarjeta
+      <FormRegistroMovimientoTarjeta
         :cuenta-id="cuenta.id"
         :registro-edited-item="registroEditedItem"
         @registro-created="registroCreated"
         @registro-updated="registroUpdated"
         :fecha="fecha_registro"
-      ></RegistroMovimientoTarjeta>
+      ></FormRegistroMovimientoTarjeta>
     </q-dialog>
-  </Teleport>
-  <Teleport to="#modal">
     <q-dialog
       v-model="showFormMSI"
       persistent
@@ -381,8 +382,6 @@
         @registroUpdated="registroMsiUpdated"
       ></RegistroMesesSinInteres>
     </q-dialog>
-  </Teleport>
-  <Teleport to="#modal">
     <q-dialog
       v-model="showFormCarga"
       persistent
@@ -396,8 +395,6 @@
         :fecha_hasta="fechaFinPeriodo"
       ></ImportarRegistrosTarjeta>
     </q-dialog>
-  </Teleport>
-  <Teleport to="#modal">
     <q-dialog
       v-model="showPagosTarjeta"
       persistent
@@ -421,13 +418,10 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { DateTime } from 'luxon'
-import RegistroMovimientoTarjeta from 'src/components/tarjetasCredito/RegistroMovimientoTarjeta.vue'
+import FormRegistroMovimientoTarjeta from 'src/components/tarjetasCredito/FormRegistroMovimientoTarjeta.vue'
 import { api } from 'src/boot/axios'
-import {
-  LISTA_REGISTROS_TARJETA,
-  DELETE_REGISTRO_TARJETA
-} from 'src/graphql/registrosTarjeta'
-import { useLazyQuery, useMutation } from '@vue/apollo-composable'
+import { LISTA_REGISTROS_TARJETA } from 'src/graphql/registrosTarjeta'
+import { useLazyQuery, useQuery } from '@vue/apollo-composable'
 import { useFormato } from 'src/composables/utils/useFormato'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import RegistroMesesSinInteres from 'src/components/tarjetasCredito/RegistroMesesSinInteres.vue'
@@ -435,18 +429,23 @@ import { useQuasar } from 'quasar'
 import PagosTarjeta from 'src/components/tarjetasCredito/PagosTarjeta.vue'
 import MesSelect from 'src/components/formComponents/MesSelect.vue'
 import ImportarRegistrosTarjeta from 'src/components/tarjetasCredito/ImportarRegistrosTarjeta.vue'
+import { useRegistrosTarjetaCrud } from 'src/composables/useRegistrosTarjetaCrud'
 
+/**
+ * composables
+ */
 const route = useRoute()
 const router = useRouter()
 const formato = useFormato()
 const notificacion = useNotificacion()
 const $q = useQuasar()
+const tarjetaRegistrosCrud = useRegistrosTarjetaCrud()
 
 /**
  * state
  */
-const fecha_inicio = ref('1900-01-01')
-const fecha_fin = ref('1900-01-01')
+// const fecha_inicio = ref('1900-01-01')
+// const fecha_fin = ref('1900-01-01')
 const dia_corte = ref(0)
 
 const listaRegistrosMsi = ref([])
@@ -472,8 +471,12 @@ const saldo_final_periodo = ref(0)
 const saldo_al_dia = ref(0)
 const editRegistroItem = ref(null)
 
-const graphql_options = ref({
-  fetchPolicy: 'network-only'
+const listaRegistrosVariables = reactive({
+  cuentaId: route.params.id,
+  fechaInicio: '',
+  fechaFin: '',
+  isMsi: null,
+  estadoRegistroTarjetaId: null
 })
 
 // const variables = reactive({
@@ -496,26 +499,26 @@ onMounted(() => {
 
   api.get(`/cuentas/${route.params.id}`).then((response) => {
     cuenta.value = response?.data.data ?? {}
-    // console.log('cuenta', cuenta.value)
     dia_corte.value = cuenta.value.dia_corte
+
+    obtenerFechasInicialFinal()
+
     obtenerSaldoAnterior()
     obtenerSaldoTarjeta()
     obtenerSaldoTarjetaAlDia()
-    obtener_fecha_inicio()
-    obtener_fecha_fin()
     // variables.fechaInicio = fecha_inicio.value
     // variables.fechaFin = fecha_fin.value
-    loadListaRegistros(
-      null,
-      {
-        cuentaId: route.params.id,
-        fechaInicio: fecha_inicio.value,
-        fechaFin: fecha_fin.value,
-        isMsi: null,
-        estadoRegistroTarjetaId: null
-      },
-      graphqlOptions
-    )
+    // loadListaRegistros(
+    //   null,
+    //   {
+    //     cuentaId: route.params.id,
+    //     fechaInicio: fecha_inicio.value,
+    //     fechaFin: fecha_fin.value,
+    //     isMsi: null,
+    //     estadoRegistroTarjetaId: null
+    //   },
+    //   graphqlOptions
+    // )
   })
 })
 
@@ -667,42 +670,44 @@ const graphqlOptions = reactive({
 })
 const {
   onError: onErrorListaRegistros,
-  onResult: onResultListaRegistros,
-  load: loadListaRegistros,
+  onResult: onResultListaRegistrosTarjeta,
   refetch: refetchListaRegistros
-} = useLazyQuery(LISTA_REGISTROS_TARJETA)
+} = useQuery(LISTA_REGISTROS_TARJETA, listaRegistrosVariables, graphqlOptions)
 
-onResultListaRegistros(({ data }) => {
-  // console.log('lista de registros', data)
-  listaRegistros.value = data?.listaRegistrosTarjeta.filter(
-    (registro) => !registro.isMsi
-  )
-  listaRegistrosMsi.value = data?.listaRegistrosTarjeta.filter(
-    (registro) => registro.isMsi
-  )
-  listaRegistrosMsi.value.forEach((registro) => {
-    registro.importe = registro.importe * -1
-  })
+onResultListaRegistrosTarjeta(({ data }) => {
+  if (!!data) {
+    console.log('lista de registros', data)
+    listaRegistros.value = data?.listaRegistrosTarjeta.filter(
+      (registro) => !registro.isMsi
+    )
+    listaRegistrosMsi.value = data?.listaRegistrosTarjeta.filter(
+      (registro) => registro.isMsi
+    )
+    listaRegistrosMsi.value.forEach((registro) => {
+      registro.importe = registro.importe * -1
+    })
 
-  obtenerSaldoTarjeta()
-  obtenerSaldoTarjetaAlDia()
+    // obtenerSaldoTarjeta()
+    // obtenerSaldoTarjetaAlDia()
+  }
 })
+
 onErrorListaRegistros((error) => {
   console.error('response', error)
 })
 
-const {
-  mutate: deleteRegistroTarjeta,
-  onDone: onDoneDeleteRegistroTarjeta,
-  onError: onErrorDeleteRegistroTarjeta
-} = useMutation(DELETE_REGISTRO_TARJETA)
+// const {
+//   mutate: deleteRegistroTarjeta,
+//   onDone: onDoneDeleteRegistroTarjeta,
+//   onError: onErrorDeleteRegistroTarjeta
+// } = useMutation(DELETE_REGISTRO_TARJETA)
 
-onDoneDeleteRegistroTarjeta((response) => {
+tarjetaRegistrosCrud.onDoneRegistroTarjetaDelete((response) => {
   console.log('registro eliminado', response)
   loadOrRefetchListaRegistrosTarjeta()
   showSuccessMessage('eliminó')
 })
-onErrorDeleteRegistroTarjeta((error) => {
+tarjetaRegistrosCrud.onErrorRegistroTarjetaDelete((error) => {
   console.error(error)
 })
 function showSuccessMessage(action) {
@@ -762,19 +767,16 @@ function deleteItem(props_row) {
   // deleteRegistroTarjeta({ id: props_row.id })
 }
 
-function obtener_fecha_inicio() {
+function obtenerFechasInicialFinal() {
   const dia_inicio = ('0' + (cuenta.value.dia_corte + 1)).slice(-2)
-  fecha_inicio.value = `${ejercicio_fiscal.value}-${(
+  const dia_fin = ('0' + cuenta.value.dia_corte).slice(-2)
+  listaRegistrosVariables.fechaInicio = `${ejercicio_fiscal.value}-${(
     '0' +
     (mes.value.id - 1)
   ).slice(-2)}-${dia_inicio}`
-  console.log('fecha_inicio', fecha_inicio.value)
-}
-function obtener_fecha_fin() {
-  const dia_fin = ('0' + cuenta.value.dia_corte).slice(-2)
-  fecha_fin.value = `${ejercicio_fiscal.value}-${('0' + mes.value.id).slice(
-    -2
-  )}-${dia_fin}`
+  listaRegistrosVariables.fechaFin = `${ejercicio_fiscal.value}-${(
+    '0' + mes.value.id
+  ).slice(-2)}-${dia_fin}`
 }
 
 function obtenerSaldoAnterior() {
@@ -854,25 +856,26 @@ function onChangeEjercicio(ejercicio_fiscal) {
  * Lista de registros de la tarjeta
  */
 function obtenerListaRegistros() {
-  const dia_inicio = ('0' + (cuenta.value.dia_corte + 1)).slice(-2)
-  const dia_fin = ('0' + cuenta.value.dia_corte).slice(-2)
-  const fechaInicio = `${ejercicio_inicial_id.value}-${(
-    '0' + mes_inicial_id.value
-  ).slice(-2)}-${dia_inicio}`
-  const fechaFin = `${ejercicio_final_id.value}-${(
-    '0' + mes_final_id.value
-  ).slice(-2)}-${dia_fin}`
-  loadListaRegistros(
-    null,
-    {
-      cuentaId: route.params.id,
-      fechaInicio,
-      fechaFin,
-      isMsi: null,
-      estadoRegistroTarjetaId: null
-    },
-    graphqlOptions
-  )
+  obtenerFechasInicialFinal()
+  // const dia_inicio = ('0' + (cuenta.value.dia_corte + 1)).slice(-2)
+  // const dia_fin = ('0' + cuenta.value.dia_corte).slice(-2)
+  // const fechaInicio = `${ejercicio_inicial_id.value}-${(
+  //   '0' + mes_inicial_id.value
+  // ).slice(-2)}-${dia_inicio}`
+  // const fechaFin = `${ejercicio_final_id.value}-${(
+  //   '0' + mes_final_id.value
+  // ).slice(-2)}-${dia_fin}`
+  // loadListaRegistros(
+  //   null,
+  //   {
+  //     cuentaId: route.params.id,
+  //     fechaInicio,
+  //     fechaFin,
+  //     isMsi: null,
+  //     estadoRegistroTarjetaId: null
+  //   },
+  //   graphqlOptions
+  // )
 }
 
 function cargarMovimientos() {

@@ -539,8 +539,10 @@ const fecha_registro = computed({
 })
 
 onResultListaRegistros(({ data }) => {
-  console.log('onResultListaRegistros en CuentaPage...')
-  listaRegistros.value = data?.obtenerRegistros ?? []
+  if (!!data) {
+    console.log('onResultListaRegistros en CuentaPage...')
+    listaRegistros.value = data?.obtenerRegistros ?? []
+  }
 })
 
 onErrorListaRegistros((error) => {
@@ -633,7 +635,7 @@ function confirmarEliminar(item) {
   }
 }
 
-registrosCrud.onDoneDelete(({ data }) => {
+registrosCrud.onDoneRegistroDelete(({ data }) => {
   loadOrRefetchListaRegistros()
   notificacion.mostrarNotificacionPositiva(
     'Registro eliminado correctamente.',

@@ -120,6 +120,16 @@ export const CUENTA_UPDATE = gql`
     }
   }
 `
+export const CUENTA_SALDO_UPDATE = gql`
+  mutation cuentaSaldoUpdate($cuentaId: ID!) {
+    cuentaSaldoUpdate(cuentaId: $cuentaId) {
+      cuenta {
+        id
+        saldo
+      }
+    }
+  }
+`
 
 export const CUENTA_DELETE = gql`
   mutation cuentaDelete($id: ID!) {

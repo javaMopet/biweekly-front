@@ -1,18 +1,16 @@
 <template>
-  <q-card
-    class="my-card no-shadow no-border bg-main-background"
-    flat
+  <div
+    class="my-card bg-main-background"
     style="width: 1100px; min-width: 1100px; overflow: hidden"
   >
-    <!-- <pre>{{ categoria }}</pre> -->
-    <q-card-section class="row justify-between items-start dialog-title">
-      <div class="row">
+    <div class="row justify-between items-center dialog-title q-px-md">
+      <div class="row items-center" style="border: 0px solid red">
         <q-avatar
           size="38px"
           font-size="23px"
           text-color="white"
           :icon="categoria.icono"
-          :style="`background-color: ${categoria.color} !important;transform: translateY(-5px)`"
+          :style="`background-color: ${categoria.color} !important`"
         />
         <div class="dialog__title--name">
           {{ categoria.nombre }}
@@ -20,17 +18,18 @@
       </div>
       <div class="dialog-closebutton">
         <q-btn
+          color="primary"
           icon="close"
           v-close-popup
-          push
           class="dialog__title--closeButton"
           round
+          dense
           glossy
         ></q-btn>
       </div>
-    </q-card-section>
+    </div>
 
-    <transition name="fade">
+    <!-- <transition name="fade">
       <div class="row bg-pink-1" v-if="errorsList.length > 0">
         <div class="column">
           <div class="row q-gutter-x-md q-pl-sm q-pt-sm">
@@ -60,7 +59,7 @@
           </q-list>
         </div>
       </div>
-    </transition>
+    </transition> -->
     <!-- <q-toolbar class="q-pl-lg q-mt-md" style="border: 0px solid red">
       <q-btn
         v-if="isSelected"
@@ -72,14 +71,9 @@
         @click="deleteSelectedItems"
       />
     </q-toolbar> -->
-    <q-card-section>
-      <q-card
-        class="my-card"
-        style="height: 100%; border: 0px solid red; padding: 0px !important"
-        flat
-        dense
-      >
-        <q-card-section style="max-height: 70vh; height: 70vh" class="scroll">
+    <div class="main-content q-py-lg">
+      <div class="cuenta-content">
+        <div style="max-height: 60vh; height: 60vh" class="scroll">
           <q-table
             :rows="listaRegistros"
             :columns="columns"
@@ -185,25 +179,23 @@
                     lazy-rules
                 /></q-td>
                 <q-td
+                  class="q-px-sm"
                   style="vertical-align: middle; border: 0px solid red"
                   align="center"
                 >
                   <q-btn
                     v-if="!editingItem"
-                    class="button-new"
-                    icon="add_circle"
+                    class="button-save"
+                    icon="save"
                     @click="saveItem"
                     flat
-                  >
-                    <!-- icon="las la-plus-square" -->
-                    <q-tooltip
-                      :offset="[-35, -65]"
-                      class="bg-accent"
-                      transition-duration="900"
-                    >
+                  />
+                  <!-- color="primary-button" -->
+                  <!-- icon="las la-plus-square" -->
+                  <!-- <q-tooltip transition-duration="600">
                       Guardar Nuevo
-                    </q-tooltip>
-                  </q-btn>
+                    </q-tooltip> -->
+
                   <q-btn
                     v-else
                     class="button-save"
@@ -251,7 +243,7 @@
             </template>
             <!-- <template #no-data>No se han agregado datos</template> -->
           </q-table>
-        </q-card-section>
+        </div>
         <q-card-actions vertical>
           <div class="row q-pl-lg q-gutter-x-md">
             <span class="text-condensed text-primary">
@@ -265,9 +257,9 @@
             <div class=""></div>
           </div>
         </q-card-actions>
-      </q-card>
-    </q-card-section>
-  </q-card>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup>
@@ -325,7 +317,7 @@ const props = defineProps({
 const emit = defineEmits(['registroCreated', 'registroUpdated'])
 
 onMounted(() => {
-  setFechaInicial()
+  inicializarFormulario()
 })
 
 const columns = [
@@ -401,7 +393,6 @@ function addItem(val) {
     }
     listaRegistros.value.push(row)
 
-    // resetForm()
     console.table(listaRegistros.value)
   }
 }
@@ -442,12 +433,17 @@ function entradaValida() {
 function cancelEditItem() {
   editingItem.value = null
   formItem.value = { ...defaultFormItem }
-  setFechaInicial()
+  inicializarFecha()
 }
 
-function resetForm() {
+function inicializarFormulario() {
   formItem.value = { ...defaultFormItem }
+  inicializarFecha()
+  formItem.value.importe = categoria.value.importeDefault?.toString() ?? ''
+  formItem.value.cuenta = categoria.value.cuentaDefault
+  formItem.value.observaciones = categoria.value.descripcion
 }
+
 function deleteSelectedItems() {
   console.log('Eliminacion....')
   console.dir(selectedItems.value)
@@ -510,7 +506,7 @@ function obtenerFechaDefault() {
   return fecha
 }
 
-function setFechaInicial() {
+function inicializarFecha() {
   console.log('fecha_inicio', props.cellData.fecha_inicio)
   formItem.value.fecha = formato.convertDateFromIsoToInput(
     props.cellData.fecha_inicio
@@ -519,12 +515,7 @@ function setFechaInicial() {
 /**
  * Methods
  */
-const row_to_insert = ref(null)
 
-/**
- *
- *
- */
 function saveItem() {
   if (entradaValida()) {
     if (['1', '2'].includes(categoria.value.tipoMovimiento.id)) {
@@ -598,7 +589,7 @@ function afterSaveItem(tipoRegistro, itemSaved) {
     1500
   )
   emit('registroCreated', itemSaved)
-  resetForm()
+  inicializarFormulario()
 }
 function afterUpdateItem(itemUpdated) {
   // const rowIndex = editingItem.value.rowIndex
@@ -610,13 +601,14 @@ function afterUpdateItem(itemUpdated) {
   reloadListaRegistros()
   emit('registroUpdated', itemUpdated)
   editingItem.value = null
-  resetForm()
+  inicializarFormulario()
 }
 
 registrosCrud.onErrorCreate((error) => {
+  console.trace(error)
   console.log('error', error.graphQLErrors[0])
-  console.log('error', error.graphQLErrors[0].extensions)
-  console.table('error', error.graphQLErrors[0].extensions.problems)
+  console.log('error', error.graphQLErrors[0]?.extensions)
+  console.table('error', error.graphQLErrors[0]?.extensions.problems)
 })
 function obtenerFechaISO(fecha_formato) {
   const date = !!fecha_formato
@@ -689,8 +681,6 @@ onResultListaRegistros(({ data }) => {
     listaRegistros.value = JSON.parse(JSON.stringify(data.obtenerRegistros))
     listaRegistros.value.forEach((element) => {
       element.fecha = formato.convertDateFromIsoToInput(element.fecha)
-      // const importe =
-      //   element.tipoAfectacion === 'C' ? element.importe * -1 : element.importe
       element.importe = element.importe.toString()
       element.saved = true
     })
@@ -700,7 +690,9 @@ onResultListaRegistros(({ data }) => {
 onResultCategoriaById(({ data }) => {
   // console.log('data', data)
   categoria.value = data.categoriaById
+  console.dir(categoria.value)
   buscarMovimientos()
+  inicializarFormulario()
 })
 
 onErrorListaRegistros((error) => {

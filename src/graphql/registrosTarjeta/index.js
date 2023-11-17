@@ -43,7 +43,7 @@ export const LISTA_REGISTROS_TARJETA = gql`
   }
 `
 
-export const CREATE_REGISTRO_TARJETA = gql`
+export const REGISTRO_TARJETA_CREATE = gql`
   mutation registroTarjetaCreate($input: RegistroTarjetaInput!) {
     registroTarjetaCreate(registroTarjetaInput: $input) {
       registroTarjeta {
@@ -73,7 +73,7 @@ export const CREATE_REGISTRO_TARJETA = gql`
   }
 `
 
-export const UPDATE_REGISTRO_TARJETA = gql`
+export const REGISTRO_TARJETA_UPDATE = gql`
   mutation registroTarjetaUpdate($id: ID!, $input: RegistroTarjetaInput!) {
     registroTarjetaUpdate(id: $id, registroTarjetaInput: $input) {
       registroTarjeta {
@@ -103,7 +103,7 @@ export const UPDATE_REGISTRO_TARJETA = gql`
   }
 `
 
-export const DELETE_REGISTRO_TARJETA = gql`
+export const REGISTRO_TARJETA_DELETE = gql`
   mutation registroTarjetaDelete($id: ID!) {
     registroTarjetaDelete(id: $id) {
       registroTarjeta {

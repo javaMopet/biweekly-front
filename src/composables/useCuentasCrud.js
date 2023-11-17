@@ -2,7 +2,8 @@ import { useMutation } from '@vue/apollo-composable'
 import {
   CUENTA_CREATE,
   CUENTA_UPDATE,
-  CUENTA_DELETE
+  CUENTA_DELETE,
+  CUENTA_SALDO_UPDATE
 } from 'src/graphql/cuentas'
 import { useCuentaStore } from 'src/stores/common/useCuentaStore'
 
@@ -46,6 +47,12 @@ export function useCuentasCrud() {
     onError: onErrorCuentaDelete
   } = useMutation(CUENTA_DELETE)
 
+  const {
+    mutate: cuentaSaldoUpdate,
+    onDone: onDoneCuentaSaldoUpdate,
+    onError: onErrorCuentaSaldoUpdate
+  } = useMutation(CUENTA_SALDO_UPDATE)
+
   // const listaCuentasReduced = computed({
   //   get() {
   //     return resultadoListaReduced.value?.listaCuentas ?? []
@@ -77,6 +84,20 @@ export function useCuentasCrud() {
     cuentaStore.listaCuentas.splice(index, 1)
   })
 
+  onDoneCuentaSaldoUpdate(({ data }) => {
+    console.log('Se actualizo el saldo de la cuenta', data)
+    console.log('Actualizar en la interfaz')
+    const saldoUpdated = data.cuentaSaldoUpdate.cuenta
+    updateCuentaInterfaz(saldoUpdated)
+  })
+
+  function updateCuentaInterfaz(saldoUpdated) {
+    const index = cuentaStore.listaCuentas.findIndex(
+      (c) => c.id === saldoUpdated.id
+    )
+    cuentaStore.listaCuentas[index].saldo = saldoUpdated.saldo
+  }
+
   onErrorCuentaCreate((error) => {
     console.trace(error)
     // console.log('error', error.graphQLErrors[0])
@@ -88,11 +109,15 @@ export function useCuentasCrud() {
     // console.log('error', error.graphQLErrors[0])
     // console.log('error', error.graphQLErrors[0]?.extensions)
   })
+  onErrorCuentaSaldoUpdate((error) => {
+    console.trace(error)
+  })
 
   return {
     cuentaCreate,
     cuentaUpdate,
     cuentaDelete,
+    cuentaSaldoUpdate,
     onDoneCuentaCreate,
     onDoneCuentaUpdate,
     onDoneCuentaDelete,

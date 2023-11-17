@@ -180,13 +180,14 @@
 <script setup>
 import { useMutation } from '@vue/apollo-composable'
 import { ref, onMounted } from 'vue'
-import { CUENTA_DELETE } from '/src/graphql/cuentas'
+// import { CUENTA_DELETE } from '/src/graphql/cuentas'
 import RegistroCuenta from 'src/components/cuentas/RegistroCuenta.vue'
 import { useQuasar } from 'quasar'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { useRouter } from 'vue-router'
 import { useFormato } from 'src/composables/utils/useFormato'
 import { useCuentaStore } from 'src/stores/common/useCuentaStore'
+import { useRegistrosTarjetaCrud } from 'src/composables/useRegistrosTarjetaCrud'
 
 /**
  * composables
@@ -196,6 +197,7 @@ const notificacion = useNotificacion()
 const router = useRouter()
 const formato = useFormato()
 const cuentaStore = useCuentaStore()
+const registrosTarjetaCrud = useRegistrosTarjetaCrud()
 
 /**
  * state
@@ -204,20 +206,21 @@ const loadingCard = ref([])
 /**
  * GRAPHQL
  */
-const {
-  mutate: deleteCuenta,
-  onDone: onDoneDeleteCuenta,
-  onError: onErrorDeleteCuenta
-} = useMutation(CUENTA_DELETE)
+// const {
+//   mutate: deleteCuenta,
+//   onDone: onDoneDeleteCuenta,
+//   onError: onErrorDeleteCuenta
+// } = useMutation(CUENTA_DELETE)
 
-onDoneDeleteCuenta(({ data }) => {
+registrosTarjetaCrud.onDoneRegistroTarjetaDelete(({ data }) => {
   if (!!data) {
     refetchListaCuentas()
     const deletedItem = data.cuentaDelete.cuenta
     mostrarNotificacion('elminó', deletedItem)
   }
 })
-onErrorDeleteCuenta((error) => {
+
+registrosTarjetaCrud.onErrorRegistroTarjetaDelete((error) => {
   console.error(error)
   notificacion.mostrarNotificacionNegativa(
     'No es posible eliminar esta tarjeta de crédito debido a que tiene movimientos',

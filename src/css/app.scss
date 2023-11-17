@@ -198,41 +198,6 @@
   background: $button-new !important;
 }
 /* *************************** */
-.dialog__title--closeButton {
-  opacity: 0.8;
-  font-size: 0.75rem;
-  color: #bdccae !important;
-  &:hover {
-    opacity: 1;
-    color: white !important;
-    background: lighten($color: $primary, $amount: 3);
-    transition: all 0.05 ease;
-  }
-}
-
-.dialog__title--name {
-  font-size: 1rem !important;
-  font-weight: 600;
-  color: $secondary-light !important;
-  letter-spacing: -0.0025rem;
-  padding: 4px 10px 5px 10px;
-}
-.dialog-title {
-  /*padding: 10px 10px 30px 15px;*/
-  // background: hsl(240, 17%, 95%);
-  position: relative;
-  background: $primary;
-  height: 45px !important;
-  // &::after {
-  //   content: '';
-  //   background: rgb(217, 217, 219);
-  //   width: 100%;
-  //   height: 1px;
-  //   position: absolute;
-  //   top: 40px;
-  //   left: 0;
-  // }
-}
 
 .btn-add {
   cursor: pointer;
@@ -270,7 +235,7 @@
   // background-color: #2c5382;
   // background: linear-gradient(to right top, #1b2327, #345263);
   // background: url('../images/credit_card11_d.jpg');
-  background: url('../images/credit_card.jpg');
+  background: url('../images/credit_card3.jpg');
   background-repeat: no-repeat;
   background-size: cover;
   cursor: normal;
@@ -388,7 +353,7 @@
 .cuenta-content {
   position: relative;
   z-index: 1;
-  padding: 32px 16px 24px 16px;
+  padding: 10px 16px 24px 16px;
   background-color: white;
   border: 1px solid #b2bdb6;
   border-radius: 5px;
@@ -541,12 +506,33 @@
 .my-card {
   background: $main-background;
 }
-
+// .dialog-title {
+/*padding: 10px 10px 30px 15px;*/
+// background: hsl(240, 17%, 95%);
+// position: relative;
+// background: $primary;
+// height: 45px !important;
+// &::after {
+//   content: '';
+//   background: rgb(217, 217, 219);
+//   width: 100%;
+//   height: 1px;
+//   position: absolute;
+//   top: 40px;
+//   left: 0;
+// }
+// }
+.dialog__title--name {
+  font-size: 1rem !important;
+  font-weight: 600;
+  // color: $secondary-light !important;
+  color: $primary !important;
+  letter-spacing: -0.0025rem;
+  padding: 4px 10px 5px 10px;
+}
 .form-componente__body {
-  position: relative;
-  z-index: 1;
-  padding: 0px 25px 15px 25px;
-  border: 1px solid #b2bdb6;
+  padding: 5px 25px 10px 25px;
+  border: 1px solid #cdcfd6;
   background: white;
   border-radius: 5px;
   overflow: hidden;
@@ -575,7 +561,7 @@
 
 .button-new {
   font-size: 0.6rem;
-  padding-right: 5px;
+  padding-inline: 5px;
   // color: $new-button-color !important;
   // box-shadow: rgba(112, 164, 194, 0.534) 2px 4px 8px,
   //   rgba(121, 170, 190, 0.733) 1px 2px 4px;
@@ -585,7 +571,7 @@
   }
 }
 
-$save-button-color: #6e65eb;
+$save-button-color: #4388f0;
 
 .button-save {
   font-size: 0.9rem;
