@@ -2,7 +2,10 @@ import { useQuery } from '@vue/apollo-composable'
 import { logErrorMessages } from '@vue/apollo-util'
 import { defineStore } from 'pinia'
 import { useCuentasContablesCrud } from 'src/composables/useCuentasContablesCrud'
-import { LISTA_CUENTAS_CONTABLES } from 'src/graphql/cuentasContables'
+import {
+  ARBOL_CUENTAS_CONTABLES,
+  LISTA_CUENTAS_CONTABLES
+} from 'src/graphql/cuentasContables'
 
 import { reactive, ref } from 'vue'
 export const useCuentaContableStore = defineStore('cuentaContableStore', () => {
@@ -16,6 +19,15 @@ export const useCuentaContableStore = defineStore('cuentaContableStore', () => {
    * composables
    */
   const cuentasContablesCrud = useCuentasContablesCrud()
+
+  const options = reactive({
+    fetchPolicy: 'cache-first'
+  })
+  const {
+    onResult: onResultArbolCuentas,
+    loading: loadingArbolCuentas,
+    onError: onErrorArbolCuentasContables
+  } = useQuery(ARBOL_CUENTAS_CONTABLES, null, options)
   /**
    * graphql
    */
@@ -54,16 +66,6 @@ export const useCuentaContableStore = defineStore('cuentaContableStore', () => {
     return null
   }
 
-  const {
-    onResultArbolCuentas,
-    loadingArbolCuentas,
-    deleteCuentaContable,
-    onDoneDeleteCuentaContable,
-    onDoneUpdateCuentaContable,
-    onErrorUpdateCuentaContable,
-    onErrorDeleteCuentaContable
-  } = cuentasContablesCrud
-
   /**
    * graphql
    */
@@ -85,32 +87,10 @@ export const useCuentaContableStore = defineStore('cuentaContableStore', () => {
     }
   })
 
-  function deleteItem(id) {
-    deleteCuentaContable({ id })
-  }
-
-  onDoneDeleteCuentaContable(({ data }) => {
-    const itemDeleted = data.cuentaContableDelete.cuentaContable
-    const id = itemDeleted.id
-    const indice = listaCuentasContables.value.findIndex((cc) => cc.id === id)
-    listaCuentasContables.value.splice(indice, 1)
-
-    /* eliminar del arbol de cuentas */
-    const padreId = itemDeleted.padreId
-    const itemPadre = findTreeElementById(padreId)
-    const childrenIndex = itemPadre.children.findIndex(
-      (child) => child.id.toString() === id.toString()
-    )
-    itemPadre.children.splice(childrenIndex, 1)
-  })
-
   /**
    * Manejo de errores
    */
   onErrorListaCuentasContables((error) => {
-    logErrorMessages(error)
-  })
-  onErrorDeleteCuentaContable((error) => {
     logErrorMessages(error)
   })
 
@@ -118,10 +98,6 @@ export const useCuentaContableStore = defineStore('cuentaContableStore', () => {
     arbolCuentasContables,
     loadingArbolCuentas,
     findTreeElementById,
-    listaCuentasContables,
-    onDoneUpdateCuentaContable,
-    deleteItem,
-    onDoneDeleteCuentaContable,
-    onErrorUpdateCuentaContable
+    listaCuentasContables
   }
 })

@@ -147,12 +147,12 @@
         transition-show="jump-up"
         transition-hide="jump-down"
       >
-        <RegistroCuentaContable
+        <FormRegistroCuentaContable
           :edited-item="editedItem"
           @cuentaContableSaved="onCuentaContableSaved"
           @cuentaContableUpdated="cuentaContableUpdated"
           :is-padre-default="true"
-        ></RegistroCuentaContable>
+        ></FormRegistroCuentaContable>
       </q-dialog>
     </Teleport>
   </div>
@@ -160,11 +160,12 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import RegistroCuentaContable from 'src/components/cuentasContables/FormRegistroCuentaContable.vue'
+import FormRegistroCuentaContable from 'src/components/cuentasContables/FormRegistroCuentaContable.vue'
 import { useNotificacion } from 'src/composables/utils/useNotificacion.js'
 import { useQuasar } from 'quasar'
 import { useRouter } from 'vue-router'
 import { useCuentaContableStore } from 'src/stores/common/useCuentaContableStore'
+import { useCuentasContablesCrud } from 'src/composables/useCuentasContablesCrud'
 
 /**
  * composables
@@ -173,6 +174,7 @@ const notificacion = useNotificacion()
 const $q = useQuasar()
 const $router = useRouter()
 const cuentaContableStore = useCuentaContableStore()
+const cuentasContablesCrud = useCuentasContablesCrud()
 
 const { loadingArbolCuentas, onDoneDeleteCuentaContable } = cuentaContableStore
 /**
@@ -197,7 +199,7 @@ const itemToDelete = ref({
  */
 const arbolLleno = computed({
   get() {
-    return cuentaContableStore.arbolCuentasContables.length > 0
+    return cuentaContableStore.arbolCuentasContables?.length > 0
   }
 })
 
@@ -282,7 +284,7 @@ function deleteItem(item) {
       persistent: true
     })
     .onOk(() => {
-      cuentaContableStore.deleteItem(item.node.id)
+      cuentasContablesCrud.cuentaContableDelete({ id: item.node.id })
     })
     .onCancel(() => {
       itemToDelete.value = {
@@ -308,15 +310,7 @@ function onCuentaContableSaved() {
 }
 
 function cuentaContableUpdated() {
-  console.log('onCuentaContableUpdated')
-  // const itemEdit = searchTree(arbolCuentas.value[0], itemUpdated.id)
-  // itemEdit.nombre = itemUpdated.nombre
-  // itemEdit.label = `${itemUpdated.id} - ${itemUpdated.nombre}`
-  // itemEdit.tipoAfectacion = itemUpdated.tipoAfectacion == 'Cargo' ? 'C' : 'A'
-  // notificacion.mostrarNotificacionPositiva(
-  //   `La cuenta contable ${itemUpdated.label} se actualizó correctamente.`,
-  //   2000
-  // )
+  console.log('cuentaContableUpdated()')
   showFormItem.value = false
 }
 
@@ -324,16 +318,24 @@ function cuentaContableUpdated() {
  * GRAPHQL
  */
 
-onDoneDeleteCuentaContable(() => {
-  notificacion.mostrarNotificacionPositiva(
-    'La cuenta contable fué eliminada.',
+cuentasContablesCrud.onDoneCuentaContableDelete(({ data }) => {
+  if (!!data) {
+    console.log('deleted')
+    const itemDeleted = data.cuentaContableDelete.cuentaContable
+    notificacion.mostrarNotificacionPositiva(
+      `La cuenta contable "${itemDeleted.nombreCompleto}" fué eliminada con éxito.`,
+      1200
+    )
+  }
+})
+
+cuentasContablesCrud.onErrorCuentaContableDelete(() => {
+  notificacion.mostrarNotificacionNegativa(
+    `La cuenta contable no pudo ser eliminada. Favor de verificar.`,
     1200
   )
 })
 
-// cuentasContablesCrud.onErrorDeleteCuentaContable((error) => {
-//   console.error(error)
-// })
 // onErrorArbolCuentasContables((error) => {
 //   console.error(error)
 // })

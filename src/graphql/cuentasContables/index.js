@@ -52,6 +52,7 @@ export const CUENTA_CONTABLE_UPDATE = gql`
       cuentaContable {
         id
         nombre
+        nombreCompleto
         tipoAfectacion
         subnivel
         padreId

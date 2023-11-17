@@ -159,7 +159,8 @@ function saveItem() {
   console.log('save item', editedFormItem.value)
   const input = {
     ...editedFormItem.value,
-    __typename: undefined
+    miprecion: 5
+    // __typename: undefined
   }
   if (!editedFormItem.value.id) {
     console.log('guardando banco nueva', input)

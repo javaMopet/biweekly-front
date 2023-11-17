@@ -1,14 +1,11 @@
-import { useLazyQuery, useMutation, useQuery } from '@vue/apollo-composable'
+import { useMutation } from '@vue/apollo-composable'
 import { logErrorMessages } from '@vue/apollo-util'
 import {
-  ARBOL_CUENTAS_CONTABLES,
   CUENTA_CONTABLE_CREATE,
   CUENTA_CONTABLE_UPDATE,
   CUENTA_CONTABLE_DELETE
 } from 'src/graphql/cuentasContables'
 import { useCuentaContableStore } from 'src/stores/common/useCuentaContableStore'
-
-import { ref, computed, reactive } from 'vue'
 
 export function useCuentasContablesCrud() {
   /**
@@ -19,72 +16,103 @@ export function useCuentasContablesCrud() {
    * graphql
    */
 
-  const options = reactive({
-    fetchPolicy: 'cache-first'
-  })
   const {
-    onResult: onResultArbolCuentas,
-    loading: loadingArbolCuentas,
-    onError: onErrorArbolCuentasContables
-  } = useQuery(ARBOL_CUENTAS_CONTABLES, null, options)
-
-  const {
-    mutate: createCuentaContable,
-    onDone: onDoneCreateCuentaContable,
-    onError: onErrorCreateCuentaContable
+    mutate: cuentaContableCreate,
+    onDone: onDoneCuentaContableCreate,
+    onError: onErrorCuentaContableCreate
   } = useMutation(CUENTA_CONTABLE_CREATE)
 
   const {
-    mutate: updateCuentaContable,
-    onDone: onDoneUpdateCuentaContable,
-    onError: onErrorUpdateCuentaContable
+    mutate: cuentaContableUpdate,
+    onDone: onDoneCuentaContableUpdate,
+    onError: onErrorCuentaContableUpdate
   } = useMutation(CUENTA_CONTABLE_UPDATE)
 
   const {
-    mutate: deleteCuentaContable,
-    onDone: onDoneDeleteCuentaContable,
-    onError: onErrorDeleteCuentaContable
+    mutate: cuentaContableDelete,
+    onDone: onDoneCuentaContableDelete,
+    onError: onErrorCuentaContableDelete
   } = useMutation(CUENTA_CONTABLE_DELETE)
 
-  onErrorCreateCuentaContable((error) => {
-    console.log('surgio un error')
-    logErrorMessages(error)
-    console.log('error', error.graphQLErrors[0])
-    console.log('error', error.graphQLErrors[0]?.extensions)
-  })
-
-  onDoneUpdateCuentaContable(({ data }) => {
-    console.log('refrescando cuentasContables en el crud')
-  })
-
-  onDoneDeleteCuentaContable(({ data }) => {
-    console.log(data)
+  onDoneCuentaContableCreate(({ data }) => {
     if (!!data) {
-      console.log(
-        'onDoneDeleteCuentaContable data useCuentasContablesCrud.js',
-        data
+      const itemCreated = JSON.parse(
+        JSON.stringify(data.cuentaContableCreate.cuentaContable)
       )
-      // const index = cuentaContableStore.listaCuentasContables.findIndex(cc =>
-      //   cc.id === data.)
+      itemCreated.id = Number(itemCreated.id)
+      itemCreated.label = `${itemCreated.id} - ${itemCreated.nombre}`
+      itemCreated.selectable = true
+      if (cuentaContableStore.listaCuentasContables.length > 0) {
+        cuentaContableStore.listaCuentasContables.push(itemCreated)
+      }
+      const padreId = itemCreated.padreId
+      const itemPadre = cuentaContableStore.findTreeElementById(padreId)
+      itemPadre.children.push(itemCreated)
     }
   })
 
-  onErrorUpdateCuentaContable((error) => {
+  onDoneCuentaContableUpdate(({ data }) => {
+    console.log('refrescando cuentasContables en el crud')
+    if (!!data) {
+      const itemUpdated = data.cuentaContableUpdate.cuentaContable
+      itemUpdated.label = `${itemUpdated.id} - ${itemUpdated.nombre}`
+      itemUpdated.selectable = itemUpdated.subnivel === 0
+      const itemPadre = cuentaContableStore.findTreeElementById(
+        itemUpdated.padreId
+      )
+      const itemIndex = itemPadre.children.findIndex(
+        (cc) => cc.id === Number(itemUpdated.id)
+      )
+      console.log('itemIndex', itemIndex)
+      itemPadre.children[itemIndex].nombre = itemUpdated.nombre
+      itemPadre.children[itemIndex].label = itemUpdated.nombreCompleto
+      itemPadre.children[itemIndex].selectable = itemUpdated.selectable
+      console.log('itemUpdated', itemUpdated)
+      console.log('itemUpdated origen', itemPadre.children[itemIndex])
+    }
+  })
+
+  onDoneCuentaContableDelete(({ data }) => {
+    const itemDeleted = data.cuentaContableDelete.cuentaContable
+    const id = itemDeleted.id
+    const indice = cuentaContableStore.listaCuentasContables.findIndex(
+      (cc) => cc.id === id
+    )
+    cuentaContableStore.listaCuentasContables.splice(indice, 1)
+
+    /* eliminar del arbol de cuentas */
+    const padreId = itemDeleted.padreId
+    const itemPadre = cuentaContableStore.findTreeElementById(padreId)
+    const childrenIndex = itemPadre.children.findIndex(
+      (child) => child.id.toString() === id.toString()
+    )
+    itemPadre.children.splice(childrenIndex, 1)
+  })
+
+  onErrorCuentaContableCreate((error) => {
+    console.trace(error)
+  })
+
+  onErrorCuentaContableUpdate((error) => {
+    console.trace(error)
+  })
+  onErrorCuentaContableDelete((error) => {
     logErrorMessages(error)
+    console.trace(error)
+    console.log(error.networkError)
     console.log('error', error.graphQLErrors[0])
     console.log('error', error.graphQLErrors[0]?.extensions)
   })
 
   return {
-    onResultArbolCuentas,
-    createCuentaContable,
-    updateCuentaContable,
-    deleteCuentaContable,
-    onDoneCreateCuentaContable,
-    onDoneUpdateCuentaContable,
-    onDoneDeleteCuentaContable,
-    onErrorCreateCuentaContable,
-    onErrorUpdateCuentaContable,
-    onErrorDeleteCuentaContable
+    cuentaContableCreate,
+    cuentaContableUpdate,
+    cuentaContableDelete,
+    onDoneCuentaContableCreate,
+    onDoneCuentaContableUpdate,
+    onDoneCuentaContableDelete,
+    onErrorCuentaContableCreate,
+    onErrorCuentaContableUpdate,
+    onErrorCuentaContableDelete
   }
 }

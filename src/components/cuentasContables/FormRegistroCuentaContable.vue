@@ -1,21 +1,11 @@
 <template>
-  <div class="my-card" style="width: 400px">
-    <div class="row justify-between items-center dialog-title q-px-md">
-      <div class="dialog__title--name">{{ actionName }}</div>
-      <div class="dialog-closebutton">
-        <q-btn
-          color="primary"
-          icon="close"
-          v-close-popup
-          class="dialog__title--closeButton"
-          round
-          dense
-          glossy
-        ></q-btn>
-      </div>
-    </div>
-    <div class="q-pa-lg">
-      <q-form @submit="saveItem">
+  <div class="my-card" style="width: 450px">
+    <DialogTitle>{{ actionName }}</DialogTitle>
+    <div class="main-content q-pt-md q-pb-md">
+      <q-form
+        @submit="saveItem"
+        class="q-gutter-y-md q-mt-xs form-componente__body"
+      >
         <div class="q-gutter-md">
           <div class="">
             <div class="row inline fit">
@@ -140,20 +130,16 @@ import { ref, computed, onMounted } from 'vue'
 import CuentaContableSelect from '../formComponents/CuentaContableSelect.vue'
 import { api } from 'src/boot/axios'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
-import { useCuentaContableStore } from 'src/stores/common/useCuentaContableStore'
+// import { useCuentaContableStore } from 'src/stores/common/useCuentaContableStore'
 import { useCuentasContablesCrud } from 'src/composables/useCuentasContablesCrud'
+import DialogTitle from '../formComponents/modal/DialogTitle.vue'
 
 /**
  * composables
  */
 const notificacion = useNotificacion()
 const cuentasContablesCrud = useCuentasContablesCrud()
-const cuentaContableStore = useCuentaContableStore()
-
-const { onDoneUpdateCuentaContable, onErrorUpdateCuentaContable } =
-  cuentaContableStore
-
-const { onErrorCreateCuentaContable } = cuentasContablesCrud
+// const cuentaContableStore = useCuentaContableStore()
 
 /**
  * state
@@ -257,57 +243,24 @@ function saveItem() {
   }
 
   if (props.editedItem.action === 'add') {
-    cuentasContablesCrud.createCuentaContable({ input })
+    cuentasContablesCrud.cuentaContableCreate({ input })
   } else {
-    cuentasContablesCrud.updateCuentaContable({ id, input })
+    cuentasContablesCrud.cuentaContableUpdate({ id, input })
   }
 }
 
 /**
  * GRAPHQL
  */
-cuentasContablesCrud.onDoneCreateCuentaContable(({ data }) => {
+cuentasContablesCrud.onDoneCuentaContableCreate(({ data }) => {
   if (!!data) {
-    const itemCreated = JSON.parse(
-      JSON.stringify(data.cuentaContableCreate.cuentaContable)
-    )
-    itemCreated.id = Number(itemCreated.id)
-    itemCreated.label = `${itemCreated.id} - ${itemCreated.nombre}`
-    itemCreated.selectable = true
-    if (cuentaContableStore.listaCuentasContables.length > 0) {
-      cuentaContableStore.listaCuentasContables.push(itemCreated)
-    }
-    const padreId = itemCreated.padreId
-    const itemPadre = cuentaContableStore.findTreeElementById(padreId)
-    itemPadre.children.push(itemCreated)
-    /**
-     *
-     */
     notificacion.mostrarNotificacionPositiva('Cuenta Contable creada.', 1200)
     emit('cuentaContableSaved')
   }
 })
-cuentasContablesCrud.onDoneUpdateCuentaContable(({ data }) => {
-  if (!!data) {
-    console.log('updated', data)
-    const itemUpdated = JSON.parse(
-      JSON.stringify(data.cuentaContableUpdate.cuentaContable)
-    )
-    itemUpdated.label = `${itemUpdated.id} - ${itemUpdated.nombre}`
-    itemUpdated.selectable = itemUpdated.subnivel === 0
-    const itemPadre = cuentaContableStore.findTreeElementById(
-      itemUpdated.padreId
-    )
-    const itemIndex = itemPadre.children.findIndex(
-      (cc) => cc.id === Number(itemUpdated.id)
-    )
-    console.log('itemIndex', itemIndex)
-    itemPadre.children[itemIndex] = itemUpdated
-    console.log('itemUpdated', itemUpdated)
 
-    /**
-     *
-     */
+cuentasContablesCrud.onDoneCuentaContableUpdate(({ data }) => {
+  if (!!data) {
     notificacion.mostrarNotificacionPositiva(
       'Cuenta Contable actualizada correctamente.',
       1200
@@ -316,24 +269,14 @@ cuentasContablesCrud.onDoneUpdateCuentaContable(({ data }) => {
   }
 })
 
-onErrorCreateCuentaContable((error) => {
-  // logErrorMessages(error)
+cuentasContablesCrud.onErrorCuentaContableCreate((error) => {
   notificacion.mostrarNotificacionNegativa(
     'Ocurrió un error al intentar crear la cuenta contable',
     1200
   )
 })
 
-onDoneUpdateCuentaContable(({ data }) => {
-  if (!!data) {
-    notificacion.mostrarNotificacionPositiva(
-      'Cuenta Contable actualizada.',
-      1200
-    )
-    emit('cuentaContableUpdated')
-  }
-})
-onErrorUpdateCuentaContable((error) => {
+cuentasContablesCrud.onErrorCuentaContableUpdate((error) => {
   notificacion.mostrarNotificacionNegativa(
     'Ocurrió un error al intentar actualizar la cuenta contable',
     1200

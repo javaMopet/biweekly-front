@@ -43,8 +43,9 @@ export function useBancosCrud() {
 
   onErrorCreateBanco((error) => {
     console.trace(error)
-    // console.log('error', error.graphQLErrors[0])
-    // console.log('error', error.graphQLErrors[0].extensions)
+    console.log('error', error.graphQLErrors[0])
+    console.log('error', error.graphQLErrors[0]?.extensions)
+    logErrorMessages(error)
   })
 
   onDoneUpdateBanco(({ data }) => {

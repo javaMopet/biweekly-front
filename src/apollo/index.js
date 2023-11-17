@@ -35,21 +35,21 @@ export /* async */ function getClientOptions(/* {app, router, ...} */ options) {
     // General options.
     {
       link: errorLink.concat(authLink).concat(httpLink),
-      cache: new InMemoryCache(),
-      defaultOptions: {
-        fetchPolicy: 'no-cache',
-        watchQuery: {
-          fetchPolicy: 'cache-and-network',
-          errorPolicy: 'ignore'
-        },
-        query: {
-          fetchPolicy: 'network-only',
-          errorPolicy: 'all'
-        },
-        mutate: {
-          errorPolicy: 'all'
-        }
-      }
+      cache: new InMemoryCache()
+      // defaultOptions: {
+      //   fetchPolicy: 'no-cache',
+      //   watchQuery: {
+      //     fetchPolicy: 'cache-and-network',
+      //     errorPolicy: 'ignore'
+      //   },
+      //   query: {
+      //     fetchPolicy: 'network-only',
+      //     errorPolicy: 'all'
+      //   },
+      //   mutate: {
+      //     errorPolicy: 'all'
+      //   }
+      // }
     },
     // Specific Quasar mode options.
     process.env.MODE === 'spa'
