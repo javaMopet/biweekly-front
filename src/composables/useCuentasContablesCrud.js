@@ -6,6 +6,7 @@ import {
   CUENTA_CONTABLE_DELETE
 } from 'src/graphql/cuentasContables'
 import { useCuentaContableStore } from 'src/stores/common/useCuentaContableStore'
+import { watch } from 'vue'
 
 export function useCuentasContablesCrud() {
   /**
@@ -31,7 +32,8 @@ export function useCuentasContablesCrud() {
   const {
     mutate: cuentaContableDelete,
     onDone: onDoneCuentaContableDelete,
-    onError: onErrorCuentaContableDelete
+    onError: onErrorCuentaContableDelete,
+    error
   } = useMutation(CUENTA_CONTABLE_DELETE)
 
   onDoneCuentaContableCreate(({ data }) => {
@@ -97,12 +99,18 @@ export function useCuentasContablesCrud() {
     console.trace(error)
   })
   onErrorCuentaContableDelete((error) => {
-    logErrorMessages(error)
-    console.trace(error)
-    console.log(error.networkError)
-    console.log('error', error.graphQLErrors[0])
-    console.log('error', error.graphQLErrors[0]?.extensions)
+    // logErrorMessages(error)
+    // console.trace(error)
+    console.log(error)
+    // console.log(graphQLErrors)
+    // console.log('error', error.graphQLErrors[0])
+    // console.log('error', error.graphQLErrors[0]?.extensions)
   })
+  // watch(error, (newVAlue, oldvalue) => {
+  // console.trace(error)
+  // console.log(error.result)
+  // console.log(error._value)
+  // })
 
   return {
     cuentaContableCreate,

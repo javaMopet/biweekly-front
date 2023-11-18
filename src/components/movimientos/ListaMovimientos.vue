@@ -3,8 +3,8 @@
     class="my-card bg-main-background"
     style="width: 1100px; min-width: 1100px; overflow: hidden"
   >
-    <div class="row justify-between items-center dialog-title q-px-md">
-      <div class="row items-center" style="border: 0px solid red">
+    <DialogTitle
+      ><div class="row items-center" style="border: 0px solid red">
         <q-avatar
           size="38px"
           font-size="23px"
@@ -15,20 +15,8 @@
         <div class="dialog__title--name">
           {{ categoria.nombre }}
         </div>
-      </div>
-      <div class="dialog-closebutton">
-        <q-btn
-          color="primary"
-          icon="close"
-          v-close-popup
-          class="dialog__title--closeButton"
-          round
-          dense
-          glossy
-        ></q-btn>
-      </div>
-    </div>
-
+      </div></DialogTitle
+    >
     <!-- <transition name="fade">
       <div class="row bg-pink-1" v-if="errorsList.length > 0">
         <div class="column">
@@ -275,6 +263,7 @@ import CuentaSelect from '../formComponents/CuentaSelect.vue'
 import { useRegistrosCrud } from 'src/composables/useRegistrosCrud'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { SessionStorage, useQuasar } from 'quasar'
+import DialogTitle from '../formComponents/modal/DialogTitle.vue'
 
 /**
  * composables

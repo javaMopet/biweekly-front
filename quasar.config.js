@@ -58,13 +58,14 @@ module.exports = configure(function (/* ctx */) {
       //     )
       //   }
       // },
+      // Para solucionar bug en linea 'development' === 'production' en el graphql
       rawDefine: {
         'globalThis.process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
       },
-      target: {
-        // browser: ['es2019', 'edge88', 'firefox78', 'chrome87', 'safari13.1'],
-        node: 'node16'
-      },
+      // target: {
+      //   // browser: ['es2019', 'edge88', 'firefox78', 'chrome87', 'safari13.1'],
+      //   node: 'node18'
+      // },
       vueRouterMode: 'history', // available values: 'hash', 'history'
       // vueRouterBase,
       // vueDevtools,

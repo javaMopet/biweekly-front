@@ -1,20 +1,6 @@
 <template>
   <div class="my-card" style="width: 500px">
-    <div class="row justify-between items-center dialog-title q-px-md">
-      <div class="dialog__title--name">{{ actionName }}</div>
-      <div class="dialog-closebutton">
-        <q-btn
-          color="primary"
-          round
-          icon="close"
-          class="dialog__title--closeButton"
-          v-close-popup
-          push
-          glossy
-          dense
-        ></q-btn>
-      </div>
-    </div>
+    <DialogTitle>{{ actionName }}</DialogTitle>
     <div class="q-pa-lg">
       <q-form @submit="saveItem" class="q-gutter-lg">
         <div class="q-gutter-xs">
@@ -137,6 +123,7 @@ import BancoSelect from '../formComponents/BancoSelect.vue'
 import { useTipoCuentaStore } from 'src/stores/common/useTipoCuentaStore'
 import { useCuentasCrud } from 'src/composables/useCuentasCrud'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
+import DialogTitle from '../formComponents/modal/DialogTitle.vue'
 
 /**
  * composable

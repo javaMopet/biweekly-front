@@ -239,6 +239,7 @@ function saveItem() {
     tipo_afectacion: undefined,
     label: undefined,
     selectable: undefined,
+    nombreCompleto: undefined,
     __typename: undefined
   }
 

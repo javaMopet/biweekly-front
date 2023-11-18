@@ -30,7 +30,7 @@ export function useBancosCrud() {
   } = useMutation(BANCO_UPDATE)
 
   const {
-    mutate: deleteBanco,
+    mutate: bancoDelete,
     onDone: onDoneDeleteBanco,
     onError: onErrorDeleteBanco
   } = useMutation(BANCO_DELETE)
@@ -41,12 +41,13 @@ export function useBancosCrud() {
     bancoStore.bancoCreated(itemCreated)
   })
 
-  onErrorCreateBanco((error) => {
-    console.trace(error)
-    console.log('error', error.graphQLErrors[0])
-    console.log('error', error.graphQLErrors[0]?.extensions)
-    logErrorMessages(error)
-  })
+  // onErrorCreateBanco((error) => {
+  //   console.log(error)
+  //   // console.trace(error)
+  //   console.log('error', error.graphQLErrors[0])
+  //   // console.log('error', error.graphQLErrors[0]?.extensions)
+  //   // logErrorMessages(error)
+  // })
 
   onDoneUpdateBanco(({ data }) => {
     const itemUpdated = data.bancoUpdate.banco
@@ -63,18 +64,13 @@ export function useBancosCrud() {
     logErrorMessages(error)
   })
 
-  onErrorDeleteBanco((error) => {
-    // logErrorMessages(error)
-    console.trace(error)
-    // if (!!error.graphQLErrors[0]) {
-    //   console.trace(error.graphQLErrors[0])
-    // }
-  })
+  // onErrorDeleteBanco((error) => {
+  // })
 
   return {
     createBanco,
     updateBanco,
-    deleteBanco,
+    bancoDelete,
     onDoneCreateBanco,
     onDoneUpdateBanco,
     onDoneDeleteBanco,

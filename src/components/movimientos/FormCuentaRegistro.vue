@@ -1,19 +1,6 @@
 <template>
   <div class="my-card" style="width: 630px">
-    <div class="row justify-between items-center dialog-title q-px-md">
-      <div class="dialog__title--name">{{ actionName }}</div>
-      <div class="dialog-closebutton">
-        <q-btn
-          color="primary"
-          icon="close"
-          v-close-popup
-          class="dialog__title--closeButton"
-          round
-          dense
-          glossy
-        ></q-btn>
-      </div>
-    </div>
+    <DialogTitle>{{ actionName }}</DialogTitle>
     <div class="q-px-xl q-pt-xl q-pb-lg">
       <!-- form-componente__body -->
       <q-form @submit="saveItem" class="q-gutter-y-md">
@@ -127,6 +114,7 @@ import { useTraspasosCrud } from 'src/composables/useTraspasosCrud'
 import { SessionStorage } from 'quasar'
 import { useTipoMovimientoStore } from 'src/stores/common/useTipoMovimientoStore'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
+import DialogTitle from '../formComponents/modal/DialogTitle.vue'
 
 /**
  * composables

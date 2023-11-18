@@ -106,6 +106,11 @@
           <q-icon :name="props.row.icono" size="35px" color="cyan" />
         </template>
       </q-table>
+      <!-- <pre>Bad:
+      <span v-for="(error, i) of bancosCrud.error.graphQLErrors" :key="i">
+        {{ error.message }}
+      </span>
+    </pre> -->
     </div>
 
     <Teleport to="#modal">
@@ -156,10 +161,12 @@ bancosCrud.onDoneDeleteBanco(({ data }) => {
   }
 })
 bancosCrud.onErrorDeleteBanco((error) => {
-  notificacion.mostrarNotificacionNegativa(
-    'No es posible eliminar este banco, favor de verificar.',
-    1600
-  )
+  const errorString = error?.toString() ?? ''
+  const mensaje = errorString.includes('REFERENCE constraint')
+    ? 'El banco ha sido utilizado en alguna cuenta, no es posible eliminar'
+    : 'No es posible eliminar este banco, favor de verificar.'
+
+  notificacion.mostrarNotificacionNegativa(mensaje, 1600)
 })
 
 /**
@@ -269,9 +276,13 @@ function deleteItem(item) {
     persistent: true
   })
     .onOk(() => {
-      bancosCrud.deleteBanco(
-        { id: item.row.id }
+      bancosCrud.bancoDelete(
+        { id: item.row.id },
         // ,{ refetchQueries: ['listaBancos'] }
+        null,
+        {
+          errorPolicy: 'all'
+        }
       )
     })
     .onCancel(() => {})

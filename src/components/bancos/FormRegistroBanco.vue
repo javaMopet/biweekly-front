@@ -1,19 +1,6 @@
 <template>
   <div class="my-card" style="width: 400px; min-width: 400px">
-    <div class="row justify-between items-center dialog-title q-px-md">
-      <div class="dialog__title--name">{{ actionName }}</div>
-      <div class="dialog-closebutton">
-        <q-btn
-          color="primary"
-          icon="close"
-          v-close-popup
-          class="dialog__title--closeButton"
-          round
-          dense
-          glossy
-        ></q-btn>
-      </div>
-    </div>
+    <DialogTitle>{{ actionName }}</DialogTitle>
     <div class="q-pa-md">
       <q-form @submit="saveItem" class="">
         <div class="q-gutter-xs">
@@ -80,6 +67,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useBancosCrud } from 'src/composables/useBancosCrud'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { useBancoStore } from 'src/stores/common/useBancoStore'
+import DialogTitle from '../formComponents/modal/DialogTitle.vue'
 
 /**
  * composable
@@ -159,8 +147,7 @@ function saveItem() {
   console.log('save item', editedFormItem.value)
   const input = {
     ...editedFormItem.value,
-    miprecion: 5
-    // __typename: undefined
+    __typename: undefined
   }
   if (!editedFormItem.value.id) {
     console.log('guardando banco nueva', input)
@@ -211,8 +198,10 @@ function mostrarNotificacion(action, banco) {
 }
 
 bancosCrud.onErrorCreateBanco((error) => {
-  console.log(error)
-  console.error(error)
+  notificacion.mostrarNotificacionNegativa(
+    `Surgió un error al intentar crear el banco.`,
+    1500
+  )
 })
 
 bancosCrud.onErrorUpdateBanco((error) => {

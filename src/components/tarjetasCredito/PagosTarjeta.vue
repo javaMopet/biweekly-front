@@ -1,18 +1,6 @@
 <template>
   <q-card class="my-card" style="width: 500px">
-    <q-card-section class="row justify-between items-start dialog-title">
-      <div class="dialog__title--name">{{ cuenta.nombre }}</div>
-      <div class="dialog-closebutton">
-        <q-btn
-          icon="close"
-          v-close-popup
-          push
-          class="dialog__title--closeButton"
-          round
-          glossy
-        ></q-btn>
-      </div>
-    </q-card-section>
+    <DialogTitle>{{ cuenta.nombre }}</DialogTitle>
     <q-card-section>
       <q-form @submit="generarPago" class="q-px-lg">
         <transition name="fade">
@@ -106,6 +94,7 @@ import { DateTime } from 'luxon'
 import { api } from 'src/boot/axios'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { SessionStorage } from 'quasar'
+import DialogTitle from '../formComponents/modal/DialogTitle.vue'
 
 /**
  * composables

@@ -329,11 +329,14 @@ cuentasContablesCrud.onDoneCuentaContableDelete(({ data }) => {
   }
 })
 
-cuentasContablesCrud.onErrorCuentaContableDelete(() => {
-  notificacion.mostrarNotificacionNegativa(
-    `La cuenta contable no pudo ser eliminada. Favor de verificar.`,
-    1200
-  )
+cuentasContablesCrud.onErrorCuentaContableDelete((error) => {
+  const errorString = error?.toString() ?? ''
+
+  const mensaje = errorString.includes('REFERENCE constraint')
+    ? 'La cuenta contable ya ha sido utilizada, no es posible eliminar'
+    : 'No es posible eliminar este cuenta contable, favor de verificar.'
+
+  notificacion.mostrarNotificacionNegativa(mensaje, 1600)
 })
 
 // onErrorArbolCuentasContables((error) => {

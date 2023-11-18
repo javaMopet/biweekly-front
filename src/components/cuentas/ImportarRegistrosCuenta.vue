@@ -1,21 +1,6 @@
 <template>
   <div class="my-card" style="width: 80%; min-width: 80%; max-width: 80%">
-    <div class="row justify-between items-center dialog-title q-px-md">
-      <div class="dialog__title--name">
-        Cuenta &nbsp;&nbsp;~ {{ cuenta.nombre }} ~
-      </div>
-      <div class="dialog-closebutton">
-        <q-btn
-          color="primary"
-          icon="close"
-          v-close-popup
-          class="dialog__title--closeButton"
-          round
-          dense
-          glossy
-        ></q-btn>
-      </div>
-    </div>
+    <DialogTitle>Cuenta &nbsp;&nbsp;~ {{ cuenta.nombre }} ~</DialogTitle>
     <div class="main-content q-py-lg">
       <div class="q-pa-lg cuenta-content">
         <q-toolbar class="q-gutter-x-md">
@@ -246,6 +231,7 @@ import { format } from 'accounting-js'
 import TipoMovimientoSelect from '../formComponents/TipoMovimientoSelect.vue'
 import { SessionStorage } from 'quasar'
 import { useRegistrosCrud } from 'src/composables/useRegistrosCrud'
+import DialogTitle from '../formComponents/modal/DialogTitle.vue'
 
 /**
  * Composables
