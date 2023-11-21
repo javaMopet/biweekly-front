@@ -178,9 +178,7 @@
 </template>
 
 <script setup>
-import { useMutation } from '@vue/apollo-composable'
 import { ref, onMounted } from 'vue'
-// import { CUENTA_DELETE } from '/src/graphql/cuentas'
 import RegistroCuenta from 'src/components/cuentas/RegistroCuenta.vue'
 import { useQuasar } from 'quasar'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
@@ -316,8 +314,11 @@ function editRow(item) {
   showFormItem.value = true
 }
 function abrirMovimientos(props_row) {
+  console.log('abriendo movimientos', props_row)
   loadingCard.value[props_row.rowIndex] = true
-  router.push(`/tarjetas_credito/${props_row.row.id}`)
+  router.push(
+    `/tarjetas_credito/${props_row.row.id}?dia_corte=${props_row.row.diaCorte}`
+  )
 }
 
 function deleteRow(item) {

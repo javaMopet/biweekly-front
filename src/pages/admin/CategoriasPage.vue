@@ -270,10 +270,12 @@ categoriasCrud.onDoneCategoriaDelete(({ data }) => {
 })
 
 categoriasCrud.onErrorCategoriaDelete((error) => {
-  notificacion.mostrarNotificacionNegativa(
-    'No fue posible realizar la eliminación de la categoria',
-    1300
-  )
+  const errorString = error?.toString() ?? ''
+  const mensaje = errorString.includes('REFERENCE constraint')
+    ? 'La categoría ya ha sido utilizada previamente, no es posible eliminar, favor de verificar.'
+    : 'No es posible eliminar esta categoría, favor de verificar.'
+
+  notificacion.mostrarNotificacionNegativa(mensaje, 2200)
 })
 /**
  * computed

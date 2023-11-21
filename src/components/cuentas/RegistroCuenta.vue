@@ -16,6 +16,7 @@
               :options="tiposCuentaOptions"
               @update:model-value="tipoCuentaUpdated"
               push
+              :disable="isEditing"
             />
           </div>
           <div class="column items-center">
@@ -260,11 +261,17 @@ const isBancoRequerido = computed({
     return editedFormItem.value.tipoCuenta.id !== '2'
   }
 })
-const isCuentaBancariaRequerida = computed({
+
+const isEditing = computed({
   get() {
-    return editedFormItem.value.tipoCuenta.id === '1'
+    return !!editedFormItem.value.id
   }
 })
+// const isCuentaBancariaRequerida = computed({
+//   get() {
+//     return editedFormItem.value.tipoCuenta.id === '1'
+//   }
+// })
 /**
  * onMounted
  */
@@ -302,6 +309,12 @@ function saveItem() {
     input.saldo = parseFloat(0)
     cuentasCrud.cuentaCreate({ input })
   } else {
+    if (tipo_cuenta_id === '2') {
+      console.log('se cambio el tipo de cuenta', tipo_cuenta_id)
+      input.bancoId = null
+      input.diaCorte = null
+      input.identificador = null
+    }
     const id = editedFormItem.value.id
     console.log('actualizando cuenta', id, input)
     // input.saldo = parseFloat(0)

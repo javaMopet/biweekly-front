@@ -39,7 +39,7 @@
             <q-form
               @submit.prevent="submitForm"
               class="q-gutter-md q-pa-lg"
-              style="max-width: 300px; border: 0px solid yellow"
+              style="max-width: 350px; border: 0px solid yellow"
               fit
             >
               <q-input
@@ -49,6 +49,8 @@
                 type="text"
                 label="Nombre Completo"
                 dark
+                :rules="[(val) => !!val || 'Nombre completo requerido']"
+                outlined
               >
                 <template v-slot:prepend>
                   <q-icon name="badge" />
@@ -63,6 +65,7 @@
                 lazy-rules
                 type="email"
                 dark
+                outlined
                 :rules="[(val) => !!val || 'Correo es requerido']"
               >
                 <template v-slot:prepend>
@@ -80,6 +83,7 @@
                 class="border-accent"
                 lazy-rules
                 :rules="[(val) => !!val || 'Contraseña es requerida']"
+                outlined
               >
                 <template v-slot:prepend>
                   <q-icon name="lock" />
@@ -90,10 +94,11 @@
                 type="password"
                 input-class="text-accent"
                 v-model="form.password_confirmation"
-                label="Confirmación Contraseña"
+                label="Confirmar Contraseña"
                 lazy-rules
                 dark
                 :rules="[(val) => !!val || 'Contraseña es requerida']"
+                outlined
               >
                 <template v-slot:prepend>
                   <q-icon name="lock" />
@@ -123,27 +128,30 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { useSessionStore } from 'src/stores/sessionStore'
 import { useRouter } from 'vue-router'
 import { api } from 'src/boot/axios'
+import { useNotificacion } from 'src/composables/utils/useNotificacion'
 
-const username = ref(null)
-const password = ref(null)
-const returnUrl = ref(null)
-
+/**
+ * composables
+ */
 const $q = useQuasar()
-
 const router = useRouter()
-
 const sessionStore = useSessionStore()
+const { mostrarNotificacionNegativa } = useNotificacion()
 
 /**
  * state
  */
 const form = reactive({
-  name: '',
-  email: '',
-  password: '',
-  password_confirmation: ''
+  name: 'Horacio Peña Mendoza',
+  email: 'hpenam@uaemex.mx',
+  password: 'Sv)c2%h$Kzw2][GYu0b',
+  password_confirmation: 'Sv)c2%h$Kzw2][GYu0b'
 })
+
 const loginAction = ref('one')
+// const username = ref(null)
+// const password = ref(null)
+// const returnUrl = ref(null)
 // const btnLabel = ref("Entrar");
 
 /**
@@ -175,11 +183,35 @@ function submitForm() {
     }
     const promise = sessionStore.registerUser(payload)
     promise.then(
-      (result) => {
-        console.log('terminó la instruccion')
-        console.log('resultado', result)
-        console.log(result.data.id)
-        router.push('/home')
+      ({ data }) => {
+        console.log('data', data.status)
+        if (data.status === 'unprocessable_entity') {
+          console.log('data status', data.data.errors)
+          if (
+            data.data.errors.includes(
+              "Password confirmation doesn't match Password"
+            )
+          ) {
+            mostrarNotificacionNegativa(
+              'No coincide al password de confirmación, favor de verificar.'
+            )
+          }
+          if (data.data.errors.includes('Email has already been taken')) {
+            mostrarNotificacionNegativa('El email ya se encuentra registrado')
+          }
+          if (
+            data.data.errors.includes(
+              'Password is too short (minimum is 6 characters)'
+            )
+          ) {
+            mostrarNotificacionNegativa(
+              'Password demasiado corto (mínimo 6 caracteres)'
+            )
+          }
+        } else {
+          router.push('/home')
+        }
+
         // $q.notify({
         //   type: "positive",
         //   message: `Se registro correctamente el usuario`,
@@ -202,11 +234,21 @@ function submitForm() {
     const promise = sessionStore.loginUser(payload)
     promise.then(
       (result) => {
-        console.log('result', result)
+        console.log('Resultado correcto', result)
+
         router.push('/home')
       },
       (error) => {
         console.error('error', error)
+        console.log(error)
+        if (error.toString().includes('Request failed with status code 401')) {
+          mostrarNotificacionNegativa('Usuario y/o password incorrectos', 2100)
+        } else {
+          mostrarNotificacionNegativa(
+            'Ocurrió un error al intentar iniciar sesión',
+            2100
+          )
+        }
       }
     )
   }
@@ -226,7 +268,7 @@ function resetUserInfo() {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .my-custom-toggle {
   border: 1px solid #027be3;
 }
@@ -246,5 +288,15 @@ function resetUserInfo() {
   // -webkit-filter: none !important; /* Safari 6.0 - 9.0 */
   // filter: none !important;
   z-index: 1 !important;
+}
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  color: rgb(170, 27, 27) !important;
+  -webkit-text-fill-color: rgb(223, 169, 169) !important;
+  -webkit-box-shadow: 0 0 0 1000px darken($color: $dark, $amount: 1) inset !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
 }
 </style>

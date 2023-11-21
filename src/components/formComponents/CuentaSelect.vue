@@ -34,7 +34,11 @@
       transition-show="jump-up"
       transition-hide="jump-down"
     >
-      <RegistroCuenta></RegistroCuenta>
+      <!-- :edited-item="editedItem" -->
+      <RegistroCuenta
+        @cuentaSaved="cuentaSaved"
+        @cuentaUpdated="cuentaUpdated"
+      ></RegistroCuenta>
     </q-dialog>
   </Teleport>
 </template>
@@ -160,6 +164,9 @@ function filterFn(val, update) {
 }
 function registrarCuenta() {
   form_cuenta_show.value = true
+}
+function cuentaSaved(itemSaved) {
+  form_cuenta_show.value = false
 }
 </script>
 

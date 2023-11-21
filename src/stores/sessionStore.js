@@ -51,6 +51,7 @@ export const useSessionStore = defineStore('session', () => {
       api
         .post(`users`, payload)
         .then((response) => {
+          console.log('register response', response)
           setUserInfo(response)
           resolve(response)
         })
@@ -66,11 +67,12 @@ export const useSessionStore = defineStore('session', () => {
       api
         .post('users/sign_in/', payload)
         .then((response) => {
-          console.log('response.data', response.data)
-          setUserInfo(response)
+          console.log('response.data', response)
+          setUserInfoOnLogin(response)
           resolve(response)
         })
         .catch((error) => {
+          console.log(error)
           reject(error)
         })
     })
@@ -112,14 +114,29 @@ export const useSessionStore = defineStore('session', () => {
   /**
    * mutations
    */
+  function setUserInfoOnLogin(response) {
+    // console.log('response data', response.data)
+    if (response.data.message === 'You are logged in.') {
+      // console.log('data', response.data)
+      user.value = response.data.user
+      auth_token.value = response.headers.authorization
+      SessionStorage.set('auth_token', auth_token.value)
+      SessionStorage.set('user', user.value)
+      // console.log('headers', response.data.headers)
+    }
+  }
 
   function setUserInfo(response) {
-    user.value = response.data.user
-    console.log('usuarioRecuperado', user.value)
-    auth_token.value = response.headers.authorization
-    // api.defaults.headers.common["Authorization"] = auth_token.value;
-    SessionStorage.set('auth_token', auth_token.value)
-    SessionStorage.set('user', user.value)
+    // console.log('set user Infor', response)
+    // console.log('response data', response.data.status)
+    if (response.data.status.code === 200) {
+      // console.log('data', response.data.status.data)
+      user.value = response.data.status.data
+      SessionStorage.set('user', user.value)
+      auth_token.value = response.headers.authorization
+      SessionStorage.set('user', user.value)
+      // api.defaults.headers.common["Authorization"] = auth_token.value;
+    }
   }
 
   // function setUserInforFromToken(data) {
@@ -128,6 +145,7 @@ export const useSessionStore = defineStore('session', () => {
   // }
 
   function resetUserInfo() {
+    console.log('resetting info')
     user.value = null
     auth_token.value = null
     SessionStorage.remove('auth_token')

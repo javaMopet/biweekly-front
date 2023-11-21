@@ -229,6 +229,7 @@ function addItemCategoria(props_row) {
   showRegistroCategoria.value = true
 }
 function categoriaSaved(value) {
+  console.log('categoria saved')
   categoria.value = value
   showRegistroCategoria.value = false
 }

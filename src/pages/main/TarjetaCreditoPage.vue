@@ -170,7 +170,13 @@
             </template>
             <template #body-cell-acciones="props">
               <q-td :props="props">
-                <div class="row">
+                <q-btn
+                  color="primary"
+                  icon="check"
+                  label="OK"
+                  @click="onClick"
+                />
+                <!-- <div class="row">
                   <q-btn
                     color="primary"
                     icon="more_vert"
@@ -208,7 +214,7 @@
                       </q-list>
                     </q-menu>
                   </q-btn>
-                </div>
+                </div> -->
               </q-td>
             </template>
             <template #bottom-row>
@@ -228,6 +234,9 @@
             table-header-class="bg-primary-light text-accent text-condensed"
             separator="horizontal"
             :pagination-label="obtenerMensajePaginacion"
+            selection="multiple"
+            v-model:selected="selectedItems"
+            row-key="id"
           >
             <template #top-left>
               <q-tr class="cuenta__data-subtitle">
@@ -238,6 +247,17 @@
             <template #top-right>
               <div class="">
                 <div class="row q-gutter-x-md">
+                  <q-btn
+                    v-if="selectedItems.length > 0"
+                    no-caps
+                    color="negative-pastel"
+                    label="Eliminar"
+                    @click="deleteSelectedItems"
+                    push
+                    flat
+                    icon="las la-trash"
+                    rounded
+                  />
                   <q-btn
                     no-caps
                     color="primary"
@@ -293,8 +313,22 @@
               </q-td>
             </template>
             <template #body-cell-acciones="props">
-              <q-td :props="props">
-                <div class="row">
+              <q-td :props="props" class="q-gutter-x-sm">
+                <q-btn
+                  class="button-edit"
+                  icon="las la-edit"
+                  @click="editItem(props)"
+                  flat
+                  dense
+                />
+                <q-btn
+                  class="button-delete"
+                  icon="la la-trash-alt"
+                  @click="deleteItem(props)"
+                  flat
+                  dense
+                />
+                <!-- <div class="row">
                   <q-btn
                     color="primary"
                     icon="more_vert"
@@ -312,13 +346,6 @@
                         >
                           <q-item-section>Editar...</q-item-section>
                         </q-item>
-                        <!-- <q-item
-                          clickable
-                          v-close-popup
-                          @click="mesesSinInteres(props)"
-                        >
-                          <q-item-section>Meses Sin Intereses</q-item-section>
-                        </q-item> -->
                         <q-separator />
                         <q-item
                           clickable
@@ -332,12 +359,12 @@
                       </q-list>
                     </q-menu>
                   </q-btn>
-                </div>
+                </div> -->
               </q-td>
             </template>
             <template v-slot:bottom-row>
               <q-tr class="text-bold bg-table-summary">
-                <q-td colspan="2"> Totales: </q-td>
+                <q-td colspan="3"> Totales: </q-td>
                 <q-td align="right">
                   {{ formato.toCurrency(sumatoriaCargos) }}
                 </q-td>
@@ -412,6 +439,7 @@
     </q-dialog>
   </Teleport>
   <!-- <pre>{{ fechaInicioPeriodo }}{{ fecha_inicio }}</pre> -->
+  <!-- <pre>dia corte {{ dia_corte }}</pre> -->
 </template>
 
 <script setup>
@@ -421,7 +449,7 @@ import { DateTime } from 'luxon'
 import FormRegistroMovimientoTarjeta from 'src/components/tarjetasCredito/FormRegistroMovimientoTarjeta.vue'
 import { api } from 'src/boot/axios'
 import { LISTA_REGISTROS_TARJETA } from 'src/graphql/registrosTarjeta'
-import { useLazyQuery, useQuery } from '@vue/apollo-composable'
+import { useLazyQuery } from '@vue/apollo-composable'
 import { useFormato } from 'src/composables/utils/useFormato'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import RegistroMesesSinInteres from 'src/components/tarjetasCredito/RegistroMesesSinInteres.vue'
@@ -439,14 +467,16 @@ const router = useRouter()
 const formato = useFormato()
 const notificacion = useNotificacion()
 const $q = useQuasar()
-const tarjetaRegistrosCrud = useRegistrosTarjetaCrud()
+const registrosTarjetaCrud = useRegistrosTarjetaCrud()
 
+const { mostrarNotificacionPositiva, mostrarNotificacionNegativa } =
+  useNotificacion()
 /**
  * state
  */
 // const fecha_inicio = ref('1900-01-01')
 // const fecha_fin = ref('1900-01-01')
-const dia_corte = ref(0)
+// const dia_corte = ref(0)
 
 const listaRegistrosMsi = ref([])
 const listaRegistros = ref([])
@@ -479,16 +509,14 @@ const listaRegistrosVariables = reactive({
   estadoRegistroTarjetaId: null
 })
 
-// const variables = reactive({
-//   cuentaId: route.params.id,
-//   fechaInicio: '',
-//   fechaFin: ''
-// })
+const selectedItems = ref([])
+
 /**
  * onMounted
  */
 onMounted(() => {
   // console.log('buscando los datos de la tarjeta de crédito', route.params.id)
+
   const dateNow = DateTime.now()
   ejercicio_fiscal.value = dateNow.year
   const mes_id = dateNow.month
@@ -496,12 +524,15 @@ onMounted(() => {
     (mesOption) => mesOption.id === mes_id
   )
   mes.value = mes_value
+  // obtenerFechasInicial()
+  // obtenerFechasFinal()
 
   api.get(`/cuentas/${route.params.id}`).then((response) => {
     cuenta.value = response?.data.data ?? {}
-    dia_corte.value = cuenta.value.dia_corte
-
+    //   dia_corte.value = cuenta.value.dia_corte
     obtenerFechasInicialFinal()
+
+    loadOrRefetchListaRegistrosTarjeta()
 
     obtenerSaldoAnterior()
     obtenerSaldoTarjeta()
@@ -521,7 +552,51 @@ onMounted(() => {
     // )
   })
 })
+/**
+ * graphql
+ */
+const graphqlOptions = reactive({
+  // fetchPolicy: 'network-only'
+  fetchPolicy: 'no-cache'
+  // debounce: 10000
+})
+const {
+  load: loadListaRegistrosTarjeta,
+  onResult: onResultListaRegistrosTarjeta,
+  onError: onErrorListaRegistros,
+  refetch: refetchListaRegistros
+} = useLazyQuery(
+  LISTA_REGISTROS_TARJETA,
+  listaRegistrosVariables,
+  graphqlOptions
+)
 
+function loadOrRefetchListaRegistrosTarjeta() {
+  loadListaRegistrosTarjeta() || refetchListaRegistros()
+}
+
+onResultListaRegistrosTarjeta(({ data }) => {
+  if (!!data) {
+    console.log('lista de registros', data)
+    listaRegistros.value = data?.listaRegistrosTarjeta.filter(
+      (registro) => !registro.isMsi
+    )
+    console.table(listaRegistros.value)
+    listaRegistrosMsi.value = data?.listaRegistrosTarjeta.filter(
+      (registro) => registro.isMsi
+    )
+    listaRegistrosMsi.value.forEach((registro) => {
+      registro.importe = registro.importe * -1
+    })
+
+    // obtenerSaldoTarjeta()
+    // obtenerSaldoTarjetaAlDia()
+  }
+})
+
+onErrorListaRegistros((error) => {
+  console.error('response', error)
+})
 /**
  * computed
  */
@@ -661,40 +736,6 @@ const periodoFin = computed({
     return ''
   }
 })
-/**
- * graphql
- */
-const graphqlOptions = reactive({
-  // fetchPolicy: 'network-only'
-  fetchPolicy: 'no-cache'
-})
-const {
-  onError: onErrorListaRegistros,
-  onResult: onResultListaRegistrosTarjeta,
-  refetch: refetchListaRegistros
-} = useQuery(LISTA_REGISTROS_TARJETA, listaRegistrosVariables, graphqlOptions)
-
-onResultListaRegistrosTarjeta(({ data }) => {
-  if (!!data) {
-    console.log('lista de registros', data)
-    listaRegistros.value = data?.listaRegistrosTarjeta.filter(
-      (registro) => !registro.isMsi
-    )
-    listaRegistrosMsi.value = data?.listaRegistrosTarjeta.filter(
-      (registro) => registro.isMsi
-    )
-    listaRegistrosMsi.value.forEach((registro) => {
-      registro.importe = registro.importe * -1
-    })
-
-    // obtenerSaldoTarjeta()
-    // obtenerSaldoTarjetaAlDia()
-  }
-})
-
-onErrorListaRegistros((error) => {
-  console.error('response', error)
-})
 
 // const {
 //   mutate: deleteRegistroTarjeta,
@@ -702,23 +743,29 @@ onErrorListaRegistros((error) => {
 //   onError: onErrorDeleteRegistroTarjeta
 // } = useMutation(DELETE_REGISTRO_TARJETA)
 
-tarjetaRegistrosCrud.onDoneRegistroTarjetaDelete((response) => {
+registrosTarjetaCrud.onDoneRegistroTarjetaDelete((response) => {
   console.log('registro eliminado', response)
   loadOrRefetchListaRegistrosTarjeta()
   showSuccessMessage('eliminó')
 })
-tarjetaRegistrosCrud.onErrorRegistroTarjetaDelete((error) => {
+
+registrosTarjetaCrud.onDoneRegistrosTarjetaDelete(({ data }) => {
+  mostrarNotificacionPositiva('Los movimientos han sido eliminados.', 2100)
+  cuenta.value.saldo = data.registrosTarjetaDelete.saldo
+  loadOrRefetchListaRegistrosTarjeta()
+})
+
+registrosTarjetaCrud.onErrorRegistroTarjetaDelete((error) => {
   console.error(error)
 })
+
 function showSuccessMessage(action) {
   notificacion.mostrarNotificacionPositiva(
     `El registro se ${action} correctamente.`,
     1000
   )
 }
-function loadOrRefetchListaRegistrosTarjeta() {
-  loadListaRegistros() || refetchListaRegistros()
-}
+
 /**
  * functions
  */
@@ -734,6 +781,40 @@ function editItem(item) {
     registroEditedItem.value.fecha
   )
   showForm.value = true
+}
+function deleteSelectedItems() {
+  console.table(selectedItems.value)
+  if (selectedItems.value.length > 0) {
+    const message = `Esta a punto de eliminar ${selectedItems.value.length} movimientos. ¿Desea continuar?`
+    $q.dialog({
+      title: 'Confirmar',
+      style: 'width:500px',
+      message,
+      ok: {
+        push: true,
+        color: 'positive',
+        label: 'Continuar'
+      },
+      cancel: {
+        push: true,
+        color: 'negative',
+        flat: true,
+        label: 'cancelar'
+      },
+      persistent: true
+    })
+      .onOk(() => {
+        onConfirmDeleteItems(selectedItems.value)
+      })
+      .onCancel(() => {})
+      .onDismiss(() => {})
+  }
+}
+function onConfirmDeleteItems(toDelete) {
+  console.log(toDelete)
+  const eliminar = toDelete.map((item) => item.id)
+  console.log('eliminando', eliminar.toString())
+  registrosTarjetaCrud.registrosTarjetaDelete({ ids: eliminar.toString() })
 }
 
 function deleteItem(props_row) {
@@ -766,6 +847,9 @@ function deleteItem(props_row) {
     .onDismiss(() => {})
   // deleteRegistroTarjeta({ id: props_row.id })
 }
+// function obtenerFechaInicial(){
+
+// }
 
 function obtenerFechasInicialFinal() {
   const dia_inicio = ('0' + (cuenta.value.dia_corte + 1)).slice(-2)
@@ -1057,7 +1141,8 @@ const columns = [
     field: 'action',
     sortable: false,
     align: 'center',
-    style: 'width: 5%'
+    headerStyle: 'max-width:60px;width:60px;min-width:60px'
+    // style: 'width: 5%'
   }
 ]
 const columnsMsi = [

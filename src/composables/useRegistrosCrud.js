@@ -66,6 +66,23 @@ export function useRegistrosCrud() {
     const itemDeleted = data.registroDelete.registro
     cuentaCrud.cuentaSaldoUpdate({ cuentaId: itemDeleted.cuenta.id })
   })
+  onDoneImportarRegistros(({ data }) => {
+    console.log('Registros importados', data)
+    console.log(data.importarRegistros.registros[0].cuenta.id)
+    const cuenta_id = data.importarRegistros.registros[0].cuenta.id
+    cuentaCrud.cuentaSaldoUpdate({ cuentaId: cuenta_id })
+  })
+
+  onDoneRegistrosDelete(({ data }) => {
+    console.log('registros eliminados', data.registrosDelete.saldo)
+
+    // cuentaCrud.cuentaSaldoUpdate({ cuentaId: itemDeleted.cuenta.id })
+  })
+  onErrorRegistrosDelete((error) => {
+    console.log('ocurrio un error')
+    console.log(error)
+  })
+
   return {
     createRegistro,
     importarRegistros,

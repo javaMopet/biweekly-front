@@ -131,7 +131,7 @@ onMounted(() => {
 /**
  * emits
  */
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue', 'categoriaSaved'])
 /**
  * computed
  */
@@ -181,7 +181,15 @@ function agregarCategoria() {
   }
   showRegistroCategoria.value = true
 }
-function onCategoriaSaved() {}
+function onCategoriaSaved(categoriaSaved) {
+  showRegistroCategoria.value = false
+  categoria.value = categoriaSaved
+  tipoMovimiento.value = {
+    tipoMovimientoId: tipoMovimientoId.value,
+    value: categoriaSaved
+  }
+  emit('categoriaSaved', categoriaSaved)
+}
 </script>
 
 <style lang="scss" scoped></style>

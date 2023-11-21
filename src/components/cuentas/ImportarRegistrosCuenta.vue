@@ -1,5 +1,12 @@
 <template>
   <div class="my-card" style="width: 80%; min-width: 80%; max-width: 80%">
+    <q-inner-loading
+      :showing="isLoading"
+      label="Saving... Please wait..."
+      label-class="text-teal"
+      label-style="font-size: 1.1em"
+      style="z-index: 500"
+    />
     <DialogTitle>Cuenta &nbsp;&nbsp;~ {{ cuenta.nombre }} ~</DialogTitle>
     <div class="main-content q-py-lg">
       <div class="q-pa-lg cuenta-content">
@@ -142,6 +149,7 @@
                 <TipoMovimientoSelect
                   v-model="props.row.tipoMovimiento"
                   :tipo-afectacion="props.row.tipo_afectacion"
+                  @categoriaSaved="categoriaSaved"
                 ></TipoMovimientoSelect>
               </q-td>
             </template>
@@ -217,17 +225,12 @@
 </template>
 
 <script setup>
-/**
- * imports
- */
 import { ref, computed, onMounted } from 'vue'
 import { read, utils } from 'xlsx'
 import { useFormato } from 'src/composables/utils/useFormato'
-import { api } from 'src/boot/axios'
 import { DateTime } from 'luxon'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import DateInput from '../formComponents/DateInput.vue'
-import { format } from 'accounting-js'
 import TipoMovimientoSelect from '../formComponents/TipoMovimientoSelect.vue'
 import { SessionStorage } from 'quasar'
 import { useRegistrosCrud } from 'src/composables/useRegistrosCrud'
@@ -248,6 +251,7 @@ const todos = ref()
 const errorsList = ref([])
 const fecha_inicio = ref('01/01/1900')
 const fecha_fin = ref('01/01/1900')
+const isLoading = ref(false)
 
 /**
  * composables
@@ -563,6 +567,7 @@ function saveItemsAfterValidate(registrosInput, traspasosInput) {
   console.table(registrosInput)
   console.table(traspasosInput)
 
+  isLoading.value = true
   registrosCrud.importarRegistros({
     registrosInput,
     traspasosInput
@@ -582,6 +587,7 @@ function afterSaveItems() {
 }
 
 registrosCrud.onErrorImportarRegistros((error) => {
+  isLoading.value = false
   notificacion.mostrarNotificacionNegativa(
     'Ocurrió un error el intentar guardar los movimientos',
     1500
@@ -721,6 +727,9 @@ const columns = [
 ]
 function closeErrors() {
   errorsList.value.length = 0
+}
+function categoriaSaved() {
+  console.log('La categoria fue guardada correctamente')
 }
 // deprecated
 // api

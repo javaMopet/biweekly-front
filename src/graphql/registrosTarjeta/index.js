@@ -119,3 +119,11 @@ export const REGISTRO_TARJETA_DELETE = gql`
     }
   }
 `
+
+export const REGISTROS_TARJETA_DELETE = gql`
+  mutation registrosTarjetaDelete($ids: String!) {
+    registrosTarjetaDelete(ids: $ids) {
+      saldo
+    }
+  }
+`

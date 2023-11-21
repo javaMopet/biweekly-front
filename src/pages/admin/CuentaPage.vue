@@ -128,12 +128,21 @@
             <!-- <q-separator spaced inset vertical /> -->
             <div class="col column items-center">
               <span class="tarjeta__resumen-etiqueta"> Saldo al día</span>
-              <span
-                class="tarjeta__resumen-valor"
-                style="font-weight: bold !important"
-              >
-                {{ formato.toCurrency(parseFloat(cuenta.saldo)) }}
-              </span>
+              <div class="q-gutter-x-sm">
+                <span
+                  class="tarjeta__resumen-valor"
+                  style="font-weight: bold !important"
+                >
+                  {{ formato.toCurrency(cuenta.saldo) }}
+                </span>
+                <q-btn
+                  class="small-button"
+                  color="primary"
+                  icon="las la-redo-alt"
+                  @click="actualizarSaldoFinal"
+                  flat
+                />
+              </div>
             </div>
           </div>
         </q-card-section>
@@ -147,8 +156,8 @@
             table-header-class="bg-primary-light text-accent text-condensed"
             separator="horizontal"
             hide-pagination
-            :selected="selectedItems"
             selection="multiple"
+            v-model:selected="selectedItems"
             row-key="id"
           >
             <template #top-left>
@@ -159,6 +168,17 @@
             <template #top-right>
               <q-tr>
                 <div class="q-gutter-x-md">
+                  <q-btn
+                    v-if="selectedItems.length > 0"
+                    no-caps
+                    color="negative-pastel"
+                    label="Eliminar"
+                    @click="deleteSelectedItems"
+                    push
+                    flat
+                    icon="las la-trash"
+                    rounded
+                  />
                   <q-btn
                     no-caps
                     color="primary"
@@ -192,25 +212,6 @@
             <template #body-cell-categoria="props">
               <q-td key="categoria" :props="props">
                 {{ props.row.categoria?.nombre }}
-                <!-- <q-popup-edit
-                  v-model="props.row.categoria"
-                  title="Editar categoria"
-                  buttons
-                  @save="saveObs(props)"
-                  label-set="Guardar"
-                  label-cancel="Cancelar"
-                  v-slot="scope"
-                >
-                  <q-checkbox
-                    left-label
-                    v-model="props.row.todo"
-                    label="Todos"
-                  />
-                  <CategoriaSelect
-                    v-model="scope.value"
-                    autofocus
-                  ></CategoriaSelect>
-                </q-popup-edit> -->
               </q-td>
             </template>
             <template #body-cell-importe="props">
@@ -250,46 +251,28 @@
               </q-td>
             </template>
             <template #body-cell-acciones="props">
-              <q-td :props="props">
-                <div class="row">
-                  <q-btn
-                    color="primary"
-                    icon="more_vert"
-                    flat
-                    dense
-                    size=".6rem"
-                    round
-                  >
-                    <q-menu style="width: 200px; min-width: 200px" dense>
-                      <q-list dense>
-                        <q-item
-                          clickable
-                          v-close-popup
-                          @click="editItem(props)"
-                        >
-                          <q-item-section>Editar...</q-item-section>
-                        </q-item>
-                        <q-separator />
-                        <q-item
-                          clickable
-                          v-close-popup
-                          @click="deleteItem(props)"
-                        >
-                          <q-item-section class="text-negative">
-                            <span v-if="props.row.traspasoDetalle">
-                              Eliminar Traspaso</span
-                            ><span v-else>Eliminar</span></q-item-section
-                          >
-                        </q-item>
-                      </q-list>
-                    </q-menu>
-                  </q-btn>
-                </div>
+              <q-td :props="props" class="q-gutter-x-md">
+                <q-btn
+                  icon="las la-edit"
+                  size="md"
+                  class="button-edit"
+                  dense
+                  @click="editItem(props)"
+                  flat
+                />
+                <q-btn
+                  icon="las la-trash-alt"
+                  size="md"
+                  class="button-delete"
+                  dense
+                  @click="deleteItem(props)"
+                  flat
+                />
               </q-td>
             </template>
             <template #bottom-row>
               <q-tr>
-                <q-td colspan="3" class="text-condensed text-bold"
+                <q-td colspan="4" class="text-condensed text-bold"
                   >Importe total de movimientos del periodo</q-td
                 >
                 <q-td class="text-bold" align="right">{{
@@ -356,18 +339,26 @@ import MesSelect from 'src/components/formComponents/MesSelect.vue'
 import { OBTENER_SALDO_A_FECHA } from 'src/graphql/cuentas'
 import ImportarRegistrosCuenta from 'src/components/cuentas/ImportarRegistrosCuenta.vue'
 import { useTraspasosCrud } from 'src/composables/useTraspasosCrud'
+import { useCuentaStore } from 'src/stores/common/useCuentaStore'
+import { useCuentasCrud } from 'src/composables/useCuentasCrud'
 
+/**
+ * composables
+ */
 const route = useRoute()
 const router = useRouter()
 const formato = useFormato()
-const notificacion = useNotificacion()
 const registrosCrud = useRegistrosCrud()
 const $q = useQuasar()
 const traspasosCrud = useTraspasosCrud()
+const cuentaStore = useCuentaStore()
+const cuentasCrud = useCuentasCrud()
 
 /**
  * state
  */
+const { mostrarNotificacionPositiva, mostrarNotificacionNegativa } =
+  useNotificacion()
 // const fecha_inicio = ref('1900-01-01')
 // const fecha_fin = ref('1900-01-01')
 const dia_corte = ref(0)
@@ -540,14 +531,15 @@ const fecha_registro = computed({
 
 onResultListaRegistros(({ data }) => {
   if (!!data) {
-    console.log('onResultListaRegistros en CuentaPage...')
+    // console.log('onResultListaRegistros en CuentaPage...')
     listaRegistros.value = data?.obtenerRegistros ?? []
+    // console.table(listaRegistros.value)
   }
 })
 
 onErrorListaRegistros((error) => {
-  console.log(error.graphQLErrors)
-  console.log(error.networkError)
+  // console.log(error.graphQLErrors)
+  // console.log(error.networkError)
   if (process.env.NODE_ENV !== 'production') {
     logErrorMessages(error)
   }
@@ -567,14 +559,14 @@ const {
 )
 
 onErrorObtenerSaldo((error) => {
-  console.log(error)
+  // console.log(error)
 })
 /**
  * functions
  */
 
 function editItem(item) {
-  console.log('editando item...', item.rowIndex, item.row)
+  // console.log('editando item...', item.rowIndex, item.row)
   registroEditedItem.value = JSON.parse(JSON.stringify(item.row))
   const categoria = registroEditedItem.value.categoria
   registroEditedItem.value.importe = (
@@ -582,7 +574,7 @@ function editItem(item) {
       ? registroEditedItem.value.importe * -1
       : registroEditedItem.value.importe || registroEditedItem.value.importe
   ).toString()
-  console.log('fecha', registroEditedItem.value.fecha)
+  // console.log('fecha', registroEditedItem.value.fecha)
   registroEditedItem.value.fecha = formato.convertDateFromIsoToInput(
     registroEditedItem.value.fecha
   )
@@ -590,6 +582,61 @@ function editItem(item) {
     registroEditedItem.value.categoria?.tipoMovimientoId || '3'
   showForm.value = true
 }
+function deleteSelectedItems() {
+  console.table(selectedItems.value)
+  if (selectedItems.value.length > 0) {
+    const message = `Esta a punto de eliminar ${selectedItems.value.length} movimientos. ¿Desea continuar?`
+    $q.dialog({
+      title: 'Confirmar',
+      style: 'width:500px',
+      message,
+      ok: {
+        push: true,
+        color: 'positive',
+        label: 'Continuar'
+      },
+      cancel: {
+        push: true,
+        color: 'negative',
+        flat: true,
+        label: 'cancelar'
+      },
+      persistent: true
+    })
+      .onOk(() => {
+        confirmarEliminarItems(selectedItems.value)
+      })
+      .onCancel(() => {})
+      .onDismiss(() => {})
+  }
+}
+function confirmarEliminarItems(toDelete) {
+  console.log(toDelete)
+  const eliminar = toDelete.map((item) => item.id)
+  console.log('eliminando', eliminar.toString())
+  registrosCrud.registrosDelete({ ids: eliminar.toString() })
+}
+
+registrosCrud.onDoneRegistrosDelete(({ data }) => {
+  console.log('Terminó de eliminar registros', data.registrosDelete.saldo)
+  cuentaStore.actualizarSaldoCuenta(
+    cuenta.value.id.toString(),
+    data.registrosDelete.saldo
+  )
+  cuenta.value.saldo = data.registrosDelete.saldo
+  loadOrRefetchListaRegistros()
+  mostrarNotificacionPositiva(
+    'Los movimientos fueron eliminados exitosamente',
+    1600
+  )
+})
+
+registrosCrud.onErrorRegistrosDelete(() => {
+  mostrarNotificacionNegativa(
+    'No es posible eliminar los registros, favor de verificar.',
+    2100
+  )
+})
 
 function deleteItem(props_row) {
   const item = props_row.row
@@ -637,18 +684,12 @@ function confirmarEliminar(item) {
 
 registrosCrud.onDoneRegistroDelete(({ data }) => {
   loadOrRefetchListaRegistros()
-  notificacion.mostrarNotificacionPositiva(
-    'Registro eliminado correctamente.',
-    1000
-  )
+  mostrarNotificacionPositiva('Registro eliminado correctamente.', 1000)
   cargarDatosCuenta(route.params.id, false)
 })
 traspasosCrud.onDoneTraspasoDelete(({ data }) => {
   loadOrRefetchListaRegistros()
-  notificacion.mostrarNotificacionPositiva(
-    'Registro eliminado correctamente.',
-    1000
-  )
+  mostrarNotificacionPositiva('Registro eliminado correctamente.', 1000)
   cargarDatosCuenta(route.params.id, false)
 })
 
@@ -669,14 +710,14 @@ function onChangeMes(mes) {
   obtenerListaRegistros()
 }
 function onChangeEjercicio(ejercicio_fiscal) {
-  console.log('cambio de ejercicio', ejercicio_fiscal)
+  // console.log('cambio de ejercicio', ejercicio_fiscal)
   obtenerListaRegistros()
 }
 /**
  * Lista de registros de la tarjeta
  */
 function obtenerListaRegistros() {
-  console.log('obtenerListaRegistros()')
+  // console.log('obtenerListaRegistros()')
   const fechaInicio = `${ejercicio_fiscal.value}-${(
     '0' + mes_inicial_id.value
   ).slice(-2)}-01`
@@ -684,8 +725,8 @@ function obtenerListaRegistros() {
     '0' + mes_final_id.value
   ).slice(-2)}-${dia_corte_final.value}`
 
-  console.log('fechaInicio', fechaInicio)
-  console.log('fechaFin', fechaFin)
+  // console.log('fechaInicio', fechaInicio)
+  // console.log('fechaFin', fechaFin)
 
   // cargaListaRegistros(
   //   null,
@@ -718,7 +759,7 @@ function addItem() {
 }
 
 function saveObs(id, row, observaciones) {
-  console.log('observaciones', observaciones)
+  // console.log('observaciones', observaciones)
   const input = {
     ...row,
     observaciones: observaciones,
@@ -731,8 +772,8 @@ function saveObs(id, row, observaciones) {
     traspasoDetalle: undefined
   }
 
-  console.log('input', input)
-  registrosCrud.updateItem({
+  // console.log('input', input)
+  registrosCrud.registroUpdate({
     id,
     input
   })
@@ -743,11 +784,8 @@ registrosCrud.onErrorRegistroUpdate((response) => {
 })
 
 registrosCrud.onDoneRegistroUpdate((response) => {
-  console.log('updated ', response)
-  notificacion.mostrarNotificacionPositiva(
-    'Campo observación actualizado.',
-    700
-  )
+  // console.log('updated ', response)
+  mostrarNotificacionPositiva('Campo observación actualizado.', 700)
 })
 
 function confirmQuitarMsi(id) {
@@ -759,8 +797,8 @@ function confirmQuitarMsi(id) {
       }
     })
     .then(({ data }) => {
-      console.log('actualizado', data)
-      notificacion.mostrarNotificacionInformativa(
+      // console.log('actualizado', data)
+      mostrarNotificacionInformativa(
         'El registro se eliminó de Meses Sin Intereses',
         1200
       )
@@ -772,10 +810,7 @@ function confirmQuitarMsi(id) {
 }
 
 function itemSaved(registro) {
-  notificacion.mostrarNotificacionPositiva(
-    'Se ha ingresado un nuevo registro.',
-    1200
-  )
+  mostrarNotificacionPositiva('Se ha ingresado un nuevo registro.', 1200)
   refetchListaRegistros()
   obtenerMontosResumen()
   cargarDatosCuenta(route.params.id, false)
@@ -787,7 +822,7 @@ function obtenerMontosResumen() {
 }
 
 function onItemUpdated() {
-  notificacion.mostrarNotificacionPositiva(
+  mostrarNotificacionPositiva(
     'Se ha actualizado el registro correctamente.',
     1200
   )
@@ -799,10 +834,19 @@ function onItemUpdated() {
 function itemsSaved() {
   showFormCarga.value = false
   loadOrRefetchListaRegistros()
+  actualizarSaldoFinal()
 }
 function loadOrRefetchListaRegistros() {
-  cargaListaRegistros() || refetchListaRegistros()
+  /* cargaListaRegistros() || */ refetchListaRegistros()
 }
+
+function actualizarSaldoFinal() {
+  cuentasCrud.cuentaSaldoUpdate({ cuentaId: route.params.id.toString() })
+}
+
+cuentasCrud.onDoneCuentaSaldoUpdate(({ data }) => {
+  cuenta.value.saldo = data.cuentaSaldoUpdate.cuenta.saldo
+})
 
 const mesOptions = ref([
   { id: 1, nombre: 'Enero' },
@@ -828,23 +872,23 @@ const columns = [
     sortable: true,
     align: 'left',
     format: (val, row) => formato.formatoFechaFromISO(val),
-    style: 'width: 10%'
+    headerStyle: 'width: 90px'
   },
   {
     name: 'tipomovimeinto',
     label: 'TMovId',
     field: 'registrableType',
     sortable: true,
-    align: 'left',
-    style: 'width: 10%'
+    align: 'left'
+    // style: 'width: 10%'
   },
   {
     name: 'categoria',
     label: 'Concepto',
     field: (row) => row.categoria.nombre,
     sortable: true,
-    align: 'left',
-    style: 'width:30%'
+    align: 'left'
+    // style: 'width:20%'
   },
   {
     name: 'importe',
@@ -853,15 +897,15 @@ const columns = [
     sortable: true,
     align: 'right',
     format: (val, row) => formato.toCurrency(val),
-    style: 'width:15%;color: red'
+    headerStyle: 'width: 120px; min-width:120px'
   },
   {
     name: 'observaciones',
     label: 'Observaciones',
     field: 'observaciones',
     sortable: true,
-    align: 'left',
-    style: 'width: 40%'
+    align: 'left'
+    // style: 'width: 20%'
   },
   {
     name: 'tarjetaCredito',
@@ -869,7 +913,7 @@ const columns = [
     field: (row) => row.registroTarjeta?.cuenta.nombre,
     sortable: true,
     align: 'left',
-    style: 'width: 40%'
+    headerStyle: 'width: 120px;min-width:120px;max-width:120px'
   },
   {
     name: 'tarjetaCredito',
@@ -877,15 +921,15 @@ const columns = [
     field: (row) => row.registroTarjeta?.fecha,
     sortable: true,
     align: 'left',
-    style: 'width: 40%',
-    format: (val, row) => (val ? formato.formatoFechaFromISO(val) : '')
+    format: (val, row) => (val ? formato.formatoFechaFromISO(val) : ''),
+    headerStyle: 'width: 120px;min-width:120px;max-width:120px'
   },
   {
     name: 'acciones',
     field: 'action',
     sortable: false,
     align: 'center',
-    style: 'width: 5%'
+    headerStyle: 'width: 70px'
   }
 ]
 </script>

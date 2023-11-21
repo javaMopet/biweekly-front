@@ -13,39 +13,50 @@ export const useCuentaStore = defineStore('cuentaStore', () => {
    * composables
    */
 
-  const graphql_opciones = reactive({
-    fetchPolicy: 'no-cache'
+  /**
+   * graphql
+   */
+  const graphqlOptions = reactive({
+    fetchPolicy: 'network-only'
   })
 
   const { onResult: onResultListaCuentas, onError: onErrorListaCuentas } =
-    useQuery(LISTA_CUENTAS, null, graphql_opciones)
+    useQuery(LISTA_CUENTAS, null, graphqlOptions)
 
   onResultListaCuentas(({ data }) => {
     console.log('data', data)
     if (!!data) {
-      console.log('Guardando cuentas en el store')
+      console.log('Obteniendo lista de cuentas')
       listaCuentas.value = JSON.parse(JSON.stringify(data.listaCuentas))
     }
   })
 
   onErrorListaCuentas((error) => {
-    console.log('error', error)
+    // console.log('error', error)
   })
 
   /**
    * computed
    */
-  const listaCuentasAhorro = computed({
-    get() {
-      return listaCuentas.value.filter((c) => c.tipoCuenta.id !== '3') ?? []
-    }
-  })
 
   const listaCuentasTarjeta = computed({
     get() {
       return listaCuentas.value.filter((c) => c.tipoCuenta.id === '3') ?? []
     }
   })
+  /**
+   * methods
+   */
+
+  function actualizarSaldoCuenta(cuenta_id, saldo) {
+    console.log(cuenta_id)
+    console.table(listaCuentas.value)
+    const cuentaIndex = listaCuentas.value.findIndex((c) => c.id === cuenta_id)
+    console.log('cuentaIndex', cuentaIndex)
+    const cuentaModificar = listaCuentas.value[cuentaIndex]
+    console.log('cuenta a modificar.', cuentaModificar)
+    cuentaModificar.saldo = saldo
+  }
 
   /**
    * Manejo de errores
@@ -53,7 +64,7 @@ export const useCuentaStore = defineStore('cuentaStore', () => {
 
   return {
     listaCuentas,
-    listaCuentasAhorro,
-    listaCuentasTarjeta
+    listaCuentasTarjeta,
+    actualizarSaldoCuenta
   }
 })

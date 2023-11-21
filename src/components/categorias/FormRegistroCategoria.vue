@@ -362,7 +362,7 @@ categoriaCrud.onDoneCategoriaCreate(({ data }) => {
   if (!!data) {
     notificacion.mostrarNotificacionPositiva(
       'Categoría creada correctamente.',
-      1200
+      1600
     )
     const itemSaved = data.categoriaCreate.categoria
     emit('categoriaSaved', itemSaved)
@@ -373,7 +373,7 @@ categoriaCrud.onDoneCategoriaUpdate(({ data }) => {
   if (!!data) {
     notificacion.mostrarNotificacionPositiva(
       'Categoría actualizada correctamente.',
-      1200
+      1600
     )
     const itemUpdated = data.categoriaUpdate.categoria
     emit('categoriaUpdated', itemUpdated, props.editedIndex)

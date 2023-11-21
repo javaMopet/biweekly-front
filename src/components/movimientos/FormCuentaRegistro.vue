@@ -1,12 +1,11 @@
 <template>
-  <div class="my-card" style="width: 630px">
+  <div class="my-card" style="width: 630px; min-width: 630px">
     <DialogTitle>{{ actionName }}</DialogTitle>
-    <div class="q-px-xl q-pt-xl q-pb-lg">
+    <div class="q-px-xl q-pb-lg">
       <!-- form-componente__body -->
       <q-form @submit="saveItem" class="q-gutter-y-md">
         <div class="q-py-lg">
           <q-btn-toggle
-            class="text-condensed"
             v-model="editedFormItem.tipoMovimientoId"
             spread
             no-caps

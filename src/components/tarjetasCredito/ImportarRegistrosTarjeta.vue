@@ -1,5 +1,12 @@
 <template>
   <q-card class="my-card" dense style="width: 80%; min-width: 80%">
+    <q-inner-loading
+      :showing="isLoading"
+      label="Saving... Please wait..."
+      label-class="text-teal"
+      label-style="font-size: 1.1em"
+      style="z-index: 500"
+    />
     <DialogTitle
       >Tarjeta de crédito &nbsp;&nbsp;~ {{ cuenta.nombre }} ~</DialogTitle
     >
@@ -199,6 +206,7 @@ const todos = ref()
 const fecha_inicio = ref('01/01/1900')
 const fecha_fin = ref('01/01/1900')
 const errorItems = ref([])
+const isLoading = ref(false)
 /**
  * composables
  */
@@ -432,7 +440,7 @@ function saveItems() {
       }
       lista_registros_tarjeta.push(registro)
     })
-
+    isLoading.value = true
     api
       .post('/create_multiple_registros_tarjeta', {
         lista_registros_tarjeta
@@ -440,9 +448,11 @@ function saveItems() {
       .then((response) => {
         console.log('guardado correctamente')
         console.log('response', response)
+        isLoading.value = false
         emit('itemsSaved')
       })
       .catch((error) => {
+        isLoading.value = false
         console.error(error.response.data.exception)
         notificacion.mostrarNotificacionNegativa(
           'No fue posible posible guardar los registro, revisar consola',

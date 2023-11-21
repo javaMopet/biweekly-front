@@ -1,10 +1,9 @@
-import { useMutation, useQuery } from '@vue/apollo-composable'
-import { ref } from 'vue'
+import { useMutation } from '@vue/apollo-composable'
 import {
   REGISTRO_TARJETA_CREATE,
   REGISTRO_TARJETA_UPDATE,
-  REGISTRO_TARJETA_DELETE
-  // REGISTROS_TARJETA_DELETE
+  REGISTRO_TARJETA_DELETE,
+  REGISTROS_TARJETA_DELETE
   // IMPORTAR_REGISTROS_TARJETA
 } from 'src/graphql/registrosTarjeta'
 
@@ -40,11 +39,11 @@ export function useRegistrosTarjetaCrud() {
     onError: onErrorRegistroTarjetaDelete
   } = useMutation(REGISTRO_TARJETA_DELETE)
 
-  // const {
-  //   mutate: registrosDelete,
-  //   onDone: onDoneRegistrosTarjetaDelete,
-  //   onError: onErrorRegistrosTarjetaDelete
-  // } = useMutation(REGISTROS_TARJETA_DELETE)
+  const {
+    mutate: registrosTarjetaDelete,
+    onDone: onDoneRegistrosTarjetaDelete,
+    onError: onErrorRegistrosTarjetaDelete
+  } = useMutation(REGISTROS_TARJETA_DELETE)
 
   // const {
   //   mutate: importarRegistrosTarjeta,
@@ -68,6 +67,13 @@ export function useRegistrosTarjetaCrud() {
     cuentaCrud.cuentaSaldoUpdate({ cuentaId: itemDeleted.cuenta.id })
   })
 
+  onDoneRegistrosTarjetaDelete(({ data }) => {
+    console.log(
+      'registroTarjeta actualizado',
+      data.registrosTarjetaDelete.saldo
+    )
+  })
+
   return {
     createRegistroTarjeta,
     onDoneRegistroTarjetaCreate,
@@ -77,12 +83,12 @@ export function useRegistrosTarjetaCrud() {
     registroTarjetaUpdate,
     onDoneRegistroTarjetaUpdate,
     onErrorRegistroTarjetaCreate,
-    onErrorRegistroTarjetaUpdate
+    onErrorRegistroTarjetaUpdate,
     // importarRegistrosTarjeta,
     // onDoneImportarRegistrosTarjeta,
     // onErrorImportarRegistrosTarjeta,
-    // registrosDelete,
-    // onDoneRegistrosTarjetaDelete,
+    registrosTarjetaDelete,
+    onDoneRegistrosTarjetaDelete
     // onErrorRegistrosTarjetaDelete
   }
 }

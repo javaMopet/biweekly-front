@@ -262,8 +262,11 @@ function onSelectCategoria(value) {
     // if (!props.editedItem.cuenta) {
     //   editedFormItem.value.cuenta = value.cuentaDefault
     // }
+    console.log(value.importeDefault)
+    const importeDefault = value.importeDefault ?? ''
+    console.log(importeDefault)
     editedFormItem.value.importe =
-      value.importeDefault === 0 ? '' : value.importeDefault.toString()
+      value.importeDefault === 0 ? '' : importeDefault.toString()
   }
 }
 </script>

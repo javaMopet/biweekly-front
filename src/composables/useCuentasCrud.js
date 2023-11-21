@@ -12,22 +12,6 @@ export function useCuentasCrud() {
    * composables
    */
   const cuentaStore = useCuentaStore()
-  /**
-   * graphql
-   */
-  // const graphql_options = ref({
-  //   fetchPolicy: 'network-only'
-  // })
-
-  // const {
-  //   // result: resultadoListaReduced,
-  //   onResult: onResultListaReduced,
-  //   onError: onErrorListaCuentasReduced
-  // } = useLazyQuery(
-  //   LISTA_CUENTAS_REDUCED,
-  //   null, //arguments
-  //   graphql_options
-  // )
 
   const {
     mutate: cuentaCreate,
@@ -53,25 +37,19 @@ export function useCuentasCrud() {
     onError: onErrorCuentaSaldoUpdate
   } = useMutation(CUENTA_SALDO_UPDATE)
 
-  // const listaCuentasReduced = computed({
-  //   get() {
-  //     return resultadoListaReduced.value?.listaCuentas ?? []
-  //   }
-  // })
-
   onDoneCuentaCreate(({ data }) => {
     const itemSaved = data.cuentaCreate.cuenta
     cuentaStore.listaCuentas.push(itemSaved)
   })
   onDoneCuentaUpdate(({ data }) => {
     if (!!data) {
-      console.log('ejecutando onDonecuentaUpdate useCuentaCrud', data)
+      // console.log('ejecutando onDonecuentaUpdate useCuentaCrud', data)
       const itemUpdated = data.cuentaUpdate.cuenta
-      console.log('itemUpdated... ', itemUpdated)
+      // console.log('itemUpdated... ', itemUpdated)
       const index = cuentaStore.listaCuentas.findIndex(
         (c) => c.id === itemUpdated.id
       )
-      console.log('index updated', index)
+      // console.log('index updated', index)
       cuentaStore.listaCuentas[index] = itemUpdated
     }
   })
@@ -80,18 +58,19 @@ export function useCuentasCrud() {
     const index = cuentaStore.listaCuentas.findIndex(
       (c) => c.id === itemDeleted.id
     )
-    console.log('index item deleted', index)
+    // console.log('index item deleted', index)
     cuentaStore.listaCuentas.splice(index, 1)
   })
 
   onDoneCuentaSaldoUpdate(({ data }) => {
     console.log('Se actualizo el saldo de la cuenta', data)
-    console.log('Actualizar en la interfaz')
+    // console.log('Actualizar en la interfaz')
     const saldoUpdated = data.cuentaSaldoUpdate.cuenta
     updateCuentaInterfaz(saldoUpdated)
   })
 
   function updateCuentaInterfaz(saldoUpdated) {
+    console.log('Se actualiza el saldo de la cuenta interfaz', saldoUpdated)
     const index = cuentaStore.listaCuentas.findIndex(
       (c) => c.id === saldoUpdated.id
     )
@@ -121,6 +100,7 @@ export function useCuentasCrud() {
     onDoneCuentaCreate,
     onDoneCuentaUpdate,
     onDoneCuentaDelete,
+    onDoneCuentaSaldoUpdate,
     onErrorCuentaCreate,
     onErrorCuentaUpdate,
     onErrorCuentaDelete

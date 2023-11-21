@@ -23,7 +23,7 @@
           grid
           style="width: 100%"
           dense
-          :rows="cuentaStore.listaCuentasAhorro"
+          :rows="listaCuentasAhorro"
           :columns="columns"
           row-key="id"
           :filter="filter"
@@ -250,7 +250,7 @@
           ></RegistroCuenta>
         </q-dialog>
       </Teleport>
-      <!-- <pre>{{ listaCuentas }}</pre> -->
+      <!-- <pre>{{ cuentaStore.listaCuentas.length }}</pre> -->
     </div>
   </div>
 </template>
@@ -371,6 +371,12 @@ const columns = [
  */
 onMounted(() => {
   // cuentasCrud.loadListaCuentas()
+})
+
+const listaCuentasAhorro = computed({
+  get() {
+    return cuentaStore.listaCuentas.filter((c) => c.tipoCuenta.id !== '3') ?? []
+  }
 })
 
 // onResultCuentas(({ data }) => {
