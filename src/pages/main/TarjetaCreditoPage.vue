@@ -169,14 +169,14 @@
                     Saldo Final al {{ periodoFin }}
                   </span>
                   <span class="tarjeta__resumen-valor">
-                    {{ formato.toCurrency(saldo_final_periodo) }}
+                    {{ formato.toCurrency(Math.abs(saldo_final_periodo)) }}
                   </span>
                 </div>
                 <q-separator spaced vertical />
                 <div class="col column items-center">
                   <span class="tarjeta__resumen-etiqueta"> Saldo al Día </span>
                   <span class="tarjeta__resumen-valor">
-                    {{ formato.toCurrency(cuenta.saldo * -1) }}
+                    {{ formato.toCurrency(Math.abs(cuenta.saldo)) }}
                   </span>
                 </div>
               </div>
@@ -512,7 +512,7 @@ import { DateTime } from 'luxon'
 import FormRegistroMovimientoTarjeta from 'src/components/tarjetasCredito/FormRegistroMovimientoTarjeta.vue'
 import { api } from 'src/boot/axios'
 import { LISTA_REGISTROS_TARJETA } from 'src/graphql/registrosTarjeta'
-import { useLazyQuery } from '@vue/apollo-composable'
+import { useLazyQuery, useQuery } from '@vue/apollo-composable'
 import { useFormato } from 'src/composables/utils/useFormato'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import RegistroMesesSinInteres from 'src/components/tarjetasCredito/RegistroMesesSinInteres.vue'
@@ -522,6 +522,7 @@ import MesSelect from 'src/components/formComponents/MesSelect.vue'
 import ImportarRegistrosTarjeta from 'src/components/tarjetasCredito/ImportarRegistrosTarjeta.vue'
 import { useRegistrosTarjetaCrud } from 'src/composables/useRegistrosTarjetaCrud'
 import { useCuentasCrud } from 'src/composables/useCuentasCrud'
+import { SALDO_TARJETA_CREDITO } from 'src/graphql/cuentas'
 
 /**
  * composables
@@ -760,6 +761,7 @@ const fechaFinPeriodo = computed({
     )}-${dia_fin}`
   }
 })
+
 const fecha_registro = computed({
   get() {
     const begin_date = DateTime.fromISO(fechaInicioPeriodo.value)
@@ -801,7 +803,35 @@ const periodoFin = computed({
     return ''
   }
 })
+/**
+ *
+ */
+const opcionesGraphql = reactive({
+  fetchPolicy: 'network-only'
+  // fetchPolicy: 'no-cache',
+  // debounce: 1000
+})
 
+const saldoTarjetaVariables = reactive({
+  cuentaId: route.params.id,
+  fechaFin: null,
+  isDetalle: 0
+})
+
+const {
+  onResult: onResultSaldoTarjetaCredito,
+  onError: onErrorSaldoTarjetaCredito
+} = useQuery(SALDO_TARJETA_CREDITO, saldoTarjetaVariables, opcionesGraphql)
+
+onResultSaldoTarjetaCredito(({ data }) => {
+  console.log('resultado', data.SaldoTarjetaCredito)
+  saldo_final_periodo.value = data.SaldoTarjetaCredito
+})
+
+onErrorSaldoTarjetaCredito((error) => {
+  console.trace(error)
+  mostrarNotificacionNegativa('Ocurrió un error al intentar obtener el saldo')
+})
 // const {
 //   mutate: deleteRegistroTarjeta,
 //   onDone: onDoneDeleteRegistroTarjeta,
@@ -1009,8 +1039,18 @@ function onChangePeriodo() {
   obtenerListaRegistros()
   obtenerSaldoTarjetaAlFinalPeriodo()
 }
+
 function obtenerSaldoTarjetaAlFinalPeriodo() {
-  cuentasCrud.loadSaldoTarjetaCredito(null, variables, graphqlOptions)
+  // cuentasCrud.loadSaldoTarjetaCredito(
+  //   {
+  //     cuentaId: route.params.id,
+  //     fechaFin: fechaFinPeriodo.value,
+  //     isDetalle: 0
+  //   },
+  //   graphqlOptions
+  // )
+  console.log('cambio de fecha final', fechaFinPeriodo.value)
+  saldoTarjetaVariables.fechaFin = fechaFinPeriodo.value
 }
 /**
  * Lista de registros de la tarjeta
@@ -1284,10 +1324,6 @@ const columnsMsi = [
 ]
 
 function actualizarSaldosTarjeta() {}
-
-cuentasCrud.onErrorSaldoTarjetaCredito((error) => {
-  mostrarNotificacionNegativa('Ocurrió un error al intentar obtener el saldo')
-})
 </script>
 
 <style lang="scss" scoped>

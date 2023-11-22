@@ -166,7 +166,7 @@ export const CUENTA_DELETE = gql`
 export const SALDO_TARJETA_CREDITO = gql`
   query saldoTarjetaCredito(
     $cuentaId: ID!
-    $fechaFin: ISO8601Date!
+    $fechaFin: ISO8601Date
     $isDetalle: Int!
   ) {
     SaldoTarjetaCredito(
