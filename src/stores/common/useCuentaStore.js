@@ -24,9 +24,9 @@ export const useCuentaStore = defineStore('cuentaStore', () => {
     useQuery(LISTA_CUENTAS, null, graphqlOptions)
 
   onResultListaCuentas(({ data }) => {
-    console.log('data', data)
+    // console.log('data', data)
     if (!!data) {
-      console.log('Obteniendo lista de cuentas')
+      // console.log('Obteniendo lista de cuentas')
       listaCuentas.value = JSON.parse(JSON.stringify(data.listaCuentas))
     }
   })

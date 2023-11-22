@@ -138,6 +138,7 @@
             <CategoriaSelect
               v-model="props.row.categoria"
               :tipo-afectacion="props.row.tipo_afectacion"
+              :agregar="true"
             ></CategoriaSelect>
           </q-td>
         </template>

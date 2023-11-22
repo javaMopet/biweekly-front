@@ -43,95 +43,149 @@
   </q-card>
   <div class="main-content">
     <div class="cuenta-content">
-      <q-toolbar class="q-pt-md">
-        <div class="row q-gutter-x-sm">
-          <div class="row q-gutter-x-md q-px-md">
-            <q-select
-              v-model="ejercicio_fiscal"
-              :options="ejercicioFiscalOptions"
-              option-label="nombre"
-              label="Año"
-              dense
-              outlined
-              color="secondary"
-              label-color="dark"
-              @update:model-value="onChangeEjercicio"
-            >
-              <template #prepend>
-                <q-icon name="calendar_month" />
-              </template>
-            </q-select>
-            <MesSelect
-              v-model="mes"
-              @update:model-value="onChangeMes"
-            ></MesSelect>
-          </div>
-          <q-separator spaced vertical inset />
-          <q-btn
-            color="toolbar-button"
-            label="pagos"
-            @click="pagosTarjeta"
-            push
-          />
-        </div>
-      </q-toolbar>
-      <q-card flat>
-        <q-card-section>
-          <div class="row">
-            <div class="col column items-center">
-              <span class="tarjeta__resumen-etiqueta"> Día de corte </span>
-              <span
-                class="tarjeta__resumen-valor"
-                style="font-size: 1rem !important; font-weight: bold"
-              >
-                {{ cuenta.dia_corte }}</span
-              >
+      <q-card class="my-card" flat bordered>
+        <q-card-section
+          class="q-pa-xs"
+          flat
+          dense
+          style="border: 0px solid red"
+        >
+          <q-toolbar class="" style="border: 0px solid green">
+            <div class="row q-gutter-x-sm">
+              <div class="row q-gutter-x-md q-px-md">
+                <q-select
+                  v-model="ejercicio_fiscal"
+                  :options="ejercicioFiscalOptions"
+                  option-label="nombre"
+                  label="Año"
+                  dense
+                  outlined
+                  color="secondary"
+                  label-color="dark"
+                  @update:model-value="onChangeEjercicio"
+                >
+                  <template #prepend>
+                    <q-icon name="calendar_month" />
+                  </template>
+                </q-select>
+                <MesSelect
+                  v-model="mes"
+                  @update:model-value="onChangeMes"
+                ></MesSelect>
+              </div>
+              <q-separator spaced vertical inset />
+              <q-btn
+                color="toolbar-button"
+                label="pagos"
+                @click="pagosTarjeta"
+                push
+              />
             </div>
-            <q-separator spaced vertical />
-            <div class="col column items-center">
-              <span class="tarjeta__resumen-etiqueta"> Periodo </span>
-              <span class="tarjeta__resumen-valor">
-                {{ periodoInicio }} - {{ periodoFin }}</span
-              >
-            </div>
-            <q-separator spaced vertical />
-            <div class="col column items-center">
-              <span class="tarjeta__resumen-etiqueta">
-                Importe del periodo
-              </span>
-              <span class="tarjeta__resumen-valor-importante">
-                {{ formato.toCurrency(sumaMovimientos) }}</span
-              >
-            </div>
-            <q-separator spaced vertical />
-            <div class="col column items-center">
-              <span class="tarjeta__resumen-etiqueta">
-                Saldo del periodo anterior
-              </span>
-              <span class="tarjeta__resumen-valor">
-                {{ formato.toCurrency(saldo_anterior) }}</span
-              >
-            </div>
-          </div>
-          <q-separator spaced horizontal />
-          <div class="row">
-            <div class="col column items-center">
-              <span class="tarjeta__resumen-etiqueta">
-                Saldo Final al {{ periodoFin }}
-              </span>
-              <span class="tarjeta__resumen-valor">
-                {{ formato.toCurrency(saldo_final_periodo) }}
-              </span>
-            </div>
-            <q-separator spaced vertical />
-            <div class="col column items-center">
-              <span class="tarjeta__resumen-etiqueta"> Saldo al Día </span>
-              <span class="tarjeta__resumen-valor">
-                {{ formato.toCurrency(saldo_al_dia) }}
-              </span>
-            </div>
-          </div>
+          </q-toolbar>
         </q-card-section>
+        <q-card-actions>
+          <!-- <q-btn flat color="primary" label="Share" />
+          <q-btn flat color="secondary" label="Book" /> -->
+          RESUMEN: &nbsp;
+
+          <div class="row text-condensed" v-if="!expanded">
+            <div class="column q-ml-lg items-center justify-center">
+              <span class="tarjeta__resumen-etiqueta">Periodo:</span
+              >{{ periodoInicio }} - {{ periodoFin }}
+            </div>
+            <div class="column q-ml-lg items-center justify-center">
+              <span class="tarjeta__resumen-etiqueta"
+                >Pago p/ no generar intereses):</span
+              >{{ formato.toCurrency(saldo_final_periodo) }}
+            </div>
+            <div class="column q-ml-lg items-center justify-center">
+              <span class="tarjeta__resumen-etiqueta"
+                >Saldo final en tarjeta:</span
+              >{{ formato.toCurrency(saldo_final_periodo) }}
+            </div>
+          </div>
+          <q-space />
+
+          <q-btn
+            class="small-button"
+            color="primary"
+            icon="las la-redo-alt"
+            @click="actualizarSaldosTarjeta"
+            flat
+          />
+          <q-btn
+            color="grey"
+            round
+            flat
+            dense
+            :icon="expanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'"
+            @click="expanded = !expanded"
+          />
+        </q-card-actions>
+        <q-slide-transition>
+          <div v-show="expanded">
+            <q-separator />
+            <q-card-section>
+              <div class="row">
+                <div class="col column items-center">
+                  <span class="tarjeta__resumen-etiqueta"> Día de corte </span>
+                  <span
+                    class="tarjeta__resumen-valor"
+                    style="font-size: 1rem !important; font-weight: bold"
+                  >
+                    {{ cuenta.dia_corte }}</span
+                  >
+                </div>
+                <q-separator spaced vertical />
+                <div class="col column items-center">
+                  <span class="tarjeta__resumen-etiqueta"> Periodo </span>
+                  <span class="tarjeta__resumen-valor">
+                    {{ periodoInicio }} - {{ periodoFin }}</span
+                  >
+                </div>
+                <q-separator spaced vertical />
+                <div class="col column items-center">
+                  <span class="tarjeta__resumen-etiqueta">
+                    Importe del periodo
+                  </span>
+                  <span class="tarjeta__resumen-valor-importante">
+                    {{ formato.toCurrency(sumaMovimientos) }}</span
+                  >
+                </div>
+                <q-separator spaced vertical />
+                <div class="col column items-center">
+                  <span class="tarjeta__resumen-etiqueta">
+                    Saldo del periodo anterior
+                  </span>
+                  <span class="tarjeta__resumen-valor">
+                    {{ formato.toCurrency(saldo_anterior) }}</span
+                  >
+                </div>
+              </div>
+              <q-separator spaced horizontal />
+              <div class="row">
+                <div class="col column items-center">
+                  <span class="tarjeta__resumen-etiqueta">
+                    Saldo Final al {{ periodoFin }}
+                  </span>
+                  <span class="tarjeta__resumen-valor">
+                    {{ formato.toCurrency(saldo_final_periodo) }}
+                  </span>
+                </div>
+                <q-separator spaced vertical />
+                <div class="col column items-center">
+                  <span class="tarjeta__resumen-etiqueta"> Saldo al Día </span>
+                  <span class="tarjeta__resumen-valor">
+                    {{ formato.toCurrency(cuenta.saldo * -1) }}
+                  </span>
+                </div>
+              </div>
+            </q-card-section>
+          </div>
+        </q-slide-transition>
+      </q-card>
+
+      <q-card flat>
         <q-card-section>
           <!-- <q-icon name="add_circle" class="btn-add" clickable @click="addItem">
         <q-tooltip :offset="[10, 10]"> Add New </q-tooltip>
@@ -171,11 +225,20 @@
             <template #body-cell-acciones="props">
               <q-td :props="props">
                 <q-btn
-                  color="primary"
-                  icon="check"
-                  label="OK"
-                  @click="onClick"
+                  class="button-edit"
+                  icon="las la-edit"
+                  @click="editItem(props)"
+                  flat
+                  dense
                 />
+                <q-btn
+                  class="button-delete"
+                  icon="la la-trash-alt"
+                  @click="deleteItem(props)"
+                  flat
+                  dense
+                />
+
                 <!-- <div class="row">
                   <q-btn
                     color="primary"
@@ -221,7 +284,7 @@
               <q-tr class="text-bold bg-table-summary">
                 <q-td colspan="2">Total meses sin intereses:</q-td>
                 <q-td align="right">{{ formato.toCurrency(suma_msi) }}</q-td>
-                <q-td colspan="3"></q-td>
+                <q-td colspan="4"></q-td>
               </q-tr>
             </template>
           </q-table>
@@ -458,6 +521,7 @@ import PagosTarjeta from 'src/components/tarjetasCredito/PagosTarjeta.vue'
 import MesSelect from 'src/components/formComponents/MesSelect.vue'
 import ImportarRegistrosTarjeta from 'src/components/tarjetasCredito/ImportarRegistrosTarjeta.vue'
 import { useRegistrosTarjetaCrud } from 'src/composables/useRegistrosTarjetaCrud'
+import { useCuentasCrud } from 'src/composables/useCuentasCrud'
 
 /**
  * composables
@@ -468,6 +532,7 @@ const formato = useFormato()
 const notificacion = useNotificacion()
 const $q = useQuasar()
 const registrosTarjetaCrud = useRegistrosTarjetaCrud()
+const cuentasCrud = useCuentasCrud()
 
 const { mostrarNotificacionPositiva, mostrarNotificacionNegativa } =
   useNotificacion()
@@ -498,7 +563,6 @@ const ejercicio_fiscal = ref(0)
 const mes = ref({})
 const saldo_anterior = ref(0)
 const saldo_final_periodo = ref(0)
-const saldo_al_dia = ref(0)
 const editRegistroItem = ref(null)
 
 const listaRegistrosVariables = reactive({
@@ -510,6 +574,7 @@ const listaRegistrosVariables = reactive({
 })
 
 const selectedItems = ref([])
+const expanded = ref(true)
 
 /**
  * onMounted
@@ -535,8 +600,8 @@ onMounted(() => {
     loadOrRefetchListaRegistrosTarjeta()
 
     obtenerSaldoAnterior()
-    obtenerSaldoTarjeta()
-    obtenerSaldoTarjetaAlDia()
+    // obtenerSaldoTarjeta()
+    // obtenerSaldoTarjetaAlDia()
     // variables.fechaInicio = fecha_inicio.value
     // variables.fechaFin = fecha_fin.value
     // loadListaRegistros(
@@ -577,11 +642,11 @@ function loadOrRefetchListaRegistrosTarjeta() {
 
 onResultListaRegistrosTarjeta(({ data }) => {
   if (!!data) {
-    console.log('lista de registros', data)
+    // console.log('lista de registros', data)
     listaRegistros.value = data?.listaRegistrosTarjeta.filter(
       (registro) => !registro.isMsi
     )
-    console.table(listaRegistros.value)
+    // console.table(listaRegistros.value)
     listaRegistrosMsi.value = data?.listaRegistrosTarjeta.filter(
       (registro) => registro.isMsi
     )
@@ -770,18 +835,19 @@ function showSuccessMessage(action) {
  * functions
  */
 function editItem(item) {
-  console.log('editando item...', item.rowIndex, item.row)
   registroEditedItem.value = JSON.parse(JSON.stringify(item.row))
   const importe = parseFloat(registroEditedItem.value.importe)
   const importeAEditar =
-    registroEditedItem.value.tipoAfectacion === 'A' ? importe * -1 : importe
+    registroEditedItem.value.tipoAfectacion === 'C' ? importe * -1 : importe
   registroEditedItem.value.importe = importeAEditar.toString()
-  console.log('fecha', registroEditedItem.value.fecha)
+  // console.log('fecha', registroEditedItem.value.fecha)
   registroEditedItem.value.fecha = formato.convertDateFromIsoToInput(
     registroEditedItem.value.fecha
   )
+  console.log('editando item...', registroEditedItem.value)
   showForm.value = true
 }
+
 function deleteSelectedItems() {
   console.table(selectedItems.value)
   if (selectedItems.value.length > 0) {
@@ -841,7 +907,7 @@ function deleteItem(props_row) {
     persistent: true
   })
     .onOk(() => {
-      deleteRegistroTarjeta({ id: row.id })
+      registrosTarjetaCrud.registroTarjetaDelete({ id: row.id })
     })
     .onCancel(() => {})
     .onDismiss(() => {})
@@ -884,57 +950,67 @@ function obtenerSaldoAnterior() {
     })
 }
 
-function obtenerSaldoTarjeta() {
-  console.log('fecha para obtener saldos', fechaFinPeriodo.value)
-  api
-    .get('/saldo_tarjeta_credito', {
-      params: {
-        cuenta_id: route.params.id,
-        fecha_final: fechaFinPeriodo.value,
-        is_detalle: 0
-      }
-    })
-    .then(({ data }) => {
-      let saldo_data = data.data[0].saldo || 0.0 * -1
-      let saldo = parseFloat(saldo_data) * -1
-      saldo = saldo === -0.0 ? 0.0 : saldo
-      saldo_final_periodo.value = saldo
-    })
-    .catch((error) => {
-      console.error(error)
-    })
-}
-function obtenerSaldoTarjetaAlDia() {
-  const fecha_actual = DateTime.now().toFormat('yyyy-MM-dd')
-  api
-    .get('/saldo_tarjeta_credito', {
-      params: {
-        cuenta_id: route.params.id,
-        fecha_final: fecha_actual,
-        is_detalle: 0
-      }
-    })
-    .then(({ data }) => {
-      let saldo = parseFloat(data.data[0].saldo) * -1 || 0.0
-      console.log(saldo)
-      saldo_al_dia.value = saldo
-    })
-    .catch((error) => {
-      console.error(error)
-    })
-}
+// function obtenerSaldoTarjeta() {
+//   // console.log('fecha para obtener saldos', fechaFinPeriodo.value)
+//   api
+//     .get('/saldo_tarjeta_credito', {
+//       params: {
+//         cuenta_id: route.params.id,
+//         fecha_final: fechaFinPeriodo.value,
+//         is_detalle: 0
+//       }
+//     })
+//     .then(({ data }) => {
+//       let saldo_data = data.data[0].saldo || 0.0 * -1
+//       let saldo = parseFloat(saldo_data) * -1
+//       saldo = saldo === -0.0 ? 0.0 : saldo
+//       saldo_final_periodo.value = saldo
+//     })
+//     .catch((error) => {
+//       console.error(error)
+//     })
+// }
+// function obtenerSaldoTarjetaAlDia() {
+//   const fecha_actual = DateTime.now().toFormat('yyyy-MM-dd')
+//   api
+//     .get('/saldo_tarjeta_credito', {
+//       params: {
+//         cuenta_id: route.params.id,
+//         fecha_final: fecha_actual,
+//         is_detalle: 0
+//       }
+//     })
+//     .then(({ data }) => {
+//       let saldo = parseFloat(data.data[0].saldo) * -1 || 0.0
+//       // console.log(saldo)
+//       saldo_al_dia.value = saldo
+//     })
+//     .catch((error) => {
+//       console.error(error)
+//     })
+// }
+
 function onChangeMes(mes) {
   // console.log('Cambiando mes', mes.id)
-  obtenerListaRegistros()
-  obtenerSaldoAnterior()
-  obtenerSaldoTarjeta()
-  obtenerSaldoTarjetaAlDia()
+  // obtenerListaRegistros()
+  // obtenerSaldoAnterior()
+  // obtenerSaldoTarjeta()
+  // obtenerSaldoTarjetaAlDia()
+  onChangePeriodo()
 }
 function onChangeEjercicio(ejercicio_fiscal) {
-  console.log('cambio de ejercicio', ejercicio_fiscal)
+  // console.log('cambio de ejercicio', ejercicio_fiscal)
+  // obtenerListaRegistros()
+  // obtenerSaldoTarjeta()
+  // obtenerSaldoTarjetaAlDia()
+  onChangePeriodo()
+}
+function onChangePeriodo() {
   obtenerListaRegistros()
-  obtenerSaldoTarjeta()
-  obtenerSaldoTarjetaAlDia()
+  obtenerSaldoTarjetaAlFinalPeriodo()
+}
+function obtenerSaldoTarjetaAlFinalPeriodo() {
+  cuentasCrud.loadSaldoTarjetaCredito(null, variables, graphqlOptions)
 }
 /**
  * Lista de registros de la tarjeta
@@ -1007,7 +1083,7 @@ function confirmQuitarMsi(id) {
       }
     })
     .then(({ data }) => {
-      console.log('actualizado', data)
+      // console.log('actualizado', data)
       notificacion.mostrarNotificacionInformativa(
         'El registro se eliminó de Meses Sin Intereses',
         1200
@@ -1021,7 +1097,7 @@ function confirmQuitarMsi(id) {
 
 function registroMsiUpdated() {
   showFormMSI.value = false
-  console.log('El registro fue modificado')
+  // console.log('El registro fue modificado')
   refetchListaRegistros()
 }
 function pagosTarjeta() {
@@ -1174,6 +1250,15 @@ const columnsMsi = [
     style: 'width:15%'
   },
   {
+    name: 'importeMensual',
+    label: 'Importe Mensual',
+    field: 'importeMensual',
+    sortable: true,
+    align: 'right',
+    format: (val, row) => formato.toCurrency(val),
+    style: 'width:15%'
+  },
+  {
     name: 'categoria',
     label: 'Categoria',
     field: (row) => row.categoria.nombre,
@@ -1197,6 +1282,12 @@ const columnsMsi = [
     style: 'width: 5%'
   }
 ]
+
+function actualizarSaldosTarjeta() {}
+
+cuentasCrud.onErrorSaldoTarjetaCredito((error) => {
+  mostrarNotificacionNegativa('Ocurrió un error al intentar obtener el saldo')
+})
 </script>
 
 <style lang="scss" scoped>

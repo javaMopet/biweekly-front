@@ -352,14 +352,13 @@ function saveItem() {
 }
 
 function onSelectCategoria(value) {
-  if (!!value) {
-    if (!props.editedItem.cuenta) {
-      editedFormItem.value.cuenta = value.cuentaDefault
-    }
+  if (!isEditing && !!value) {
+    console.log('Nuevo registro categoria:', value)
     editedFormItem.value.importe =
-      !value.importeDefault || value.importeDefault === 0
+      parseFloat(value.importeDefault) === 0
         ? ''
         : value.importeDefault.toString()
+    editedFormItem.value.concepto = value.descripcion
   }
 }
 

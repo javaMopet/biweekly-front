@@ -46,16 +46,20 @@
           </div>
           <div
             v-if="editedFormItem.isMsi"
-            class="row inline q-gutter-x-sm items-center"
+            class="row q-gutter-x-sm items-center justify-center"
           >
             <div class="input-label">Número de meses:</div>
-            <q-input
-              v-model="editedFormItem.numeroMsi"
-              type="number"
-              outlined
-              dense
-              style="width: 60px"
-            />
+            <div class="">
+              <q-input
+                v-model="editedFormItem.numeroMsi"
+                type="number"
+                outlined
+                dense
+                style="width: 90px"
+                lazy-rules
+                :rules="[(val) => (!!val && val > 1) || 'Requerido']"
+              />
+            </div>
           </div>
           <div class="">
             <q-input
@@ -89,11 +93,6 @@ import PriceInput from '../formComponents/PriceInput.vue'
 import CategoriaSelect from '../formComponents/CategoriaSelect.vue'
 import { DateTime } from 'luxon'
 import { useFormato } from 'src/composables/utils/useFormato'
-// import {
-//   CREATE_REGISTRO_TARJETA,
-//   UPDATE_REGISTRO_TARJETA
-// } from 'src/graphql/registrosTarjeta'
-import { useMutation } from '@vue/apollo-composable'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { useRegistrosTarjetaCrud } from 'src/composables/useRegistrosTarjetaCrud'
 import DialogTitle from '../formComponents/modal/DialogTitle.vue'
@@ -101,9 +100,12 @@ import DialogTitle from '../formComponents/modal/DialogTitle.vue'
 /**
  * composables
  */
-const registrosTarjetaCrud = useRegistrosTarjetaCrud()
 const formato = useFormato()
 const notificacion = useNotificacion()
+const registrosTarjetaCrud = useRegistrosTarjetaCrud()
+
+const { mostrarNotificacionPositiva, mostrarNotificacionNegativa } =
+  useNotificacion()
 
 /**
  * state
@@ -162,21 +164,6 @@ const props = defineProps({
 const emit = defineEmits(['registroCreated', 'registroUpdated'])
 
 /**
- * grapqhl
- */
-
-// const {
-//   mutate: createRegistroTarjeta,
-//   onDone: onDoneCreateRegistroTarjeta,
-//   onError: onErrorCreateRegistroTarjeta
-// } = useMutation(CREATE_REGISTRO_TARJETA)
-
-// const {
-//   mutate: updateRegistroTarjeta,
-//   onDone: onDoneUpdateRegistroTarjeta,
-//   onError: onErrorUpdateRegistroTarjeta
-// } = useMutation(UPDATE_REGISTRO_TARJETA)
-/**
  * Guardar movimiento a tarjeta
  */
 function saveItem() {
@@ -200,7 +187,10 @@ function saveItem() {
     }
     console.log('item guardando...', input)
     if (!!editedFormItem.value.id) {
-      updateRegistroTarjeta({ id: editedFormItem.value.id, input })
+      registrosTarjetaCrud.registroTarjetaUpdate({
+        id: editedFormItem.value.id,
+        input
+      })
     } else {
       registrosTarjetaCrud.createRegistroTarjeta({ input })
     }
@@ -252,21 +242,26 @@ const editedFormItem = computed({
     formItem.value = val
   }
 })
+
+const isEditing = computed({
+  get() {
+    return !!props.registroEditedItem?.id
+  }
+})
+
 function isFechaValida(val) {
   const date = DateTime.fromFormat(val, 'dd/MM/yyyy')
   return date.isValid
 }
 
 function onSelectCategoria(value) {
-  if (!!value) {
-    // if (!props.editedItem.cuenta) {
-    //   editedFormItem.value.cuenta = value.cuentaDefault
-    // }
-    console.log(value.importeDefault)
-    const importeDefault = value.importeDefault ?? ''
-    console.log(importeDefault)
+  if (!isEditing.value && !!value) {
+    console.log('Nuevo registros tarjeta categoria:', value)
     editedFormItem.value.importe =
-      value.importeDefault === 0 ? '' : importeDefault.toString()
+      parseFloat(value.importeDefault) === 0
+        ? ''
+        : value.importeDefault.toString()
+    editedFormItem.value.concepto = value.descripcion
   }
 }
 </script>

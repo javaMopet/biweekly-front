@@ -26,6 +26,7 @@ export const LISTA_REGISTROS_TARJETA = gql`
       tipoAfectacion
       cargo
       abono
+      importeMensual
       estadoRegistroTarjeta {
         id
         nombre
@@ -109,6 +110,10 @@ export const REGISTRO_TARJETA_DELETE = gql`
       registroTarjeta {
         id
         cuentaId
+        cuenta {
+          id
+          nombre
+        }
         categoriaId
         importe
         fecha

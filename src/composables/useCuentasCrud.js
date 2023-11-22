@@ -1,9 +1,10 @@
-import { useMutation } from '@vue/apollo-composable'
+import { useLazyQuery, useMutation } from '@vue/apollo-composable'
 import {
   CUENTA_CREATE,
   CUENTA_UPDATE,
   CUENTA_DELETE,
-  CUENTA_SALDO_UPDATE
+  CUENTA_SALDO_UPDATE,
+  SALDO_TARJETA_CREDITO
 } from 'src/graphql/cuentas'
 import { useCuentaStore } from 'src/stores/common/useCuentaStore'
 
@@ -36,6 +37,12 @@ export function useCuentasCrud() {
     onDone: onDoneCuentaSaldoUpdate,
     onError: onErrorCuentaSaldoUpdate
   } = useMutation(CUENTA_SALDO_UPDATE)
+
+  const {
+    load: loadSaldoTarjetaCredito,
+    onResult: onResultSaldoTarjetaCredito,
+    onError: onErrorSaldoTarjetaCredito
+  } = useLazyQuery(SALDO_TARJETA_CREDITO)
 
   onDoneCuentaCreate(({ data }) => {
     const itemSaved = data.cuentaCreate.cuenta
@@ -91,6 +98,9 @@ export function useCuentasCrud() {
   onErrorCuentaSaldoUpdate((error) => {
     console.trace(error)
   })
+  onErrorSaldoTarjetaCredito((error) => {
+    console.trace(error)
+  })
 
   return {
     cuentaCreate,
@@ -103,6 +113,9 @@ export function useCuentasCrud() {
     onDoneCuentaSaldoUpdate,
     onErrorCuentaCreate,
     onErrorCuentaUpdate,
-    onErrorCuentaDelete
+    onErrorCuentaDelete,
+    loadSaldoTarjetaCredito,
+    onResultSaldoTarjetaCredito,
+    onErrorSaldoTarjetaCredito
   }
 }
