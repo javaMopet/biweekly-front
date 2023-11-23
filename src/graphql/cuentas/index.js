@@ -169,7 +169,21 @@ export const SALDO_TARJETA_CREDITO = gql`
     $fechaFin: ISO8601Date
     $isDetalle: Int!
   ) {
-    SaldoTarjetaCredito(
+    saldoTarjetaCredito(
+      cuentaId: $cuentaId
+      fechaFin: $fechaFin
+      isDetalle: $isDetalle
+    )
+  }
+`
+
+export const SALDO_PAGAR_TARJETA_CREDITO = gql`
+  query saldoPagarTarjetaCredito(
+    $cuentaId: ID!
+    $fechaFin: ISO8601Date
+    $isDetalle: Int!
+  ) {
+    saldoPagarTarjetaCredito(
       cuentaId: $cuentaId
       fechaFin: $fechaFin
       isDetalle: $isDetalle

@@ -3,7 +3,8 @@ import {
   CUENTA_CREATE,
   CUENTA_UPDATE,
   CUENTA_DELETE,
-  CUENTA_SALDO_UPDATE
+  CUENTA_SALDO_UPDATE,
+  SALDO_TARJETA_CREDITO
   // SALDO_TARJETA_CREDITO
 } from 'src/graphql/cuentas'
 import { useCuentaStore } from 'src/stores/common/useCuentaStore'

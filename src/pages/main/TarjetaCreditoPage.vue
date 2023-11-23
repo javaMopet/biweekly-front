@@ -84,10 +84,7 @@
           </q-toolbar>
         </q-card-section>
         <q-card-actions>
-          <!-- <q-btn flat color="primary" label="Share" />
-          <q-btn flat color="secondary" label="Book" /> -->
           RESUMEN: &nbsp;
-
           <div class="row text-condensed" v-if="!expanded">
             <div class="column q-ml-lg items-center justify-center">
               <span class="tarjeta__resumen-etiqueta">Periodo:</span
@@ -101,7 +98,7 @@
             <div class="column q-ml-lg items-center justify-center">
               <span class="tarjeta__resumen-etiqueta"
                 >Saldo final en tarjeta:</span
-              >{{ formato.toCurrency(saldo_final_periodo) }}
+              >{{ formato.toCurrency(Math.abs(saldo_final_periodo)) }}
             </div>
           </div>
           <q-space />
@@ -110,7 +107,7 @@
             class="small-button"
             color="primary"
             icon="las la-redo-alt"
-            @click="actualizarSaldosTarjeta"
+            @click="actualizarSaldosResumen"
             flat
           />
           <q-btn
@@ -146,6 +143,17 @@
                 <q-separator spaced vertical />
                 <div class="col column items-center">
                   <span class="tarjeta__resumen-etiqueta">
+                    PAGO PARA NO GENERAR INTERESES
+                  </span>
+                  <span class="tarjeta__resumen-valor">
+                    {{
+                      formato.toCurrency(Math.abs(saldo_pagar_periodo))
+                    }}</span
+                  >
+                </div>
+                <q-separator spaced vertical />
+                <div class="col column items-center">
+                  <span class="tarjeta__resumen-etiqueta">
                     Importe del periodo
                   </span>
                   <span class="tarjeta__resumen-valor-importante">
@@ -158,7 +166,7 @@
                     Saldo del periodo anterior
                   </span>
                   <span class="tarjeta__resumen-valor">
-                    {{ formato.toCurrency(saldo_anterior) }}</span
+                    {{ formato.toCurrency(saldo_final_perido_anterior) }}</span
                   >
                 </div>
               </div>
@@ -184,12 +192,8 @@
           </div>
         </q-slide-transition>
       </q-card>
-
       <q-card flat>
         <q-card-section>
-          <!-- <q-icon name="add_circle" class="btn-add" clickable @click="addItem">
-        <q-tooltip :offset="[10, 10]"> Add New </q-tooltip>
-      </q-icon> -->
           <q-table
             v-if="listaRegistrosMsi.length > 0"
             :rows="listaRegistrosMsi"
@@ -238,46 +242,6 @@
                   flat
                   dense
                 />
-
-                <!-- <div class="row">
-                  <q-btn
-                    color="primary"
-                    icon="more_vert"
-                    flat
-                    dense
-                    size=".6rem"
-                    round
-                  >
-                    <q-menu style="width: 150px">
-                      <q-list>
-                        <q-item
-                          clickable
-                          v-close-popup
-                          @click="editItem(props)"
-                        >
-                          <q-item-section>Editar...</q-item-section>
-                        </q-item>
-                        <q-item
-                          clickable
-                          v-close-popup
-                          @click="quitarMsi(props)"
-                        >
-                          <q-item-section>Quitar MSI</q-item-section>
-                        </q-item>
-                        <q-separator />
-                        <q-item
-                          clickable
-                          v-close-popup
-                          @click="deleteItem(props)"
-                        >
-                          <q-item-section class="text-negative"
-                            >Eliminar</q-item-section
-                          >
-                        </q-item>
-                      </q-list>
-                    </q-menu>
-                  </q-btn>
-                </div> -->
               </q-td>
             </template>
             <template #bottom-row>
@@ -363,8 +327,6 @@
                   v-slot="scope"
                   max-width="150px"
                 >
-                  <!-- @before-hide="actualizarObservaciones(props)"
-              -->
                   <q-input
                     v-model="scope.value"
                     @keyup.enter="scope.set"
@@ -391,38 +353,6 @@
                   flat
                   dense
                 />
-                <!-- <div class="row">
-                  <q-btn
-                    color="primary"
-                    icon="more_vert"
-                    flat
-                    dense
-                    size=".6rem"
-                    round
-                  >
-                    <q-menu style="width: 200px; min-width: 200px" dense>
-                      <q-list dense>
-                        <q-item
-                          clickable
-                          v-close-popup
-                          @click="editItem(props)"
-                        >
-                          <q-item-section>Editar...</q-item-section>
-                        </q-item>
-                        <q-separator />
-                        <q-item
-                          clickable
-                          v-close-popup
-                          @click="deleteItem(props)"
-                        >
-                          <q-item-section class="text-negative"
-                            >Eliminar</q-item-section
-                          >
-                        </q-item>
-                      </q-list>
-                    </q-menu>
-                  </q-btn>
-                </div> -->
               </q-td>
             </template>
             <template v-slot:bottom-row>
@@ -441,9 +371,6 @@
         </q-card-section>
       </q-card>
     </div>
-    <!-- <div class="">
-      <pre> {{ listaRegistrosVariables }} </pre>
-    </div> -->
   </div>
 
   <Teleport to="#modal">
@@ -460,17 +387,6 @@
         @registro-updated="registroUpdated"
         :fecha="fecha_registro"
       ></FormRegistroMovimientoTarjeta>
-    </q-dialog>
-    <q-dialog
-      v-model="showFormMSI"
-      persistent
-      transition-show="jump-up"
-      transition-hide="jump-down"
-    >
-      <RegistroMesesSinInteres
-        :registro-tarjeta="editRegistroItem"
-        @registroUpdated="registroMsiUpdated"
-      ></RegistroMesesSinInteres>
     </q-dialog>
     <q-dialog
       v-model="showFormCarga"
@@ -501,8 +417,6 @@
       ></PagosTarjeta>
     </q-dialog>
   </Teleport>
-  <!-- <pre>{{ fechaInicioPeriodo }}{{ fecha_inicio }}</pre> -->
-  <!-- <pre>dia corte {{ dia_corte }}</pre> -->
 </template>
 
 <script setup>
@@ -515,14 +429,16 @@ import { LISTA_REGISTROS_TARJETA } from 'src/graphql/registrosTarjeta'
 import { useLazyQuery, useQuery } from '@vue/apollo-composable'
 import { useFormato } from 'src/composables/utils/useFormato'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
-import RegistroMesesSinInteres from 'src/components/tarjetasCredito/RegistroMesesSinInteres.vue'
 import { useQuasar } from 'quasar'
 import PagosTarjeta from 'src/components/tarjetasCredito/PagosTarjeta.vue'
 import MesSelect from 'src/components/formComponents/MesSelect.vue'
 import ImportarRegistrosTarjeta from 'src/components/tarjetasCredito/ImportarRegistrosTarjeta.vue'
 import { useRegistrosTarjetaCrud } from 'src/composables/useRegistrosTarjetaCrud'
-import { useCuentasCrud } from 'src/composables/useCuentasCrud'
-import { SALDO_TARJETA_CREDITO } from 'src/graphql/cuentas'
+
+import {
+  SALDO_TARJETA_CREDITO,
+  SALDO_PAGAR_TARJETA_CREDITO
+} from 'src/graphql/cuentas'
 
 /**
  * composables
@@ -533,17 +449,12 @@ const formato = useFormato()
 const notificacion = useNotificacion()
 const $q = useQuasar()
 const registrosTarjetaCrud = useRegistrosTarjetaCrud()
-const cuentasCrud = useCuentasCrud()
 
 const { mostrarNotificacionPositiva, mostrarNotificacionNegativa } =
   useNotificacion()
 /**
  * state
  */
-// const fecha_inicio = ref('1900-01-01')
-// const fecha_fin = ref('1900-01-01')
-// const dia_corte = ref(0)
-
 const listaRegistrosMsi = ref([])
 const listaRegistros = ref([])
 
@@ -562,9 +473,10 @@ const showPagosTarjeta = ref(false)
 const cuenta = ref({})
 const ejercicio_fiscal = ref(0)
 const mes = ref({})
+const saldo_pagar_periodo = ref(0)
 const saldo_anterior = ref(0)
 const saldo_final_periodo = ref(0)
-const editRegistroItem = ref(null)
+const saldo_final_perido_anterior = ref(0)
 
 const listaRegistrosVariables = reactive({
   cuentaId: route.params.id,
@@ -581,8 +493,6 @@ const expanded = ref(true)
  * onMounted
  */
 onMounted(() => {
-  // console.log('buscando los datos de la tarjeta de crédito', route.params.id)
-
   const dateNow = DateTime.now()
   ejercicio_fiscal.value = dateNow.year
   const mes_id = dateNow.month
@@ -590,39 +500,19 @@ onMounted(() => {
     (mesOption) => mesOption.id === mes_id
   )
   mes.value = mes_value
-  // obtenerFechasInicial()
-  // obtenerFechasFinal()
 
   api.get(`/cuentas/${route.params.id}`).then((response) => {
     cuenta.value = response?.data.data ?? {}
-    //   dia_corte.value = cuenta.value.dia_corte
+
     obtenerFechasInicialFinal()
-
     loadOrRefetchListaRegistrosTarjeta()
-
-    obtenerSaldoAnterior()
-    // obtenerSaldoTarjeta()
-    // obtenerSaldoTarjetaAlDia()
-    // variables.fechaInicio = fecha_inicio.value
-    // variables.fechaFin = fecha_fin.value
-    // loadListaRegistros(
-    //   null,
-    //   {
-    //     cuentaId: route.params.id,
-    //     fechaInicio: fecha_inicio.value,
-    //     fechaFin: fecha_fin.value,
-    //     isMsi: null,
-    //     estadoRegistroTarjetaId: null
-    //   },
-    //   graphqlOptions
-    // )
+    loadOrRefetchSaldoAnteriorTC()
   })
 })
 /**
  * graphql
  */
 const graphqlOptions = reactive({
-  // fetchPolicy: 'network-only'
   fetchPolicy: 'no-cache'
   // debounce: 10000
 })
@@ -643,30 +533,25 @@ function loadOrRefetchListaRegistrosTarjeta() {
 
 onResultListaRegistrosTarjeta(({ data }) => {
   if (!!data) {
-    // console.log('lista de registros', data)
     listaRegistros.value = data?.listaRegistrosTarjeta.filter(
       (registro) => !registro.isMsi
     )
-    // console.table(listaRegistros.value)
     listaRegistrosMsi.value = data?.listaRegistrosTarjeta.filter(
       (registro) => registro.isMsi
     )
     listaRegistrosMsi.value.forEach((registro) => {
       registro.importe = registro.importe * -1
     })
-
-    // obtenerSaldoTarjeta()
-    // obtenerSaldoTarjetaAlDia()
   }
 })
 
 onErrorListaRegistros((error) => {
   console.error('response', error)
 })
+
 /**
  * computed
  */
-
 const sumaMovimientos = computed({
   get() {
     return Math.abs(
@@ -704,11 +589,6 @@ const suma_msi = computed({
     return listaRegistrosMsi.value.reduce((accumulator, registro) => {
       return accumulator + registro.importe
     }, 0)
-  }
-})
-const saldo_final = computed({
-  get() {
-    return parseFloat(saldo_anterior.value) + parseFloat(sumaMovimientos.value)
   }
 })
 
@@ -774,9 +654,7 @@ const fecha_registro = computed({
       : fechaFinPeriodo.value
   }
 })
-/**
- *
- */
+
 const periodoInicio = computed({
   get() {
     const mes = mesOptions.value.find(
@@ -803,12 +681,12 @@ const periodoFin = computed({
     return ''
   }
 })
+
 /**
- *
+ * graphql
  */
 const opcionesGraphql = reactive({
   fetchPolicy: 'network-only'
-  // fetchPolicy: 'no-cache',
   // debounce: 1000
 })
 
@@ -824,19 +702,69 @@ const {
 } = useQuery(SALDO_TARJETA_CREDITO, saldoTarjetaVariables, opcionesGraphql)
 
 onResultSaldoTarjetaCredito(({ data }) => {
-  console.log('resultado', data.SaldoTarjetaCredito)
-  saldo_final_periodo.value = data.SaldoTarjetaCredito
+  console.log('resultado', data.saldoTarjetaCredito)
+  saldo_final_periodo.value = data.saldoTarjetaCredito
 })
 
 onErrorSaldoTarjetaCredito((error) => {
   console.trace(error)
   mostrarNotificacionNegativa('Ocurrió un error al intentar obtener el saldo')
 })
-// const {
-//   mutate: deleteRegistroTarjeta,
-//   onDone: onDoneDeleteRegistroTarjeta,
-//   onError: onErrorDeleteRegistroTarjeta
-// } = useMutation(DELETE_REGISTRO_TARJETA)
+
+const {
+  load: loadSaldoAnteriorTC,
+  onResult: onResultSaldoAnteriorTC,
+  onError: onErrorSaldoAnteriorTC
+} = useLazyQuery(SALDO_TARJETA_CREDITO)
+
+function loadOrRefetchSaldoAnteriorTC() {
+  const variables = {
+    cuentaId: route.params.id,
+    fechaFin: DateTime.fromISO(listaRegistrosVariables.fechaInicio)
+      .plus({ days: -1 })
+      .toISODate(),
+    isDetalle: 0
+  }
+  loadSaldoAnteriorTC(null, variables, opcionesGraphql) /* ||
+    refetchSaldoAnteriorTC(null, variables, opcionesGraphql )*/
+}
+
+onResultSaldoAnteriorTC(({ data }) => {
+  console.log('resultado saldo anterior', data)
+  saldo_final_perido_anterior.value = data.saldoTarjetaCredito
+})
+
+onErrorSaldoAnteriorTC((error) => {
+  console.trace(error)
+  mostrarNotificacionNegativa(
+    'Ocurrió un error al intentar obtener el saldo anterior'
+  )
+})
+
+const saldoPagarTarjetaVariables = reactive({
+  cuentaId: route.params.id,
+  fechaFin: null,
+  isDetalle: 0
+})
+
+const {
+  onResult: onResultSaldoPagarTarjetaCredito,
+  onError: onErrorSaldoPagarTarjetaCredito
+} = useQuery(
+  SALDO_PAGAR_TARJETA_CREDITO,
+  saldoPagarTarjetaVariables,
+  opcionesGraphql
+)
+
+onResultSaldoPagarTarjetaCredito(({ data }) => {
+  console.log('resultado saldo pagar', data.saldoPagarTarjetaCredito)
+  saldo_pagar_periodo.value = data.saldoPagarTarjetaCredito
+})
+
+onErrorSaldoPagarTarjetaCredito((error) => {
+  console.trace(error)
+  mostrarNotificacionNegativa('Ocurrió un error al intentar obtener el saldo')
+})
 
 registrosTarjetaCrud.onDoneRegistroTarjetaDelete((response) => {
   console.log('registro eliminado', response)
@@ -854,6 +782,9 @@ registrosTarjetaCrud.onErrorRegistroTarjetaDelete((error) => {
   console.error(error)
 })
 
+/**
+ * functions
+ */
 function showSuccessMessage(action) {
   notificacion.mostrarNotificacionPositiva(
     `El registro se ${action} correctamente.`,
@@ -861,20 +792,15 @@ function showSuccessMessage(action) {
   )
 }
 
-/**
- * functions
- */
 function editItem(item) {
   registroEditedItem.value = JSON.parse(JSON.stringify(item.row))
   const importe = parseFloat(registroEditedItem.value.importe)
   const importeAEditar =
     registroEditedItem.value.tipoAfectacion === 'C' ? importe * -1 : importe
   registroEditedItem.value.importe = importeAEditar.toString()
-  // console.log('fecha', registroEditedItem.value.fecha)
   registroEditedItem.value.fecha = formato.convertDateFromIsoToInput(
     registroEditedItem.value.fecha
   )
-  console.log('editando item...', registroEditedItem.value)
   showForm.value = true
 }
 
@@ -906,6 +832,7 @@ function deleteSelectedItems() {
       .onDismiss(() => {})
   }
 }
+
 function onConfirmDeleteItems(toDelete) {
   console.log(toDelete)
   const eliminar = toDelete.map((item) => item.id)
@@ -941,11 +868,7 @@ function deleteItem(props_row) {
     })
     .onCancel(() => {})
     .onDismiss(() => {})
-  // deleteRegistroTarjeta({ id: props_row.id })
 }
-// function obtenerFechaInicial(){
-
-// }
 
 function obtenerFechasInicialFinal() {
   const dia_inicio = ('0' + (cuenta.value.dia_corte + 1)).slice(-2)
@@ -959,123 +882,29 @@ function obtenerFechasInicialFinal() {
   ).slice(-2)}-${dia_fin}`
 }
 
-function obtenerSaldoAnterior() {
-  const dia = ('0' + cuenta.value.dia_corte).slice(-2)
-  const fecha = `${ejercicio_inicial_id.value}-${(
-    '0' + mes_inicial_id.value
-  ).slice(-2)}-${dia}`
-  api
-    .get('/cuentas/obtener_saldo_tarjeta', {
-      params: {
-        cuenta_id: route.params.id,
-        fecha
-      }
-    })
-    .then(({ data }) => {
-      // console.log('response', data.suma)
-      saldo_anterior.value = data.suma
-    })
-    .catch((error) => {
-      console.error(error)
-    })
-}
-
-// function obtenerSaldoTarjeta() {
-//   // console.log('fecha para obtener saldos', fechaFinPeriodo.value)
-//   api
-//     .get('/saldo_tarjeta_credito', {
-//       params: {
-//         cuenta_id: route.params.id,
-//         fecha_final: fechaFinPeriodo.value,
-//         is_detalle: 0
-//       }
-//     })
-//     .then(({ data }) => {
-//       let saldo_data = data.data[0].saldo || 0.0 * -1
-//       let saldo = parseFloat(saldo_data) * -1
-//       saldo = saldo === -0.0 ? 0.0 : saldo
-//       saldo_final_periodo.value = saldo
-//     })
-//     .catch((error) => {
-//       console.error(error)
-//     })
-// }
-// function obtenerSaldoTarjetaAlDia() {
-//   const fecha_actual = DateTime.now().toFormat('yyyy-MM-dd')
-//   api
-//     .get('/saldo_tarjeta_credito', {
-//       params: {
-//         cuenta_id: route.params.id,
-//         fecha_final: fecha_actual,
-//         is_detalle: 0
-//       }
-//     })
-//     .then(({ data }) => {
-//       let saldo = parseFloat(data.data[0].saldo) * -1 || 0.0
-//       // console.log(saldo)
-//       saldo_al_dia.value = saldo
-//     })
-//     .catch((error) => {
-//       console.error(error)
-//     })
-// }
-
 function onChangeMes(mes) {
-  // console.log('Cambiando mes', mes.id)
-  // obtenerListaRegistros()
-  // obtenerSaldoAnterior()
-  // obtenerSaldoTarjeta()
-  // obtenerSaldoTarjetaAlDia()
   onChangePeriodo()
 }
+
 function onChangeEjercicio(ejercicio_fiscal) {
-  // console.log('cambio de ejercicio', ejercicio_fiscal)
-  // obtenerListaRegistros()
-  // obtenerSaldoTarjeta()
-  // obtenerSaldoTarjetaAlDia()
   onChangePeriodo()
 }
+
 function onChangePeriodo() {
   obtenerListaRegistros()
   obtenerSaldoTarjetaAlFinalPeriodo()
+  loadOrRefetchSaldoAnteriorTC()
 }
 
 function obtenerSaldoTarjetaAlFinalPeriodo() {
-  // cuentasCrud.loadSaldoTarjetaCredito(
-  //   {
-  //     cuentaId: route.params.id,
-  //     fechaFin: fechaFinPeriodo.value,
-  //     isDetalle: 0
-  //   },
-  //   graphqlOptions
-  // )
-  console.log('cambio de fecha final', fechaFinPeriodo.value)
   saldoTarjetaVariables.fechaFin = fechaFinPeriodo.value
+  saldoPagarTarjetaVariables.fechaFin = fechaFinPeriodo.value
 }
 /**
  * Lista de registros de la tarjeta
  */
 function obtenerListaRegistros() {
   obtenerFechasInicialFinal()
-  // const dia_inicio = ('0' + (cuenta.value.dia_corte + 1)).slice(-2)
-  // const dia_fin = ('0' + cuenta.value.dia_corte).slice(-2)
-  // const fechaInicio = `${ejercicio_inicial_id.value}-${(
-  //   '0' + mes_inicial_id.value
-  // ).slice(-2)}-${dia_inicio}`
-  // const fechaFin = `${ejercicio_final_id.value}-${(
-  //   '0' + mes_final_id.value
-  // ).slice(-2)}-${dia_fin}`
-  // loadListaRegistros(
-  //   null,
-  //   {
-  //     cuentaId: route.params.id,
-  //     fechaInicio,
-  //     fechaFin,
-  //     isMsi: null,
-  //     estadoRegistroTarjetaId: null
-  //   },
-  //   graphqlOptions
-  // )
 }
 
 function cargarMovimientos() {
@@ -1086,60 +915,6 @@ function addItem() {
   showForm.value = true
 }
 
-function mesesSinInteres(item) {
-  showFormMSI.value = true
-  editRegistroItem.value = item.row
-}
-function quitarMsi(item) {
-  $q.dialog({
-    title: 'Confirmar',
-    style: 'width:500px',
-    message: `¿Está seguro que desea quitar el movimiento de meses sin intereses?`,
-    ok: {
-      push: true,
-      color: 'positive',
-      label: 'Continuar'
-    },
-    cancel: {
-      push: true,
-      color: 'negative',
-      flat: true,
-      label: 'cancelar'
-    },
-    persistent: true
-  })
-    .onOk(() => {
-      confirmQuitarMsi(item.row.id)
-    })
-    .onCancel(() => {})
-    .onDismiss(() => {})
-}
-function confirmQuitarMsi(id) {
-  api
-    .put(`/registros_tarjeta/${id}`, {
-      registro_tarjeta: {
-        is_msi: false,
-        numero_msi: 0
-      }
-    })
-    .then(({ data }) => {
-      // console.log('actualizado', data)
-      notificacion.mostrarNotificacionInformativa(
-        'El registro se eliminó de Meses Sin Intereses',
-        1200
-      )
-      refetchListaRegistros()
-    })
-    .catch((error) => {
-      console.error(error)
-    })
-}
-
-function registroMsiUpdated() {
-  showFormMSI.value = false
-  // console.log('El registro fue modificado')
-  refetchListaRegistros()
-}
 function pagosTarjeta() {
   console.log('registrando el pago')
 
@@ -1323,27 +1098,12 @@ const columnsMsi = [
   }
 ]
 
-function actualizarSaldosTarjeta() {}
+function actualizarSaldosResumen() {
+  console.log('actualizar saldo resumen')
+}
 </script>
 
 <style lang="scss" scoped>
-// .tarjeta__resumen-etiqueta {
-//   letter-spacing: -0.025rem;
-//   font-size: 0.75rem;
-//   font-weight: 600;
-//   color: #686666;
-// }
-// .tarjeta__resumen-valor {
-//   font-size: 0.85rem;
-//   font-weight: 400;
-//   color: #888585;
-//   &-importante {
-//     font-size: 0.85rem;
-//     font-weight: 600;
-//     letter-spacing: -0.035rem;
-//     color: #476d59 !important;
-//   }
-// }
 .cuenta__data-subtitle {
   letter-spacing: -0.045rem;
   font-size: 0.95rem;
