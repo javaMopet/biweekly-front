@@ -124,149 +124,156 @@
           </div>
         </q-card-actions>
       </q-card>
-      <q-table
-        class="q-mt-lg"
-        :rows="listaRegistros"
-        :columns="columns"
-        dense
-        :rows-per-page-options="[0]"
-        table-header-class="bg-primary-light text-accent"
-        separator="vertical"
-        hide-pagination
-        selection="multiple"
-        v-model:selected="selectedItems"
-        row-key="id"
-        :filter="filter"
-      >
-        <template #top-left>
-          <q-tr class="cuenta__data-subtitle">
-            <div class="table-title">Movimientos del periodo</div>
-          </q-tr>
-        </template>
-        <template #top-right>
-          <q-tr>
-            <div class="row q-gutter-x-sm">
-              <q-btn
-                v-if="selectedItems.length > 0"
-                no-caps
-                color="negative-pastel"
-                label="Eliminar"
-                @click="deleteSelectedItems"
-                push
-                flat
-                icon="las la-trash"
-                rounded
-              />
-              <q-btn
-                no-caps
-                color="primary"
-                label="Agregar"
-                @click="addItem"
-                push
-                flat
-                icon="add_circle"
-                rounded
-              />
-              <q-btn
-                color="primary-button"
-                flat
-                @click="importarMovimientos"
-                no-caps
-                rounded
-              >
-                <q-avatar square size="24px">
-                  <q-img src="/icons/excel.png" width="24px" height="24px" />
-                </q-avatar>
-                <span class="q-ml-sm">Importar</span>
-              </q-btn>
-              <q-input
-                outlined
-                dense
-                debounce="300"
-                v-model="filter"
-                placeholder="Buscar"
-                clearable
-                class="bg-accent-light"
-                style="width: 180px; min-width: 180px"
-              >
-                <template v-slot:append>
-                  <q-icon name="search" />
-                </template>
-              </q-input>
-            </div>
-          </q-tr>
-        </template>
+      <div class="sticky-table-container">
+        <q-table
+          class="q-mt-lg my-sticky-header-table"
+          :rows="listaRegistros"
+          :columns="columns"
+          dense
+          :rows-per-page-options="[0]"
+          table-header-class="bg-primary-light text-accent"
+          separator="vertical"
+          hide-pagination
+          selection="multiple"
+          v-model:selected="selectedItems"
+          row-key="id"
+          :filter="filter"
+          no-data-label="No se han registrado movimientos"
+        >
+          <template #top-left>
+            <q-tr class="cuenta__data-subtitle">
+              <div class="table-title">Movimientos del periodo</div>
+            </q-tr>
+          </template>
+          <template #top-right>
+            <q-tr>
+              <div class="row q-gutter-x-sm">
+                <q-btn
+                  v-if="selectedItems.length > 0"
+                  no-caps
+                  color="negative-pastel"
+                  label="Eliminar"
+                  @click="deleteSelectedItems"
+                  push
+                  flat
+                  icon="las la-trash"
+                  rounded
+                />
+                <q-btn
+                  no-caps
+                  color="primary"
+                  label="Agregar"
+                  @click="addItem"
+                  push
+                  flat
+                  icon="add_circle"
+                  rounded
+                />
+                <q-btn
+                  color="primary-button"
+                  flat
+                  @click="importarMovimientos"
+                  no-caps
+                  rounded
+                >
+                  <q-avatar square size="24px">
+                    <q-img src="/icons/excel.png" width="24px" height="24px" />
+                  </q-avatar>
+                  <span class="q-ml-sm">Importar</span>
+                </q-btn>
+                <q-input
+                  outlined
+                  dense
+                  debounce="300"
+                  v-model="filter"
+                  placeholder="Buscar"
+                  clearable
+                  class="bg-accent-light"
+                  style="width: 180px; min-width: 180px"
+                >
+                  <template v-slot:append>
+                    <q-icon name="search" />
+                  </template>
+                </q-input>
+              </div>
+            </q-tr>
+          </template>
 
-        <template #body-cell-categoria="props">
-          <q-td key="categoria" :props="props">
-            {{ props.row.categoria?.nombre }}
-          </q-td>
-        </template>
-        <template #body-cell-importe="props">
-          <q-td
-            class="registros__columna--importe"
-            :style="{
-              color: props.row.importe < 0 ? 'red' : 'black'
-            }"
-            align="right"
-          >
-            {{ formato.toCurrency(props.row.importe) }}
-          </q-td>
-        </template>
-        <template #body-cell-observaciones="props">
-          <q-td key="observaciones" :props="props">
-            {{ props.row.observaciones }}
-            <q-popup-edit
-              v-model="props.row.observaciones"
-              title="Editar observaciones"
-              buttons
-              label-set="Guardar"
-              label-cancel="Cancelar"
-              @update:model-value="
-                saveObs(props.row.id, props.row, props.row.observaciones)
-              "
-              v-slot="scope"
-              max-width="150px"
+          <template #body-cell-categoria="props">
+            <q-td key="categoria" :props="props">
+              {{ props.row.categoria?.nombre }}
+            </q-td>
+          </template>
+          <template #body-cell-importe="props">
+            <q-td
+              class="registros__columna--importe"
+              :style="{
+                color: props.row.importe < 0 ? 'red' : 'black'
+              }"
+              align="right"
             >
-              <q-input
-                v-model="scope.value"
-                @keyup.enter="scope.set"
-                type="text"
-                label="Favor de ingresar observaciones"
-                autofocus
+              {{ formato.toCurrency(props.row.importe) }}
+            </q-td>
+          </template>
+          <template #body-cell-observaciones="props">
+            <q-td key="observaciones" :props="props">
+              {{ props.row.observaciones }}
+              <q-popup-edit
+                v-model="props.row.observaciones"
+                title="Editar observaciones"
+                buttons
+                label-set="Guardar"
+                label-cancel="Cancelar"
+                @update:model-value="
+                  saveObs(props.row.id, props.row, props.row.observaciones)
+                "
+                v-slot="scope"
+                max-width="150px"
+              >
+                <q-input
+                  v-model="scope.value"
+                  @keyup.enter="scope.set"
+                  type="text"
+                  label="Favor de ingresar observaciones"
+                  autofocus
+                />
+              </q-popup-edit>
+            </q-td>
+          </template>
+          <template #body-cell-acciones="props">
+            <q-td :props="props" class="q-gutter-x-md">
+              <q-btn
+                icon="las la-edit"
+                class="button-edit"
+                dense
+                @click="editItem(props)"
+                flat
               />
-            </q-popup-edit>
-          </q-td>
-        </template>
-        <template #body-cell-acciones="props">
-          <q-td :props="props" class="q-gutter-x-md">
-            <q-btn
-              icon="las la-edit"
-              class="button-edit"
-              dense
-              @click="editItem(props)"
-              flat
-            />
-            <q-btn
-              icon="las la-trash-alt"
-              class="button-delete"
-              dense
-              @click="deleteItem(props)"
-              flat
-            />
-          </q-td>
-        </template>
-        <template #bottom-row>
-          <q-tr>
-            <q-td colspan="4" class="text-condensed text-bold"
-              >Importe total de movimientos del periodo</q-td
-            >
-            <q-td class="text-bold" align="right">{{
-              formato.toCurrency(sumaMovimientos)
-            }}</q-td>
-          </q-tr>
-        </template>
-      </q-table>
+              <q-btn
+                icon="las la-trash-alt"
+                class="button-delete"
+                dense
+                @click="deleteItem(props)"
+                flat
+              />
+            </q-td>
+          </template>
+          <!-- <template #bottom-row>
+            <q-tr>
+              <q-td colspan="4" class="text-condensed text-bold"
+                >Importe total de movimientos del periodo</q-td
+              >
+              <q-td class="text-bold" align="right">{{
+                formato.toCurrency(sumaMovimientos)
+              }}</q-td>
+            </q-tr>
+          </template> -->
+        </q-table>
+      </div>
+      <div class="summary">
+        Importe total de movimientos:
+        <span> {{ toCurrency(sumaMovimientos) }}</span>
+      </div>
       <!-- <pre>{{ fecha_inicio }} {{ fecha_fin }}</pre> -->
     </div>
   </div>
@@ -343,6 +350,7 @@ const cuentasCrud = useCuentasCrud()
  */
 const { mostrarNotificacionPositiva, mostrarNotificacionNegativa } =
   useNotificacion()
+const { toCurrency } = useFormato()
 // const fecha_inicio = ref('1900-01-01')
 // const fecha_fin = ref('1900-01-01')
 const dia_corte = ref(0)
@@ -943,6 +951,45 @@ const columns = [
     font-family: 'Roboto Slab', sans-serif;
     font-size: 0.85rem;
     color: #625179;
+  }
+}
+.sticky-table-container {
+  // border: 1px solid red;
+  height: calc(100vh - 395px) !important;
+}
+.my-sticky-header-table {
+  /* height or max-height is important */
+  // height: calc(100vh - 125px);
+  height: 100%;
+
+  .q-table__top,
+  .q-table__bottom,
+  thead tr:first-child th {
+    /* bg color is important for th; just specify one */
+    background-color: $primary-light;
+  }
+  thead tr th {
+    position: sticky;
+    z-index: 1;
+  }
+  thead tr:first-child th {
+    top: 0;
+  }
+
+  /* this is when the loading indicator appears */
+  &.q-table--loading thead tr:last-child th {
+    /* height of all previous header rows */
+    top: 48px;
+  }
+}
+.summary {
+  padding: 5px;
+  color: $primary;
+  font-weight: bold;
+  & span {
+    font-family: 'Roboto Slab';
+    padding-inline: 15px;
+    color: #463161;
   }
 }
 </style>

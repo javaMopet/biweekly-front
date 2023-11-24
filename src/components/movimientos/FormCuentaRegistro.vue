@@ -263,6 +263,11 @@ const isTraspaso = computed({
     return editedFormItem.value.tipoMovimientoId === '3'
   }
 })
+const isEditing = computed({
+  get() {
+    return !!editedFormItem.value.id
+  }
+})
 
 const color = new Map([
   ['1', 'ingreso-button'],
@@ -352,7 +357,7 @@ function saveItem() {
 }
 
 function onSelectCategoria(value) {
-  if (!isEditing && !!value) {
+  if (!isEditing.value && !!value) {
     console.log('Nuevo registro categoria:', value)
     editedFormItem.value.importe =
       parseFloat(value.importeDefault) === 0
