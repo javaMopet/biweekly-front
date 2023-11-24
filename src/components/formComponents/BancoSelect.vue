@@ -65,14 +65,14 @@
       transition-show="jump-up"
       transition-hide="jump-down"
     >
-      <RegistroCuenta></RegistroCuenta>
+      <FormRegistroCuenta></FormRegistroCuenta>
     </q-dialog>
   </Teleport>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
-import RegistroCuenta from '../cuentas/RegistroCuenta.vue'
+import FormRegistroCuenta from '../cuentas/FormRegistroCuenta.vue'
 import { logErrorMessages } from '@vue/apollo-util'
 import { useBancoStore } from 'src/stores/common/useBancoStore'
 

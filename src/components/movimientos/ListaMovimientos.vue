@@ -1,7 +1,7 @@
 <template>
   <div
     class="my-card bg-main-background"
-    style="width: 1100px; min-width: 1100px; overflow: hidden"
+    style="width: 1200px; min-width: 1200px; overflow: hidden"
   >
     <DialogTitle
       ><div class="row items-center" style="border: 0px solid red">
@@ -17,51 +17,20 @@
         </div>
       </div></DialogTitle
     >
-    <!-- <transition name="fade">
-      <div class="row bg-pink-1" v-if="errorsList.length > 0">
-        <div class="column">
-          <div class="row q-gutter-x-md q-pl-sm q-pt-sm">
-            <q-icon name="warning" size="1.5rem" color="negative" />
-            <span class="text-caption text-dark"
-              >Los datos ingresados contienen errores:</span
-            >
-          </div>
-          <q-list dense>
-            <q-item
-              :inset-level="0.5"
-              dense
-              v-for="error in errorsList"
-              :key="error.code"
-            >
-              <q-item-section
-                avatar
-                dense
-                style="min-width: 25px !important; width: 25px !important"
-              >
-                <q-icon color="primary" name="arrow_right" />
-              </q-item-section>
-              <q-item-section class="errors__list--subtitle">{{
-                error.message
-              }}</q-item-section>
-            </q-item>
-          </q-list>
-        </div>
-      </div>
-    </transition> -->
-    <!-- <q-toolbar class="q-pl-lg q-mt-md" style="border: 0px solid red">
-      <q-btn
-        v-if="isSelected"
-        no-caps
-        label="Eliminar"
-        icon="las la-trash-alt"
-        color="negative-pastel"
-        outline
-        @click="deleteSelectedItems"
-      />
-    </q-toolbar> -->
     <div class="main-content q-py-lg">
       <div class="cuenta-content">
-        <div style="max-height: 60vh; height: 60vh" class="scroll">
+        <q-card-section>
+          <div class="row q-gutter-md text-primary">
+            <span class="">Periodo:</span
+            ><span class="tarjeta__resumen-valor text-bold">{{
+              periodoFormato
+            }}</span>
+          </div>
+        </q-card-section>
+        <div
+          style="max-height: 65vh; height: 65vh; border: 0px solid red"
+          class="scroll"
+        >
           <q-table
             :rows="listaRegistros"
             :columns="columns"
@@ -69,121 +38,109 @@
             :rows-per-page-options="[0]"
             hide-pagination
             dense
+            bordered
             class="my-sticky-header-table"
-            separator="cell"
+            separator="horizontal"
             selection="multiple"
             v-model:selected="selectedItems"
             no-data-label="No hay registros para esta categoria y periodo"
           >
             <template #top>
-              <q-th fit style="width: 100%">
-                <q-toolbar class="">
-                  <div class="column" style="width: 80px">
-                    <span class="tarjeta__resumen-etiqueta">Periodo:</span
-                    ><span class="tarjeta__resumen-valor"
-                      >Del:
-                      {{
-                        formato.convertDateFromIsoToInput(
-                          props.cellData.fecha_inicio
-                        )
-                      }}
-                      Al:
-                      {{
-                        formato.convertDateFromIsoToInput(
-                          props.cellData.fecha_fin
-                        )
-                      }}</span
-                    >
-                  </div>
-                  <q-toolbar-title> </q-toolbar-title>
-                </q-toolbar>
-                <q-toolbar
-                  class="row items-between"
-                  style="width: 100%; padding: 0px !important"
-                >
+              <q-td class="full-width">
+                <q-toolbar>
                   <q-btn
-                    v-if="isSelected"
                     no-caps
                     icon="las la-trash-alt"
                     color="negative-pastel"
+                    label="Eliminar"
                     @click="deleteSelectedItems"
+                    :disable="!isSelected"
+                    dense
                   />
                   <q-toolbar-title></q-toolbar-title>
-                  <span
+                  <!--  -->
+                  <div
                     v-if="isEditing"
-                    :class="{
-                      'bg-accent-light': isEditing,
-                      'text-primary': true
-                    }"
-                    style="padding-top: 10px; padding-bottom: 10px; width: 30%"
+                    class="row q-gutter-x-md items-center actualizando-class"
                   >
-                    Actualizando ...</span
-                  >
-
-                  <!-- <q-btn
-                    v-if="isEditing"
-                    no-caps
-                    label="Actualizar"
-                    icon="update"
-                    color="negative-pastel"
-                    @click="deleteSelectedItems"
-                  /> -->
+                    <span
+                      :class="{
+                        'bg-accent-light': isEditing,
+                        'actualizando-class': true
+                      }"
+                    >
+                      Actualizando ...</span
+                    >
+                    <q-btn
+                      color="negative-pastel"
+                      icon="las la-ban"
+                      no-caps
+                      label="Cancelar"
+                      @click="cancelEditItem"
+                      dense
+                    />
+                  </div>
                 </q-toolbar>
+              </q-td>
+            </template>
+            <template #header-cell-fecha="props">
+              <q-th :props="props" class="bg-white"
+                ><DateInput
+                  v-model="formItem.fecha"
+                  lbl_field="Fecha"
+                  :optional="false"
+                  :rango-fecha-inicio="categoria.fecha_inicio_formato"
+                  :rango-fecha-fin="categoria.fecha_fin_formato"
+                ></DateInput
+              ></q-th>
+            </template>
+            <template #header-cell-importe="props">
+              <q-th :props="props">
+                <PriceInput
+                  v-model="formItem.importe"
+                  :autofocus="true"
+                  :is-error="errors.isPriceError"
+                ></PriceInput>
               </q-th>
-              <q-th :class="{ 'bg-accent-light': isEditing }">
-                <q-td style="min-width: 32px; max-width: 32px"></q-td>
-                <q-td style="width: 135px"
-                  ><DateInput
-                    v-model="formItem.fecha"
-                    lbl_field="Fecha"
-                    :optional="false"
-                    :rango-fecha-inicio="categoria.fecha_inicio_formato"
-                    :rango-fecha-fin="categoria.fecha_fin_formato"
-                  ></DateInput
-                ></q-td>
-                <q-td style="width: 160px">
-                  <PriceInput
-                    v-model="formItem.importe"
-                    :autofocus="true"
-                    :is-error="errors.isPriceError"
-                  ></PriceInput>
-                </q-td>
-                <q-td style="width: 200px; max-width: 200px; min-width: 200px">
-                  <CuentaSelect
-                    v-model="formItem.cuenta"
-                    :agregar="false"
-                    :filter-array="['1', '2']"
-                  ></CuentaSelect
-                ></q-td>
-                <q-td style="min-width: 412px; width: 412px">
-                  <q-input
-                    v-model="formItem.observaciones"
-                    type="textarea"
-                    label="observaciones"
-                    dense
-                    outlined
-                    color="secondary"
-                    rows="1"
-                    lazy-rules
-                /></q-td>
-                <q-td
-                  class="q-px-sm"
-                  style="vertical-align: middle; border: 0px solid red"
-                  align="center"
-                >
+            </template>
+            <template #header-cell-cuenta="props">
+              <q-th :props="props">
+                <CuentaSelect
+                  v-model="formItem.cuenta"
+                  :agregar="false"
+                  :filter-array="['1', '2']"
+                ></CuentaSelect>
+              </q-th>
+            </template>
+            <template #header-cell-observaciones="props">
+              <q-th :props="props">
+                <q-input
+                  v-model="formItem.observaciones"
+                  type="textarea"
+                  label="observaciones"
+                  dense
+                  outlined
+                  color="secondary"
+                  rows="1"
+                  lazy-rules
+                />
+              </q-th>
+            </template>
+            <template #header-cell-acciones="props">
+              <q-th :props="props">
+                <div class="row justify-start">
                   <q-btn
                     v-if="!editingItem"
-                    class="button-save"
                     icon="save"
                     @click="saveItem"
+                    dense
+                    no-caps
+                    class="button-save"
+                    round
                     flat
-                  />
-                  <!-- color="primary-button" -->
-                  <!-- icon="las la-plus-square" -->
-                  <!-- <q-tooltip transition-duration="600">
-                      Guardar Nuevo
-                    </q-tooltip> -->
-
+                  >
+                    <q-tooltip :offset="[10, 10]"> Guardar </q-tooltip>
+                  </q-btn>
                   <q-btn
                     v-else
                     class="button-save"
@@ -191,12 +148,8 @@
                     @click="saveItem"
                     flat
                   >
-                    <!-- icon="las la-save" -->
-                    <q-tooltip :offset="[10, 10]" class="bg-accent">
-                      Actualizar
-                    </q-tooltip>
+                    <q-tooltip :offset="[10, 10]"> Actualizar </q-tooltip>
                   </q-btn>
-
                   <q-btn
                     v-if="editingItem"
                     class="button-cancel"
@@ -204,32 +157,33 @@
                     @click="cancelEditItem(props)"
                     flat
                   >
-                    <q-tooltip :offset="[10, 10]" class="bg-accent">
-                      Cancelar
-                    </q-tooltip></q-btn
+                    <q-tooltip :offset="[10, 10]"> Cancelar </q-tooltip></q-btn
                   >
-                </q-td>
-                <!-- </q-tr> -->
+                </div>
               </q-th>
             </template>
             <template v-slot:body-cell-acciones="props">
               <q-td :props="props">
                 <q-btn
-                  v-if="!editingItem"
+                  :disable="isEditing"
                   class="button-edit"
-                  icon="edit"
                   @click="editItem(props)"
+                  icon="las la-edit"
+                  no-caps
                   dense
                   flat
                 >
                   <!-- icon="las la-edit" -->
-                  <q-tooltip :offset="[10, 10]" class="bg-accent">
+                  <q-tooltip
+                    v-if="!isEditing"
+                    :offset="[10, 10]"
+                    transition-duration="900"
+                  >
                     Editar
                   </q-tooltip>
                 </q-btn>
               </q-td>
             </template>
-            <!-- <template #no-data>No se han agregado datos</template> -->
           </q-table>
         </div>
         <q-card-actions vertical>
@@ -314,42 +268,37 @@ const columns = [
     name: 'fecha',
     label: 'Fecha',
     field: 'fecha',
-    sortable: true,
+    format: (val) => DateTime.fromISO(val).toFormat('dd-MM-yyyy'),
+    sortable: false,
     align: 'center',
-    // style: 'min-width:140px'
-    style: 'width:15%',
-    headerStyle: 'width: 15%'
+    headerStyle: 'width:13%'
   },
   {
     name: 'importe',
     label: 'Importe',
     field: (row) => row.importe,
     format: (val, row) => `${obtenerFormatoImporte(val)}`,
-    sortable: true,
+    sortable: false,
     align: 'right',
-    // style: 'min-width:160px'
-    style: 'width:15%',
-    headerStyle: 'width: 15%'
+    headerStyle: 'width:15%;max-width:15%;min-width:15%'
   },
   {
     name: 'cuenta',
     label: 'Cuenta',
     field: (row) => row.cuenta?.nombre || '',
-    sortable: true,
+    sortable: false,
     align: 'left',
-    // style: 'min-width:200px'
-    style: 'width:20%',
-    headerStyle: 'width: 20%'
+    headerStyle: 'width: 30%;max-width:30%;min-width:30%'
   },
   {
     name: 'observaciones',
     label: 'Observaciones',
     field: (row) => row.observaciones,
-    sortable: true,
+    sortable: false,
     align: 'left',
     style: 'text-wrap: wrap; min-width:40%;max-width:40%',
-    headerStyle: 'width:40%'
-    // style: 'min-width:200px;max-width:200px;text-wrap: wrap'
+    headerStyle: 'width:32%',
+    style: 'text-wrap: wrap'
   },
   {
     name: 'acciones',
@@ -357,34 +306,10 @@ const columns = [
     field: '',
     sortable: false,
     align: 'center',
-    // style: 'width:80px;min-width:80px;max-width:80px'
-    style: 'width:15%;min-width:10%'
+    headerStyle: 'width: 8%;text-wrap: wrap',
+    style: 'text-wrap: wrap'
   }
 ]
-
-function addItem(val) {
-  const fecha = formItem.value.fecha
-  const importe = formItem.value.importe
-  const cuenta = formItem.value.cuenta
-
-  const observaciones = formItem.value.observaciones
-  const validar = true
-  if (entradaValida()) {
-    const row = {
-      identifier: listaRegistros.value.length,
-      categoriaId: props.cellData.categoriaId,
-      cuentaValida: true,
-      estadoRegistroId: 1,
-      importe: importe,
-      fecha,
-      cuenta,
-      observaciones
-    }
-    listaRegistros.value.push(row)
-
-    console.table(listaRegistros.value)
-  }
-}
 
 function editItem(props) {
   const rowIndex = props.rowIndex
@@ -393,13 +318,16 @@ function editItem(props) {
     rowIndex,
     row
   }
+
   console.log(row.categoria.tipoMovimientoId)
   const importe =
     row.categoria.tipoMovimientoId === '2'
       ? parseFloat(row.importe) * -1
       : parseFloat(row.importe)
+
+  const fecha = formato.convertDateFromIsoToInput(row.fecha)
   formItem.value = {
-    fecha: row.fecha,
+    fecha,
     importe: importe.toString(),
     cuenta: row.cuenta,
     observaciones: row.observaciones
@@ -480,21 +408,6 @@ registrosCrud.onDoneRegistrosDelete(({ data }) => {
   reloadListaRegistros()
 })
 
-function obtenerFechaDefault() {
-  const fechaInicio = DateTime.fromISO(props.cellData.fecha_inicio)
-  const fechaFin = DateTime.fromISO(props.cellData.fecha_fin)
-  const now = DateTime.now()
-  const diff1 = now.diff(fechaInicio, ['days'])
-  const diff2 = fechaFin.diff(now, ['days'])
-  let fecha = null
-  if (diff1 > 0 && diff2 > 0) {
-    fecha = formato.dateNowToInput()
-  } else {
-    fecha = formato.convertDateTimeToInput(fechaInicio)
-  }
-  return fecha
-}
-
 function inicializarFecha() {
   console.log('fecha_inicio', props.cellData.fecha_inicio)
   formItem.value.fecha = formato.convertDateFromIsoToInput(
@@ -557,7 +470,7 @@ function addError(code, message) {
   })
 }
 
-registrosCrud.onDoneCreate(({ data }) => {
+registrosCrud.onDoneRegistroCreate(({ data }) => {
   console.log('data', data)
   const itemSaved = data.registroCreate.registro
   afterSaveItem('Ingreso', itemSaved)
@@ -593,7 +506,7 @@ function afterUpdateItem(itemUpdated) {
   inicializarFormulario()
 }
 
-registrosCrud.onErrorCreate((error) => {
+registrosCrud.onErrorRegistroCreate((error) => {
   console.trace(error)
   console.log('error', error.graphQLErrors[0])
   console.log('error', error.graphQLErrors[0]?.extensions)
@@ -636,17 +549,14 @@ const graphql_options = ref({
   fetchPolicy: 'network-only'
 })
 
-const {
-  result: resultCategoria,
-  onError: onErrorCategoriaById,
-  onResult: onResultCategoriaById
-} = useQuery(
-  CATEGORIA_BY_ID,
-  {
-    id: props.cellData.categoriaId
-  },
-  graphql_options
-)
+const { onError: onErrorCategoriaById, onResult: onResultCategoriaById } =
+  useQuery(
+    CATEGORIA_BY_ID,
+    {
+      id: props.cellData.categoriaId
+    },
+    graphql_options
+  )
 
 const {
   onError: onErrorListaRegistros,
@@ -669,7 +579,7 @@ onResultListaRegistros(({ data }) => {
   if (data.obtenerRegistros.length > 0) {
     listaRegistros.value = JSON.parse(JSON.stringify(data.obtenerRegistros))
     listaRegistros.value.forEach((element) => {
-      element.fecha = formato.convertDateFromIsoToInput(element.fecha)
+      // element.fecha = formato.convertDateFromIsoToInput(element.fecha)
       element.importe = element.importe.toString()
       element.saved = true
     })
@@ -695,6 +605,13 @@ onErrorCategoriaById((error) => {
 /**
  * computed
  */
+const periodoFormato = computed({
+  get() {
+    return `Del: ${formato.convertDateFromIsoToInput(
+      props.cellData.fecha_inicio
+    )} Al: ${formato.convertDateFromIsoToInput(props.cellData.fecha_fin)}`
+  }
+})
 // const importeValido = ref(true)
 
 const isImporteValido = (importeValido) => {
@@ -803,7 +720,8 @@ function buscarMovimientos() {
   .q-table__bottom,
   thead tr:first-child th {
     /* bg color is important for th; just specify one */
-    background-color: $main-background;
+    // background-color: $main-background;
+    background: rgb(248, 248, 248) !important;
   }
 
   thead tr th {
@@ -831,6 +749,28 @@ function buscarMovimientos() {
   tbody {
     /* height of all previous header rows */
     scroll-margin-top: 48px;
+  }
+}
+
+.actualizando-class {
+  padding: 6px 25px;
+  color: $dark;
+  border: 0px solid $dark;
+  border-radius: 5px;
+  & span {
+    // animation: blink 3s linear infinite;
+  }
+}
+
+@keyframes blink {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
   }
 }
 </style>

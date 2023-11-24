@@ -197,6 +197,7 @@
 .bg-button-new {
   background: $button-new !important;
 }
+
 /* *************************** */
 
 .btn-add {
@@ -304,25 +305,6 @@
     }
   }*/
 }
-.cuenta-card {
-  width: 350px;
-  min-width: 340px;
-  background: #f2f2f2;
-  box-shadow: rgba(206, 207, 209, 0.568) 1px 1px 26px,
-    rgba(195, 198, 202, 0.678) 1px 1px 3px;
-  border-radius: 5px;
-  cursor: normal;
-
-  &:hover {
-    box-shadow: rgba(104, 102, 102, 0.76) 5px 14px 28px,
-      rgba(105, 102, 102, 0.74) 5px 10px 10px;
-    -webkit-font-smoothing: subpixel-antialiased;
-    -webkit-transform: translateZ(0) scale(1, 1);
-    background: #ffffff;
-    transform: translate(-1px, -2px);
-    transition: all 0.25s;
-  }
-}
 
 /* ********************************************* */
 .breadcrum-component {
@@ -378,27 +360,6 @@
   font-size: 0.75rem;
 }
 
-/* ************************************ */
-.tarjeta__resumen-etiqueta {
-  letter-spacing: -0.025rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #686666;
-}
-.tarjeta__resumen-valor {
-  font-family: sans-serif;
-  font-size: 0.9rem;
-  font-weight: 300;
-  letter-spacing: 0.0025rem;
-  color: rgb(122, 63, 15);
-  &-importante {
-    font-family: 'Cousine', monospace;
-    font-size: 0.85rem;
-    font-weight: 600;
-    letter-spacing: -0.035rem;
-    color: #476d59 !important;
-  }
-}
 /* *********************************** */
 .more-button {
   font-size: 0.85rem;
@@ -557,7 +518,7 @@
   }
 }
 
-$save-button-color: #4388f0;
+$save-button-color: #0b387a;
 
 .button-save {
   font-size: 0.9rem;
@@ -589,6 +550,13 @@ $save-button-color: #4388f0;
 
 .small-button {
   font-size: 0.6rem !important;
+  padding-inline: 5px !important;
+  &:hover {
+    color: $secondary !important;
+  }
+}
+.extra-small-button {
+  font-size: 0.55rem !important;
   padding-inline: 5px !important;
   &:hover {
     color: $secondary !important;

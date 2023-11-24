@@ -91,7 +91,7 @@
             </div>
           </template>
           <template #item="props">
-            <q-card class="cuenta-card text-primary q-ma-sm clickable">
+            <q-card class="cuenta-card text-primary q-ma-sm" bordered>
               <q-inner-loading
                 class="card-loading"
                 :showing="loadingAccount[props.rowIndex]"
@@ -130,47 +130,14 @@
                       {{ props.row.cuentaContable.nombreCompleto }}
                     </div>
                   </div>
-                  <!-- <div class="column">
-                    <q-btn
-                      color="more-button"
-                      flat
-                      icon="more_vert"
-                      round
-                      dense
-                    >
-                      <q-menu>
-                        <q-list style="min-width: 100px">
-                          <q-item
-                            clickable
-                            @click="editRow(props)"
-                            v-close-popup
-                          >
-                            <q-item-section avatar>
-                              <q-icon name="edit" color="info"
-                            /></q-item-section>
-                            <q-item-section>Editar</q-item-section>
-                          </q-item>
-                          <q-separator />
-                          <q-item
-                            clickable
-                            @click="deleteRow(props)"
-                            v-close-popup
-                          >
-                            <q-item-section avatar>
-                              <q-icon name="delete" color="negative"
-                            /></q-item-section>
-                            <q-item-section>Eliminar</q-item-section>
-                          </q-item>
-                        </q-list>
-                      </q-menu>
-                    </q-btn>
-                  </div> -->
+                  <div class="text-subtitle2 full-width" align="right">
+                    {{ formato.toCurrency(props.row.saldo ?? 0) }}
+                  </div>
                 </div>
                 <div
-                  class="row inline full-width items-center justify-between q-pt-md"
-                  style="border-top: 1px solid #dddddd"
+                  class="row full-width items-center justify-between q-pt-sm cuenta-card__acciones"
                 >
-                  <div class="col" style="cursor: normal">
+                  <div class="col" align="right" style="cursor: normal">
                     <q-btn
                       flat
                       round
@@ -187,47 +154,8 @@
                       @click="deleteRow(props)"
                     />
                   </div>
-                  <div class="col">
-                    <q-item-label
-                      style="border: 0px solid red; width: 100%"
-                      caption
-                      class="text-blue-grey-6 text-bold"
-                      align="right"
-                    >
-                      <span class="text-h6">
-                        {{ formato.toCurrency(props.row.saldo ?? 0) }}
-                      </span>
-                    </q-item-label>
-                  </div>
                 </div>
               </q-card-section>
-
-              <!-- <q-card-section>
-              <div
-                class="text-subtitle text-grey-8 text-bold q-mt-xs"
-                align="right"
-              ></div>
-              <span class="cuenta__card--descripcion"> </span>
-            </q-card-section> -->
-
-              <!-- <q-separator inset /> -->
-
-              <!-- <q-card-actions>
-              <q-btn
-                round
-                color="primary"
-                flat
-                icon="edit"
-                @click="editRow(props)"
-              />
-              <q-btn
-                round
-                flat
-                icon="delete"
-                class="q-ml-sm"
-                @click="deleteRow(props)"
-              />
-            </q-card-actions> -->
             </q-card>
           </template>
           <template #body-cell-icono="props">
@@ -243,21 +171,20 @@
           transition-show="jump-up"
           transition-hide="jump-down"
         >
-          <RegistroCuenta
+          <FormRegistroCuenta
             :edited-item="editedItem"
             @cuentaSaved="cuentaSaved"
             @cuentaUpdated="cuentaUpdated"
-          ></RegistroCuenta>
+          ></FormRegistroCuenta>
         </q-dialog>
       </Teleport>
-      <!-- <pre>{{ cuentaStore.listaCuentas.length }}</pre> -->
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import RegistroCuenta from 'src/components/cuentas/RegistroCuenta.vue'
+import FormRegistroCuenta from 'src/components/cuentas/FormRegistroCuenta.vue'
 import { useQuasar } from 'quasar'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { useFormato } from 'src/composables/utils/useFormato'
@@ -278,19 +205,6 @@ const cuentasCrud = useCuentasCrud()
 /**
  * GRAPHQL
  */
-// const graphql_options = ref({
-//   fetchPolicy: 'cache-and-network'
-//   // fetchPolicy: 'cache-only'
-// })
-
-// onDoneDeleteCuenta(({ data }) => {
-//   if (!!data) {
-//     console.log('item deleted ', data)
-//     const deletedItem = data.cuentaDelete.cuenta
-//     mostrarNotificacion('elminó', deletedItem)
-//     refetchListaCuentas()
-//   }
-// })
 cuentasCrud.onErrorCuentaDelete((error) => {
   console.error(error)
   notificacion.mostrarNotificacionNegativa(
@@ -298,9 +212,6 @@ cuentasCrud.onErrorCuentaDelete((error) => {
     1600
   )
 })
-// onErrorListaCuentas((error) => {
-//   console.error(error)
-// })
 /**
  * state
  */
@@ -321,17 +232,9 @@ const loadingAccount = ref([])
 /**
  * computed
  */
-// const listaCuentas = computed({
-//   get() {
-//     return (
-//       resultCuentas.value?.listaCuentas.filter(
-//         (cuenta) => cuenta.tipoCuenta.id !== '3'
-//       ) ?? []
-//     )
-//   }
-// })
+
 /**
- *
+ * Columns
  */
 const columns = [
   // { name: 'id', label: 'Id', field: 'id', sortable: true, align: 'left' },
@@ -378,13 +281,6 @@ const listaCuentasAhorro = computed({
     return cuentaStore.listaCuentas.filter((c) => c.tipoCuenta.id !== '3') ?? []
   }
 })
-
-// onResultCuentas(({ data }) => {
-//   if (!!data) {
-//     console.log('response', data)
-//     listaCuentas.value = JSON.parse(JSON.stringify(data.listaCuentas))
-//   }
-// })
 
 function addRow(tipoCuentaId) {
   console.log('tipo de cuenta', tipoCuentaId)
@@ -452,12 +348,33 @@ function cuentaUpdated(itemUpdated) {
 }
 </script>
 
-<style lang="scss">
-.cuenta-card__title {
-  text-decoration: underline;
-  font-size: 1.1rem;
-  color: $dark;
+<style lang="scss" scoped>
+.cuenta-card {
+  width: 350px;
+  min-width: 340px;
+  background: $main-background;
+  border-radius: 10px;
+  cursor: normal;
+
+  &:hover {
+    box-shadow: rgba(104, 102, 102, 0.76) 5px 14px 28px,
+      rgba(112, 128, 173, 0.74) 5px 10px 10px;
+    -webkit-font-smoothing: subpixel-antialiased;
+    -webkit-transform: translateZ(0) scale(1, 1);
+    background: #ffffff;
+    transform: translate(-1px, -2px);
+    transition: all 0.25s;
+  }
+  &__title {
+    text-decoration: underline;
+    font-size: 1.1rem;
+    color: $dark;
+  }
+  &__acciones {
+    border-top: 1px solid #d5dde4;
+  }
 }
+
 .cuenta__card--descripcion {
   font-size: 0.8rem !important;
   // color: rgb(85, 85, 103) !important;

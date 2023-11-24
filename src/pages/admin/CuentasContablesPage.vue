@@ -32,6 +32,7 @@
             dense
             style="width: 400px"
             color="secondary"
+            class="bg-accent-light"
           >
             <template v-slot:append>
               <q-icon name="filter_alt" />

@@ -83,22 +83,50 @@
             </div>
           </q-toolbar>
         </q-card-section>
-        <q-card-actions>
-          RESUMEN: &nbsp;
+        <q-card-actions class="resumen bg-white">
+          <q-item-label class="q-pr-md"> RESUMEN: &nbsp; </q-item-label>
+          <!-- -->
           <div class="row text-condensed" v-if="!expanded">
-            <div class="column q-ml-lg items-center justify-center">
+            <q-separator spaced vertical />
+            <div class="column items-center justify-center">
+              <span class="tarjeta__resumen-etiqueta">Día de corte:</span
+              ><span class="resumen__valor"> {{ cuenta.dia_corte }}</span>
+            </div>
+            <q-separator spaced vertical />
+            <div class="column items-center justify-center">
               <span class="tarjeta__resumen-etiqueta">Periodo:</span
-              >{{ periodoInicio }} - {{ periodoFin }}
+              ><span class="resumen__valor"
+                >{{ periodoInicio }} - {{ periodoFin }}</span
+              >
             </div>
-            <div class="column q-ml-lg items-center justify-center">
+            <q-separator spaced vertical />
+            <div class="column items-center justify-center">
               <span class="tarjeta__resumen-etiqueta"
-                >Pago p/ no generar intereses):</span
-              >{{ formato.toCurrency(saldo_final_periodo) }}
+                >Pago para no generar intereses:</span
+              ><span class="resumen__valor">{{
+                formato.toCurrency(
+                  saldo_pagar_periodo === 0 ? 0 : saldo_pagar_periodo * -1
+                )
+              }}</span>
             </div>
-            <div class="column q-ml-lg items-center justify-center">
+            <q-separator spaced vertical />
+            <div class="column items-center justify-center">
               <span class="tarjeta__resumen-etiqueta"
-                >Saldo final en tarjeta:</span
-              >{{ formato.toCurrency(Math.abs(saldo_final_periodo)) }}
+                >Saldo del periodo anterior:</span
+              ><span class="resumen__valor">{{
+                formato.toCurrency(
+                  saldo_final_perido_anterior === 0
+                    ? 0
+                    : saldo_final_perido_anterior * -1
+                )
+              }}</span>
+            </div>
+            <q-separator spaced vertical />
+            <div class="column items-center justify-center">
+              <span class="tarjeta__resumen-etiqueta">Saldo en tarjeta:</span
+              ><span class="resumen__valor">{{
+                toCurrencyAbsoluteFormat(cuenta.saldo)
+              }}</span>
             </div>
           </div>
           <q-space />
@@ -121,71 +149,92 @@
         </q-card-actions>
         <q-slide-transition>
           <div v-show="expanded">
-            <q-separator />
-            <q-card-section>
-              <div class="row">
-                <div class="col column items-center">
-                  <span class="tarjeta__resumen-etiqueta"> Día de corte </span>
-                  <span
-                    class="tarjeta__resumen-valor"
-                    style="font-size: 1rem !important; font-weight: bold"
-                  >
-                    {{ cuenta.dia_corte }}</span
-                  >
+            <q-card-section class="row tarjeta-resumen">
+              <div class="col tarjeta-resumen__left q-gutter-y-xs">
+                <div class="row">
+                  <div class="col column items-center">
+                    <span class="tarjeta-resumen__etiqueta">
+                      DÍA DE CORTE
+                    </span>
+                    <span class="tarjeta-resumen__valor">
+                      {{ cuenta.dia_corte }}</span
+                    >
+                  </div>
                 </div>
-                <q-separator spaced vertical />
-                <div class="col column items-center">
-                  <span class="tarjeta__resumen-etiqueta"> Periodo </span>
-                  <span class="tarjeta__resumen-valor">
-                    {{ periodoInicio }} - {{ periodoFin }}</span
-                  >
+                <div class="">
+                  <q-separator spaced vertical />
+                  <div class="col column items-center">
+                    <span class="tarjeta-resumen__etiqueta">
+                      PERIODO DE FACTURACIÓN
+                    </span>
+                    <span class="tarjeta-resumen__valor">
+                      {{ periodoInicio }} - {{ periodoFin }}</span
+                    >
+                  </div>
                 </div>
-                <q-separator spaced vertical />
-                <div class="col column items-center">
-                  <span class="tarjeta__resumen-etiqueta">
-                    PAGO PARA NO GENERAR INTERESES
-                  </span>
-                  <span class="tarjeta__resumen-valor">
-                    {{
-                      formato.toCurrency(Math.abs(saldo_pagar_periodo))
-                    }}</span
-                  >
-                </div>
-                <q-separator spaced vertical />
-                <div class="col column items-center">
-                  <span class="tarjeta__resumen-etiqueta">
-                    Importe del periodo
-                  </span>
-                  <span class="tarjeta__resumen-valor-importante">
-                    {{ formato.toCurrency(sumaMovimientos) }}</span
-                  >
-                </div>
-                <q-separator spaced vertical />
-                <div class="col column items-center">
-                  <span class="tarjeta__resumen-etiqueta">
-                    Saldo del periodo anterior
-                  </span>
-                  <span class="tarjeta__resumen-valor">
-                    {{ formato.toCurrency(saldo_final_perido_anterior) }}</span
-                  >
+                <div class="row">
+                  <div class="col column items-center">
+                    <span class="tarjeta-resumen__etiqueta">
+                      PAGO PARA NO GENERAR INTERESES
+                    </span>
+                    <span class="tarjeta-resumen__valor--importante">
+                      {{
+                        formato.toCurrency(Math.abs(saldo_pagar_periodo))
+                      }}</span
+                    >
+                  </div>
                 </div>
               </div>
-              <q-separator spaced horizontal />
-              <div class="row">
-                <div class="col column items-center">
-                  <span class="tarjeta__resumen-etiqueta">
-                    Saldo Final al {{ periodoFin }}
-                  </span>
-                  <span class="tarjeta__resumen-valor">
-                    {{ formato.toCurrency(Math.abs(saldo_final_periodo)) }}
-                  </span>
+              <div class="col tarjeta-resumen__right q-gutter-y-xs">
+                <div class="row">
+                  <div class="col column items-center">
+                    <span class="tarjeta-resumen__etiqueta"
+                      >SALDO EN TARJETA ANTERIOR
+                    </span>
+                    <span class="tarjeta-resumen__valor">
+                      {{
+                        formato.toCurrency(
+                          saldo_final_perido_anterior === 0
+                            ? 0
+                            : saldo_final_perido_anterior * -1
+                        )
+                      }}</span
+                    >
+                  </div>
                 </div>
-                <q-separator spaced vertical />
-                <div class="col column items-center">
-                  <span class="tarjeta__resumen-etiqueta"> Saldo al Día </span>
-                  <span class="tarjeta__resumen-valor">
-                    {{ formato.toCurrency(Math.abs(cuenta.saldo)) }}
-                  </span>
+                <div class="row">
+                  <div class="col column items-center">
+                    <span class="tarjeta-resumen__etiqueta">
+                      COMPRAS Y OTROS CARGOS
+                    </span>
+                    <span class="tarjeta-resumen__valor">
+                      {{ formato.toCurrency(sumaMovimientos + suma_msi) }}</span
+                    >
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col column items-center">
+                    <span class="tarjeta-resumen__etiqueta">
+                      SALDO EN TARJETA AL PERIODO
+                    </span>
+                    <span class="tarjeta-resumen__valor">
+                      {{ formato.toCurrency(Math.abs(saldo_final_periodo)) }}
+                    </span>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col column items-center">
+                    <span class="tarjeta-resumen__etiqueta">
+                      SALDO EN TARJETA
+                    </span>
+                    <span class="tarjeta-resumen__valor--importante">
+                      {{
+                        formato.toCurrency(
+                          cuenta.saldo === 0 ? 0 : cuenta.saldo * -1
+                        )
+                      }}
+                    </span>
+                  </div>
                 </div>
               </div>
             </q-card-section>
@@ -452,6 +501,8 @@ const registrosTarjetaCrud = useRegistrosTarjetaCrud()
 
 const { mostrarNotificacionPositiva, mostrarNotificacionNegativa } =
   useNotificacion()
+
+const { toCurrencyAbsoluteFormat } = useFormato()
 /**
  * state
  */
@@ -487,7 +538,7 @@ const listaRegistrosVariables = reactive({
 })
 
 const selectedItems = ref([])
-const expanded = ref(true)
+const expanded = ref(false)
 
 /**
  * onMounted
@@ -1109,5 +1160,56 @@ function actualizarSaldosResumen() {
   font-size: 0.95rem;
   font-weight: 600;
   color: #7b6992;
+}
+
+/* ************************************ */
+.resumen {
+  color: $primary;
+  font-size: 0.8rem;
+  font-weight: 300;
+  // border: 1px solid green;
+  &__etiqueta {
+    letter-spacing: -0.025rem;
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: #60665c;
+  }
+  &__valor {
+    // font-family: 'Roboto Slab', sans-serif;
+    font-weight: 500;
+    color: $input-label;
+  }
+}
+.tarjeta-resumen {
+  // border: 0px solid rgb(0, 68, 255);
+  // background-color: rgb(230, 250, 230);
+  background: white;
+  // background-color: rgb(248, 248, 247);
+  border-top: 1px solid #d3d6d1;
+  &__left {
+  }
+  &__right {
+  }
+
+  &__etiqueta {
+    letter-spacing: -0.025rem;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: $dark;
+  }
+
+  &__valor {
+    font-family: 'Roboto Slab', monospace;
+    font-size: 0.8rem;
+    font-weight: 400;
+    letter-spacing: 0.0025rem;
+    color: $input-label;
+
+    &--importante {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: $accent !important;
+    }
+  }
 }
 </style>

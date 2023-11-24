@@ -26,6 +26,7 @@ export const LISTA_CUENTAS = gql`
         icono
       }
       saldo
+      propietario
     }
   }
 `
@@ -85,6 +86,7 @@ export const CUENTA_CREATE = gql`
           icono
         }
         saldo
+        propietario
       }
     }
   }
@@ -116,6 +118,7 @@ export const CUENTA_UPDATE = gql`
           icono
         }
         saldo
+        propietario
       }
     }
   }

@@ -8,6 +8,12 @@ export function useFormato() {
     }).format(val)
   }
 
+  function toCurrencyAbsoluteFormat(val) {
+    let valor = !val ? 0.0 : parseFloat(val)
+    valor = valor === 0 ? 0 : valor * -1
+    return toCurrency(valor)
+  }
+
   function toPercentage(val) {
     return val * 100 + '%'
   }
@@ -59,6 +65,7 @@ export function useFormato() {
 
   return {
     toCurrency,
+    toCurrencyAbsoluteFormat,
     toPercentage,
     formatoFecha,
     formatoHoraAMPM,

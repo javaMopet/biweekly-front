@@ -49,241 +49,225 @@
   </q-card>
   <div class="main-content">
     <div class="cuenta-content">
-      <q-toolbar class="">
-        <div class="row q-gutter-x-sm">
-          <q-select
-            v-model="ejercicio_fiscal"
-            :options="ejercicioFiscalOptions"
-            option-label="nombre"
-            label="Año"
-            dense
-            outlined
-            color="secondary"
-            label-color="dark"
-            @update:model-value="onChangeEjercicio"
-          >
-            <template #prepend>
-              <q-icon name="calendar_month" />
-            </template>
-          </q-select>
-          <!-- <q-select
-          v-model="mes"
-          :options="mesOptions"
-          option-label="nombre"
-          label="Mes"
-          dense
-          outlined
-          color="secondary"
-          label-color="dark"
-          @update:model-value="onChangeMes"
+      <q-card class="my-card" flat bordered>
+        <q-toolbar class="">
+          <div class="row q-gutter-x-sm">
+            <q-select
+              v-model="ejercicio_fiscal"
+              :options="ejercicioFiscalOptions"
+              option-label="nombre"
+              label="Año"
+              dense
+              outlined
+              color="secondary"
+              label-color="dark"
+              @update:model-value="onChangeEjercicio"
+            >
+              <template #prepend>
+                <q-icon name="calendar_month" />
+              </template>
+            </q-select>
+            <MesSelect
+              v-model="mes"
+              @update:model-value="onChangeMes"
+            ></MesSelect>
+          </div>
+          <q-toolbar-title> </q-toolbar-title>
+        </q-toolbar>
+        <q-card-actions
+          class="row bg-white full-width text-accent text-subtitle2 resumen"
+          bordered
+          style="border: 0px solid red"
         >
-          <template #prepend>
-            <q-icon name="calendar_month" />
-          </template>
-        </q-select> -->
-          <MesSelect
-            v-model="mes"
-            @update:model-value="onChangeMes"
-          ></MesSelect>
-        </div>
-        <q-toolbar-title> </q-toolbar-title>
-      </q-toolbar>
-
-      <q-card flat>
-        <q-card-section>
-          <div class="row">
-            <div class="col column items-center">
-              <span class="tarjeta__resumen-etiqueta"> Periodo </span>
-              <span class="tarjeta__resumen-valor">
-                {{ periodoInicio }} - {{ periodoFin }}</span
-              >
-            </div>
-            <q-separator spaced inset vertical />
-            <div class="col column items-center">
-              <span class="tarjeta__resumen-etiqueta"> Saldo del periodo</span>
-              <span class="tarjeta__resumen-valor">
-                {{ formato.toCurrency(sumaMovimientos) }}
-              </span>
-            </div>
-            <q-separator spaced inset vertical />
-            <div class="col column items-center">
-              <span class="tarjeta__resumen-etiqueta">
-                Saldo al final del periodo</span
-              >
-              <span class="tarjeta__resumen-valor">
-                {{ formato.toCurrency(saldo_final_periodo) }}
-              </span>
-            </div>
-            <!--<div class="col column items-center">
-              <span class="tarjeta__resumen-etiqueta">
-                Suma de movimientos del periodo
-              </span>
-              <span class="tarjeta__resumen-valor-importante">
-                {{ formato.toCurrency(sumaMovimientos) }}</span
-              >
-            </div> -->
+          <q-item-label class="q-pr-md"> RESUMEN: &nbsp; </q-item-label>
+          <div class="col column items-center">
+            <span class="resumen__etiqueta"> Periodo </span>
+            <span class="resumen__valor">
+              {{ periodoInicio }} - {{ periodoFin }}</span
+            >
           </div>
-          <q-separator spaced inset horizontal />
-          <div class="row">
-            <!-- <q-separator spaced inset vertical /> -->
-            <div class="col column items-center">
-              <span class="tarjeta__resumen-etiqueta"> Saldo al día</span>
-              <div class="q-gutter-x-sm">
-                <span
-                  class="tarjeta__resumen-valor"
-                  style="font-weight: bold !important"
-                >
-                  {{ formato.toCurrency(cuenta.saldo) }}
-                </span>
-                <q-btn
-                  class="small-button"
-                  color="primary"
-                  icon="las la-redo-alt"
-                  @click="actualizarSaldoFinal"
-                  flat
-                />
-              </div>
-            </div>
-          </div>
-        </q-card-section>
-        <q-card-section>
           <q-separator spaced inset vertical />
-          <q-table
-            :rows="listaRegistros"
-            :columns="columns"
-            dense
-            :rows-per-page-options="[0]"
-            table-header-class="bg-primary-light text-accent text-condensed"
-            separator="horizontal"
-            hide-pagination
-            selection="multiple"
-            v-model:selected="selectedItems"
-            row-key="id"
-          >
-            <template #top-left>
-              <q-tr class="cuenta__data-subtitle">
-                <div class="table-title">Movimientos del periodo</div>
-              </q-tr>
-            </template>
-            <template #top-right>
-              <q-tr>
-                <div class="q-gutter-x-md">
-                  <q-btn
-                    v-if="selectedItems.length > 0"
-                    no-caps
-                    color="negative-pastel"
-                    label="Eliminar"
-                    @click="deleteSelectedItems"
-                    push
-                    flat
-                    icon="las la-trash"
-                    rounded
-                  />
-                  <q-btn
-                    no-caps
-                    color="primary"
-                    label="Agregar"
-                    @click="addItem"
-                    push
-                    flat
-                    icon="add_circle"
-                    rounded
-                  />
-                  <q-btn
-                    color="primary-button"
-                    flat
-                    @click="importarMovimientos"
-                    no-caps
-                    rounded
-                  >
-                    <q-avatar square size="24px">
-                      <q-img
-                        src="/icons/excel.png"
-                        width="24px"
-                        height="24px"
-                      />
-                    </q-avatar>
-                    <span class="q-ml-sm">Importar</span>
-                  </q-btn>
-                </div>
-              </q-tr>
-            </template>
-
-            <template #body-cell-categoria="props">
-              <q-td key="categoria" :props="props">
-                {{ props.row.categoria?.nombre }}
-              </q-td>
-            </template>
-            <template #body-cell-importe="props">
-              <q-td
-                class="registros__columna--importe"
-                :style="{
-                  color: props.row.importe < 0 ? 'red' : 'black'
-                }"
-                align="right"
-              >
-                {{ formato.toCurrency(props.row.importe) }}
-              </q-td>
-            </template>
-            <template #body-cell-observaciones="props">
-              <q-td key="observaciones" :props="props">
-                {{ props.row.observaciones }}
-                <q-popup-edit
-                  v-model="props.row.observaciones"
-                  title="Editar observaciones"
-                  buttons
-                  label-set="Guardar"
-                  label-cancel="Cancelar"
-                  @update:model-value="
-                    saveObs(props.row.id, props.row, props.row.observaciones)
-                  "
-                  v-slot="scope"
-                  max-width="150px"
-                >
-                  <q-input
-                    v-model="scope.value"
-                    @keyup.enter="scope.set"
-                    type="text"
-                    label="Favor de ingresar observaciones"
-                    autofocus
-                  />
-                </q-popup-edit>
-              </q-td>
-            </template>
-            <template #body-cell-acciones="props">
-              <q-td :props="props" class="q-gutter-x-md">
-                <q-btn
-                  icon="las la-edit"
-                  size="md"
-                  class="button-edit"
-                  dense
-                  @click="editItem(props)"
-                  flat
-                />
-                <q-btn
-                  icon="las la-trash-alt"
-                  size="md"
-                  class="button-delete"
-                  dense
-                  @click="deleteItem(props)"
-                  flat
-                />
-              </q-td>
-            </template>
-            <template #bottom-row>
-              <q-tr>
-                <q-td colspan="4" class="text-condensed text-bold"
-                  >Importe total de movimientos del periodo</q-td
-                >
-                <q-td class="text-bold" align="right">{{
-                  formato.toCurrency(sumaMovimientos)
-                }}</q-td>
-              </q-tr>
-            </template>
-          </q-table>
-          <!-- <pre>{{ fecha_inicio }} {{ fecha_fin }}</pre> -->
-        </q-card-section>
+          <div class="col column items-center">
+            <span class="resumen__etiqueta"> Saldo del periodo anterior</span>
+            <span class="resumen__valor">
+              {{ formato.toCurrency(saldo_periodo_anterior) }}
+            </span>
+          </div>
+          <q-separator spaced inset vertical />
+          <div class="col column items-center">
+            <span class="resumen__etiqueta"> Balance del periodo</span>
+            <span class="resumen__valor">
+              {{ formato.toCurrency(sumaMovimientos) }}
+            </span>
+          </div>
+          <q-separator spaced inset vertical />
+          <div class="col column items-center">
+            <span class="resumen__etiqueta"> Saldo al final del periodo</span>
+            <span class="resumen__valor">
+              {{ formato.toCurrency(saldo_final_periodo) }}
+            </span>
+          </div>
+          <div class="col column items-center">
+            <span class="resumen__etiqueta"> Saldo al día</span>
+            <div class="q-gutter-x-sm">
+              <span class="resumen__valor" style="font-weight: bold !important">
+                {{ formato.toCurrency(cuenta.saldo) }}
+              </span>
+              <q-btn
+                class="small-button"
+                color="primary"
+                icon="las la-redo-alt"
+                @click="actualizarSaldoFinal"
+                flat
+              />
+            </div>
+          </div>
+        </q-card-actions>
       </q-card>
+      <q-table
+        class="q-mt-lg"
+        :rows="listaRegistros"
+        :columns="columns"
+        dense
+        :rows-per-page-options="[0]"
+        table-header-class="bg-primary-light text-accent"
+        separator="vertical"
+        hide-pagination
+        selection="multiple"
+        v-model:selected="selectedItems"
+        row-key="id"
+        :filter="filter"
+      >
+        <template #top-left>
+          <q-tr class="cuenta__data-subtitle">
+            <div class="table-title">Movimientos del periodo</div>
+          </q-tr>
+        </template>
+        <template #top-right>
+          <q-tr>
+            <div class="row q-gutter-x-sm">
+              <q-btn
+                v-if="selectedItems.length > 0"
+                no-caps
+                color="negative-pastel"
+                label="Eliminar"
+                @click="deleteSelectedItems"
+                push
+                flat
+                icon="las la-trash"
+                rounded
+              />
+              <q-btn
+                no-caps
+                color="primary"
+                label="Agregar"
+                @click="addItem"
+                push
+                flat
+                icon="add_circle"
+                rounded
+              />
+              <q-btn
+                color="primary-button"
+                flat
+                @click="importarMovimientos"
+                no-caps
+                rounded
+              >
+                <q-avatar square size="24px">
+                  <q-img src="/icons/excel.png" width="24px" height="24px" />
+                </q-avatar>
+                <span class="q-ml-sm">Importar</span>
+              </q-btn>
+              <q-input
+                outlined
+                dense
+                debounce="300"
+                v-model="filter"
+                placeholder="Buscar"
+                clearable
+                class="bg-accent-light"
+                style="width: 180px; min-width: 180px"
+              >
+                <template v-slot:append>
+                  <q-icon name="search" />
+                </template>
+              </q-input>
+            </div>
+          </q-tr>
+        </template>
+
+        <template #body-cell-categoria="props">
+          <q-td key="categoria" :props="props">
+            {{ props.row.categoria?.nombre }}
+          </q-td>
+        </template>
+        <template #body-cell-importe="props">
+          <q-td
+            class="registros__columna--importe"
+            :style="{
+              color: props.row.importe < 0 ? 'red' : 'black'
+            }"
+            align="right"
+          >
+            {{ formato.toCurrency(props.row.importe) }}
+          </q-td>
+        </template>
+        <template #body-cell-observaciones="props">
+          <q-td key="observaciones" :props="props">
+            {{ props.row.observaciones }}
+            <q-popup-edit
+              v-model="props.row.observaciones"
+              title="Editar observaciones"
+              buttons
+              label-set="Guardar"
+              label-cancel="Cancelar"
+              @update:model-value="
+                saveObs(props.row.id, props.row, props.row.observaciones)
+              "
+              v-slot="scope"
+              max-width="150px"
+            >
+              <q-input
+                v-model="scope.value"
+                @keyup.enter="scope.set"
+                type="text"
+                label="Favor de ingresar observaciones"
+                autofocus
+              />
+            </q-popup-edit>
+          </q-td>
+        </template>
+        <template #body-cell-acciones="props">
+          <q-td :props="props" class="q-gutter-x-md">
+            <q-btn
+              icon="las la-edit"
+              class="button-edit"
+              dense
+              @click="editItem(props)"
+              flat
+            />
+            <q-btn
+              icon="las la-trash-alt"
+              class="button-delete"
+              dense
+              @click="deleteItem(props)"
+              flat
+            />
+          </q-td>
+        </template>
+        <template #bottom-row>
+          <q-tr>
+            <q-td colspan="4" class="text-condensed text-bold"
+              >Importe total de movimientos del periodo</q-td
+            >
+            <q-td class="text-bold" align="right">{{
+              formato.toCurrency(sumaMovimientos)
+            }}</q-td>
+          </q-tr>
+        </template>
+      </q-table>
+      <!-- <pre>{{ fecha_inicio }} {{ fecha_fin }}</pre> -->
     </div>
   </div>
 
@@ -372,13 +356,14 @@ const registroEditedItem = ref([
     importe: '500.20'
   }
 ])
-
+const filter = ref()
 const showForm = ref(false)
 const showFormCarga = ref(false)
 const cuenta = ref({})
 const ejercicio_fiscal = ref(0)
 const mes = ref({})
 const selectedItems = ref([])
+const saldo_periodo_anterior = ref(0)
 
 const variables = reactive({
   categoriaId: null,
@@ -885,8 +870,9 @@ const columns = [
   {
     name: 'categoria',
     label: 'Concepto',
-    field: (row) => row.categoria.nombre,
-    sortable: true,
+    field: (row) => row.categoria?.nombre,
+    sortable: false,
+    filter: false,
     align: 'left'
     // style: 'width:20%'
   },
@@ -945,5 +931,18 @@ const columns = [
   font-size: 0.75rem;
   font-weight: 500;
   letter-spacing: -0.025rem;
+}
+.resumen {
+  &__etiqueta {
+    font-size: 0.75rem !important;
+    font-weight: bold;
+    font-style: italic;
+    color: #7f7988;
+  }
+  &__valor {
+    font-family: 'Roboto Slab', sans-serif;
+    font-size: 0.85rem;
+    color: #625179;
+  }
 }
 </style>

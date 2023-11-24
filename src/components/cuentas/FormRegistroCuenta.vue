@@ -64,6 +64,15 @@
                   mask="####"
                 ></q-input>
               </div>
+              <div class="q-pb-lg">
+                <q-input
+                  v-model="editedFormItem.propietario"
+                  type="text"
+                  label="Nombre Propietario"
+                  outlined
+                  dense
+                />
+              </div>
               <div class="">
                 <CuentaContableSelect
                   v-model="editedFormItem.cuentaContable"

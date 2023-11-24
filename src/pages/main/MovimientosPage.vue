@@ -42,6 +42,7 @@
           debounce="400"
           v-model="filter"
           placeholder="Buscar Ingreso"
+          class="bg-accent-light"
         >
           <template v-slot:append>
             <q-icon name="search" />
@@ -132,6 +133,7 @@
         debounce="300"
         v-model="filter"
         placeholder="Buscar Gasto"
+        class="bg-accent-light"
       >
         <template #append>
           <q-icon name="search" />

@@ -51,6 +51,7 @@
             v-model="filter"
             placeholder="Buscar Cuenta"
             clearable
+            class="bg-accent-light"
           >
             <template v-slot:append>
               <q-icon name="search" />

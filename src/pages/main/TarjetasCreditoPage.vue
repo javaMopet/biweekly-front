@@ -77,33 +77,22 @@
                   <q-spinner-ball size="90px" color="white" />
                 </q-inner-loading>
                 <div
-                  class="row inline full-width items-center justify-between credit-card__title"
-                  style="padding-left: 15px"
+                  class="row full-width items-center justify-between credit-card__title q-px-md"
                 >
                   <div
-                    class="col text-bold text-subtitle1 q-py-sm"
+                    class="text-bold text-subtitle1 q-py-sm"
                     @click="abrirMovimientos(props)"
                     style="cursor: pointer"
                   >
                     {{ props.row.nombre }}
                   </div>
-                  <div class="row inline">
-                    <q-btn
-                      flat
-                      round
-                      icon="las la-edit"
-                      class="button-edit"
-                      color="primary"
-                      @click="editRow(props)"
-                    />
-                    <q-btn
-                      flat
-                      round
-                      icon="las la-trash-alt"
-                      class="button-delete"
-                      color="negative"
-                      @click="deleteRow(props)"
-                    />
+
+                  <div class="text-blue-10 text-bold">
+                    <span class="text-subtitle2">{{
+                      formato.toCurrency(
+                        props.row.saldo === 0 ? 0 : props.row.saldo * -1
+                      )
+                    }}</span>
                   </div>
                 </div>
                 <!-- images -->
@@ -130,7 +119,7 @@
                   style="cursor: pointer"
                 >
                   <div
-                    class="non-selectable q-py-xs text-blue-grey-10 text-h6"
+                    class="non-selectable q-py-xs text-blue-grey-8 text-h6"
                     @click="abrirMovimientos(props)"
                   >
                     **** **** **** {{ props.row.identificador }}
@@ -138,18 +127,27 @@
                 </div>
               </div>
               <div class="row justify-between items-center q-px-lg q-pb-sm">
-                <span class="text-caption text-blue-grey-1"
-                  >HORACIO PEÑA MENDOZA</span
-                >
-                <q-item-label
-                  align="right"
-                  caption
-                  lines="2"
-                  class="text-blue-grey-2 text-bold text-h3"
-                  ><span class="text-h6">{{
-                    formato.toCurrency(props.row.saldo)
-                  }}</span>
-                </q-item-label>
+                <span class="text-caption text-blue-grey-7">{{
+                  props.row.propietario
+                }}</span>
+                <div class="row inline">
+                  <q-btn
+                    flat
+                    round
+                    icon="las la-edit"
+                    class="button-edit"
+                    color="primary"
+                    @click="editRow(props)"
+                  />
+                  <q-btn
+                    flat
+                    round
+                    icon="las la-trash-alt"
+                    class="button-delete"
+                    color="negative"
+                    @click="deleteRow(props)"
+                  />
+                </div>
               </div>
             </div>
           </template>
@@ -167,19 +165,19 @@
         transition-show="jump-up"
         transition-hide="jump-down"
       >
-        <RegistroCuenta
+        <FormRegistroCuenta
           :edited-item="editedItem"
           @cuentaSaved="cuentaSaved"
           @cuentaUpdated="cuentaUpdated"
-        ></RegistroCuenta>
+        ></FormRegistroCuenta>
       </q-dialog>
     </Teleport>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import RegistroCuenta from 'src/components/cuentas/RegistroCuenta.vue'
+import { ref, computed, onMounted } from 'vue'
+import FormRegistroCuenta from 'src/components/cuentas/FormRegistroCuenta.vue'
 import { useQuasar } from 'quasar'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { useRouter } from 'vue-router'
@@ -316,9 +314,7 @@ function editRow(item) {
 function abrirMovimientos(props_row) {
   console.log('abriendo movimientos', props_row)
   loadingCard.value[props_row.rowIndex] = true
-  router.push(
-    `/tarjetas_credito/${props_row.row.id}?dia_corte=${props_row.row.diaCorte}`
-  )
+  router.push(`/tarjetas_credito/${props_row.row.id}`)
 }
 
 function deleteRow(item) {
