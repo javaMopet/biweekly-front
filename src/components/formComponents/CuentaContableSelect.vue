@@ -1,70 +1,42 @@
 <template>
-  <div class="row q-gutter-x-sm">
-    <div class="col">
-      <q-select
-        outlined
-        color="positive"
-        v-model="cuentaContable"
-        :options="filteredOptions"
-        option-label="nombreCompleto"
-        :label="props.inputLabel"
-        use-input
-        input-debounce="0"
-        @filter="filterFn"
-        behavior="menu"
-        clearable=""
-        dense
-        map-options
-        hide-selected
-        fill-input
-        lazy-rules
-        :rules="rules"
-        :readonly="props.readonly"
-        :disable="props.disable"
-      >
-        <!-- <template #after>
+  <div class="column" style="border: 0px solid red">
+    <q-select
+      outlined
+      color="positive"
+      v-model="cuentaContable"
+      :options="filteredOptions"
+      option-label="nombreCompleto"
+      :label="props.inputLabel"
+      use-input
+      input-debounce="0"
+      @filter="filterFn"
+      behavior="menu"
+      clearable=""
+      dense
+      map-options
+      hide-selected
+      fill-input
+      lazy-rules
+      :rules="rules"
+      :readonly="props.readonly"
+      :disable="props.disable"
+    >
+      <template #after>
+        <div class="" v-if="isAlta" style="border: 0px solid red">
           <q-btn
-            color="more-button"
-            round
-            flat
-            dense
-            icon="more_vert"
-            v-if="!props.disable"
-          >
-            <q-menu>
-              <q-list style="min-width: 100px">
-                <q-item
-                  clickable
-                  @click="addNew(props)"
-                  v-close-popup
-                >
-                  <q-item-section class="text-teal">
-                    Nueva cuenta contable
-                  </q-item-section>
-                </q-item>
-              </q-list>
-            </q-menu>
-          </q-btn>
-        </template> -->
-        <template #after>
-          <div class="q-mx-sm" v-if="isAlta">
-            <q-btn
-              icon="add"
-              @click="addNew(props)"
-              class="q-pa-xs button-new"
-              dense
-              round
-              color="secondary-button"
-            />
-          </div>
-        </template>
-        <template v-slot:no-option>
-          <q-item>
-            <q-item-section class="text-grey"> No results </q-item-section>
-          </q-item>
-        </template>
-      </q-select>
-    </div>
+            color="accent"
+            class="small-button"
+            icon="add"
+            @click="addNew(props)"
+          />
+        </div>
+      </template>
+      <template v-slot:no-option>
+        <q-item>
+          <q-item-section class="text-grey"> No results </q-item-section>
+        </q-item>
+      </template>
+    </q-select>
   </div>
 
   <Teleport to="#modal">

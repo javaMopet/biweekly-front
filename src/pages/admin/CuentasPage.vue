@@ -38,14 +38,14 @@
               <div class="">
                 <q-btn-dropdown
                   split
-                  color="primary"
+                  color="primary-button"
                   push
                   glossy
                   no-caps
                   label="Nuevo"
                   icon="add_circle"
                   @click="addRow(1)"
-                  text-color="white"
+                  text-color="accent-light"
                 >
                   <q-list class="bg-primary-light">
                     <q-item clickable v-close-popup @click="addRow(1)">

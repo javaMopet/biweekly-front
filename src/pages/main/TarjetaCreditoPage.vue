@@ -32,6 +32,7 @@
     <div class="row inline fit items-center justify-between q-px-xl q-pt-md">
       <div class="row items-center q-gutter-md">
         <q-img
+          class="shadow-icon"
           :src="`/icons/${cuenta.banco?.icono ?? 'cash.png'}`"
           width="50px"
           height="50px"
@@ -84,10 +85,14 @@
           </q-toolbar>
         </q-card-section>
         <q-card-actions class="resumen bg-white">
-          <q-item-label class="q-pr-md"> RESUMEN: &nbsp; </q-item-label>
+          <q-item-label
+            v-if="expanded"
+            class="q-pr-md text-primary text-subtitle1 text-bold"
+          >
+            RESUMEN: &nbsp;
+          </q-item-label>
           <!-- -->
           <div class="row text-condensed" v-if="!expanded">
-            <q-separator spaced vertical />
             <div class="column items-center justify-center">
               <span class="tarjeta__resumen-etiqueta">Día de corte:</span
               ><span class="resumen__valor"> {{ cuenta.dia_corte }}</span>
@@ -107,6 +112,14 @@
                 formato.toCurrency(
                   saldo_pagar_periodo === 0 ? 0 : saldo_pagar_periodo * -1
                 )
+              }}</span>
+            </div>
+            <q-separator spaced vertical />
+            <div class="column items-center justify-center">
+              <span class="tarjeta__resumen-etiqueta"
+                >Fecha límite de pago:</span
+              ><span class="resumen__valor">{{
+                fecha_limite_pago.toFormat('dd/MM/yyyy')
               }}</span>
             </div>
             <q-separator spaced vertical />
@@ -181,6 +194,16 @@
                       {{
                         formato.toCurrency(Math.abs(saldo_pagar_periodo))
                       }}</span
+                    >
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col column items-center">
+                    <span class="tarjeta-resumen__etiqueta">
+                      FECHA LIMITE DE PAGO
+                    </span>
+                    <span class="tarjeta-resumen__valor--importante">
+                      {{ fecha_limite_pago.toFormat('dd/MM/yyyy') }}</span
                     >
                   </div>
                 </div>
@@ -324,23 +347,23 @@
               <div class="">
                 <div class="row q-gutter-x-md">
                   <q-btn
-                    v-if="selectedItems.length > 0"
+                    :disable="selectedItems.length <= 0"
+                    class="medium-button"
                     no-caps
                     color="negative-pastel"
                     label="Eliminar"
                     @click="deleteSelectedItems"
                     push
-                    flat
                     icon="las la-trash"
                     rounded
                   />
                   <q-btn
                     no-caps
-                    color="primary"
+                    class="medium-button"
+                    color="primary-button"
                     label="Agregar"
                     @click="addItem"
                     push
-                    flat
                     icon="add_circle"
                     rounded
                   />
@@ -395,13 +418,13 @@
                   flat
                   dense
                 />
-                <q-btn
+                <!-- <q-btn
                   class="button-delete"
                   icon="la la-trash-alt"
                   @click="deleteItem(props)"
                   flat
                   dense
-                />
+                /> -->
               </q-td>
             </template>
             <template v-slot:bottom-row>
@@ -730,6 +753,16 @@ const periodoFin = computed({
       }`
     }
     return ''
+  }
+})
+
+const fecha_limite_pago = computed({
+  get() {
+    console.log(cuenta.value.dias_gracia)
+    const fecha = DateTime.fromISO(fechaFinPeriodo.value).plus({
+      days: cuenta.value.dias_gracia
+    })
+    return fecha
   }
 })
 

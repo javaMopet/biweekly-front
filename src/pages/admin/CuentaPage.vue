@@ -149,32 +149,32 @@
             <q-tr>
               <div class="row q-gutter-x-sm">
                 <q-btn
-                  v-if="selectedItems.length > 0"
-                  no-caps
+                  class="medium-button"
                   color="negative-pastel"
+                  :disable="selectedItems.length <= 0"
+                  no-caps
                   label="Eliminar"
                   @click="deleteSelectedItems"
-                  push
-                  flat
                   icon="las la-trash"
                   rounded
+                  push
                 />
                 <q-btn
+                  class="medium-button"
+                  color="primary-button"
                   no-caps
-                  color="primary"
-                  label="Agregar"
+                  label="Nuevo"
                   @click="addItem"
-                  push
-                  flat
                   icon="add_circle"
                   rounded
+                  push
                 />
                 <q-btn
                   color="primary-button"
-                  flat
                   @click="importarMovimientos"
                   no-caps
                   rounded
+                  outline
                 >
                   <q-avatar square size="24px">
                     <q-img src="/icons/excel.png" width="24px" height="24px" />
@@ -249,13 +249,13 @@
                 @click="editItem(props)"
                 flat
               />
-              <q-btn
+              <!-- <q-btn
                 icon="las la-trash-alt"
                 class="button-delete"
                 dense
                 @click="deleteItem(props)"
                 flat
-              />
+              /> -->
             </q-td>
           </template>
           <!-- <template #bottom-row>

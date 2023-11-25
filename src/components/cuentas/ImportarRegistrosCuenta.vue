@@ -75,7 +75,7 @@
           :offset="[508, 68]"
           expand
         >
-          <transition name="fade">
+          <!-- <transition name="fade">
             <div
               class="row bg-pink-1"
               v-if="errorsList.length > 0"
@@ -128,7 +128,7 @@
                 </q-list>
               </div>
             </div>
-          </transition>
+          </transition> -->
         </q-page-sticky>
         <q-card-section style="max-height: 60vh; height: 60vh" class="scroll">
           <q-table
@@ -137,6 +137,7 @@
             :rows-per-page-options="[0]"
             row-key="consecutivo"
             dense
+            separator="cell"
             selection="multiple"
             v-model:selected="registrosSelected"
             table-header-class="text-accent text-condensed bg-primary-light"
@@ -146,11 +147,26 @@
           >
             <template #body-cell-categoria="props">
               <q-td :props="props">
-                <TipoMovimientoSelect
-                  v-model="props.row.tipoMovimiento"
-                  :tipo-afectacion="props.row.tipo_afectacion"
-                  @categoriaSaved="categoriaSaved"
-                ></TipoMovimientoSelect>
+                <div class="column col">
+                  <div>
+                    <TipoMovimientoSelect
+                      v-model="props.row.tipoMovimiento"
+                      :tipo-afectacion="props.row.tipo_afectacion"
+                      @categoriaSaved="categoriaSaved"
+                    ></TipoMovimientoSelect>
+                  </div>
+                  <transition name="fade">
+                    <div class="requerido" v-if="!props.row.isValid">
+                      <div class="requerido__message">
+                        <q-icon
+                          name="las la-exclamation-triangle"
+                          size="16px"
+                        />
+                        Requerido
+                      </div>
+                    </div>
+                  </transition>
+                </div>
               </q-td>
             </template>
             <template #body-cell-importe="props">
@@ -221,6 +237,9 @@
         </q-card-actions>
       </div>
     </div>
+  </div>
+  <div class="col bg-white">
+    <pre>{{ listaRegistrosFiltrados }}</pre>
   </div>
 </template>
 
@@ -433,25 +452,14 @@ function obtenerMovimientosBancomer(wb) {
         : !!abono
         ? parseFloat(abono)
         : 0
-      const item = {
-        id: index,
-        consecutivo: index + 1,
-        tipo_afectacion,
-        fecha: fecha,
-        concepto: row.concepto,
-        importe,
-        saldo: row.saldo,
-        saved: false,
-        tipoMovimiento: {}
-      }
-      listaRegistros.value.push(item)
+      addItemToSave(row, index, fecha, importe, tipo_afectacion)
     }
   })
   console.table(listaRegistros.value)
 }
 function obtenerMovimientosEfectivo(wb) {
   const data = utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {
-    header: ['A', 'B', 'C', 'D', 'E'],
+    header: ['A', 'B', 'C', 'D', 'E', 'F'],
     skipHeader: true,
     raw: false
   })
@@ -460,36 +468,66 @@ function obtenerMovimientosEfectivo(wb) {
     consecutivo: row.A,
     fecha: row.B,
     concepto: row.C,
-    importe: row.D,
-    saldo: row.E
+    cargo: row.D,
+    abono: row.E,
+    saldo: row.F
   }))
-  console.log('todos', todos.value)
+  // console.log('todos', todos.value)
+  console.table(todos.value)
 
   todos.value.forEach((row, index) => {
     let fecha = row.fecha?.toString() || ''
-    console.log('fecha', fecha)
-    const fechaObject = DateTime.fromFormat(fecha, 'dd/MM/yyyy')
-    console.log('fecha valida', fechaObject.isValid)
+    // console.log('fecha', fecha)
+    let fechaObject = DateTime.fromFormat(fecha, 'dd/MM/yyyy')
+    if (!fechaObject.isValid) {
+      fechaObject = DateTime.fromFormat(fecha, 'dd-MM-yyyy')
+    }
+    // console.log('fecha valida', fechaObject.isValid)
     if (fechaObject.isValid) {
-      console.log('row', row.importe)
-      const importeReal = row.importe?.replace(',', '')
-      const importe = !!importeReal ? parseFloat(importeReal) : 0
-      const tipo_afectacion = importe >= 0 ? 'A' : 'C'
-
-      const item = {
-        id: index,
-        consecutivo: row.consecutivo,
-        tipo_afectacion,
-        fecha: fecha,
-        concepto: row.concepto,
-        importe,
-        saldo: row.saldo,
-        saved: false
+      const cargo = parseFloat(row.cargo?.replace(',', '') ?? 0)
+      const abono = parseFloat(row.abono?.replace(',', '') ?? 0)
+      console.log('cargo y abono: ', cargo, abono)
+      if (cargo !== 0 && abono !== 0) {
+        console.trace('error en la linea')
+        return
       }
-      listaRegistros.value.push(item)
+      let tipo_afectacion = null
+      let importe = 0
+      if (cargo !== 0) {
+        tipo_afectacion = 'C'
+        importe = cargo * -1
+      } else {
+        tipo_afectacion = 'A'
+        importe = abono
+      }
+      addItemToSave(row, index, fecha, importe, tipo_afectacion)
     }
   })
-  console.log(listaRegistros.value)
+  console.table(listaRegistros.value)
+}
+
+/**
+ * Agregar un item a la lista de movimientos a guardar
+ * @param {*} row
+ * @param {*} index
+ * @param {*} fecha
+ * @param {*} importe
+ * @param {*} tipo_afectacion
+ */
+function addItemToSave(row, index, fecha, importe, tipo_afectacion) {
+  console.log('fecha', fecha)
+  const item = {
+    id: index,
+    consecutivo: row.consecutivo,
+    tipo_afectacion,
+    fecha: fecha,
+    concepto: row.concepto,
+    importe,
+    saldo: row.saldo,
+    saved: false,
+    isValid: true
+  }
+  listaRegistros.value.push(item)
 }
 
 function obtenerRegistros() {
@@ -500,7 +538,7 @@ function obtenerRegistros() {
     console.log('recorriendo arreglo')
     console.dir(item.tipoMovimiento)
     if (opciones.indexOf(item.tipoMovimiento.tipoMovimientoId) !== -1) {
-      const fecha = DateTime.fromFormat(item.fecha, 'dd/MM/yyyy')
+      const fecha = fechaFromFormat(item.fecha)
       registrosInput.push({
         estadoRegistroId: 2, //cerrado
         tipoAfectacion: obtenerTipoAfectacionCategoria(
@@ -517,6 +555,13 @@ function obtenerRegistros() {
   })
   return registrosInput
 }
+
+function fechaFromFormat(fecha) {
+  return DateTime.fromFormat(fecha, 'dd/MM/yyyy').isValid
+    ? DateTime.fromFormat(fecha, 'dd/MM/yyyy')
+    : DateTime.fromFormat(fecha, 'dd-MM-yyyy')
+}
+
 function obtenerTipoAfectacionCategoria(tipoMovimientoId) {
   return tipoMovimientoId === '1' ? 'A' : 'C'
 }
@@ -555,7 +600,10 @@ function saveItems() {
   if (containsErrors) {
     setTimeout(() => {
       errorsList.value.length = 0
-    }, 7000)
+      listaRegistrosFiltrados.value.forEach((item) => {
+        item.isValid = true
+      })
+    }, 4000)
   } else {
     var registrosInput = obtenerRegistros()
     var traspasosInput = obtenerTraspasos()
@@ -598,6 +646,7 @@ registrosCrud.onErrorImportarRegistros((error) => {
 })
 
 function validarMovimientos() {
+  // setTimeout(() => {
   if (listaRegistrosFiltrados.value.length <= 0) {
     addError(0, null, 'No hay datos para guardar')
   }
@@ -610,12 +659,18 @@ function validarMovimientos() {
           item.consecutivo,
           'Favor de ingresar los valores requeridos'
         )
+        item.isValid = false
+      } else {
+        item.isValid = true
       }
     } else {
       addError(1, item.consecutivo, 'Favor de agregar categoria')
+      item.isValid = false
     }
   })
   return errorsList.value.length > 0
+  // , 4000
+  // })
 }
 
 function addError(code, numero_linea, message) {
@@ -660,6 +715,9 @@ const listaRegistrosFiltrados = computed({
 
     return listaRegistros.value.filter((registro) => {
       const fecha_registro = DateTime.fromFormat(registro.fecha, 'dd/MM/yyyy')
+        .isValid
+        ? DateTime.fromFormat(registro.fecha, 'dd/MM/yyyy')
+        : DateTime.fromFormat(registro.fecha, 'dd-MM-yyyy')
       return fecha_registro >= start_date && fecha_registro <= end_date
     })
   }
@@ -681,7 +739,8 @@ const columns = [
     field: 'consecutivo',
     sortable: true,
     align: 'left',
-    filter: false
+    filter: false,
+    headerStyle: 'width:40px;max-width:40px'
   },
   {
     name: 'fecha',
@@ -689,7 +748,9 @@ const columns = [
     field: 'fecha',
     sortable: true,
     align: 'left',
-    filter: false
+    filter: false,
+    headerStyle: 'width:100px;max-width:100px',
+    style: 'width:100px;max-width:100px'
   },
 
   {
@@ -698,15 +759,17 @@ const columns = [
     field: 'concepto',
     sortable: true,
     align: 'left',
-    filter: true,
-    style: 'width: 30%'
+    filter: true
+    // headerStyle: 'width:250px;max-width:250px',
+    // style: 'width:250px;max-width:250px'
   },
   {
     name: 'importe',
     label: 'Importe',
     field: 'importe',
     sortable: true,
-    align: 'right'
+    align: 'right',
+    headerStyle: 'width:100px;max-width:100px'
   },
   {
     name: 'categoria',
@@ -714,7 +777,8 @@ const columns = [
     field: 'categoria',
     sortable: true,
     align: 'center',
-    style: 'width:30%'
+    headerStyle: 'width:400px;max-width:400px',
+    style: 'width:400px;max-width:400px'
   },
   {
     name: 'acciones',
@@ -790,6 +854,27 @@ function categoriaSaved() {
   tbody {
     /* height of all previous header rows */
     scroll-margin-top: 48px;
+  }
+}
+.requerido {
+  position: absolute;
+  top: 5px;
+  right: 20px;
+  width: 20px;
+  z-index: 50;
+  &__message {
+    font-size: 0.7rem !important ;
+    background: rgb(243, 195, 195);
+    color: #ff0000;
+    position: fixed;
+    top: 1;
+    left: 1;
+    padding: 3px;
+    border: 3px solid red;
+    border-style: double;
+    border-radius: 5px;
+    box-shadow: rgba(165, 138, 138, 0.76) 5px 14px 28px,
+      rgba(145, 109, 109, 0.74) 5px 10px 10px;
   }
 }
 </style>

@@ -41,14 +41,13 @@
             <div class="row inline items-center q-gutter-x-md">
               <div class="">
                 <q-btn
-                  color="primary"
+                  color="primary-button"
                   icon="add_card"
                   @click="addRow(3)"
-                  label="Agregar"
+                  label="Nuevo"
                   no-caps
-                  push
                   text-color="accent-light"
-                  glossy
+                  push
                 />
               </div>
               <div class="bg-accent-light">
@@ -184,6 +183,7 @@ import { useRouter } from 'vue-router'
 import { useFormato } from 'src/composables/utils/useFormato'
 import { useCuentaStore } from 'src/stores/common/useCuentaStore'
 import { useRegistrosTarjetaCrud } from 'src/composables/useRegistrosTarjetaCrud'
+import { useCuentasCrud } from 'src/composables/useCuentasCrud'
 
 /**
  * composables
@@ -194,6 +194,10 @@ const router = useRouter()
 const formato = useFormato()
 const cuentaStore = useCuentaStore()
 const registrosTarjetaCrud = useRegistrosTarjetaCrud()
+const cuentasCrud = useCuentasCrud()
+
+const { mostrarNotificacionPositiva, mostrarNotificacionNegativa } =
+  useNotificacion()
 
 /**
  * state
@@ -336,11 +340,24 @@ function deleteRow(item) {
     persistent: true
   })
     .onOk(() => {
-      deleteCuenta({ id: item.row.id })
+      cuentasCrud.cuentaDelete({ id: item.row.id })
     })
     .onCancel(() => {})
     .onDismiss(() => {})
 }
+
+cuentasCrud.onDoneCuentaDelete(({ data }) => {
+  console.log('tarjeta eliminada', data)
+  const cuentaDeleted = data.cuentaDelete.cuenta
+  mostrarNotificacionPositiva(
+    `Se eliminó la tarjeta "${cuentaDeleted.nombre}".`,
+    2100
+  )
+})
+cuentasCrud.onErrorCuentaDelete((error) => {
+  console.trace(error)
+  mostrarNotificacionNegativa('No es posible eliminar la tarjeta', 2100)
+})
 
 function cuentaSaved(itemSaved) {
   console.log('tarjetaSaved', itemSaved)

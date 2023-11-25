@@ -32,6 +32,7 @@
           <div class="row items-center">
             <div class="page-title q-pr-md">Ingresos</div>
             <q-btn
+              color="primary-button"
               icon="add"
               label="Nuevo"
               no-caps
@@ -91,7 +92,7 @@
           <q-td :props="props" fit class="bg-white q-gutter-x-md">
             <q-btn
               class="button-edit"
-              icon="edit"
+              icon="las la-edit"
               dense
               @click="editRow(props)"
               round
@@ -100,8 +101,7 @@
             <q-btn
               icon="las la-trash-alt"
               class="button-delete"
-              color="accent"
-              rounded
+              round
               dense
               @click="deleteRow(props)"
               flat
@@ -126,6 +126,7 @@
           <div class="row items-center">
             <div class="page-title q-pr-md">Gastos</div>
             <q-btn
+              color="primary-button"
               icon="add"
               label="Nuevo"
               no-caps
@@ -183,16 +184,16 @@
           <q-td :props="props" fit class="bg-white q-gutter-x-md">
             <q-btn
               class="button-edit"
-              icon="edit"
+              icon="las la-edit"
               dense
               @click="editRow(props)"
-              rounded
+              round
               flat
             />
             <q-btn
               icon="las la-trash-alt"
               class="button-delete"
-              rounded
+              round
               @click="deleteRow(props)"
               flat
               dense

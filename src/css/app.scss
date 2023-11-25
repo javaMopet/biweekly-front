@@ -456,7 +456,7 @@
   opacity: 1;
 }
 .fade-enter-active {
-  transition: all 2s ease;
+  transition: all 0.8s ease;
 }
 .fade-leave-from {
   opacity: 1;
@@ -500,16 +500,6 @@
   }
 }
 /* ************************************************** */
-.button-delete {
-  font-size: 0.7rem;
-  padding-inline: 5px;
-  color: $negative;
-  &:hover {
-    color: $negative-pastel !important;
-  }
-}
-// $new-button-color: #b2c8d3;
-
 .button-new {
   font-size: 0.6rem;
   padding-inline: 5px;
@@ -519,6 +509,33 @@
   &:hover {
     background: darken($color: $traspaso-button, $amount: 15) !important;
     color: white !important;
+  }
+}
+
+.button-delete {
+  font-size: 0.7rem;
+  padding-inline: 5px;
+  color: lighten($color: $negative, $amount: 30) !important;
+  &:hover {
+    color: $negative !important;
+  }
+}
+
+.button-edit {
+  font-size: 0.7rem;
+  padding-left: 4px;
+  padding-right: 2px;
+  color: lighten($color: rgb(55, 123, 185), $amount: 15);
+  margin: 0px;
+  padding-top: 2px !important;
+  padding-bottom: 3px !important;
+  &:hover {
+    color: darken($color: rgb(37, 124, 223), $amount: 40) !important;
+    background: darken($color: #eff3f8, $amount: 10);
+  }
+  i {
+    margin: 0px !important;
+    padding: 0px !important;
   }
 }
 
@@ -533,14 +550,6 @@ $save-button-color: #0b387a;
     color: darken($color: $save-button-color, $amount: 10) !important;
   }
 }
-.button-edit {
-  font-size: 0.7rem;
-  padding-inline: 5px;
-  color: rgb(37, 124, 223);
-  &:hover {
-    color: darken($color: rgb(37, 124, 223), $amount: 40) !important;
-  }
-}
 
 .button-cancel {
   font-size: 0.8rem;
@@ -551,19 +560,27 @@ $save-button-color: #0b387a;
     color: $negative !important;
   }
 }
-
+.medium-button {
+  font-size: 0.7rem;
+  padding-inline: 10px;
+  letter-spacing: -0.0025rem;
+  margin: 4px;
+  i {
+    margin-right: 3px;
+  }
+}
 .small-button {
   font-size: 0.6rem !important;
   padding-inline: 5px !important;
   &:hover {
-    color: $secondary !important;
+    // color: $secondary !important;
   }
 }
 .extra-small-button {
   font-size: 0.55rem !important;
   padding-inline: 5px !important;
   &:hover {
-    color: $secondary !important;
+    // color: $secondary !important;
   }
 }
 /** ************************************************* */

@@ -27,6 +27,7 @@ export const LISTA_CUENTAS = gql`
       }
       saldo
       propietario
+      diasGracia
     }
   }
 `
@@ -87,6 +88,7 @@ export const CUENTA_CREATE = gql`
         }
         saldo
         propietario
+        diasGracia
       }
     }
   }
@@ -119,6 +121,7 @@ export const CUENTA_UPDATE = gql`
         }
         saldo
         propietario
+        diasGracia
       }
     }
   }
@@ -161,6 +164,7 @@ export const CUENTA_DELETE = gql`
           icono
         }
         saldo
+        diasGracia
       }
     }
   }

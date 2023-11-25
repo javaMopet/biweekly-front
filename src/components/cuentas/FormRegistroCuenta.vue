@@ -34,11 +34,7 @@
                   color="positive"
                   autofocus
                   lazy-rules
-                  :rules="[
-                    (val) =>
-                      (val && val.length > 0) ||
-                      'Favor de ingresar el nombre de la Cuenta'
-                  ]"
+                  :rules="[(val) => (val && val.length > 0) || 'Requerido']"
                 />
               </div>
               <div v-if="isBancoRequerido">
@@ -73,33 +69,51 @@
                   dense
                 />
               </div>
+              <div v-if="isDiaCorteRequired" class="row q-gutter-x-md">
+                <div class="col">
+                  <q-input
+                    v-model="editedFormItem.diaCorte"
+                    outlined
+                    label="Día de corte"
+                    type="number"
+                    dense
+                    lazy-rules
+                    :rules="[
+                      (val) =>
+                        (!!val && val > 0 && val <= 30) ||
+                        'Requerido (Entre 0 y 30)'
+                    ]"
+                  />
+                </div>
+                <div class="col">
+                  <q-input
+                    v-model="editedFormItem.diasGracia"
+                    outlined
+                    label="Días de gracia"
+                    type="number"
+                    dense
+                    lazy-rules
+                    :rules="[
+                      (val) =>
+                        (!!val && val > 0 && val <= 30) ||
+                        'Requerido (Entre 0 y 30)'
+                    ]"
+                  />
+                </div>
+              </div>
               <div class="">
                 <CuentaContableSelect
                   v-model="editedFormItem.cuentaContable"
                   :subnivel="cuentaContableProps.subnivel"
                   :clasificacion="cuentaContableProps.clasificacion"
                   :tipo-afectacion="cuentaContableProps.tipoAfectacion"
-                  :rules="[(val) => !!val || 'Required']"
                   :is-alta="false"
                   input-label="Seleccione una Cuenta Contable"
+                  :rules="[(val) => !!val || 'Requerido']"
                 ></CuentaContableSelect>
               </div>
-              <div class="column" v-if="isDiaCorteRequired">
-                <div class="">
-                  <q-input
-                    v-model="editedFormItem.diaCorte"
-                    outlined
-                    style="width: 100px"
-                    type="number"
-                    dense
-                    lazy-rules
-                    :rules="[
-                      (val) =>
-                        (!!val && val > 0 && val <= 31) ||
-                        'Ingresa un día del mes válido'
-                    ]"
-                  />
-                </div>
+              <div class="column">
+                <div class=""></div>
               </div>
             </div>
           </div>
@@ -293,7 +307,10 @@ onMounted(() => {
  */
 function saveItem() {
   console.log('save item', editedFormItem.value)
-  const cuenta_contable_id = editedFormItem.value.cuentaContable.id
+  let cuenta_contable_id = null
+  if (!!editedFormItem.value.cuentaContable) {
+    cuenta_contable_id = parseInt(editedFormItem.value.cuentaContable.id)
+  }
   const tipo_cuenta_id = editedFormItem.value.tipoCuenta.id
   const bancoId = !!editedFormItem.value.banco
     ? editedFormItem.value.banco.id
@@ -301,6 +318,9 @@ function saveItem() {
   const identificador = !!editedFormItem.value.identificador
     ? editedFormItem.value.identificador
     : ''
+  const diasGracia = !!editedFormItem.value.diasGracia
+    ? parseInt(editedFormItem.value.diasGracia)
+    : 0
   const input = {
     ...editedFormItem.value,
     identificador,
@@ -309,6 +329,7 @@ function saveItem() {
     tipoCuentaId: parseInt(tipo_cuenta_id),
     bancoId,
     diaCorte: parseInt(editedFormItem.value.diaCorte),
+    diasGracia,
     banco: undefined,
     tipoCuenta: undefined,
     __typename: undefined

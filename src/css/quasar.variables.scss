@@ -69,7 +69,11 @@ $categoria-title-light: #aebbc7;
 
 $primary-grey: #a3a3a8;
 
-$primary-button: #00838f; //Utilizado en itop
+$primary-button: darken(
+  $color: #00838f,
+  $amount: 5
+); //Utilizado en itop
+
 $secondary-button: #d1deeb;
 /*$primary-button: #00AAC1;*/
 // $toggle-button: #4b9972;

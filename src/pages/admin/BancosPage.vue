@@ -34,13 +34,13 @@
         <template v-slot:top-right>
           <div class="q-pa-md">
             <q-btn
-              color="primary"
+              color="primary-button"
               label="Nuevo"
               @click="addItem"
               push
               glossy
               no-caps
-              text-color="white"
+              text-color="accent-light"
               icon="add_circle"
             />
           </div>
