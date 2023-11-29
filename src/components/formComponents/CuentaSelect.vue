@@ -26,6 +26,10 @@
   <div v-if="agregar" class="q-mt-xs" style="border: 0px solid red">
     <q-btn color="accent" outline icon="add" dense @click="registrarCuenta" />
   </div>
+  <!-- <div class="">
+    {{ props.filterIdArray }}
+    {{ filteredOptions }}
+  </div> -->
 
   <Teleport to="#modal">
     <q-dialog
@@ -74,6 +78,13 @@ const props = defineProps({
     required: false,
     default: () => {
       return ['1', '2', '3']
+    }
+  },
+  filterIdArray: {
+    type: Array,
+    required: false,
+    default: () => {
+      return []
     }
   },
   opcional: {
@@ -138,9 +149,13 @@ const cuenta = computed({
 const listaOptions = computed({
   get() {
     return (
-      cuentaStore.listaCuentas?.filter((option) => {
-        return props.filterArray.includes(option.tipoCuenta.id)
-      }) ?? []
+      cuentaStore.listaCuentas
+        ?.filter((option) => {
+          return props.filterArray.includes(option.tipoCuenta.id)
+        })
+        .filter((option) => {
+          return !props.filterIdArray.includes(option.id)
+        }) ?? []
     )
   }
 })

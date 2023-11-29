@@ -305,6 +305,7 @@ function abrirMovimientos(props_row) {
   loadingAccount.value[props_row.rowIndex] = true
   router.push(`/cuentas/${props_row.row.id}`)
 }
+
 function deleteRow(item) {
   $q.dialog({
     title: 'Confirmar',

@@ -45,7 +45,10 @@
               :opcional="false"
               :rules="[
                 (val) =>
-                  (!!val && val !== '0' && val !== '$0.00') ||
+                  (!!val &&
+                    val !== '0' &&
+                    val !== '$0.00' &&
+                    val !== '$NaN.undefined') ||
                   'Favor de ingresar un valor mayor a cero'
               ]"
             ></PriceInput>
@@ -63,6 +66,7 @@
             v-model="cuentaDestino"
             label="Cuenta Destino"
             :filter-array="['1', '2']"
+            :filter-id-array="filterIdArray"
             :rules="[(val) => !!val || 'Favor de ingresar la cuenta destino']"
           ></CuentaSelect>
         </div>
@@ -100,9 +104,7 @@
 </template>
 
 <script setup>
-import { useMutation } from '@vue/apollo-composable'
 import { ref, computed, onMounted } from 'vue'
-import { TRANSFERENCIA_CREATE } from 'src/graphql/transferencias'
 import DateInput from '../formComponents/DateInput.vue'
 import CategoriaSelect from '../formComponents/CategoriaSelect.vue'
 import CuentaSelect from '../formComponents/CuentaSelect.vue'
@@ -122,7 +124,8 @@ const formato = useFormato()
 const registrosCrud = useRegistrosCrud()
 const traspasosCrud = useTraspasosCrud()
 const tipoMovimientoStore = useTipoMovimientoStore()
-const notificacion = useNotificacion()
+const { mostrarNotificacionPositiva, mostrarNotificacionNegativa } =
+  useNotificacion()
 
 /**
  * state
@@ -142,6 +145,7 @@ const cuentaReadOnly = ref(true)
 
 const formItem = ref({ ...defaultItem })
 const cuentaDestino = ref(null)
+const filterIdArray = ref([])
 
 /**
  * onMounted
@@ -150,6 +154,8 @@ onMounted(() => {
   editedFormItem.value.fecha = !!props.fecha
     ? formato.convertDateFromIsoToInput(props.fecha)
     : formato.formatoFecha(new Date())
+
+  filterIdArray.value.push(editedFormItem.value.cuenta.id.toString())
 })
 
 /**
@@ -182,37 +188,34 @@ const emit = defineEmits(['itemSaved', 'itemUpdated'])
 /**
  * GRAPHQL
  */
-const options = ref({
-  fetchPolicy: 'network-only'
-})
-
-const {
-  mutate: createTransferencia,
-  onDone: onDoneCreateTransferencia,
-  onError: onErrorCreateTransferencia
-} = useMutation(TRANSFERENCIA_CREATE)
-
-onDoneCreateTransferencia(({ data }) => {
-  console.log('Egreso creado data', data)
-})
-
-onErrorCreateTransferencia((error) => {
-  console.error(error)
-})
+// const options = ref({
+//   fetchPolicy: 'network-only'
+// })
 
 registrosCrud.onDoneRegistroCreate(({ data }) => {
+  mostrarNotificacionPositiva('El registro se creó correctamente.', 2100)
   const item = data.registroCreate.registro
   emit('itemSaved', item)
 })
+
 registrosCrud.onErrorRegistroCreate((error) => {
-  notificacion.mostrarNotificacionNegativa(
-    'Surgió un error al intentar guardar el movimientos',
-    1600
+  mostrarNotificacionNegativa(
+    'Surgió un error al intentar guardar el movimiento.',
+    2100
   )
 })
 
 traspasosCrud.onDoneTraspasoCreate(({ data }) => {
+  console.log('traspaso creado', data)
+  mostrarNotificacionPositiva('El traspaso se creó correctamente.', 2100)
   emit('itemSaved')
+})
+
+traspasosCrud.onErrorTraspasoCreate((error) => {
+  mostrarNotificacionNegativa(
+    'No fue posible generar el traspaso. Revisar log.',
+    2100
+  )
 })
 
 registrosCrud.onDoneRegistroUpdate(({ data }) => {
@@ -358,11 +361,10 @@ function saveItem() {
 
 function onSelectCategoria(value) {
   if (!isEditing.value && !!value) {
-    console.log('Nuevo registro categoria:', value)
+    const importeDefault = value.importeDefault ?? 0
+    console.log('Nuevo registro categoria:', importeDefault)
     editedFormItem.value.importe =
-      parseFloat(value.importeDefault) === 0
-        ? ''
-        : value.importeDefault.toString()
+      parseFloat(importeDefault) === 0 ? '' : importeDefault.toString()
     editedFormItem.value.concepto = value.descripcion
   }
 }

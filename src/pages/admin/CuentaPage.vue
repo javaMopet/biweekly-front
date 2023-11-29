@@ -83,7 +83,7 @@
           <div class="col column items-center">
             <span class="resumen__etiqueta"> Periodo </span>
             <span class="resumen__valor">
-              {{ periodoInicio }} - {{ periodoFin }}</span
+              {{ periodoInicioStr }} - {{ periodoFinStr }}</span
             >
           </div>
           <q-separator spaced inset vertical />
@@ -104,7 +104,7 @@
           <div class="col column items-center">
             <span class="resumen__etiqueta"> Saldo al final del periodo</span>
             <span class="resumen__valor">
-              {{ formato.toCurrency(saldo_final_periodo) }}
+              {{ formato.toCurrency(saldoFinalPeriodo) }}
             </span>
           </div>
           <div class="col column items-center">
@@ -274,7 +274,7 @@
         Importe total de movimientos:
         <span> {{ toCurrency(sumaMovimientos) }}</span>
       </div>
-      <!-- <pre>{{ fecha_inicio }} {{ fecha_fin }}</pre> -->
+      <pre>{{ mes }}</pre>
     </div>
   </div>
 
@@ -307,15 +307,15 @@
       <ImportarRegistrosCuenta
         :cuenta="cuenta"
         @items-saved="itemsSaved"
-        :fecha_desde="variables.fechaInicio"
-        :fecha_hasta="variables.fechaFin"
+        :fecha_desde="detalleVariables.fechaInicio"
+        :fecha_hasta="detalleVariables.fechaFin"
       ></ImportarRegistrosCuenta>
     </q-dialog>
   </Teleport>
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onBeforeMount, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { DateTime } from 'luxon'
 import { api } from 'src/boot/axios'
@@ -345,83 +345,93 @@ const traspasosCrud = useTraspasosCrud()
 const cuentaStore = useCuentaStore()
 const cuentasCrud = useCuentasCrud()
 
+const { mostrarNotificacionPositiva, mostrarNotificacionNegativa } =
+  useNotificacion()
+
+const { toCurrency } = useFormato()
+
+const mesOptions = ref([
+  { id: 1, nombre: 'Enero' },
+  { id: 2, nombre: 'Febrero' },
+  { id: 3, nombre: 'Marzo' },
+  { id: 4, nombre: 'Abril' },
+  { id: 5, nombre: 'Mayo' },
+  { id: 6, nombre: 'Junio' },
+  { id: 7, nombre: 'Julio' },
+  { id: 8, nombre: 'Agosto' },
+  { id: 9, nombre: 'Septiembre' },
+  { id: 10, nombre: 'Octubre' },
+  { id: 11, nombre: 'Noviembre' },
+  { id: 12, nombre: 'Diciembre' }
+])
 /**
  * state
  */
-const { mostrarNotificacionPositiva, mostrarNotificacionNegativa } =
-  useNotificacion()
-const { toCurrency } = useFormato()
-// const fecha_inicio = ref('1900-01-01')
-// const fecha_fin = ref('1900-01-01')
-const dia_corte = ref(0)
-
-const listaRegistros = ref([])
-
-const registroEditedItem = ref([
-  {
-    concepto: 'mi concepto',
-    fecha: '10/05/2013',
-    importe: '500.20'
-  }
-])
-const filter = ref()
-const showForm = ref(false)
-const showFormCarga = ref(false)
-const cuenta = ref({})
-const ejercicio_fiscal = ref(0)
-const mes = ref({})
-const selectedItems = ref([])
-const saldo_periodo_anterior = ref(0)
-
-const variables = reactive({
+const detalleVariables = reactive({
   categoriaId: null,
   cuentaId: route.params.id,
-  fechaInicio: '',
-  fechaFin: '',
+  fechaInicio: DateTime.now().startOf('month').toISODate(),
+  fechaFin: DateTime.now().endOf('month').toISODate(),
   isMsi: null
 })
 
+const variablesSaldoAnterior = reactive({
+  cuentaId: route.params.id,
+  fechaFin: DateTime.now().startOf('month').plus({ days: -1 }).toISODate()
+})
+
+// const variablesSaldoAlPeriodo = reactive({
+//   cuentaId: route.params.id,
+//   fechaFin: DateTime.now().endOf('month').toISODate()
+// })
+
+const cuenta = ref({})
+const listaRegistros = ref([])
+
+const ejercicio_fiscal = ref(DateTime.now().year)
+const mes = ref({})
+const registroEditedItem = ref(null)
+const selectedItems = ref([])
+const saldo_periodo_anterior = ref(0)
+// const saldoFinalPeriodo = ref(0)
+
+const filter = ref()
+
+const showForm = ref(false)
+const showFormCarga = ref(false)
+
+/**
+ * on before mount
+ */
+onBeforeMount(() => {
+  console.log('On before mount ..............')
+})
 /**
  * onMounted
  */
 onMounted(() => {
-  // console.log('buscando los datos de la tarjeta de crédito', route.params.id)
-  const dateNow = DateTime.now()
-  ejercicio_fiscal.value = dateNow.year
-  const mes_id = dateNow.month
-  const mes_value = mesOptions.value.find(
-    (mesOption) => mesOption.id === mes_id
+  console.log('On mounted ................')
+
+  mes.value = mesOptions.value.find(
+    (mesOption) => mesOption.id === DateTime.now().month
   )
-  mes.value = mes_value
-  obtener_fecha_inicio()
-  obtener_fecha_fin()
+
   cargarDatosCuenta(route.params.id, true)
 })
 
-function cargarDatosCuenta(cuenta_id, is_inicio) {
+/**
+ * Cargar datos de la cuenta desde la api.
+ * @author Horacio Peña Mendoza <hpena.dtic@gmail.com>
+ * @param {Number} cuenta_id - Id de la cuenta.
+ */
+function cargarDatosCuenta(cuenta_id) {
   api.get(`/cuentas/${cuenta_id}`).then((response) => {
     cuenta.value = response?.data.data ?? {}
-    dia_corte.value = cuenta.value.dia_corte
-    if (is_inicio) {
-      // cargaListaRegistros(
-      //   null,
-      //   {
-      //     cuentaId: route.params.id?.toString() || 0,
-      //     categoriaId: null,
-      //     fechaInicio: fecha_inicio.value,
-      //     fechaFin: fecha_fin.value
-      //   },
-      //   graphqlOptions
-      // )
-    }
-    fetchOrRefetchSaldoFinalPeriodo()
   })
 }
-function fetchOrRefetchSaldoFinalPeriodo() {
-  refetchSaldoAFecha()
-}
+
 /**
- * graphql
+ * GRAPHQL
  */
 const graphqlOptions = reactive({
   fetchPolicy: 'no-cache'
@@ -431,7 +441,45 @@ const {
   onError: onErrorListaRegistros,
   onResult: onResultListaRegistros,
   refetch: refetchListaRegistros
-} = useQuery(LISTA_REGISTROS, variables, graphqlOptions)
+} = useQuery(LISTA_REGISTROS, detalleVariables, graphqlOptions)
+
+onResultListaRegistros(({ data }) => {
+  if (!!data) {
+    console.log('on result lista registros.....')
+    listaRegistros.value = data?.obtenerRegistros ?? []
+  }
+})
+
+onErrorListaRegistros((error) => {
+  mostrarNotificacionNegativa(
+    'Ocurrió un error, no se pueden obtener los detalles de la cuenta'
+  )
+  if (process.env.NODE_ENV !== 'production') {
+    logErrorMessages(error)
+  }
+})
+
+const {
+  onResult: onResultObtenerSaldoAFecha,
+  onError: onErrorObtenerSaldo,
+  refetch: refetchSaldoAFecha
+} = useQuery(OBTENER_SALDO_A_FECHA, variablesSaldoAnterior, graphqlOptions)
+
+onResultObtenerSaldoAFecha(({ data }) => {
+  if (!!data) {
+    console.log('onResultObtenerSaldoAFecha anterior.....')
+    // saldoFinalPeriodo.value = data.obtenerSaldoAFecha
+    saldo_periodo_anterior.value = data.obtenerSaldoAFecha
+  }
+})
+
+onErrorObtenerSaldo((error) => {
+  mostrarNotificacionNegativa('Ocurrió un error, no se puede obtener el saldo')
+  if (process.env.NODE_ENV !== 'production') {
+    logErrorMessages(error)
+  }
+})
+
 /**
  * computed
  */
@@ -443,121 +491,51 @@ const sumaMovimientos = computed({
     }, 0)
   }
 })
-const saldo_final_periodo = computed({
-  get() {
-    return resultSaldoAFecha.value?.obtenerSaldoAFecha ?? 0
-  }
-})
 
-const mes_inicial_id = computed({
+const saldoFinalPeriodo = computed({
   get() {
-    return mes.value.id
-  }
-})
-
-const ejercicio_final_id = computed({
-  get() {
-    return ejercicio_fiscal.value
-  }
-})
-
-const dia_corte_final = computed({
-  get() {
-    const fechaString = `${ejercicio_fiscal.value}-${(
-      '0' + mes_inicial_id.value
-    ).slice(-2)}-01`
-    // console.log('mes para buscar ultimo dia', fechaString)
-    let fecha = DateTime.fromISO(fechaString)
-    fecha = fecha.endOf('month')
-    return fecha.day
-  }
-})
-const mes_final_id = computed({
-  get() {
-    return mes.value.id
-  }
-})
-
-const fecha_fin_periodo = computed({
-  get() {
-    return `${ejercicio_final_id.value}-${('0' + mes_final_id.value).slice(
-      -2
-    )}-${dia_corte_final.value}`
-  }
-})
-const periodoInicio = computed({
-  get() {
-    const mes = mesOptions.value.find(
-      (option) => option.id === mes_inicial_id.value
-    )
-    if (!!mes) {
-      return `01/${mes.nombre.substring(0, 3)}/${ejercicio_fiscal.value}`
-    }
-    return ''
-  }
-})
-const periodoFin = computed({
-  get() {
-    const mes = mesOptions.value.find(
-      (option) => option.id === mes_final_id.value
-    )
-    if (!!mes) {
-      return `${dia_corte_final.value}/${mes.nombre.substring(0, 3)}/${
-        ejercicio_final_id.value
-      }`
-    }
-    return ''
+    // console.log('calculando saldo final periodo')
+    return saldo_periodo_anterior.value + sumaMovimientos.value
   }
 })
 
 const fecha_registro = computed({
   get() {
-    const begin_date = DateTime.fromISO(variables.fechaInicio)
-    const end_date = DateTime.fromISO(variables.fechaFin)
+    const begin_date = DateTime.fromISO(detalleVariables.fechaInicio)
+    const end_date = DateTime.fromISO(detalleVariables.fechaFin)
     const today = DateTime.now()
 
     return begin_date <= today && today <= end_date
       ? undefined
-      : variables.fechaFin
+      : detalleVariables.fechaFin
   }
 })
-
-onResultListaRegistros(({ data }) => {
-  if (!!data) {
-    // console.log('onResultListaRegistros en CuentaPage...')
-    listaRegistros.value = data?.obtenerRegistros ?? []
-    // console.table(listaRegistros.value)
+const periodoInicioStr = computed({
+  get() {
+    return `01/${mes.value?.nombre?.substring(0, 3)}/${ejercicio_fiscal.value}`
   }
 })
+const periodoFinStr = computed({
+  get() {
+    const diaFinal = DateTime.fromISO(detalleVariables.fechaFin).day
 
-onErrorListaRegistros((error) => {
-  // console.log(error.graphQLErrors)
-  // console.log(error.networkError)
-  if (process.env.NODE_ENV !== 'production') {
-    logErrorMessages(error)
+    return `${diaFinal}/${mes.value?.nombre?.substring(0, 3)}/${
+      ejercicio_fiscal.value
+    }`
   }
-})
-
-const {
-  result: resultSaldoAFecha,
-  onError: onErrorObtenerSaldo,
-  refetch: refetchSaldoAFecha
-} = useQuery(
-  OBTENER_SALDO_A_FECHA,
-  {
-    cuentaId: route.params.id,
-    fechaFin: fecha_fin_periodo
-  },
-  graphqlOptions
-)
-
-onErrorObtenerSaldo((error) => {
-  // console.log(error)
 })
 /**
  * functions
  */
-
+function refetchDatos() {
+  refetchListaRegistros()
+  refetchSaldoAFecha()
+  actualizarSaldoFinal()
+}
+/**
+ * Iniciar la edición de un elemento de la lista
+ * @param {*} item - item de la tabla a editar.
+ */
 function editItem(item) {
   // console.log('editando item...', item.rowIndex, item.row)
   registroEditedItem.value = JSON.parse(JSON.stringify(item.row))
@@ -575,8 +553,10 @@ function editItem(item) {
     registroEditedItem.value.categoria?.tipoMovimientoId || '3'
   showForm.value = true
 }
+
 function deleteSelectedItems() {
   console.table(selectedItems.value)
+
   if (selectedItems.value.length > 0) {
     const message = `Esta a punto de eliminar ${selectedItems.value.length} movimientos. ¿Desea continuar?`
     $q.dialog({
@@ -617,7 +597,7 @@ registrosCrud.onDoneRegistrosDelete(({ data }) => {
     data.registrosDelete.saldo
   )
   cuenta.value.saldo = data.registrosDelete.saldo
-  loadOrRefetchListaRegistros()
+  refetchDatos()
   mostrarNotificacionPositiva(
     'Los movimientos fueron eliminados exitosamente',
     1600
@@ -631,112 +611,93 @@ registrosCrud.onErrorRegistrosDelete(() => {
   )
 })
 
-function deleteItem(props_row) {
-  const item = props_row.row
-  const message = !item.traspasoDetalle
-    ? `Va a eliminar un movimiento con un importe de: ${formato.toCurrency(
-        item.importe
-      )} ¿Desea continuar con la eliminación?`
-    : `La eliminación del traspaso afectara también la cuenta destino ¿Desea continuar con la eliminación del traspaso?`
+// function deleteItem(props_row) {
+//   const item = props_row.row
+//   const message = !item.traspasoDetalle
+//     ? `Va a eliminar un movimiento con un importe de: ${formato.toCurrency(
+//         item.importe
+//       )} ¿Desea continuar con la eliminación?`
+//     : `La eliminación del traspaso afectara también la cuenta destino ¿Desea continuar con la eliminación del traspaso?`
 
-  deleteItem.value = $q
-    .dialog({
-      title: 'Confirmar',
-      style: 'width:500px',
-      message,
-      ok: {
-        push: true,
-        color: 'positive',
-        label: 'Continuar'
-      },
-      cancel: {
-        push: true,
-        color: 'negative',
-        flat: true,
-        label: 'cancelar'
-      },
-      persistent: true
-    })
-    .onOk(() => {
-      confirmarEliminar(item)
-    })
-    .onCancel(() => {})
-    .onDismiss(() => {})
-}
-function confirmarEliminar(item) {
-  if (!item.traspasoDetalle) {
-    registrosCrud.deleteRegistro({
-      id: item.id
-    })
-  } else {
-    traspasosCrud.traspasoDelete({
-      id: item.traspasoDetalle.traspasoId
-    })
-  }
-}
+//   deleteItem.value = $q
+//     .dialog({
+//       title: 'Confirmar',
+//       style: 'width:500px',
+//       message,
+//       ok: {
+//         push: true,
+//         color: 'positive',
+//         label: 'Continuar'
+//       },
+//       cancel: {
+//         push: true,
+//         color: 'negative',
+//         flat: true,
+//         label: 'cancelar'
+//       },
+//       persistent: true
+//     })
+//     .onOk(() => {
+//       confirmarEliminar(item)
+//     })
+//     .onCancel(() => {})
+//     .onDismiss(() => {})
+// }
+// function confirmarEliminar(item) {
+//   if (!item.traspasoDetalle) {
+//     registrosCrud.deleteRegistro({
+//       id: item.id
+//     })
+//   } else {
+//     traspasosCrud.traspasoDelete({
+//       id: item.traspasoDetalle.traspasoId
+//     })
+//   }
+// }
 
-registrosCrud.onDoneRegistroDelete(({ data }) => {
-  loadOrRefetchListaRegistros()
-  mostrarNotificacionPositiva('Registro eliminado correctamente.', 1000)
-  cargarDatosCuenta(route.params.id, false)
-})
-traspasosCrud.onDoneTraspasoDelete(({ data }) => {
-  loadOrRefetchListaRegistros()
-  mostrarNotificacionPositiva('Registro eliminado correctamente.', 1000)
-  cargarDatosCuenta(route.params.id, false)
-})
+// registrosCrud.onDoneRegistroDelete(({ data }) => {
+//   loadOrRefetchListaRegistros()
+//   mostrarNotificacionPositiva('Registro eliminado correctamente.', 1000)
+//   cargarDatosCuenta(route.params.id, false)
+// })
+// traspasosCrud.onDoneTraspasoDelete(({ data }) => {
+//   loadOrRefetchListaRegistros()
+//   mostrarNotificacionPositiva('Registro eliminado correctamente.', 1000)
+//   cargarDatosCuenta(route.params.id, false)
+// })
 
-function obtener_fecha_inicio() {
-  variables.fechaInicio = `${ejercicio_fiscal.value}-${(
-    '0' + mes.value.id
-  ).slice(-2)}-01`
+/**
+ * Al cambiar el mes
+ */
+function onChangeMes() {
+  onChangePeriodo()
 }
-function obtener_fecha_fin() {
-  variables.fechaFin = `${ejercicio_fiscal.value}-${('0' + mes.value.id).slice(
-    -2
-  )}-${dia_corte_final.value}`
-}
-
-function onChangeMes(mes) {
-  obtener_fecha_inicio()
-  obtener_fecha_fin()
-  obtenerListaRegistros()
-}
-function onChangeEjercicio(ejercicio_fiscal) {
-  // console.log('cambio de ejercicio', ejercicio_fiscal)
-  obtenerListaRegistros()
+/**
+ * Al cambiar el ejericio
+ */
+function onChangeEjercicio() {
+  onChangePeriodo()
 }
 /**
  * Lista de registros de la tarjeta
  */
-function obtenerListaRegistros() {
-  // console.log('obtenerListaRegistros()')
-  const fechaInicio = `${ejercicio_fiscal.value}-${(
-    '0' + mes_inicial_id.value
-  ).slice(-2)}-01`
-  const fechaFin = `${ejercicio_final_id.value}-${(
-    '0' + mes_final_id.value
-  ).slice(-2)}-${dia_corte_final.value}`
-
-  // console.log('fechaInicio', fechaInicio)
-  // console.log('fechaFin', fechaFin)
-
-  // cargaListaRegistros(
-  //   null,
-  //   {
-  //     categoriaId: null,
-  //     cuentaId: route.params.id,
-  //     fechaInicio,
-  //     fechaFin,
-  //     isMsi: null
-  //   },
-  //   graphqlOptions
-  // )
+function onChangePeriodo() {
+  const fechaString = `${ejercicio_fiscal.value}-${('0' + mes.value.id).slice(
+    -2
+  )}-01`
+  const fecha = DateTime.fromISO(fechaString)
+  detalleVariables.fechaInicio = fecha.toISODate()
+  detalleVariables.fechaFin = fecha.endOf('month').toISODate()
+  // variablesSaldoAlPeriodo.fechaFin = fecha.endOf('month').toISODate()
+  variablesSaldoAnterior.fechaFin = fecha
+    .startOf('month')
+    .plus({ days: -1 })
+    .toISODate()
 }
 
-function importarMovimientos() {
-  showFormCarga.value = true
-}
+/**
+ * Muestra el formulario para agregar un registro, ingreso, gasto o traspaso.
+ */
 function addItem() {
   registroEditedItem.value = {
     tipoMovimientoId: '2',
@@ -772,46 +733,18 @@ function saveObs(id, row, observaciones) {
   })
 }
 
+registrosCrud.onDoneRegistroUpdate((response) => {
+  mostrarNotificacionPositiva('Campo observación actualizado.', 700)
+})
+
 registrosCrud.onErrorRegistroUpdate((response) => {
   console.trace(response)
 })
 
-registrosCrud.onDoneRegistroUpdate((response) => {
-  // console.log('updated ', response)
-  mostrarNotificacionPositiva('Campo observación actualizado.', 700)
-})
-
-function confirmQuitarMsi(id) {
-  api
-    .put(`/registros_tarjeta/${id}`, {
-      registro_tarjeta: {
-        is_msi: false,
-        numero_msi: 0
-      }
-    })
-    .then(({ data }) => {
-      // console.log('actualizado', data)
-      mostrarNotificacionInformativa(
-        'El registro se eliminó de Meses Sin Intereses',
-        1200
-      )
-      refetchListaRegistros()
-    })
-    .catch((error) => {
-      console.error(error)
-    })
-}
-
 function itemSaved(registro) {
-  mostrarNotificacionPositiva('Se ha ingresado un nuevo registro.', 1200)
-  refetchListaRegistros()
-  obtenerMontosResumen()
-  cargarDatosCuenta(route.params.id, false)
+  refetchDatos()
+  // cargarDatosCuenta(route.params.id, false)
   showForm.value = false
-}
-
-function obtenerMontosResumen() {
-  refetchSaldoAFecha()
 }
 
 function onItemUpdated() {
@@ -819,43 +752,38 @@ function onItemUpdated() {
     'Se ha actualizado el registro correctamente.',
     1200
   )
-  refetchListaRegistros()
-  obtenerMontosResumen()
-  cargarDatosCuenta(route.params.id, false)
+  refetchDatos()
+  // cargarDatosCuenta(route.params.id, false)
   showForm.value = false
 }
+
 function itemsSaved() {
   showFormCarga.value = false
-  loadOrRefetchListaRegistros()
-  actualizarSaldoFinal()
+  refetchDatos()
 }
-function loadOrRefetchListaRegistros() {
-  /* cargaListaRegistros() || */ refetchListaRegistros()
-}
-
+/**
+ * Actualizar el saldo final de la cuenta sin importar la fecha y actualizar en interfaz.
+ */
 function actualizarSaldoFinal() {
   cuentasCrud.cuentaSaldoUpdate({ cuentaId: route.params.id.toString() })
 }
 
 cuentasCrud.onDoneCuentaSaldoUpdate(({ data }) => {
+  console.log('cuentasCrud.onDoneCuentaSaldoUpdate ......')
   cuenta.value.saldo = data.cuentaSaldoUpdate.cuenta.saldo
 })
 
-const mesOptions = ref([
-  { id: 1, nombre: 'Enero' },
-  { id: 2, nombre: 'Febrero' },
-  { id: 3, nombre: 'Marzo' },
-  { id: 4, nombre: 'Abril' },
-  { id: 5, nombre: 'Mayo' },
-  { id: 6, nombre: 'Junio' },
-  { id: 7, nombre: 'Julio' },
-  { id: 8, nombre: 'Agosto' },
-  { id: 9, nombre: 'Septiembre' },
-  { id: 10, nombre: 'Octubre' },
-  { id: 11, nombre: 'Noviembre' },
-  { id: 12, nombre: 'Diciembre' }
-])
+/**
+ * Iniciar el formulario de importación de movimientos.
+ */
+function importarMovimientos() {
+  showFormCarga.value = true
+}
+/**
+ * cambiar el metodo de obtener ejercicios
+ */
 const ejercicioFiscalOptions = ref([2021, 2022, 2023])
+
 const columns = [
   // { name: 'id', label: 'Id', field: 'id', sortable: true, align: 'left' },
   {
