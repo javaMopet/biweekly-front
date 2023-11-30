@@ -40,6 +40,8 @@ export const LISTA_REGISTROS = gql`
       traspasoDetalle {
         id
         traspasoId
+        tipoCuentaTraspasoId
+        importe
       }
       userId
     }
@@ -111,7 +113,7 @@ export const REGISTRO_DELETE = gql`
 export const REGISTROS_DELETE = gql`
   mutation registrosDelete($ids: String!) {
     registrosDelete(ids: $ids) {
-      saldo
+      cuentasIds
     }
   }
 `

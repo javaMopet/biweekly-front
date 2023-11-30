@@ -143,7 +143,7 @@
                       round
                       icon="las la-edit"
                       class="button-edit"
-                      @click="editRow(props)"
+                      @click="editItem(props)"
                       ><q-tooltip> Editar </q-tooltip></q-btn
                     >
                     <q-btn
@@ -292,7 +292,7 @@ function addRow(tipoCuentaId) {
  * Iniciar la edición de un item.
  * @param {*} item
  */
-function editRow(item) {
+function editItem(item) {
   editedItem.value = {
     ...item.row
   }

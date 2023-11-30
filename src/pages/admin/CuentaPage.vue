@@ -274,7 +274,7 @@
         Importe total de movimientos:
         <span> {{ toCurrency(sumaMovimientos) }}</span>
       </div>
-      <pre>{{ mes }}</pre>
+      <!-- <pre>{{ mes }}</pre> -->
     </div>
   </div>
 
@@ -537,26 +537,41 @@ function refetchDatos() {
  * @param {*} item - item de la tabla a editar.
  */
 function editItem(item) {
-  // console.log('editando item...', item.rowIndex, item.row)
   registroEditedItem.value = JSON.parse(JSON.stringify(item.row))
-  const categoria = registroEditedItem.value.categoria
-  registroEditedItem.value.importe = (
-    categoria?.tipoMovimientoId === '2'
-      ? registroEditedItem.value.importe * -1
-      : registroEditedItem.value.importe || registroEditedItem.value.importe
+
+  registroEditedItem.value.importe = obtenerImporteByTipoMovimiento(
+    registroEditedItem.value
   ).toString()
-  // console.log('fecha', registroEditedItem.value.fecha)
+
   registroEditedItem.value.fecha = formato.convertDateFromIsoToInput(
     registroEditedItem.value.fecha
   )
   registroEditedItem.value.tipoMovimientoId =
     registroEditedItem.value.categoria?.tipoMovimientoId || '3'
+
+  console.log('item to edit', registroEditedItem.value)
   showForm.value = true
 }
 
-function deleteSelectedItems() {
-  console.table(selectedItems.value)
+/**
+ * Obtener importe con el formato adecuado para editar.
+ * @param {Object} editedItem - Item a editar.
+ * @returns {Float} Retornar el importe formateado de acuerdo al tipo de movimiento
+ */
+function obtenerImporteByTipoMovimiento(editedItem) {
+  console.log('obtenerImporteByTipoMovimiento item...', editedItem)
+  if (!!editedItem.categoria) {
+    return editedItem.categoria.tipoMovimientoId === '2'
+      ? editedItem.importe * -1
+      : editedItem.importe
+  } else if (!!editedItem.traspasoDetalle) {
+    return editedItem.traspasoDetalle.importe
+  } else {
+    return ''
+  }
+}
 
+function deleteSelectedItems() {
   if (selectedItems.value.length > 0) {
     const message = `Esta a punto de eliminar ${selectedItems.value.length} movimientos. ¿Desea continuar?`
     $q.dialog({
@@ -583,6 +598,10 @@ function deleteSelectedItems() {
       .onDismiss(() => {})
   }
 }
+/**
+ * Una vez confirmada la eliminación de items
+ * @param {Array} toDelete - Items to delete.
+ */
 function confirmarEliminarItems(toDelete) {
   console.log(toDelete)
   const eliminar = toDelete.map((item) => item.id)
@@ -591,17 +610,18 @@ function confirmarEliminarItems(toDelete) {
 }
 
 registrosCrud.onDoneRegistrosDelete(({ data }) => {
-  console.log('Terminó de eliminar registros', data.registrosDelete.saldo)
+  console.log('Terminó de eliminar registros', data.registrosDelete.cuentasIds)
   cuentaStore.actualizarSaldoCuenta(
     cuenta.value.id.toString(),
     data.registrosDelete.saldo
   )
-  cuenta.value.saldo = data.registrosDelete.saldo
+  // cuenta.value.saldo = data.registrosDelete.saldo
   refetchDatos()
   mostrarNotificacionPositiva(
     'Los movimientos fueron eliminados exitosamente',
     1600
   )
+  selectedItems.value.length = 0
 })
 
 registrosCrud.onErrorRegistrosDelete(() => {
@@ -769,7 +789,7 @@ function actualizarSaldoFinal() {
 }
 
 cuentasCrud.onDoneCuentaSaldoUpdate(({ data }) => {
-  console.log('cuentasCrud.onDoneCuentaSaldoUpdate ......')
+  // console.log('cuentasCrud.onDoneCuentaSaldoUpdate ......')
   cuenta.value.saldo = data.cuentaSaldoUpdate.cuenta.saldo
 })
 

@@ -735,7 +735,8 @@ body {
   .q-table__bottom,
   thead tr:first-child th {
     /* bg color is important for th; just specify one */
-    background-color: $main-background;
+    // background-color: $main-background;
+    background-color: white;
   }
 
   thead tr th {
@@ -831,8 +832,8 @@ body {
 .movimientos__celda--importe {
   font-family: 'Roboto Slab', 'Open Sans', sans-serif;
   font-size: 0.75rem !important;
-  font-weight: 400 !important;
-  color: #000000;
+  font-weight: 300 !important;
+  color: #242121;
   // border: 0px solid white !important;
 }
 .cuentas__celda--importe {

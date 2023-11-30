@@ -63,7 +63,7 @@
         <div class="">
           <CuentaSelect
             v-if="isTraspaso"
-            v-model="cuentaDestino"
+            v-model="editedFormItem.cuentaDestino"
             label="Cuenta Destino"
             :filter-array="['1', '2']"
             :filter-id-array="filterIdArray"
@@ -136,7 +136,7 @@ const defaultItem = {
   categoria: null,
   cuenta: null,
   estadoRegistroId: 2,
-  importe: '',
+  importe: '500',
   fecha: formato.formatoFecha(new Date()),
   observaciones: ''
 }
@@ -144,16 +144,18 @@ const defaultItem = {
 const cuentaReadOnly = ref(true)
 
 const formItem = ref({ ...defaultItem })
-const cuentaDestino = ref(null)
+// const cuentaDestino = ref(null)
 const filterIdArray = ref([])
 
 /**
  * onMounted
  */
 onMounted(() => {
-  editedFormItem.value.fecha = !!props.fecha
-    ? formato.convertDateFromIsoToInput(props.fecha)
-    : formato.formatoFecha(new Date())
+  if (!isEditing.value) {
+    editedFormItem.value.fecha = !!props.fecha
+      ? formato.convertDateFromIsoToInput(props.fecha)
+      : formato.formatoFecha(new Date())
+  }
 
   filterIdArray.value.push(editedFormItem.value.cuenta.id.toString())
 })
@@ -222,6 +224,12 @@ registrosCrud.onDoneRegistroUpdate(({ data }) => {
   console.log('Registro update', data)
   const item = data.registroUpdate.registro
   emit('itemUpdated', item)
+})
+registrosCrud.onErrorRegistroUpdate((error) => {
+  mostrarNotificacionNegativa(
+    'No es posible actualizar el movimiento con la información ingresada. Favor de verificar.',
+    2100
+  )
 })
 /**
  * computed
@@ -314,7 +322,7 @@ function saveItem() {
       importe: importe
     })
     inputDetalle.push({
-      cuentaId: parseInt(cuentaDestino.value.id),
+      cuentaId: parseInt(editedFormItem.value.cuentaDestino.id),
       tipoCuentaTraspasoId: 1,
       importe
     })

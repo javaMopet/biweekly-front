@@ -49,12 +49,8 @@ export const useCuentaStore = defineStore('cuentaStore', () => {
    */
 
   function actualizarSaldoCuenta(cuenta_id, saldo) {
-    console.log(cuenta_id)
-    console.table(listaCuentas.value)
     const cuentaIndex = listaCuentas.value.findIndex((c) => c.id === cuenta_id)
-    console.log('cuentaIndex', cuentaIndex)
     const cuentaModificar = listaCuentas.value[cuentaIndex]
-    console.log('cuenta a modificar.', cuentaModificar)
     cuentaModificar.saldo = saldo
   }
 
