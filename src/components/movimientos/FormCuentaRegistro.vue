@@ -104,7 +104,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, reactive } from 'vue'
 import DateInput from '../formComponents/DateInput.vue'
 import CategoriaSelect from '../formComponents/CategoriaSelect.vue'
 import CuentaSelect from '../formComponents/CuentaSelect.vue'
@@ -130,6 +130,8 @@ const { mostrarNotificacionPositiva, mostrarNotificacionNegativa } =
 /**
  * state
  */
+const traspaso = ref(null)
+
 const defaultItem = {
   tipoMovimientoId: '1',
   tipoAfectacion: 'A',
@@ -155,6 +157,8 @@ onMounted(() => {
     editedFormItem.value.fecha = !!props.fecha
       ? formato.convertDateFromIsoToInput(props.fecha)
       : formato.formatoFecha(new Date())
+  } else {
+    obtenerDatosTraspasoSiAplica()
   }
 
   filterIdArray.value.push(editedFormItem.value.cuenta.id.toString())
@@ -231,10 +235,21 @@ registrosCrud.onErrorRegistroUpdate((error) => {
     2100
   )
 })
+
+traspasosCrud.onResultListaTraspasos(({ data }) => {
+  const tipoCuentaTraspasoId =
+    editedFormItem.value.traspasoDetalle.tipoCuentaTraspasoId
+  traspaso.value = data.listaTraspasos[0]
+  const detalleContrario = traspaso.value.traspasoDetalles.find((detalle) => {
+    return detalle.tipoCuentaTraspasoId !== tipoCuentaTraspasoId
+  })
+  editedFormItem.value.cuentaDestino = detalleContrario.cuenta
+  editedFormItem.value.observaciones = traspaso.value.observaciones
+})
+
 /**
  * computed
  */
-
 const editedFormItem = computed({
   get() {
     return !!props.editedItem.cuenta ? props.editedItem : formItem.value
@@ -309,25 +324,53 @@ function saveItem() {
   console.dir(editedFormItem.value)
 
   if (isTraspaso.value) {
-    const inputDetalle = []
-    const input = {
-      fecha: formato.convertDateFromInputToIso(editedFormItem.value.fecha),
-      observaciones: editedFormItem.value.observaciones,
-      userId
+    if (isEditing.value) {
+      const id = traspaso.value.id
+      const input = {
+        ...traspaso.value,
+        __typename: undefined,
+        traspasoDetalles: undefined
+      }
+      const inputDetalle = []
+
+      console.log('inputDetalle', inputDetalle)
+      traspaso.value.traspasoDetalles.forEach((detalle) => {
+        let traspasoDetalle = {
+          ...detalle,
+          cuentaId: detalle.cuenta.id.toString(),
+          cuenta: undefined,
+          __typename: undefined
+        }
+        traspasoDetalle.registroId = detalle.registro.id.toString()
+        traspasoDetalle.registro = undefined
+        console.log('traspasoDetalle', traspasoDetalle)
+        inputDetalle.push(traspasoDetalle)
+      })
+
+      console.log('Mandar actualizar traspaso', id, input, inputDetalle)
+
+      traspasosCrud.traspasoUpdate({ id, input, inputDetalle })
+    } else {
+      const inputDetalle = []
+      const input = {
+        fecha: formato.convertDateFromInputToIso(editedFormItem.value.fecha),
+        observaciones: editedFormItem.value.observaciones,
+        userId
+      }
+
+      inputDetalle.push({
+        cuentaId: parseInt(editedFormItem.value.cuenta.id),
+        tipoCuentaTraspasoId: 2,
+        importe: importe
+      })
+      inputDetalle.push({
+        cuentaId: parseInt(editedFormItem.value.cuentaDestino.id),
+        tipoCuentaTraspasoId: 1,
+        importe
+      })
+
+      traspasosCrud.traspasoCreate({ input, inputDetalle })
     }
-
-    inputDetalle.push({
-      cuentaId: parseInt(editedFormItem.value.cuenta.id),
-      tipoCuentaTraspasoId: 2,
-      importe: importe
-    })
-    inputDetalle.push({
-      cuentaId: parseInt(editedFormItem.value.cuentaDestino.id),
-      tipoCuentaTraspasoId: 1,
-      importe
-    })
-
-    traspasosCrud.traspasoCreate({ input, inputDetalle })
   } else {
     let tipoAfectacion = undefined
     let importe_real = undefined
@@ -367,6 +410,17 @@ function saveItem() {
   }
 }
 
+traspasosCrud.onDoneTraspasoUpdate(({ data }) => {
+  console.log('Al terminar de actualizar traspaso', data)
+  mostrarNotificacionPositiva('Traspaso actualizado', 2100)
+  // emit('itemUpdated')
+})
+
+traspasosCrud.onErrorTraspasoUpdate((error) => {
+  // console.trace(error)
+  mostrarNotificacionNegativa('No es posible actualizar el movimiento')
+})
+
 function onSelectCategoria(value) {
   if (!isEditing.value && !!value) {
     const importeDefault = value.importeDefault ?? 0
@@ -381,4 +435,15 @@ function onSelectCategoria(value) {
 //   console.log('data', data)
 //   emit('itemUpdated')
 // })
+const graphqlOptions = reactive({
+  fetchPolicy: 'no-cache'
+})
+
+function obtenerDatosTraspasoSiAplica() {
+  console.log('verificando si es traspaso', editedFormItem.value)
+  if (!!editedFormItem.value.traspasoDetalle) {
+    const id = editedFormItem.value.traspasoDetalle.traspasoId
+    traspasosCrud.loadListaTraspasos(null, { id }, graphqlOptions)
+  }
+}
 </script>

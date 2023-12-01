@@ -201,7 +201,6 @@ const formato = useFormato()
 const router = useRouter()
 const cuentaStore = useCuentaStore()
 const cuentasCrud = useCuentasCrud()
-
 /**
  * GRAPHQL
  */

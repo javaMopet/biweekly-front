@@ -17,17 +17,17 @@ export const useCuentaStore = defineStore('cuentaStore', () => {
    * graphql
    */
   const graphqlOptions = reactive({
-    fetchPolicy: 'network-only'
+    fetchPolicy: 'no-cache'
+    // fetchPolicy: 'network-only'
   })
 
   const { onResult: onResultListaCuentas, onError: onErrorListaCuentas } =
     useQuery(LISTA_CUENTAS, null, graphqlOptions)
 
   onResultListaCuentas(({ data }) => {
-    // console.log('data', data)
     if (!!data) {
-      // console.log('Obteniendo lista de cuentas')
-      listaCuentas.value = JSON.parse(JSON.stringify(data.listaCuentas))
+      console.log('Se obtuvo la lista de cuentas', data)
+      listaCuentas.value = JSON.parse(JSON.stringify(data?.listaCuentas ?? []))
     }
   })
 
