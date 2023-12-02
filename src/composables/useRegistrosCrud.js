@@ -74,9 +74,14 @@ export function useRegistrosCrud() {
   })
 
   onDoneRegistrosDelete(({ data }) => {
-    console.log('registros eliminados', data.registrosDelete.saldo)
-
-    // cuentaCrud.cuentaSaldoUpdate({ cuentaId: itemDeleted.cuenta.id })
+    console.log(
+      'useRegistroCrud registros eliminados',
+      data.registrosDelete.cuentasIds
+    )
+    data.registrosDelete.cuentasIds.forEach((element) => {
+      console.log('cuenta element', element)
+      cuentaCrud.cuentaSaldoUpdate({ cuentaId: element })
+    })
   })
   onErrorRegistrosDelete((error) => {
     console.log('ocurrio un error')

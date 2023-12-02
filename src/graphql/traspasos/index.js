@@ -11,6 +11,16 @@ export const TRASPASO_CREATE = gql`
     ) {
       traspaso {
         id
+        detalleOrigen {
+          id
+          cuentaId
+          tipoCuentaTraspasoId
+        }
+        detalleDestino {
+          id
+          cuentaId
+          tipoCuentaTraspasoId
+        }
       }
     }
   }
@@ -28,7 +38,22 @@ export const TRASPASO_UPDATE = gql`
       traspasosDetalleInput: $inputDetalle
     ) {
       traspaso {
+        detalleOrigen {
+          id
+          cuentaId
+          tipoCuentaTraspasoId
+        }
+        detalleDestino {
+          id
+          cuentaId
+          tipoCuentaTraspasoId
+        }
+      }
+      cuentasIds
+      cuentas {
         id
+        nombre
+        saldo
       }
     }
   }
@@ -39,6 +64,16 @@ export const TRASPASO_DELETE = gql`
     traspasoDelete(id: $id) {
       traspaso {
         id
+        detalleOrigen {
+          id
+          cuentaId
+          tipoCuentaTraspasoId
+        }
+        detalleDestino {
+          id
+          cuentaId
+          tipoCuentaTraspasoId
+        }
       }
     }
   }

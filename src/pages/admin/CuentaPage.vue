@@ -768,10 +768,6 @@ function itemSaved(registro) {
 }
 
 function onItemUpdated() {
-  mostrarNotificacionPositiva(
-    'Se ha actualizado el registro correctamente.',
-    1200
-  )
   refetchDatos()
   // cargarDatosCuenta(route.params.id, false)
   showForm.value = false

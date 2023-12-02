@@ -328,21 +328,35 @@ function saveItem() {
       const id = traspaso.value.id
       const input = {
         ...traspaso.value,
+        fecha: formato.convertDateFromInputToIso(editedFormItem.value.fecha),
+        observaciones: editedFormItem.value.observaciones,
         __typename: undefined,
         traspasoDetalles: undefined
       }
       const inputDetalle = []
+      console.table(traspaso.value.traspasoDetalles)
 
       console.log('inputDetalle', inputDetalle)
       traspaso.value.traspasoDetalles.forEach((detalle) => {
+        console.log(
+          'cuenta',
+          detalle.tipoCuentaTraspasoId,
+          detalle.cuenta.id.toString()
+        )
+        console.assert(detalle.tipoCuentaTraspasoId === 1)
         let traspasoDetalle = {
           ...detalle,
-          cuentaId: detalle.cuenta.id.toString(),
+          importe,
+          cuentaId:
+            detalle.tipoCuentaTraspasoId === 1
+              ? detalle.cuenta.id.toString()
+              : editedFormItem.value.cuentaDestino.id,
           cuenta: undefined,
-          __typename: undefined
+          __typename: undefined,
+          registroId: detalle.registro.id.toString(),
+          registro: undefined
         }
-        traspasoDetalle.registroId = detalle.registro.id.toString()
-        traspasoDetalle.registro = undefined
+
         console.log('traspasoDetalle', traspasoDetalle)
         inputDetalle.push(traspasoDetalle)
       })
@@ -360,12 +374,12 @@ function saveItem() {
 
       inputDetalle.push({
         cuentaId: parseInt(editedFormItem.value.cuenta.id),
-        tipoCuentaTraspasoId: 2,
+        tipoCuentaTraspasoId: 1,
         importe: importe
       })
       inputDetalle.push({
         cuentaId: parseInt(editedFormItem.value.cuentaDestino.id),
-        tipoCuentaTraspasoId: 1,
+        tipoCuentaTraspasoId: 2,
         importe
       })
 
@@ -413,12 +427,15 @@ function saveItem() {
 traspasosCrud.onDoneTraspasoUpdate(({ data }) => {
   console.log('Al terminar de actualizar traspaso', data)
   mostrarNotificacionPositiva('Traspaso actualizado', 2100)
-  // emit('itemUpdated')
+  emit('itemUpdated')
 })
 
 traspasosCrud.onErrorTraspasoUpdate((error) => {
   // console.trace(error)
-  mostrarNotificacionNegativa('No es posible actualizar el movimiento')
+  mostrarNotificacionNegativa(
+    'Ocurrió un error al intentar actualizar el movimiento. Favor de verificar.',
+    2100
+  )
 })
 
 function onSelectCategoria(value) {
