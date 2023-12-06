@@ -273,6 +273,7 @@ const columns = [
  */
 onMounted(() => {
   // cuentasCrud.loadListaCuentas()
+  console.log('onMounted CuentasPage.vue', cuentaStore.listaCuentas.length > 0)
 })
 
 const listaCuentasAhorro = computed({

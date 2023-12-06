@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 import { LISTA_CUENTAS } from 'src/graphql/cuentas'
 import { computed, reactive, ref } from 'vue'
 
-export const useCuentaStore = defineStore('cuentaStore', () => {
+export const useCuentaStore = defineStore('useCuentaStore', () => {
   /**
    * state
    */
