@@ -1,5 +1,5 @@
 <template>
-  <q-card class="my-card" dense style="width: 80%; min-width: 80%">
+  <q-card class="my-card" dense style="width: 85%; min-width: 85%">
     <q-inner-loading
       :showing="isLoading"
       label="Saving... Please wait..."
@@ -23,7 +23,7 @@
               accept=".xlsx,.xls"
               @input="updateFile"
               dense
-              style="width: 300px"
+              style="width: 450px"
               max-files="1"
               outlined
               label-color="accent"
@@ -120,6 +120,7 @@
         :columns="columns"
         :rows-per-page-options="[0]"
         row-key="consecutivo"
+        separator="cell"
         dense
         selection="multiple"
         v-model:selected="registrosSelected"
@@ -142,15 +143,22 @@
             ></CategoriaSelect>
           </q-td>
         </template>
-        <template #body-cell-importe="props">
+        <template #body-cell-cargo="props">
           <q-td :props="props">
             <span :class="props.row.clase">
-              {{ formato.toCurrency(parseFloat(props.row.importe)) }}
+              {{ formato.toCurrency(parseFloat(props.row.cargo)) }}
+            </span>
+          </q-td>
+        </template>
+        <template #body-cell-abono="props">
+          <q-td :props="props">
+            <span :class="props.row.clase">
+              {{ formato.toCurrency(parseFloat(props.row.abono)) }}
             </span>
           </q-td>
         </template>
         <template #body-cell-acciones="props">
-          <q-td :props="props" fit class="bg-white">
+          <q-td :props="props">
             <q-btn
               icon="delete_sweep"
               size="md"
@@ -165,18 +173,35 @@
         </template>
       </q-table>
     </q-card-section>
-
-    <q-card-actions>
-      <div class="row inline justify-between items-center fit q-pa-md">
-        <div class="">
-          <span class="text-bold text-primary"> Importe Total:</span>
-          <span class="q-pl-md text-secondary text-bold">{{
-            formato.toCurrency(sumatoriaImporte)
-          }}</span>
+    <q-card-actions style="border: 0px solid red" class="q-pa-xs">
+      <div class="row justify-between items-center full-width text-accent">
+        <div class="col-9 q-pl-lg">
+          <table style="border: 0px solid red">
+            <tr>
+              <td>Total cargos:</td>
+              <td class="summary__value">
+                {{ toCurrency(sumaCargos) }}
+              </td>
+            </tr>
+            <tr>
+              <td>Total abonos:</td>
+              <td class="summary__value">
+                {{ toCurrency(sumaAbonos) }}
+              </td>
+            </tr>
+            <tr>
+              <td>Importe Total:</td>
+              <td class="summary__value">
+                {{ toCurrency(sumatoriaImporte) }}
+              </td>
+            </tr>
+          </table>
         </div>
-        <div class="row q-gutter-lg q-pa-sm">
-          <q-btn flat label="Cancelar" v-close-popup />
-          <q-btn label="Guardar" color="primary-button" @click="saveItems" />
+        <div class="col-3">
+          <div class="row justify-center">
+            <q-btn flat label="Cancelar" v-close-popup class="q-mr-lg" />
+            <q-btn label="Guardar" color="primary-button" @click="saveItems" />
+          </div>
         </div>
       </div>
     </q-card-actions>
@@ -213,6 +238,7 @@ const isLoading = ref(false)
  */
 const formato = useFormato()
 const notificacion = useNotificacion()
+const { toCurrency } = useFormato()
 /**
  * defProperties
  */
@@ -250,10 +276,12 @@ onMounted(() => {
  * emits
  */
 const emit = defineEmits(['itemsSaved'])
+
 /**
  *
  * @param {*} v
  */
+const monthsMap = new Map()
 // assuming `todos` is a standard VueJS `ref`
 async function updateFile(v) {
   try {
@@ -268,6 +296,18 @@ async function updateFile(v) {
     //   raw: false
     // })
 
+    monthsMap.set('Ene', '01')
+    monthsMap.set('Feb', '02')
+    monthsMap.set('Mar', '03')
+    monthsMap.set('Abr', '04')
+    monthsMap.set('May', '05')
+    monthsMap.set('Jun', '06')
+    monthsMap.set('Jul', '07')
+    monthsMap.set('Ago', '08')
+    monthsMap.set('Sep', '09')
+    monthsMap.set('Oct', '10')
+    monthsMap.set('Nov', '11')
+    monthsMap.set('Dic', '12')
     // for (const row of rows) {
     //   for (const key in row) {
     //     console.log('data cell', row[key])
@@ -287,138 +327,133 @@ async function updateFile(v) {
     console.log(e)
   }
 }
+
+/**
+ * Cargar movimientos de santander.
+ * @param {Object} wb - Excel data
+ */
 function cargarMovimientosSantander(wb) {
   // get data of first worksheet as an array of objects
   const data = utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {
-    header: ['A', 'B', 'C', 'D'],
+    header: ['FECHA', 'CONSECUTIVO', 'CONCEPTO', 'IMPORTE'],
     skipHeader: true,
     raw: false
   })
 
-  // console.log('data', data)
-  const monthsMap = new Map()
-  monthsMap.set('Ene', '01')
-  monthsMap.set('Feb', '02')
-  monthsMap.set('Mar', '03')
-  monthsMap.set('Abr', '04')
-  monthsMap.set('May', '05')
-  monthsMap.set('Jun', '06')
-  monthsMap.set('Jul', '07')
-  monthsMap.set('Ago', '08')
-  monthsMap.set('Sep', '09')
-  monthsMap.set('Oct', '10')
-  monthsMap.set('Nov', '11')
-  monthsMap.set('Dic', '12')
+  // console.table(data)
+  // data.forEach((d) => {
+  //   console.log(d.IMPORTE)
+  // })
 
   todos.value = data.map((row) => ({
-    fecha: row.A,
-    consecutivo: row.B,
-    concepto: row.C,
-    importe: row.D
+    fecha: row.FECHA.replace(
+      row.FECHA.substring(3, 6),
+      monthsMap.get(row.FECHA.substring(3, 6))
+    ),
+    consecutivo: row.CONSECUTIVO,
+    concepto: row.CONCEPTO,
+    importe: row.IMPORTE
   }))
-  // console.log('datda', todos.value)
-  // console.log('datda', todos.value[5])
   todos.value.forEach((row, index) => {
-    let fecha = row.fecha.toString()
-    for (const [key, value] of monthsMap) {
-      // console.log(`${key}: ${value}`)
-      fecha = fecha.replace(key.toString(), value.toString())
-    }
-    const fechaObject = DateTime.fromFormat(fecha, 'dd/MM/yyyy')
+    const importe = parseFloat(row.importe)
+    row.cargo = importe > 0 ? importe : 0
+    row.abono = importe < 0 ? importe : 0
+  })
+  console.table(todos.value)
+  // console.log('datda', todos.value[5])
+  crearListaRegistrosTarjeta(todos.value)
+}
+/**
+ * Cargar movimientos de Santander
+ * @param {Object} wb - Excel data
+ */
+function cargarMovimientosBancomer(wb) {
+  // get data of first worksheet as an array of objects
+  const data = utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {
+    header: ['FECHA', 'DESCRIPCION', 'CARGO', 'ABONO', 'SALDO'],
+    skipHeader: true,
+    raw: false
+  })
+
+  todos.value = data.map((row, index) => ({
+    fecha: row.FECHA,
+    consecutivo: index,
+    concepto: row.DESCRIPCION,
+    cargo: row.CARGO?.replace(',', '') ?? 0,
+    abono: row.ABONO?.replace(',', '') ?? 0,
+    saldo: row.SALDO?.replace(',', '') ?? 0
+  }))
+  crearListaRegistrosTarjeta(todos.value)
+}
+/**
+ * Convertir un arreglo de datos de excel a registros para visualizar en la tabla.
+ * @param {Array} excelData - Datos obtenidos del archivo excel
+ */
+function crearListaRegistrosTarjeta(excelData) {
+  console.table(excelData)
+  todos.value.forEach((row, index) => {
+    const fechaObject = DateTime.fromFormat(row.fecha.toString(), 'dd/MM/yyyy')
     if (fechaObject.isValid) {
-      const importe = parseFloat(row.importe) * -1
-      const tipo_afectacion = importe < 0 ? 'C' : 'A'
-      const clase = importe >= 0 ? 'registro_positivo' : ''
       const item = {
         id: index,
-        fecha,
+        fecha: fechaObject.toISODate(),
         consecutivo: row.consecutivo,
-        importe: importe.toString(),
-        tipo_afectacion,
+        cargo: parseFloat(row.cargo),
+        abono: parseFloat(row.abono),
         concepto: row.concepto,
-        saved: false,
-        clase
+        tipoAfectacion: row.cargo !== 0 ? 'C' : 'A',
+        clase: row.abono !== 0 ? 'registro-abono' : '',
+        saved: false
       }
       listaRegistrosTarjeta.value.push(item)
     }
   })
-
   console.table(listaRegistrosTarjeta.value)
 }
 /**
  * computed
  */
-const isErrors = computed({
-  get() {
-    return errorItems.value.length > 0
-  }
-})
 const listaRegistroFiltrados = computed({
   get() {
     const start_date = DateTime.fromFormat(fecha_inicio.value, 'dd/MM/yyyy')
     const end_date = DateTime.fromFormat(fecha_fin.value, 'dd/MM/yyyy')
 
     return listaRegistrosTarjeta.value.filter((registro) => {
-      const fecha_registro = DateTime.fromFormat(registro.fecha, 'dd/MM/yyyy')
+      const fecha_registro = DateTime.fromISO(registro.fecha)
       return fecha_registro >= start_date && fecha_registro <= end_date
     })
   }
 })
-const sumatoriaImporte = computed({
+const isErrors = computed({
+  get() {
+    return errorItems.value.length > 0
+  }
+})
+
+const sumaCargos = computed({
   get() {
     return listaRegistroFiltrados.value.reduce((accumulator, registro) => {
-      return accumulator + parseFloat(registro.importe)
+      return accumulator + parseFloat(registro.cargo)
     }, 0)
   }
 })
-function cargarMovimientosBancomer(wb) {
-  // get data of first worksheet as an array of objects
-  const data = utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {
-    header: ['A', 'B', 'C', 'D', 'E'],
-    skipHeader: true,
-    raw: false
-  })
+const sumaAbonos = computed({
+  get() {
+    return listaRegistroFiltrados.value.reduce((accumulator, registro) => {
+      return accumulator + parseFloat(registro.abono)
+    }, 0)
+  }
+})
 
-  console.log('data', data)
-
-  todos.value = data.map((row) => ({
-    fecha: row.A,
-    concepto: row.B,
-    cargo: row.C,
-    abono: row.D,
-    saldo: row.E
-  }))
-  // console.log('datda', todos.value)
-  // console.log('datda', todos.value[5])
-  todos.value.forEach((row, index) => {
-    let fecha = row.fecha.toString()
-    const fechaObject = DateTime.fromFormat(fecha, 'dd/MM/yyyy')
-    if (fechaObject.isValid) {
-      console.log('row', row.cargo, row.abono)
-      const cargo = row.cargo?.replace(',', '')
-      const abono = row.abono?.replace(',', '')
-      const tipo_afectacion = !!cargo ? 'C' : !!abono ? 'A' : 'N/A'
-      const importeCargoAbono = !!cargo
-        ? Math.abs(parseFloat(cargo))
-        : !!abono
-        ? Math.abs(parseFloat(abono))
-        : 0
-
-      const importe =
-        tipo_afectacion === 'C' ? importeCargoAbono * -1 : importeCargoAbono
-      const item = {
-        id: index,
-        fecha,
-        consecutivo: index,
-        importe,
-        concepto: row.concepto,
-        tipo_afectacion,
-        saved: false
-      }
-      listaRegistrosTarjeta.value.push(item)
-    }
-  })
-}
+const sumatoriaImporte = computed({
+  get() {
+    return listaRegistroFiltrados.value.reduce((accumulator, registro) => {
+      return (
+        accumulator + parseFloat(registro.cargo) + parseFloat(registro.abono)
+      )
+    }, 0)
+  }
+})
 
 function saveItems() {
   const containsErrors = validarMovimientos()
@@ -432,16 +467,18 @@ function saveItems() {
     listaRegistroFiltrados.value.forEach((item) => {
       const registro = {
         estado_registro_tarjeta_id: 1, //pendiente
-        tipo_afectacion: item.tipo_afectacion,
+        tipo_afectacion: item.tipoAfectacion,
         cuenta_id: props.cuenta.id,
         categoria_id: item.categoria.id,
-        importe: parseFloat(item.importe),
-        fecha: formato.convertDateFromInputToIso(item.fecha),
+        importe: !!item.cargo ? item.cargo : item.abono, //parseFloat(item.importe),
+        fecha: item.fecha,
         concepto: item.concepto
       }
       lista_registros_tarjeta.push(registro)
     })
+
     isLoading.value = true
+
     api
       .post('/create_multiple_registros_tarjeta', {
         lista_registros_tarjeta
@@ -460,7 +497,7 @@ function saveItems() {
           900
         )
       })
-    console.log('items guardados')
+    // console.log('items guardados')
   }
 }
 /**
@@ -532,16 +569,18 @@ const columns = [
     sortable: true,
     align: 'left',
     filter: true,
-    style: 'width:80px'
+    style: 'width:55px',
+    headerStyle: 'width:55px'
   },
   {
     name: 'fecha',
     label: 'Fecha',
     field: 'fecha',
     sortable: true,
-    align: 'left',
+    align: 'center',
     filter: false,
-    style: 'width:120px'
+    style: 'width:95px;min-width: 95px;max-width: 95px',
+    headerStyle: 'width: 95px;min-width: 95px;max-width: 95px'
   },
   {
     name: 'concepto',
@@ -552,21 +591,34 @@ const columns = [
     filter: true
   },
   {
-    name: 'importe',
-    label: 'Importe',
-    field: 'importe',
-    sortable: true,
+    name: 'cargo',
+    label: 'Cargo',
+    field: 'cargo',
+    // sortable: true,
     align: 'right',
     // format: (val, row) => `${formato.toCurrency(parseFloat(val))}`,
-    style: 'width:150px'
+    style: 'width:100px; min-width: 100px; max-width: 100px',
+    headerStyle: 'width:100px; min-width: 100px; max-width: 100px'
+  },
+  {
+    name: 'abono',
+    label: 'Abono',
+    field: 'abono',
+    // sortable: true,
+    align: 'right',
+    // format: (val, row) => `${formato.toCurrency(parseFloat(val))}`,
+    style: 'width:100px; min-width: 100px; max-width: 100px',
+    headerStyle: 'width:100px; min-width: 100px; max-width: 100px'
   },
   {
     name: 'categoria',
     label: 'Categoria',
     field: 'categoria',
-    sortable: true,
-    align: 'left',
-    style: 'width:450px;max-width:450px'
+    sortable: false,
+    filter: false,
+    align: 'left'
+    // style: 'width:450px;max-width:450px',
+    // headerStyle: 'width:450px;max-width:450px'
   },
   {
     name: 'acciones',
@@ -574,7 +626,8 @@ const columns = [
     field: 'action',
     sortable: false,
     align: 'center',
-    style: 'width:100px'
+    style: 'width:70px',
+    headerStyle: 'width:70px'
   }
 ]
 function closeErrors() {
@@ -582,7 +635,7 @@ function closeErrors() {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .btn-close {
   &:hover {
     color: $accent-light !important;
@@ -608,9 +661,9 @@ function closeErrors() {
   transition: all 0.5s ease-out;
 }
 
-.registro_positivo {
-  color: $negative !important;
-  font-weight: 700;
+.registro-abono {
+  color: $positive !important;
+  font-weight: 500;
 }
 
 .my-sticky-header-table {
@@ -643,5 +696,12 @@ function closeErrors() {
     /* height of all previous header rows */
     scroll-margin-top: 48px;
   }
+}
+.summary__value {
+  font-family: 'Roboto Slab';
+  font-size: 0.8rem;
+  width: 100px;
+  text-align: right;
+  font-weight: bold;
 }
 </style>
