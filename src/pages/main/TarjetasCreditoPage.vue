@@ -175,7 +175,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onActivated } from 'vue'
 import FormRegistroCuenta from 'src/components/cuentas/FormRegistroCuenta.vue'
 import { useQuasar } from 'quasar'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
@@ -287,7 +287,9 @@ const columns = [
 /**
  * onMounted
  */
-onMounted(() => {})
+onMounted(() => {
+  cuentaStore.loadOrRefetchListaCuentas()
+})
 
 // onResultCuentas(({ data }) => {
 //   if (!!data) {

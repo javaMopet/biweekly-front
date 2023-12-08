@@ -23,7 +23,7 @@
           grid
           style="width: 100%"
           dense
-          :rows="listaCuentasAhorro"
+          :rows="cuentaStore.listaCuentasAhorro"
           :columns="columns"
           row-key="id"
           :filter="filter"
@@ -183,7 +183,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onActivated } from 'vue'
 import FormRegistroCuenta from 'src/components/cuentas/FormRegistroCuenta.vue'
 import { useQuasar } from 'quasar'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
@@ -271,15 +271,10 @@ const columns = [
 /**
  * onMounted
  */
-onMounted(() => {
+onActivated(() => {
   // cuentasCrud.loadListaCuentas()
+  cuentaStore.loadOrRefetchListaCuentas()
   console.log('onMounted CuentasPage.vue', cuentaStore.listaCuentas.length > 0)
-})
-
-const listaCuentasAhorro = computed({
-  get() {
-    return cuentaStore.listaCuentas.filter((c) => c.tipoCuenta.id !== '3') ?? []
-  }
 })
 
 function addRow(tipoCuentaId) {

@@ -27,7 +27,7 @@ export function useCategoriasCrud() {
   const {
     mutate: categoriaUpdate,
     onDone: onDoneCategoriaUpdate,
-    onError: onErrorUpdateCategoria
+    onError: onErrorCategoriaUpdate
   } = useMutation(CATEGORIA_UPDATE)
 
   const {
@@ -77,8 +77,9 @@ export function useCategoriasCrud() {
     console.log('error', error.graphQLErrors[0]?.extensions)
   })
 
-  onErrorUpdateCategoria((error) => {
-    console.dir(error)
+  onErrorCategoriaUpdate((error) => {
+    logErrorMessages(error)
+    // console.dir(error)
     // const problems = error.graphQLErrors[0].extensions.problems
     // if (!!problems) {
     //   console.table(problems)
@@ -93,7 +94,7 @@ export function useCategoriasCrud() {
     onDoneCategoriaUpdate,
     onDoneCategoriaDelete,
     onErrorCategoriaCreate,
-    onErrorUpdateCategoria,
+    onErrorCategoriaUpdate,
     onErrorCategoriaDelete
   }
 }

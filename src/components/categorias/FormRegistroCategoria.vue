@@ -203,7 +203,8 @@ import DialogTitle from '../formComponents/modal/DialogTitle.vue'
 /**
  * composables
  */
-const notificacion = useNotificacion()
+const { mostrarNotificacionPositiva, mostrarNotificacionNegativa } =
+  useNotificacion()
 const tipoMovimientoStore = useTipoMovimientoStore()
 const categoriaStore = useCategoriaStore()
 const categoriaCrud = useCategoriasCrud()
@@ -360,41 +361,46 @@ function saveItem() {
  */
 categoriaCrud.onDoneCategoriaCreate(({ data }) => {
   if (!!data) {
-    notificacion.mostrarNotificacionPositiva(
-      'Categoría creada correctamente.',
+    const itemSaved = data.categoriaCreate.categoria
+    mostrarNotificacionPositiva(
+      `Categoría "${itemSaved.nombre}" creada correctamente.`,
       1600
     )
-    const itemSaved = data.categoriaCreate.categoria
     emit('categoriaSaved', itemSaved)
   }
 })
 
 categoriaCrud.onDoneCategoriaUpdate(({ data }) => {
   if (!!data) {
-    notificacion.mostrarNotificacionPositiva(
-      'Categoría actualizada correctamente.',
+    const itemUpdated = data.categoriaUpdate.categoria
+    mostrarNotificacionPositiva(
+      `Categoría "${itemUpdated.nombre}" actualizada correctamente.`,
       1600
     )
-    const itemUpdated = data.categoriaUpdate.categoria
     emit('categoriaUpdated', itemUpdated, props.editedIndex)
   }
 })
 
-// categoriaCrud.onErrorCreateCategoria((error) => {
-//   // console.log('error', error)
-//   // console.log('error', error.graphQLErrors[0].extensions)
-// })
-// categoriaCrud.onErrorUpdateCategoria((error) => {
-//   // console.log('error', error)
-//   // console.log('error', error.graphQLErrors[0].extensions)
-//   showError('actualizar')
-// })
-function showError(action) {
-  notificacion.mostrarNotificacionNegativa(
-    `Error al intentar ${action} la categoría, favor de intentar nuevamente.`,
-    1600
-  )
-}
+categoriaCrud.onErrorCategoriaCreate((error) => {
+  const nombreError = error.graphQLErrors[0]?.extensions?.nombre ?? null
+
+  const errorString = !!nombreError
+    ? 'No fue posible guardar la categoria. Ya existe una categoria con el nombre que intenta guardar'
+    : 'No fue posible guardar la categoria. Favor de intentar nuevamente'
+
+  mostrarNotificacionNegativa(errorString, 2100)
+})
+
+categoriaCrud.onErrorCategoriaUpdate((error) => {
+  const nombreError = error.graphQLErrors[0]?.extensions?.nombre ?? null
+
+  const errorString = !!nombreError
+    ? 'No fue posible guardar la categoria. Ya existe una categoria con el nombre que intenta guardar'
+    : 'No fue posible guardar la categoria. Favor de intentar nuevamente'
+
+  mostrarNotificacionNegativa(errorString, 2100)
+})
+
 /**
  * onMounted
  */

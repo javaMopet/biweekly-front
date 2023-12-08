@@ -262,7 +262,7 @@ function deleteItem(item) {
   $q.dialog({
     title: 'Confirmar',
     style: 'width:500px',
-    message: `Está a punto de eliminar la cuenta "${item.row.nombre}" ¿Desea continuar con la eliminación?`,
+    message: `Está a punto de eliminar el banco "${item.row.nombre}" ¿Está seguro que desea continuar con la eliminación?`,
     ok: {
       push: true,
       color: 'positive',

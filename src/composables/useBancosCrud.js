@@ -2,6 +2,7 @@ import { useMutation } from '@vue/apollo-composable'
 import { logErrorMessages } from '@vue/apollo-util'
 import { BANCO_CREATE, BANCO_UPDATE, BANCO_DELETE } from 'src/graphql/bancos'
 import { useBancoStore } from 'src/stores/common/useBancoStore'
+import { useCuentaStore } from 'src/stores/common/useCuentaStore'
 
 import { ref, computed } from 'vue'
 
@@ -10,6 +11,11 @@ export function useBancosCrud() {
    * store
    */
   const bancoStore = useBancoStore()
+
+  /**
+   * composables
+   */
+  const cuentaStore = useCuentaStore()
   /**
    * graphql
    */
@@ -51,8 +57,9 @@ export function useBancosCrud() {
 
   onDoneUpdateBanco(({ data }) => {
     const itemUpdated = data.bancoUpdate.banco
-    console.log('itemUpdated', itemUpdated)
+    // console.log('itemUpdated', itemUpdated)
     bancoStore.bancoUpdated(itemUpdated)
+    cuentaStore.loadOrRefetchListaCuentas()
   })
 
   onDoneDeleteBanco(({ data }) => {
