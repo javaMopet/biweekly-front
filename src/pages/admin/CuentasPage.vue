@@ -9,7 +9,7 @@
             separator=">"
             separator-color="primary"
           >
-            <q-breadcrumbs-el icon="home" to="/" />
+            <q-breadcrumbs-el label="Home" icon="home" to="/" />
             <q-breadcrumbs-el label="Cuentas" icon="account_balance" />
           </q-breadcrumbs>
         </div>
@@ -205,7 +205,6 @@ const cuentasCrud = useCuentasCrud()
  * GRAPHQL
  */
 cuentasCrud.onErrorCuentaDelete((error) => {
-  console.error(error)
   notificacion.mostrarNotificacionNegativa(
     'No es posible eliminar esta cuenta, favor de verificar que no contenga movimientos',
     1600

@@ -14,7 +14,8 @@ export const useCuentaStore = defineStore('cuentaStore', () => {
    */
   //fetchPolicy: 'no-cache'
   const graphqlOptions = ref({
-    fetchPolicy: 'network-only'
+    fetchPolicy: 'no-cache'
+    // fetchPolicy: 'network-only'
   })
 
   const {

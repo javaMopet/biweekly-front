@@ -1,5 +1,5 @@
 <template>
-  <div class="my-card" style="width: 80%; min-width: 80%; max-width: 80%">
+  <div class="my-card" style="width: 90%; min-width: 90%; max-width: 90%">
     <q-inner-loading
       :showing="isLoading"
       label="Saving... Please wait..."
@@ -22,7 +22,7 @@
                 accept=".xlsx,.xls"
                 @input="updateFile"
                 dense
-                style="width: 340px"
+                style="width: 450px"
                 max-files="1"
                 outlined
                 no-caps
@@ -238,9 +238,9 @@
       </div>
     </div>
   </div>
-  <div class="col bg-white">
+  <!-- <div class="col bg-white">
     <pre>{{ listaRegistrosFiltrados }}</pre>
-  </div>
+  </div> -->
 </template>
 
 <script setup>

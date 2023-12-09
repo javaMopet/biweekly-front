@@ -812,14 +812,6 @@ const columns = [
     headerStyle: 'width: 90px'
   },
   {
-    name: 'tipomovimeinto',
-    label: 'TMovId',
-    field: 'registrableType',
-    sortable: true,
-    align: 'left'
-    // style: 'width: 10%'
-  },
-  {
     name: 'categoria',
     label: 'Concepto',
     field: (row) => row.categoria?.nombre,
@@ -829,13 +821,22 @@ const columns = [
     // style: 'width:20%'
   },
   {
-    name: 'importe',
-    label: 'Importe',
-    field: 'importe',
+    name: 'cargo',
+    label: 'Cargo',
+    field: 'cargo',
     sortable: true,
     align: 'right',
     format: (val, row) => formato.toCurrency(val),
-    headerStyle: 'width: 120px; min-width:120px'
+    headerStyle: 'width: 100px; min-width:100px'
+  },
+  {
+    name: 'abono',
+    label: 'Abono',
+    field: 'abono',
+    sortable: true,
+    align: 'right',
+    format: (val, row) => formato.toCurrency(val),
+    headerStyle: 'width: 100px; min-width:100px'
   },
   {
     name: 'observaciones',

@@ -155,7 +155,11 @@ import DialogTitle from '../formComponents/modal/DialogTitle.vue'
 // const tipoMovimientoStore = useTipoMovimientoStore()
 const tipoCuentaStore = useTipoCuentaStore()
 const cuentasCrud = useCuentasCrud()
-const notificacion = useNotificacion()
+const {
+  mostrarNotificacionPositiva,
+  mostrarNotificacionNegativa,
+  mostrarNotificacionInformativa
+} = useNotificacion()
 
 /**
  * state
@@ -193,7 +197,7 @@ cuentasCrud.onDoneCuentaUpdate(({ data }) => {
 })
 
 function mostrarNotificacion(action, cuenta) {
-  notificacion.mostrarNotificacionPositiva(
+  mostrarNotificacionPositiva(
     `La cuenta "${cuenta.nombre}" se ${action} correctamente`,
     2500
   )
@@ -307,10 +311,6 @@ onMounted(() => {
  */
 function saveItem() {
   console.log('save item', editedFormItem.value)
-  let cuenta_contable_id = null
-  if (!!editedFormItem.value.cuentaContable) {
-    cuenta_contable_id = parseInt(editedFormItem.value.cuentaContable.id)
-  }
   const tipo_cuenta_id = editedFormItem.value.tipoCuenta.id
   const bancoId = !!editedFormItem.value.banco
     ? editedFormItem.value.banco.id
@@ -321,6 +321,11 @@ function saveItem() {
   const diasGracia = !!editedFormItem.value.diasGracia
     ? parseInt(editedFormItem.value.diasGracia)
     : 0
+
+  let cuenta_contable_id = null
+  if (!!editedFormItem.value.cuentaContable) {
+    cuenta_contable_id = parseInt(editedFormItem.value.cuentaContable.id)
+  }
   const input = {
     ...editedFormItem.value,
     identificador,
@@ -351,9 +356,24 @@ function saveItem() {
     cuentasCrud.cuentaUpdate({ id, input })
   }
 }
+cuentasCrud.onErrorCuentaCreate((error) => {
+  const nombreError = error.graphQLErrors[0]?.extensions?.nombre ?? null
+
+  const errorString = !!nombreError
+    ? 'No fue posible guardar la cuenta. Ya existe una cuenta con el nombre que intenta guardar'
+    : 'No fue posible guardar la cuenta. Favor de intentar nuevamente'
+
+  mostrarNotificacionNegativa(errorString, 2100)
+})
 
 cuentasCrud.onErrorCuentaUpdate((error) => {
-  console.trace(error)
+  const nombreError = error.graphQLErrors[0]?.extensions?.nombre ?? null
+
+  const errorString = !!nombreError
+    ? 'No fue posible actualizar la cuenta. Ya existe una cuenta con el nombre que intenta guardar'
+    : 'No fue posible actualizar la cuenta. Favor de intentar nuevamente'
+
+  mostrarNotificacionNegativa(errorString, 2100)
 })
 
 function tipoCuentaUpdated(value) {
