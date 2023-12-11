@@ -20,6 +20,8 @@ export const LISTA_REGISTROS = gql`
       importe
       observaciones
       importe
+      cargo
+      abono
       cuenta {
         id
         nombre

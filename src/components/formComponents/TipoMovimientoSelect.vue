@@ -60,7 +60,12 @@
               />
             </q-item-section>
           </q-item>
-          <q-item clickable @click="agregarCategoria" v-if="mostrarCategoria">
+          <q-item
+            clickable
+            @click="agregarCategoria"
+            v-if="mostrarCategoria"
+            v-close-popup
+          >
             <q-item-section class="text-positive-pastel">
               Agregar categoría
             </q-item-section>

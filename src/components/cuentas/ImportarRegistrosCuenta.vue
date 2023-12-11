@@ -38,13 +38,6 @@
                 </template>
               </q-file>
             </div>
-            <q-btn
-              v-if="isSelected"
-              label="Eliminar"
-              @click="eliminarSeleccionados"
-              color="primary"
-              dense
-            />
           </div>
           <q-separator vertical></q-separator>
           <div class="row items-center q-gutter-x-md">
@@ -67,8 +60,16 @@
               ></DateInput>
             </div>
           </div>
+          <q-toolbar-title> </q-toolbar-title>
+          <q-btn
+            color="negative"
+            :disable="!isSelected"
+            icon="las la-trash-alt"
+            label="Eliminar"
+            @click="eliminarSeleccionados"
+            dense
+          />
         </q-toolbar>
-
         <q-page-sticky
           position="top"
           style="z-index: 100; width: 600px"
@@ -140,6 +141,7 @@
             separator="cell"
             selection="multiple"
             v-model:selected="registrosSelected"
+            :selected-rows-label="getSelectedString"
             table-header-class="text-accent text-condensed bg-primary-light"
             no-data-label="No existen datos disponibles"
             hide-pagination
@@ -239,7 +241,7 @@
     </div>
   </div>
   <!-- <div class="col bg-white">
-    <pre>{{ listaRegistrosFiltrados }}</pre>
+    <pre>{{ registrosSelected }}</pre>
   </div> -->
 </template>
 
@@ -359,6 +361,16 @@ async function updateFile(v) {
     console.log(e)
   }
 }
+function getSelectedString() {
+  return registrosSelected.value.length === 0
+    ? ''
+    : `${registrosSelected.value.length} registro${
+        registrosSelected.value.length > 1 ? 's' : ''
+      } seleccionados. Importe: ${formato.toCurrency(
+        importe_seleccionado.value
+      )} `
+  //de ${listaRegistrosFiltrados.value.length}
+}
 function obtenerMovimientosSantander(wb) {
   // get data of first worksheet as an array of objects
   const data = utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {
@@ -447,6 +459,7 @@ function obtenerMovimientosBancomer(wb) {
       const cargo = row.cargo?.replace(',', '')
       const abono = row.abono?.replace(',', '')
       const tipo_afectacion = !!cargo ? 'C' : !!abono ? 'A' : 'N/A'
+      row.consecutivo = index
       const importe = !!cargo
         ? parseFloat(cargo)
         : !!abono
@@ -457,6 +470,7 @@ function obtenerMovimientosBancomer(wb) {
   })
   console.table(listaRegistros.value)
 }
+
 function obtenerMovimientosEfectivo(wb) {
   const data = utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {
     header: ['A', 'B', 'C', 'D', 'E', 'F'],
@@ -689,6 +703,7 @@ function eliminarSeleccionados() {
       listaRegistros.value.splice(index, 1)
     }
   })
+  registrosSelected.value.length = 0
 }
 
 function deleteRow(props) {
@@ -726,6 +741,13 @@ const listaRegistrosFiltrados = computed({
 const sumatoriaMovimientos = computed({
   get() {
     return listaRegistrosFiltrados.value.reduce((accumulator, registro) => {
+      return accumulator + parseFloat(registro.importe)
+    }, 0)
+  }
+})
+const importe_seleccionado = computed({
+  get() {
+    return registrosSelected.value.reduce((accumulator, registro) => {
       return accumulator + parseFloat(registro.importe)
     }, 0)
   }

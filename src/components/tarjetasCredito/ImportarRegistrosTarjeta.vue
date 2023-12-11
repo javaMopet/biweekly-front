@@ -70,7 +70,7 @@
       </q-toolbar>
 
       <transition name="fade">
-        <div class="errors-message bg-pink-1" v-if="isErrors">
+        <div class="errors-message bg-pink-1" v-if="!isErrors">
           <div class="row">
             <div class="col-1">
               <div
@@ -86,6 +86,7 @@
                   >El formulario contiene los siguientes errores:</span
                 >
               </div>
+              <!-- <q-spinner-tail color="blue-grey" /> -->
               <q-list dense>
                 <q-item
                   dense
@@ -97,6 +98,9 @@
                   -> {{ item.message }}
                 </q-item>
               </q-list>
+            </div>
+            <div class="col">
+              <q-spinner-tail color="blue-grey" size="25px" />
             </div>
             <div class="col">
               <div class="column items-end">
@@ -537,6 +541,7 @@ function eliminarSeleccionados() {
       listaRegistrosTarjeta.value.splice(index, 1)
     }
   })
+  registrosSelected.value.length = 0
 }
 
 function deleteRow(props) {
