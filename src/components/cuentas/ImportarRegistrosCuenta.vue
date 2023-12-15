@@ -774,7 +774,6 @@ const columns = [
     headerStyle: 'width:100px;max-width:100px',
     style: 'width:100px;max-width:100px'
   },
-
   {
     name: 'concepto',
     label: 'Concepto',

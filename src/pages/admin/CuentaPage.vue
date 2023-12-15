@@ -140,6 +140,19 @@
           :filter="filter"
           no-data-label="No se han registrado movimientos"
         >
+          <template v-slot:header-selection="scope">
+            <!-- <q-toggle v-model="scope.selected" /> -->
+            <q-checkbox v-model="scope.selected" dense />
+          </template>
+
+          <template v-slot:body-selection="scope">
+            <!-- <q-toggle v-model="scope.selected" :disable="true" /> -->
+            <q-checkbox
+              v-model="scope.selected"
+              :disable="scope.row.disable"
+              dense
+            />
+          </template>
           <template #top-left>
             <q-tr class="cuenta__data-subtitle">
               <div class="table-title">Movimientos del periodo</div>
@@ -274,7 +287,7 @@
         Importe total de movimientos:
         <span> {{ toCurrency(sumaMovimientos) }}</span>
       </div>
-      <!-- <pre>{{ mes }}</pre> -->
+      <!-- <pre>{{ listaRegistros }}</pre> -->
     </div>
   </div>
 
@@ -843,8 +856,10 @@ const columns = [
     label: 'Observaciones',
     field: 'observaciones',
     sortable: true,
-    align: 'left'
-    // style: 'width: 20%'
+    align: 'left',
+    headerStyle: 'width:250px;max-width: 250px',
+    style:
+      'width:250px;max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis'
   },
   {
     name: 'tarjetaCredito',
@@ -854,15 +869,15 @@ const columns = [
     align: 'left',
     headerStyle: 'width: 120px;min-width:120px;max-width:120px'
   },
-  {
-    name: 'tarjetaCredito',
-    label: 'Tarjeta de Crédito',
-    field: (row) => row.registroTarjeta?.fecha,
-    sortable: true,
-    align: 'left',
-    format: (val, row) => (val ? formato.formatoFechaFromISO(val) : ''),
-    headerStyle: 'width: 120px;min-width:120px;max-width:120px'
-  },
+  // {
+  //   name: 'tarjetaCredito',
+  //   label: 'Tarjeta de Crédito',
+  //   field: (row) => row.registroTarjeta?.fecha,
+  //   sortable: true,
+  //   align: 'left',
+  //   format: (val, row) => (val ? formato.formatoFechaFromISO(val) : ''),
+  //   headerStyle: 'width: 120px;min-width:120px;max-width:120px'
+  // },
   {
     name: 'acciones',
     field: 'action',

@@ -29,7 +29,7 @@
           icon="add"
           @click="addItemCategoria(props)"
           dense
-          class="button-new"
+          class="small-button"
           glossy
           push
         >

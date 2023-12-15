@@ -22,6 +22,7 @@ export const LISTA_REGISTROS = gql`
       importe
       cargo
       abono
+      disable
       cuenta {
         id
         nombre

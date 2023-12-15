@@ -38,13 +38,6 @@
               </template>
             </q-file>
           </div>
-          <q-btn
-            v-if="isSelected"
-            label="Eliminar"
-            @click="eliminarSeleccionados"
-            outline
-            color="primary"
-          />
         </div>
         <q-separator vertical></q-separator>
         <div class="row items-center q-gutter-x-md">
@@ -67,10 +60,18 @@
             ></DateInput>
           </div>
         </div>
+        <q-toolbar-title></q-toolbar-title>
+        <q-btn
+          :disable="!isSelected"
+          label="Eliminar"
+          @click="eliminarSeleccionados"
+          outline
+          color="negative"
+        />
       </q-toolbar>
 
       <transition name="fade">
-        <div class="errors-message bg-pink-1" v-if="!isErrors">
+        <div class="errors-message bg-pink-1" v-if="isErrors">
           <div class="row">
             <div class="col-1">
               <div
@@ -82,11 +83,23 @@
             </div>
             <div class="col-10">
               <div class="q-py-sm">
-                <span class="errors-message__title"
-                  >El formulario contiene los siguientes errores:</span
+                <q-linear-progress
+                  query
+                  rounded
+                  color="primary-light"
+                  class="q-mt-sm"
+                  size="8px"
+                  stripe
+                />
+                <div
+                  class="row items-center q-gutter-x-lg"
+                  style="border: 0px solid red"
                 >
+                  <span class="errors-message__title"
+                    >El formulario contiene los siguientes errores:</span
+                  >
+                </div>
               </div>
-              <!-- <q-spinner-tail color="blue-grey" /> -->
               <q-list dense>
                 <q-item
                   dense
@@ -99,9 +112,9 @@
                 </q-item>
               </q-list>
             </div>
-            <div class="col">
+            <!-- <div class="col">
               <q-spinner-tail color="blue-grey" size="25px" />
-            </div>
+            </div> -->
             <div class="col">
               <div class="column items-end">
                 <q-btn
@@ -621,9 +634,9 @@ const columns = [
     field: 'categoria',
     sortable: false,
     filter: false,
-    align: 'left'
-    // style: 'width:450px;max-width:450px',
-    // headerStyle: 'width:450px;max-width:450px'
+    align: 'left',
+    style: 'width:400px;max-width:400px',
+    headerStyle: 'width:400px;max-width:400px'
   },
   {
     name: 'acciones',
@@ -667,7 +680,7 @@ function closeErrors() {
 }
 
 .registro-abono {
-  color: $positive !important;
+  color: $negative-pastel !important;
   font-weight: 500;
 }
 
