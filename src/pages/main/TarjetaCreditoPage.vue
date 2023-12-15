@@ -140,6 +140,7 @@
               ><span class="resumen__valor">{{
                 toCurrencyAbsoluteFormat(cuenta.saldo)
               }}</span>
+              <!-- <pre>{{ cuenta.saldo }}</pre> -->
             </div>
           </div>
           <q-space />
@@ -506,7 +507,7 @@ import PagosTarjeta from 'src/components/tarjetasCredito/PagosTarjeta.vue'
 import MesSelect from 'src/components/formComponents/MesSelect.vue'
 import ImportarRegistrosTarjeta from 'src/components/tarjetasCredito/ImportarRegistrosTarjeta.vue'
 import { useRegistrosTarjetaCrud } from 'src/composables/useRegistrosTarjetaCrud'
-
+import { useCuentasCrud } from 'src/composables/useCuentasCrud'
 import {
   SALDO_TARJETA_CREDITO,
   SALDO_PAGAR_TARJETA_CREDITO
@@ -520,12 +521,14 @@ const router = useRouter()
 const formato = useFormato()
 const notificacion = useNotificacion()
 const $q = useQuasar()
+const cuentaCrud = useCuentasCrud()
 const registrosTarjetaCrud = useRegistrosTarjetaCrud()
 
 const { mostrarNotificacionPositiva, mostrarNotificacionNegativa } =
   useNotificacion()
 
 const { toCurrencyAbsoluteFormat } = useFormato()
+
 /**
  * state
  */
@@ -833,7 +836,8 @@ const saldoPagarTarjetaVariables = reactive({
 
 const {
   onResult: onResultSaldoPagarTarjetaCredito,
-  onError: onErrorSaldoPagarTarjetaCredito
+  onError: onErrorSaldoPagarTarjetaCredito,
+  refetch: refetchSaldoPagarTarjetaCredito
 } = useQuery(
   SALDO_PAGAR_TARJETA_CREDITO,
   saldoPagarTarjetaVariables,
@@ -853,6 +857,7 @@ onErrorSaldoPagarTarjetaCredito((error) => {
 registrosTarjetaCrud.onDoneRegistroTarjetaDelete((response) => {
   console.log('registro eliminado', response)
   loadOrRefetchListaRegistrosTarjeta()
+  refetchSaldoPagarTarjetaCredito()
   showSuccessMessage('eliminó')
 })
 
@@ -860,6 +865,7 @@ registrosTarjetaCrud.onDoneRegistrosTarjetaDelete(({ data }) => {
   mostrarNotificacionPositiva('Los movimientos han sido eliminados.', 2100)
   cuenta.value.saldo = data.registrosTarjetaDelete.saldo
   loadOrRefetchListaRegistrosTarjeta()
+  refetchSaldoPagarTarjetaCredito()
 })
 
 registrosTarjetaCrud.onErrorRegistroTarjetaDelete((error) => {
@@ -1022,14 +1028,19 @@ function registroUpdated() {
 
   showForm.value = false
 }
-function cargaMasivaSaved() {
+function cargaMasivaSaved(cuenta_id) {
   showFormCarga.value = false
+  cuentaCrud.cuentaSaldoUpdate({ cuentaId: cuenta_id })
   notificacion.mostrarNotificacionPositiva(
     'Los movimientos fueron guardados correctamente.',
     900
   )
+  refetchSaldoPagarTarjetaCredito()
   refetchListaRegistros()
 }
+cuentaCrud.onDoneCuentaSaldoUpdate(({ data }) => {
+  cuenta.value.saldo = data.cuentaSaldoUpdate.cuenta.saldo
+})
 function pagosRegistrados() {
   showPagosTarjeta.value = false
   loadOrRefetchListaRegistrosTarjeta()

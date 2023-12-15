@@ -190,9 +190,9 @@
         </template>
       </q-table>
     </q-card-section>
-    <q-card-actions style="border: 0px solid red" class="q-pa-xs">
+    <q-card-actions class="q-pa-xs">
       <div class="row justify-between items-center full-width text-accent">
-        <div class="col-9 q-pl-lg">
+        <div class="col-9 q-pl-xl">
           <table style="border: 0px solid red">
             <tr>
               <td>Total cargos:</td>
@@ -214,7 +214,7 @@
             </tr>
           </table>
         </div>
-        <div class="col-3">
+        <div class="col-2">
           <div class="row justify-center">
             <q-btn flat label="Cancelar" v-close-popup class="q-mr-lg" />
             <q-btn label="Guardar" color="primary-button" @click="saveItems" />
@@ -256,6 +256,7 @@ const isLoading = ref(false)
 const formato = useFormato()
 const notificacion = useNotificacion()
 const { toCurrency } = useFormato()
+
 /**
  * defProperties
  */
@@ -482,12 +483,13 @@ function saveItems() {
     var lista_registros_tarjeta = []
 
     listaRegistroFiltrados.value.forEach((item) => {
+      const importe = item.tipoAfectacion === 'C' ? item.cargo * -1 : item.abono
       const registro = {
         estado_registro_tarjeta_id: 1, //pendiente
         tipo_afectacion: item.tipoAfectacion,
         cuenta_id: props.cuenta.id,
         categoria_id: item.categoria.id,
-        importe: !!item.cargo ? item.cargo : item.abono, //parseFloat(item.importe),
+        importe,
         fecha: item.fecha,
         concepto: item.concepto
       }
@@ -503,8 +505,10 @@ function saveItems() {
       .then((response) => {
         console.log('guardado correctamente')
         console.log('response', response)
+        const cuenta_id = response.data.retorno[0].cuenta_id
+        console.log('cuenta', cuenta_id)
         isLoading.value = false
-        emit('itemsSaved')
+        emit('itemsSaved', cuenta_id)
       })
       .catch((error) => {
         isLoading.value = false
@@ -517,6 +521,7 @@ function saveItems() {
     // console.log('items guardados')
   }
 }
+
 /**
  * Funcion utilizada para validar los movimiento al momento de guardar
  */

@@ -88,9 +88,7 @@
 
                   <div class="text-blue-10 text-bold">
                     <span class="text-subtitle2">{{
-                      formato.toCurrency(
-                        props.row.saldo === 0 ? 0 : props.row.saldo * -1
-                      )
+                      toCurrencyAbsoluteFormat(props.row.saldo)
                     }}</span>
                   </div>
                 </div>
@@ -191,11 +189,11 @@ import { useCuentasCrud } from 'src/composables/useCuentasCrud'
 const $q = useQuasar()
 const notificacion = useNotificacion()
 const router = useRouter()
-const formato = useFormato()
 const cuentaStore = useCuentaStore()
 const registrosTarjetaCrud = useRegistrosTarjetaCrud()
 const cuentasCrud = useCuentasCrud()
 
+const { toCurrencyAbsoluteFormat } = useFormato()
 const { mostrarNotificacionPositiva, mostrarNotificacionNegativa } =
   useNotificacion()
 
