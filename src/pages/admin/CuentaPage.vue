@@ -141,12 +141,10 @@
           no-data-label="No se han registrado movimientos"
         >
           <template v-slot:header-selection="scope">
-            <!-- <q-toggle v-model="scope.selected" /> -->
             <q-checkbox v-model="scope.selected" dense />
           </template>
 
           <template v-slot:body-selection="scope">
-            <!-- <q-toggle v-model="scope.selected" :disable="true" /> -->
             <q-checkbox
               v-model="scope.selected"
               :disable="scope.row.disable"
