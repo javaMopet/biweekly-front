@@ -157,7 +157,7 @@
                       @categoriaSaved="categoriaSaved"
                     ></TipoMovimientoSelect>
                   </div>
-                  <transition name="fade">
+                  <!-- <transition name="fade">
                     <div class="requerido" v-if="!props.row.isValid">
                       <div class="requerido__message">
                         <q-icon
@@ -167,7 +167,7 @@
                         Requerido
                       </div>
                     </div>
-                  </transition>
+                  </transition> -->
                 </div>
               </q-td>
             </template>

@@ -4,7 +4,7 @@
       <div class="row items-center q-ml-sm q-gutter-x-sm">
         <div class="q-pa-md q-gutter-sm">
           <q-breadcrumbs class="breadcrum-component">
-            <q-breadcrumbs-el icon="home" to="/" />
+            <q-breadcrumbs-el icon="home" label="Home" to="/" />
             <q-breadcrumbs-el
               label="Tarjetas de crédito"
               icon="credit_card"
@@ -320,7 +320,9 @@
             <template #bottom-row>
               <q-tr class="text-bold bg-table-summary">
                 <q-td colspan="2">Total meses sin intereses:</q-td>
-                <q-td align="right">{{ formato.toCurrency(suma_msi) }}</q-td>
+                <q-td align="right">{{
+                  formato.toCurrencyAbsoluteFormat(suma_msi)
+                }}</q-td>
                 <q-td colspan="4"></q-td>
               </q-tr>
             </template>
@@ -616,9 +618,7 @@ onResultListaRegistrosTarjeta(({ data }) => {
     listaRegistrosMsi.value = data?.listaRegistrosTarjeta.filter(
       (registro) => registro.isMsi
     )
-    listaRegistrosMsi.value.forEach((registro) => {
-      registro.importe = registro.importe * -1
-    })
+    console.table(listaRegistrosMsi.value)
   }
 })
 
@@ -937,7 +937,7 @@ function deleteItem(props_row) {
   $q.dialog({
     title: 'Confirmar',
     style: 'width:500px',
-    message: `¿Está seguro que desea eliminar el registro con un monto de ${formato.toCurrency(
+    message: `¿Está seguro que desea eliminar el registro con un monto de ${formato.toCurrencyAbsoluteFormat(
       row.importe
     )}?`,
     ok: {
@@ -1016,6 +1016,7 @@ function registroCreated(registro) {
     1200
   )
   refetchListaRegistros()
+  refetchSaldoPagarTarjetaCredito()
   showForm.value = false
 }
 
@@ -1025,7 +1026,7 @@ function registroUpdated() {
     1200
   )
   refetchListaRegistros()
-
+  refetchSaldoPagarTarjetaCredito()
   showForm.value = false
 }
 function cargaMasivaSaved(cuenta_id) {
@@ -1152,11 +1153,11 @@ const columnsMsi = [
   },
   {
     name: 'importe',
-    label: 'Importe',
+    label: 'Importe Total',
     field: 'importe',
     sortable: true,
     align: 'right',
-    format: (val, row) => formato.toCurrency(val),
+    format: (val, row) => formato.toCurrencyAbsoluteFormat(val),
     style: 'width:15%'
   },
   {

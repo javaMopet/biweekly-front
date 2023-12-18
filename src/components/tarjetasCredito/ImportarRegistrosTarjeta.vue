@@ -363,21 +363,25 @@ function cargarMovimientosSantander(wb) {
   //   console.log(d.IMPORTE)
   // })
 
-  todos.value = data.map((row) => ({
-    fecha: row.FECHA.replace(
-      row.FECHA.substring(3, 6),
-      monthsMap.get(row.FECHA.substring(3, 6))
-    ),
-    consecutivo: row.CONSECUTIVO,
-    concepto: row.CONCEPTO,
-    importe: row.IMPORTE
-  }))
+  todos.value = data
+    .filter((row) => {
+      return !!row.FECHA
+    })
+    .map((row) => ({
+      fecha: row.FECHA.replace(
+        row.FECHA.substring(3, 6),
+        monthsMap.get(row.FECHA.substring(3, 6))
+      ),
+      consecutivo: row.CONSECUTIVO,
+      concepto: row.CONCEPTO,
+      importe: row.IMPORTE
+    }))
   todos.value.forEach((row, index) => {
     const importe = parseFloat(row.importe)
     row.cargo = importe > 0 ? importe : 0
     row.abono = importe < 0 ? importe : 0
   })
-  console.table(todos.value)
+  // console.table(todos.value)
   // console.log('datda', todos.value[5])
   crearListaRegistrosTarjeta(todos.value)
 }
@@ -408,7 +412,7 @@ function cargarMovimientosBancomer(wb) {
  * @param {Array} excelData - Datos obtenidos del archivo excel
  */
 function crearListaRegistrosTarjeta(excelData) {
-  console.table(excelData)
+  // console.table(excelData)
   todos.value.forEach((row, index) => {
     const fechaObject = DateTime.fromFormat(row.fecha.toString(), 'dd/MM/yyyy')
     if (fechaObject.isValid) {
@@ -426,7 +430,7 @@ function crearListaRegistrosTarjeta(excelData) {
       listaRegistrosTarjeta.value.push(item)
     }
   })
-  console.table(listaRegistrosTarjeta.value)
+  // console.table(listaRegistrosTarjeta.value)
 }
 /**
  * computed
