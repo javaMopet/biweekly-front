@@ -51,27 +51,11 @@
     <div class="cuenta-content">
       <q-card class="my-card" flat bordered>
         <q-toolbar class="">
-          <div class="row q-gutter-x-sm">
-            <q-select
-              v-model="ejercicio_fiscal"
-              :options="ejercicioFiscalOptions"
-              option-label="nombre"
-              label="Año"
-              dense
-              outlined
-              color="secondary"
-              label-color="dark"
-              @update:model-value="onChangeEjercicio"
-            >
-              <template #prepend>
-                <q-icon name="calendar_month" />
-              </template>
-            </q-select>
-            <MesSelect
-              v-model="mes"
-              @update:model-value="onChangeMes"
-            ></MesSelect>
-          </div>
+          <PeriodoSelect
+            v-model:year="ejercicio_fiscal"
+            v-model:month="mes"
+            @onChangePeriodo="onChangePeriodo"
+          ></PeriodoSelect>
           <q-toolbar-title> </q-toolbar-title>
         </q-toolbar>
         <q-card-actions
@@ -343,6 +327,8 @@ import ImportarRegistrosCuenta from 'src/components/cuentas/ImportarRegistrosCue
 import { useTraspasosCrud } from 'src/composables/useTraspasosCrud'
 import { useCuentaStore } from 'src/stores/common/useCuentaStore'
 import { useCuentasCrud } from 'src/composables/useCuentasCrud'
+import PeriodoSelect from 'src/components/formComponents/PeriodoSelect.vue'
+import { useGeneralStore } from 'src/stores/common/useGeneralStore'
 
 /**
  * composables
@@ -355,26 +341,13 @@ const $q = useQuasar()
 const traspasosCrud = useTraspasosCrud()
 const cuentaStore = useCuentaStore()
 const cuentasCrud = useCuentasCrud()
+const generalStore = useGeneralStore()
 
 const { mostrarNotificacionPositiva, mostrarNotificacionNegativa } =
   useNotificacion()
 
 const { toCurrency } = useFormato()
 
-const mesOptions = ref([
-  { id: 1, nombre: 'Enero' },
-  { id: 2, nombre: 'Febrero' },
-  { id: 3, nombre: 'Marzo' },
-  { id: 4, nombre: 'Abril' },
-  { id: 5, nombre: 'Mayo' },
-  { id: 6, nombre: 'Junio' },
-  { id: 7, nombre: 'Julio' },
-  { id: 8, nombre: 'Agosto' },
-  { id: 9, nombre: 'Septiembre' },
-  { id: 10, nombre: 'Octubre' },
-  { id: 11, nombre: 'Noviembre' },
-  { id: 12, nombre: 'Diciembre' }
-])
 /**
  * state
  */
@@ -422,11 +395,9 @@ onBeforeMount(() => {
  */
 onMounted(() => {
   console.log('On mounted ................')
-
-  mes.value = mesOptions.value.find(
+  mes.value = generalStore.meses.find(
     (mesOption) => mesOption.id === DateTime.now().month
   )
-
   cargarDatosCuenta(route.params.id, true)
 })
 
@@ -713,6 +684,8 @@ function onChangeEjercicio() {
  * Lista de registros de la tarjeta
  */
 function onChangePeriodo() {
+  console.log('Periodo cambiado', ejercicio_fiscal.value, mes.value)
+
   const fechaString = `${ejercicio_fiscal.value}-${('0' + mes.value.id).slice(
     -2
   )}-01`
@@ -806,10 +779,10 @@ cuentasCrud.onDoneCuentaSaldoUpdate(({ data }) => {
 function importarMovimientos() {
   showFormCarga.value = true
 }
-/**
- * cambiar el metodo de obtener ejercicios
- */
-const ejercicioFiscalOptions = ref([2021, 2022, 2023])
+
+// function onChangePeriodo(){
+//   console.log('periodo cambiado',ejercicio_fiscal.value, mes.value)
+// }
 
 const columns = [
   // { name: 'id', label: 'Id', field: 'id', sortable: true, align: 'left' },

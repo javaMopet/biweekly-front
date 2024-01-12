@@ -53,27 +53,11 @@
         >
           <q-toolbar class="" style="border: 0px solid green">
             <div class="row q-gutter-x-sm">
-              <div class="row q-gutter-x-md q-px-md">
-                <q-select
-                  v-model="ejercicio_fiscal"
-                  :options="ejercicioFiscalOptions"
-                  option-label="nombre"
-                  label="Año"
-                  dense
-                  outlined
-                  color="secondary"
-                  label-color="dark"
-                  @update:model-value="onChangeEjercicio"
-                >
-                  <template #prepend>
-                    <q-icon name="calendar_month" />
-                  </template>
-                </q-select>
-                <MesSelect
-                  v-model="mes"
-                  @update:model-value="onChangeMes"
-                ></MesSelect>
-              </div>
+              <PeriodoSelect
+                v-model:year="ejercicio_fiscal"
+                v-model:month="mes"
+                @onChangePeriodo="onChangePeriodo"
+              ></PeriodoSelect>
               <q-separator spaced vertical inset />
               <q-btn
                 color="toolbar-button"
@@ -514,6 +498,7 @@ import {
   SALDO_TARJETA_CREDITO,
   SALDO_PAGAR_TARJETA_CREDITO
 } from 'src/graphql/cuentas'
+import PeriodoSelect from 'src/components/formComponents/PeriodoSelect.vue'
 
 /**
  * composables
@@ -961,23 +946,22 @@ function deleteItem(props_row) {
 }
 
 function obtenerFechasInicialFinal() {
+  let mesInicio = mes.value.id - 1
+  let ejercicioFiscal = ejercicio_fiscal.value
+  if (!mesInicio) {
+    mesInicio = 12
+    ejercicioFiscal = ejercicio_fiscal.value - 1
+  }
   const dia_inicio = ('0' + (cuenta.value.dia_corte + 1)).slice(-2)
   const dia_fin = ('0' + cuenta.value.dia_corte).slice(-2)
-  listaRegistrosVariables.fechaInicio = `${ejercicio_fiscal.value}-${(
-    '0' +
-    (mes.value.id - 1)
+  listaRegistrosVariables.fechaInicio = `${ejercicioFiscal}-${(
+    '0' + mesInicio
   ).slice(-2)}-${dia_inicio}`
+  console.log('fechaInicio', listaRegistrosVariables.fechaInicio)
   listaRegistrosVariables.fechaFin = `${ejercicio_fiscal.value}-${(
     '0' + mes.value.id
   ).slice(-2)}-${dia_fin}`
-}
-
-function onChangeMes(mes) {
-  onChangePeriodo()
-}
-
-function onChangeEjercicio(ejercicio_fiscal) {
-  onChangePeriodo()
+  console.log('fechaFin', listaRegistrosVariables.fechaFin)
 }
 
 function onChangePeriodo() {
