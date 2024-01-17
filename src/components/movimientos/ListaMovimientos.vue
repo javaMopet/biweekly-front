@@ -17,8 +17,71 @@
         </div>
       </div></DialogTitle
     >
+
     <div class="main-content q-py-lg">
       <div class="cuenta-content">
+        <transition name="fade">
+          <div class="errors-message bg-pink-1" v-if="!isErrors">
+            <div class="row">
+              <div class="col-1">
+                <div
+                  class="row justify-center items-start q-pt-md"
+                  style="height: 100%"
+                >
+                  <q-icon name="warning" size="3rem" color="negative" />
+                </div>
+              </div>
+              <div class="col-10">
+                <div class="q-py-sm">
+                  <q-linear-progress
+                    query
+                    rounded
+                    color="primary-light"
+                    class="q-mt-sm"
+                    size="8px"
+                    stripe
+                  />
+                  <div
+                    class="row items-center q-gutter-x-lg"
+                    style="border: 0px solid red"
+                  >
+                    <span class="errors-message__title"
+                      >El formulario contiene los siguientes errores:</span
+                    >
+                  </div>
+                </div>
+                <q-list dense>
+                  <q-item
+                    dense
+                    v-for="item in errorItems"
+                    :key="item.id"
+                    class="errors-message__item"
+                  >
+                    {{
+                      !item.numeroLinea ? '' : `No. Línea ${item.numeroLinea}`
+                    }}
+                    -> {{ item.message }}
+                  </q-item>
+                </q-list>
+              </div>
+              <!-- <div class="col">
+              <q-spinner-tail color="blue-grey" size="25px" />
+            </div> -->
+              <div class="col">
+                <div class="column items-end">
+                  <q-btn
+                    color="primary"
+                    icon="close"
+                    dense
+                    flat
+                    class="errors-message__closeBtn"
+                    @click="closeErrors"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </transition>
         <q-card-section>
           <div class="row q-gutter-md text-primary">
             <span class="">Periodo:</span
@@ -58,6 +121,7 @@
                     dense
                   />
                   <q-toolbar-title></q-toolbar-title>
+
                   <!--  -->
                   <div
                     v-if="isEditing"
@@ -131,16 +195,14 @@
                 <div class="row justify-start">
                   <q-btn
                     v-if="!editingItem"
-                    icon="save"
+                    color="primary"
+                    label="Agregar"
                     @click="saveItem"
-                    dense
                     no-caps
-                    class="button-save"
-                    round
-                    flat
-                  >
-                    <q-tooltip :offset="[10, 10]"> Guardar </q-tooltip>
-                  </q-btn>
+                    rounded
+                    dense
+                  />
+
                   <q-btn
                     v-else
                     class="button-save"
@@ -224,13 +286,18 @@ import DialogTitle from '../formComponents/modal/DialogTitle.vue'
  */
 const formato = useFormato()
 const registrosCrud = useRegistrosCrud()
-const notificacion = useNotificacion()
+const {
+  mostrarNotificacionPositiva,
+  mostrarNotificacionNegativa,
+  mostrarNotificacionInformativa
+} = useNotificacion()
 const $q = useQuasar()
 
 /**
  * state
  */
 const categoria = ref({})
+const errorItems = ref([])
 const listaEncabezado = ref([])
 const listaRegistros = ref([])
 const errorsList = ref([])
@@ -326,12 +393,14 @@ function editItem(props) {
       : parseFloat(row.importe)
 
   const fecha = formato.convertDateFromIsoToInput(row.fecha)
+
   formItem.value = {
     fecha,
     importe: importe.toString(),
     cuenta: row.cuenta,
     observaciones: row.observaciones
   }
+  console.log('estableciendo formItem', formItem.value)
 }
 
 function entradaValida() {
@@ -339,11 +408,20 @@ function entradaValida() {
   const importe = parseFloat(formItem.value.importe)
   if (!importe || importe === 0) {
     errors.value.isPriceError = true
-    setTimeout(() => {
-      errors.value.isPriceError = false
-    }, 2500)
+    // setTimeout(() => {
+    //   errors.value.isPriceError = false
+    // }, 2500)
+    mostrarNotificacionNegativa('Favor de ingresar el precio', 1200, 'top')
   }
-
+  const cuentaBancariaId = formItem.value.cuenta?.id || null
+  if (!cuentaBancariaId) {
+    errors.value.is
+    mostrarNotificacionNegativa(
+      'Favor de ingresar la cuenta bancaria',
+      1200,
+      'top'
+    )
+  }
   return !errors.value.isPriceError
 }
 
@@ -356,7 +434,11 @@ function cancelEditItem() {
 function inicializarFormulario() {
   formItem.value = { ...defaultFormItem }
   inicializarFecha()
-  formItem.value.importe = categoria.value.importeDefault?.toString() ?? ''
+
+  let importe = categoria.value.importeDefault?.toString() ?? ''
+  importe = importe === 0 || importe === '0' ? '' : importe
+
+  formItem.value.importe = importe
   formItem.value.cuenta = categoria.value.cuentaDefault
   formItem.value.observaciones = categoria.value.descripcion
 }
@@ -401,9 +483,7 @@ registrosCrud.onErrorRegistrosDelete((error) => {
 })
 registrosCrud.onDoneRegistrosDelete(({ data }) => {
   console.log('data', data)
-  notificacion.mostrarNotificacionPositiva(
-    'los registros se eliminaron correctamente'
-  )
+  mostrarNotificacionPositiva('los registros se eliminaron correctamente')
   selectedItems.value = []
   reloadListaRegistros()
 })
@@ -486,20 +566,14 @@ function afterSaveItem(tipoRegistro, itemSaved) {
   console.log('item saved')
   // row_to_insert.value.saved = true
   listaRegistros.value.push(itemSaved)
-  notificacion.mostrarNotificacionPositiva(
-    `El registro se guardado correctamente.`,
-    1500
-  )
+  mostrarNotificacionPositiva(`El registro se guardado correctamente.`, 1500)
   emit('registroCreated', itemSaved)
   inicializarFormulario()
 }
 function afterUpdateItem(itemUpdated) {
   // const rowIndex = editingItem.value.rowIndex
   // listaRegistros.value[rowIndex] = itemUpdated
-  notificacion.mostrarNotificacionPositiva(
-    `El registro se actualizó correctamente.`,
-    1500
-  )
+  mostrarNotificacionPositiva(`El registro se actualizó correctamente.`, 1500)
   reloadListaRegistros()
   emit('registroUpdated', itemUpdated)
   editingItem.value = null
@@ -612,6 +686,12 @@ const periodoFormato = computed({
     )} Al: ${formato.convertDateFromIsoToInput(props.cellData.fecha_fin)}`
   }
 })
+
+const isErrors = computed({
+  get() {
+    return errorItems.value.length > 0
+  }
+})
 // const importeValido = ref(true)
 
 const isImporteValido = (importeValido) => {
@@ -680,6 +760,10 @@ function buscarMovimientos() {
 </script>
 
 <style lang="scss" scoped>
+.tarjeta__resumen-valor {
+  font-size: 0.8rem;
+}
+
 .myClass {
   &:hover {
     background-color: white;

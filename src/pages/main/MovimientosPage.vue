@@ -274,6 +274,7 @@
         </q-td>
       </template>
     </q-table>
+    <!-- <pre>{{ cellData }}</pre> -->
   </div>
 
   <Teleport to="#modal">

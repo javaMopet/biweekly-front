@@ -60,7 +60,7 @@ const emit = defineEmits(['update:modelValue', 'blur'])
 const props = defineProps({
   modelValue: {
     type: String,
-    default: '0.00'
+    default: ''
   },
   currencyCode: {
     type: String,

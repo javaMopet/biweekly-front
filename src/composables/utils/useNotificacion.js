@@ -16,9 +16,9 @@ export function useNotificacion() {
   }
   // progress: true,
 
-  const mostrarNotificacionNegativa = (message, timeout) => {
+  const mostrarNotificacionNegativa = (message, timeout, position) => {
     $q.notify({
-      position: 'center',
+      position,
       type: 'negative',
       message,
       timeout

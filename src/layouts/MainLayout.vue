@@ -17,9 +17,8 @@
           width="380px"
         /> -->
         <q-toolbar-title class="font-title"> </q-toolbar-title>
-        <span class="q-pr-sm text-bold" v-if="user"
-          >{{ user.id }}{{ user.name }}</span
-        >
+        <span class="q-pr-sm text-bold" v-if="user">{{ user.name }}</span>
+        <!-- {{ user.id }} -->
         <q-btn
           icon="account_circle"
           @click="onClickAccount"
@@ -160,6 +159,7 @@ function logout() {
     )
   }
 }
+
 function onClickAccount() {}
 
 // onResult(({ data }) => {
