@@ -51,13 +51,14 @@ module.exports = configure(function (/* ctx */) {
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#build
     build: {
-      // extendViteConf(viteConf) {
-      //   viteConf.define = {
-      //     'globalThis.process.env.NODE_ENV': JSON.stringify(
-      //       process.env.NODE_ENV
-      //     )
-      //   }
-      // },
+      extendViteConf(viteConf) {
+        viteConf.define.__VUE_PROD_HYDRATION_MISMATCH_DETAILS__ = false
+        //   viteConf.define = {
+        //     'globalThis.process.env.NODE_ENV': JSON.stringify(
+        //       process.env.NODE_ENV
+        //     )
+        //   }
+      },
       // Para solucionar bug en linea 'development' === 'production' en el graphql
       rawDefine: {
         'globalThis.process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)

@@ -1,5 +1,8 @@
 <template>
-  <div style="z-index: 5">
+  <div
+    style="z-index: 5"
+    :class="[errorActive ? 'input-error' : 'input-no-error']"
+  >
     <q-input
       v-model="inputValue"
       type="text"
@@ -9,7 +12,7 @@
       placeholder="0.00"
       ref="inputEditing"
       outlined
-      color="positive"
+      color="secondary"
       dense
       :label="label"
       :readonly="readonly"
@@ -17,12 +20,16 @@
       lazy-rules
       :rules="rules"
     >
+      <!-- @blur="onBlurInput" -->
       <template #append>
         <div class="text-subtitle1">{{ editingLabel }}</div>
       </template>
+      <!-- <template #after>
+        <pre> {{ errorActive }}</pre>
+      </template> -->
     </q-input>
     <transition name="fade">
-      <div class="level2" v-if="isError">
+      <div class="level2" v-if="errorActive">
         <div class="level1">
           <div class="price-error">Ingresar un precio distinto de 0</div>
         </div>
@@ -32,7 +39,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, toRef, watch, watchEffect } from 'vue'
 import { formatMoney } from 'accounting-js'
 /**
  * state
@@ -41,6 +48,7 @@ const selectedCurrency = ref({})
 const editing = ref(false)
 const localValue = ref(0)
 const inputEditing = ref()
+const errorActive = ref(false)
 
 const inputValue = computed({
   get() {
@@ -55,7 +63,7 @@ const inputValue = computed({
 /**
  * emits
  */
-const emit = defineEmits(['update:modelValue', 'blur'])
+const emit = defineEmits(['update:modelValue', 'update:isError', 'blur'])
 
 const props = defineProps({
   modelValue: {
@@ -104,15 +112,54 @@ const props = defineProps({
     default: false
   }
 })
+
+// const { isError } = toRefs(props)
+const isErrors = toRef(props.isError)
+// watch(
+//   () => props.isError,
+//   (newValue, oldValue) => {
+//     console.log('CAMBIANDO IS ERROR', oldValue, newValue)
+//   }
+// )
+watchEffect(() => {
+  errorActive.value = props.isError
+  // setTimeout(() => {
+  //   errorActive.value = false
+  //   isErrors.value = false
+  //   emit('update:isError', false)
+  // }, 3000)
+})
 /**
  * computed
  */
+
+const isErrores = computed({
+  get() {
+    return props.isError
+  },
+  set(val) {
+    // isErrores.value = val
+    emit('update:isError', val)
+  }
+})
 
 const editingLabel = computed({
   get() {
     return selectedCurrency.value.code
   }
 })
+
+// watch(
+//   () => props.isError,
+//   (newValue, oldValue) => {
+//     console.log('CAMBIO LA PROPIEDAD is error', oldValue, newValue)
+//     isErrores.value = newValue
+//     setTimeout(() => {
+//       console.log('CAMBIO LA PROPIEDAD is error', false)
+//       isErrores.value = false
+//     }, 2500)
+//   }
+// )
 
 /**
  * onMounted
@@ -124,16 +171,29 @@ onMounted(() => {
 
   localValue.value = props.modelValue
 
+  // isError.value = toRef(props.isError)
+
   setCurrency(props.currencyCode)
 
   onBlur()
 })
 function onBlur(e) {
+  console.log('onblur input')
   editing.value = false
   emit('blur')
+  isErrores.value = false
+  validar()
 }
 function onFocus() {
   editing.value = true
+}
+
+function validar() {
+  console.log('validando el precio', inputValue.value)
+  errorActive.value = false
+  if (inputValue.value === '$0.00') {
+    errorActive.value = true
+  }
 }
 
 var currenciesOpts = {
@@ -214,5 +274,16 @@ function setCurrency(code) {
     position: relative;
     top: -25px;
   }
+}
+.input-no-error {
+  border: 1px solid $positive;
+  border-radius: 4px;
+  padding: 1px;
+}
+.input-error {
+  border: 1px solid red;
+  border-radius: 4px;
+  padding: 1px;
+  transition: all 0.1s ease-out;
 }
 </style>

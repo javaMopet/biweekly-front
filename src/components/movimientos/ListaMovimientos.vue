@@ -20,7 +20,7 @@
 
     <div class="main-content q-py-lg">
       <div class="cuenta-content">
-        <transition name="fade">
+        <!-- <transition name="fade">
           <div class="errors-message bg-pink-1" v-if="!isErrors">
             <div class="row">
               <div class="col-1">
@@ -64,9 +64,6 @@
                   </q-item>
                 </q-list>
               </div>
-              <!-- <div class="col">
-              <q-spinner-tail color="blue-grey" size="25px" />
-            </div> -->
               <div class="col">
                 <div class="column items-end">
                   <q-btn
@@ -81,7 +78,7 @@
               </div>
             </div>
           </div>
-        </transition>
+        </transition> -->
         <q-card-section>
           <div class="row q-gutter-md text-primary">
             <span class="">Periodo:</span
@@ -160,10 +157,13 @@
             </template>
             <template #header-cell-importe="props">
               <q-th :props="props">
+                <!-- Precio -->
+                <!-- :is-error="errors.isPriceError" -->
                 <PriceInput
                   v-model="formItem.importe"
                   :autofocus="true"
                   :is-error="errors.isPriceError"
+                  ref="inputPrecio"
                 ></PriceInput>
               </q-th>
             </template>
@@ -280,6 +280,7 @@ import { useRegistrosCrud } from 'src/composables/useRegistrosCrud'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { SessionStorage, useQuasar } from 'quasar'
 import DialogTitle from '../formComponents/modal/DialogTitle.vue'
+import { toast } from 'vue3-toastify'
 
 /**
  * composables
@@ -297,6 +298,7 @@ const $q = useQuasar()
  * state
  */
 const categoria = ref({})
+const inputPrecio = ref()
 const errorItems = ref([])
 const listaEncabezado = ref([])
 const listaRegistros = ref([])
@@ -403,26 +405,38 @@ function editItem(props) {
   console.log('estableciendo formItem', formItem.value)
 }
 
-function entradaValida() {
-  errors.value.isPriceError = false
+function entradaNoValida() {
+  // errors.value.isPriceError = false
   const importe = parseFloat(formItem.value.importe)
-  if (!importe || importe === 0) {
-    errors.value.isPriceError = true
-    // setTimeout(() => {
-    //   errors.value.isPriceError = false
-    // }, 2500)
-    mostrarNotificacionNegativa('Favor de ingresar el precio', 1200, 'top')
-  }
+  errors.value.isPriceError = false
+  errors.value.isPriceError = !importe || importe === 0
+
+  console.log(errors.value.isPriceError)
+
+  // if (!importe || importe === 0) {
+  //   errors.value.isPriceError = !errors.value.isPriceError
+  // setTimeout(() => {
+  //   errors.value.isPriceError = false
+  // }, 2500)
+  // mostrarNotificacionNegativa('', 1200, 'top')
+  // toast.error('Favor de ingresar el precio !', {
+  //   autoClose: 1800
+  // }) // ToastOptions
+  // }
   const cuentaBancariaId = formItem.value.cuenta?.id || null
-  if (!cuentaBancariaId) {
-    errors.value.is
-    mostrarNotificacionNegativa(
-      'Favor de ingresar la cuenta bancaria',
-      1200,
-      'top'
-    )
-  }
-  return !errors.value.isPriceError
+  errors.value.isCuentaError = !cuentaBancariaId
+  // if (!cuentaBancariaId) {
+  //   errors.value.is
+  // mostrarNotificacionNegativa(
+  //   '',
+  //   1200,
+  //   'top'
+  // )
+  // toast.error('Favor de ingresar la cuenta bancaria!', {
+  //   autoClose: 2800
+  // }) // ToastOptions
+  // }
+  return errors.value.isPriceError || errors.value.isCuentaError
 }
 
 function cancelEditItem() {
@@ -499,7 +513,7 @@ function inicializarFecha() {
  */
 
 function saveItem() {
-  if (entradaValida()) {
+  if (!entradaNoValida()) {
     if (['1', '2'].includes(categoria.value.tipoMovimiento.id)) {
       const tipoAfectacion =
         categoria.value.tipoMovimiento.id === '1' ? 'A' : 'C'
@@ -526,6 +540,8 @@ function saveItem() {
         registrosCrud.createRegistro({ input })
       }
     }
+  } else {
+    console.log('Existen errores de validacion')
   }
 }
 
