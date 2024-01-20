@@ -188,12 +188,12 @@ function onFocus() {
   editing.value = true
 }
 
-function validar() {
+const validar = () => {
   console.log('validando el precio', inputValue.value)
-  errorActive.value = false
-  if (inputValue.value === '$0.00') {
-    errorActive.value = true
-  }
+  // errorActive.value = false
+  // if (inputValue.value === '$0.00') {
+  //   errorActive.value = true
+  // }
 }
 
 var currenciesOpts = {

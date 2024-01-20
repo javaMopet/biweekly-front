@@ -20,65 +20,6 @@
 
     <div class="main-content q-py-lg">
       <div class="cuenta-content">
-        <!-- <transition name="fade">
-          <div class="errors-message bg-pink-1" v-if="!isErrors">
-            <div class="row">
-              <div class="col-1">
-                <div
-                  class="row justify-center items-start q-pt-md"
-                  style="height: 100%"
-                >
-                  <q-icon name="warning" size="3rem" color="negative" />
-                </div>
-              </div>
-              <div class="col-10">
-                <div class="q-py-sm">
-                  <q-linear-progress
-                    query
-                    rounded
-                    color="primary-light"
-                    class="q-mt-sm"
-                    size="8px"
-                    stripe
-                  />
-                  <div
-                    class="row items-center q-gutter-x-lg"
-                    style="border: 0px solid red"
-                  >
-                    <span class="errors-message__title"
-                      >El formulario contiene los siguientes errores:</span
-                    >
-                  </div>
-                </div>
-                <q-list dense>
-                  <q-item
-                    dense
-                    v-for="item in errorItems"
-                    :key="item.id"
-                    class="errors-message__item"
-                  >
-                    {{
-                      !item.numeroLinea ? '' : `No. Línea ${item.numeroLinea}`
-                    }}
-                    -> {{ item.message }}
-                  </q-item>
-                </q-list>
-              </div>
-              <div class="col">
-                <div class="column items-end">
-                  <q-btn
-                    color="primary"
-                    icon="close"
-                    dense
-                    flat
-                    class="errors-message__closeBtn"
-                    @click="closeErrors"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </transition> -->
         <q-card-section>
           <div class="row q-gutter-md text-primary">
             <span class="">Periodo:</span
@@ -145,35 +86,37 @@
               </q-td>
             </template>
             <template #header-cell-fecha="props">
-              <q-th :props="props" class="bg-white"
-                ><DateInput
+              <q-th :props="props" class="bg-white">
+                <!-- Fecha -->
+                <InputDate
                   v-model="formItem.fecha"
                   lbl_field="Fecha"
                   :optional="false"
                   :rango-fecha-inicio="categoria.fecha_inicio_formato"
                   :rango-fecha-fin="categoria.fecha_fin_formato"
-                ></DateInput
+                  ref="inputDate"
+                ></InputDate
               ></q-th>
             </template>
             <template #header-cell-importe="props">
               <q-th :props="props">
                 <!-- Precio -->
-                <!-- :is-error="errors.isPriceError" -->
-                <PriceInput
+                <InputPrice
                   v-model="formItem.importe"
                   :autofocus="true"
-                  :is-error="errors.isPriceError"
                   ref="inputPrecio"
-                ></PriceInput>
+                ></InputPrice>
               </q-th>
             </template>
             <template #header-cell-cuenta="props">
               <q-th :props="props">
-                <CuentaSelect
+                <!-- Cuenta -->
+                <SelectCuenta
                   v-model="formItem.cuenta"
                   :agregar="false"
                   :filter-array="['1', '2']"
-                ></CuentaSelect>
+                  ref="selectCuenta"
+                ></SelectCuenta>
               </q-th>
             </template>
             <template #header-cell-observaciones="props">
@@ -257,9 +200,13 @@
               {{ formato.toCurrency(sumatoriaRegistros) }}</span
             >
           </div>
-          <div class="row inline justify-between items-center fit q-pa-md">
-            <div class=""></div>
-          </div>
+          <!-- <div class="row inline justify-between items-center fit q-pa-md">
+            <div class="">
+              <div class="">
+                <pre>{{ formItem.importe }}</pre>
+              </div>
+            </div>
+          </div> -->
         </q-card-actions>
       </div>
     </div>
@@ -270,10 +217,10 @@
 import { ref, onMounted, computed } from 'vue'
 import { useLazyQuery, useQuery } from '@vue/apollo-composable'
 import DateInput from '../formComponents/DateInput.vue'
+import InputPrice from '../formComponents/InputPrice.vue'
 import { DateTime } from 'luxon'
 import { LISTA_REGISTROS } from 'src/graphql/registros'
 import { CATEGORIA_BY_ID } from 'src/graphql/categorias'
-import PriceInput from '../formComponents/PriceInput.vue'
 import { useFormato } from 'src/composables/utils/useFormato'
 import CuentaSelect from '../formComponents/CuentaSelect.vue'
 import { useRegistrosCrud } from 'src/composables/useRegistrosCrud'
@@ -281,6 +228,8 @@ import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { SessionStorage, useQuasar } from 'quasar'
 import DialogTitle from '../formComponents/modal/DialogTitle.vue'
 import { toast } from 'vue3-toastify'
+import SelectCuenta from '../formComponents/SelectCuenta.vue'
+import InputDate from '../formComponents/InputDate.vue'
 
 /**
  * composables
@@ -297,10 +246,13 @@ const $q = useQuasar()
 /**
  * state
  */
+const hijoRef = ref(null)
+
 const categoria = ref({})
-const inputPrecio = ref()
+const inputDate = ref(null)
+const inputPrecio = ref(null)
+const selectCuenta = ref(null)
 const errorItems = ref([])
-const listaEncabezado = ref([])
 const listaRegistros = ref([])
 const errorsList = ref([])
 const defaultFormItem = {
@@ -309,10 +261,13 @@ const defaultFormItem = {
   cuenta: null,
   observaciones: ''
 }
+
 const formItem = ref({ ...defaultFormItem })
+
 const errors = ref({
   isPriceError: false
 })
+
 const selectedItems = ref([])
 const editingItem = ref(null)
 
@@ -330,6 +285,7 @@ const emit = defineEmits(['registroCreated', 'registroUpdated'])
 
 onMounted(() => {
   inicializarFormulario()
+  // hijoRef.value = this.$refs.hijoRef
 })
 
 const columns = [
@@ -404,6 +360,15 @@ function editItem(props) {
   }
   console.log('estableciendo formItem', formItem.value)
 }
+const validarEntrada = () => {
+  const validarDate = inputDate.value.validar()
+  console.log('despues de validar date', validarDate)
+  const validar = inputPrecio.value.validar()
+  console.log('despues de validar', validar)
+  const validarCuenta = selectCuenta.value.validar()
+  console.log('despues de validar Cuenta', validarCuenta)
+  return false
+}
 
 function entradaNoValida() {
   // errors.value.isPriceError = false
@@ -413,6 +378,8 @@ function entradaNoValida() {
 
   console.log(errors.value.isPriceError)
 
+  const validar = inputPrecio.value.validar()
+  console.log('despues de validar', validar)
   // if (!importe || importe === 0) {
   //   errors.value.isPriceError = !errors.value.isPriceError
   // setTimeout(() => {
@@ -513,7 +480,7 @@ function inicializarFecha() {
  */
 
 function saveItem() {
-  if (!entradaNoValida()) {
+  if (validarEntrada()) {
     if (['1', '2'].includes(categoria.value.tipoMovimiento.id)) {
       const tipoAfectacion =
         categoria.value.tipoMovimiento.id === '1' ? 'A' : 'C'
