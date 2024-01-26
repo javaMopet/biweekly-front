@@ -38,7 +38,7 @@
   <transition name="fade">
     <div class="level2" v-if="containsError">
       <div class="level1">
-        <div class="price-error">Campo requerido. Favor seleccionar.</div>
+        <div class="price-error">Requerido.</div>
       </div>
     </div>
   </transition>
@@ -119,8 +119,9 @@ export default {
     })
     function dateSelected(value, reason, details) {
       console.log('seleccionado', value, reason, details)
-      if (!!value) {
-        popUpDate.value.hide()
+      popUpDate.value.hide()
+      if (!value) {
+        valor_fecha.value = ''
       }
     }
     /**

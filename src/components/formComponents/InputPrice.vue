@@ -27,7 +27,7 @@
     <transition name="fade">
       <div class="level2" v-if="containsError">
         <div class="level1">
-          <div class="price-error">Ingresar un precio distinto de 0</div>
+          <div class="price-error">Precio distinto de 0</div>
         </div>
       </div>
     </transition>
