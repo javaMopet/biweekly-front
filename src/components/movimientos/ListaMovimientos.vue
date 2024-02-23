@@ -281,7 +281,11 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['registroCreated', 'registroUpdated'])
+const emit = defineEmits([
+  'registroCreated',
+  'registroUpdated',
+  'registroDeleted'
+])
 
 onMounted(() => {
   inicializarFormulario()
@@ -359,15 +363,6 @@ function editItem(props) {
     observaciones: row.observaciones
   }
   console.log('estableciendo formItem', formItem.value)
-}
-const validarEntrada = () => {
-  const validarDate = inputDate.value.validar()
-  console.log('despues de validar date', validarDate)
-  const validar = inputPrecio.value.validar()
-  console.log('despues de validar', validar)
-  const validarCuenta = selectCuenta.value.validar()
-  console.log('despues de validar Cuenta', validarCuenta)
-  return false
 }
 
 function entradaNoValida() {
@@ -467,6 +462,7 @@ registrosCrud.onDoneRegistrosDelete(({ data }) => {
   mostrarNotificacionPositiva('los registros se eliminaron correctamente')
   selectedItems.value = []
   reloadListaRegistros()
+  emit('registroDeleted', data.registrosDelete.cuentasIds)
 })
 
 function inicializarFecha() {
@@ -510,6 +506,16 @@ function saveItem() {
   } else {
     console.log('Existen errores de validacion')
   }
+}
+const validarEntrada = () => {
+  const validarDate = inputDate.value.validar()
+  console.log('despues de validar date', validarDate)
+  const validar = inputPrecio.value.validar()
+  console.log('despues de validar', validar)
+  const validarCuenta = selectCuenta.value.validar()
+  console.log('despues de validar Cuenta', validarCuenta)
+  let validarEntrada = validarDate && validar && validarCuenta
+  return validarEntrada
 }
 
 function isInputItemValid(row) {
@@ -640,6 +646,8 @@ onResultListaRegistros(({ data }) => {
       element.importe = element.importe.toString()
       element.saved = true
     })
+  } else {
+    listaRegistros.value.length = 0
   }
 })
 

@@ -476,6 +476,7 @@
       ></PagosTarjeta>
     </q-dialog>
   </Teleport>
+  <pre>{{ fechaInicioPeriodo }}</pre>
 </template>
 
 <script setup>
@@ -689,12 +690,22 @@ const mes_final_id = computed({
 })
 const fechaInicioPeriodo = computed({
   get() {
+    let mesInicio = 0
+    let anioInicio = 0
+
+    if (mes.value.id - 1 <= 0) {
+      mesInicio = 12
+      anioInicio = ejercicio_fiscal.value - 1
+    } else {
+      mesInicio = mes.value.id
+      anioInicio = ejercicio_fiscal.value
+    }
+
     const dia_inicio = ('0' + (cuenta.value.dia_corte + 1)).slice(-2)
-    return `${ejercicio_fiscal.value}-${('0' + (mes.value.id - 1)).slice(
-      -2
-    )}-${dia_inicio}`
+    return `${anioInicio}-${('0' + mesInicio).slice(-2)}-${dia_inicio}`
   }
 })
+
 const fechaFinPeriodo = computed({
   get() {
     const dia_fin = ('0' + cuenta.value.dia_corte).slice(-2)

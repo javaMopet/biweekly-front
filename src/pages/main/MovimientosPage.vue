@@ -300,6 +300,8 @@
       <ListaMovimientos
         :cell-data="cellData"
         @registro-created="onRegistroCreated"
+        @registro-updated="onRegistroUpdated"
+        @registro-deleted="onRegistroDeleted"
       ></ListaMovimientos>
     </q-dialog>
     <q-dialog
@@ -666,6 +668,13 @@ function onRegistroCreated(itemCreated) {
   // show_movimientos.value = false
   cargarDatos()
 }
+function onRegistroUpdated(itemUpdated) {
+  cargarDatos()
+}
+function onRegistroDeleted(cuentasIds) {
+  cargarDatos()
+}
+
 function onChangeMes(value) {
   obtenerColumnas(ejercicio_fiscal.value, value.id)
 }
