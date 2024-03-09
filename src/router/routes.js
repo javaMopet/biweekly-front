@@ -1,7 +1,7 @@
 const routes = [
   {
     path: '',
-    redirect: 'home'
+    redirect: 'login'
   },
   {
     path: '/login',
@@ -13,6 +13,7 @@ const routes = [
     component: () => import('layouts/MainLayout.vue'),
     children: [
       { path: '', component: () => import('src/pages/HomePage.vue') },
+      { path: '/main', component: () => import('src/pages/HomeMainPage.vue') },
       {
         path: '/movimientos',
         component: () => import('src/pages/main/MovimientosPage.vue')
@@ -82,8 +83,10 @@ const routes = [
     ]
   },
   {
-    path: '/:catchAll(.*)*',
+    //path: '/:catchAll(.*)*',
+    path: '/:notFound',
     component: () => import('pages/ErrorNotFound.vue')
+    //redirect: '/'
   }
 ]
 
