@@ -396,15 +396,16 @@ function cargarMovimientosBancomer(wb) {
     skipHeader: true,
     raw: false
   })
-
+  console.log('data.map', data)
   todos.value = data.map((row, index) => ({
     fecha: row.FECHA,
     consecutivo: index,
     concepto: row.DESCRIPCION,
-    cargo: row.CARGO?.replace(',', '') ?? 0,
-    abono: row.ABONO?.replace(',', '') ?? 0,
+    cargo: row.CARGO === '' ? 0 : row.CARGO?.replace(',', '') ?? 0,
+    abono: row.ABONO === '' ? 0 : row.ABONO?.replace(',', '') ?? 0,
     saldo: row.SALDO?.replace(',', '') ?? 0
   }))
+  console.log('todos.value', todos.value)
   crearListaRegistrosTarjeta(todos.value)
 }
 /**
@@ -413,7 +414,7 @@ function cargarMovimientosBancomer(wb) {
  */
 function crearListaRegistrosTarjeta(excelData) {
   // console.table(excelData)
-  todos.value.forEach((row, index) => {
+  excelData.forEach((row, index) => {
     const fechaObject = DateTime.fromFormat(row.fecha.toString(), 'dd/MM/yyyy')
     if (fechaObject.isValid) {
       const item = {

@@ -1,1 +1,0 @@
-import{aI as e,ag as a,aK as s,aq as o}from"./index.20d4ad85.js";const t={},r=o("div",{class:"row text-h1"},"Usuarios",-1),c=[r];function n(_,i){return a(),s("div",null,c)}var l=e(t,[["render",n]]);export{l as default};
