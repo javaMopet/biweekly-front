@@ -34,7 +34,7 @@ export default route(function (/* { store, ssrContext } */) {
     // quasar.conf.js -> build -> publicPath
     history: createHistory(process.env.VUE_ROUTER_BASE)
   })
-  /*
+
   Router.beforeEach((to, from) => {
     console.log('to an from ', to, from)
     const publicPages = ['/login', '/403', '/']
@@ -52,7 +52,7 @@ export default route(function (/* { store, ssrContext } */) {
         return '/'
       }
     }
-  })*/
+  })
 
   return Router
 })

@@ -4,10 +4,13 @@ const routes = [
     redirect: 'login'
   },
   {
+    path: '/index.html',
+    redirect: '/home/main'
+  },
+  {
     path: '/login',
     component: () => import('pages/LoginPage.vue')
   },
-
   {
     path: '/home',
     component: () => import('layouts/MainLayout.vue'),
@@ -83,8 +86,8 @@ const routes = [
     ]
   },
   {
-    //path: '/:catchAll(.*)*',
-    path: '/:notFound',
+    path: '/:catchAll(.*)*',
+    // path: '/:notFound',
     component: () => import('pages/ErrorNotFound.vue')
     //redirect: '/'
   }

@@ -6,8 +6,8 @@
           class="bg-dark text-accent card-login"
           v-bind:style="
             $q.screen.lt.sm || $q.screen.lt.md
-              ? { width: '70%' }
-              : { width: '20%' }
+              ? { width: '80%' }
+              : { width: '30%' }
           "
         >
           <q-card-section>
@@ -17,7 +17,7 @@
               Iniciar Sesión
             </div>
           </q-card-section>
-          <!-- <q-card-section class="q-pt-xl">
+          <q-card-section class="q-pt-xl">
             <q-btn-toggle
               icon="login"
               v-model="loginAction"
@@ -27,13 +27,14 @@
               toggle-text-color="white"
               text-color="grey-6"
               :options="[
-                { label: 'Entrar', value: 'one' }
+                { label: 'Entrar', value: 'one' },
+                { label: 'Registrar', value: 'two' }
               ]"
               padding="0.8rem"
               push
               style="border: 0px solid !important"
             />
-          </q-card-section> -->
+          </q-card-section>
           <q-card-section style="border: 0px solid red" align="center">
             <q-form
               @submit.prevent="submitForm"
@@ -41,6 +42,20 @@
               style="max-width: 350px; border: 0px solid yellow"
               fit
             >
+              <q-input
+                v-if="isRegistration"
+                v-model="form.name"
+                lazy-rules
+                type="text"
+                label="Nombre Completo"
+                dark
+                :rules="[(val) => !!val || 'Nombre completo requerido']"
+                outlined
+              >
+                <template v-slot:prepend>
+                  <q-icon name="badge" />
+                </template>
+              </q-input>
               <q-input
                 v-model="form.email"
                 label="Correo"
@@ -74,6 +89,22 @@
                   <q-icon name="lock" />
                 </template>
               </q-input>
+              <q-input
+                v-if="isRegistration"
+                type="password"
+                input-class="text-accent"
+                v-model="form.password_confirmation"
+                label="Confirmar Contraseña"
+                lazy-rules
+                dark
+                :rules="[(val) => !!val || 'Contraseña es requerida']"
+                outlined
+              >
+                <template v-slot:prepend>
+                  <q-icon name="lock" />
+                </template>
+              </q-input>
+
               <div class="row justify-center">
                 <q-btn
                   :label="btnLabel"
@@ -137,6 +168,59 @@ onMounted(() => {
 })
 
 function submitForm() {
+  if (isRegistration.value) {
+    const payload = {
+      user: {
+        name: form.name,
+        email: form.email,
+        password: form.password,
+        password_confirmation: form.password_confirmation
+      }
+    }
+    const promise = sessionStore.registerUser(payload)
+    promise.then(
+      ({ data }) => {
+        console.log('data', data.status)
+        if (data.status === 'unprocessable_entity') {
+          console.log('data status', data.data.errors)
+          if (
+            data.data.errors.includes(
+              "Password confirmation doesn't match Password"
+            )
+          ) {
+            mostrarNotificacionNegativa(
+              'No coincide al password de confirmación, favor de verificar.'
+            )
+          }
+          if (data.data.errors.includes('Email has already been taken')) {
+            mostrarNotificacionNegativa('El email ya se encuentra registrado')
+          }
+          if (
+            data.data.errors.includes(
+              'Password is too short (minimum is 6 characters)'
+            )
+          ) {
+            mostrarNotificacionNegativa(
+              'Password demasiado corto (mínimo 6 caracteres)'
+            )
+          }
+        } else {
+          router.push('/home')
+        }
+
+        // $q.notify({
+        //   type: "positive",
+        //   message: `Se registro correctamente el usuario`,
+        //   timeout: 1500,
+        // });
+      },
+      (e) => {
+        console.log('Ocurrió un error al intentar registrar el usuario.', e)
+
+        console.error(e)
+      }
+    )
+  } else {
     const payload = {
       user: {
         email: form.email,
@@ -162,6 +246,7 @@ function submitForm() {
         }
       }
     )
+  }
 }
 
 function showNotification(error) {

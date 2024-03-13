@@ -77,7 +77,7 @@ export const useSessionStore = defineStore('session', () => {
         })
     })
   }
-  const logoutUser = () => {
+  const logoutUser = async () => {
     const config = {
       headers: { authorization: auth_token }
     }
@@ -91,6 +91,9 @@ export const useSessionStore = defineStore('session', () => {
         .catch((error) => {
           reject(error)
         })
+    }).then((response) => {
+      console.log('Respondiendo en el logoutuser')
+      console.log(response)
     })
   }
 
