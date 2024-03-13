@@ -31,11 +31,13 @@ export /* async */ function getClientOptions(/* {app, router, ...} */ options) {
   const authLink = setContext((_, { headers }) => {
     // get the authentication token from local storage if it exists
     const user = SessionStorage.getItem('user')
+    const auth_token = SessionStorage.getItem('auth_token')
     // return the headers to the context so httpLink can read them
+    console.log('token', auth_token)
     return {
       headers: {
         ...headers,
-        authorization: user.token ? `Bearer ${user.token}` : ''
+        Authorization: auth_token.toString()
       }
     }
   })
