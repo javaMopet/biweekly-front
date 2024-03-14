@@ -5,7 +5,7 @@
       <div class="text-subtitle2">{{ username }} ({{ email }})</div>
     </q-card-section>
     <q-card-section>
-      Inicia seleccionando una opción en el menú de la izquierda.
+      Inicia seleccionando una opción en el menú de la izquierda. Test
     </q-card-section>
   </q-card>
 </template>
