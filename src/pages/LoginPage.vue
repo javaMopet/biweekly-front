@@ -5,9 +5,13 @@
         <q-card
           class="bg-dark text-accent card-login"
           v-bind:style="
-            $q.screen.lt.sm || $q.screen.lt.md
-              ? { width: '70%' }
-              : { width: '35%' }
+            $q.screen.lt.sm
+              ? { width: '85%' }
+              : $q.screen.lt.md
+              ? { width: '60%' }
+              : $q.screen.lt.lg
+              ? { width: '40%' }
+              : { width: '25%' }
           "
         >
           <q-card-section>
@@ -57,14 +61,22 @@
                   <q-icon name="lock" />
                 </template>
               </q-input>
+              <div class="text-negative-pastel" v-if="invalidCredentials">
+                El usuario y/o contraseña son incorrectos
+              </div>
               <div class="row justify-center">
                 <q-btn
-                  :label="btnLabel"
+                  label="Entrar"
                   type="submit"
+                  :loading="submitting"
                   outline
                   color="secondary"
                   class="text-bold"
-                />
+                >
+                  <template v-slot:loading>
+                    <q-spinner-pie />
+                  </template>
+                </q-btn>
               </div>
             </q-form>
           </q-card-section>
@@ -112,17 +124,12 @@ const form = reactive({
   password_confirmation: ''
 })
 
-const loginAction = ref('one')
+const invalidCredentials = ref(false)
+const submitting = ref(false)
 
 /**
  * computed
  */
-const btnLabel = computed(() =>
-  loginAction.value == 'one' ? 'Entrar' : 'Registrar'
-)
-const isRegistration = computed(() =>
-  loginAction.value == 'two' ? true : false
-)
 
 /**
  * onMounted
@@ -132,6 +139,8 @@ onMounted(() => {
 })
 
 function login() {
+  submitting.value = true
+  invalidCredentials.value = false
   const email = form.email.toString()
   const password = form.password.toString()
   sessionService.userLogin({
@@ -142,10 +151,12 @@ function login() {
 
 sessionService.onDoneUserLogin(({ data }) => {
   console.log('mandando al home')
+  submitting.value = false
   router.push('/home')
 })
 sessionService.onErrorUserLogin((response) => {
-  // console.log(response)
+  submitting.value = false
+  invalidCredentials.value = true
 })
 
 // function login() {
@@ -190,15 +201,15 @@ function resetUserInfo() {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .my-custom-toggle {
   border: 1px solid #027be3;
 }
 .bg-color {
   // background-color: #ffffff;
   // background-image: url('../../public/images/3968744.jpg');
-  // background-repeat: no-repeat;
-  // background-size: cover;
+  background-repeat: no-repeat;
+  background-size: cover;
   background: url('/images/1.jpg') 0 / cover fixed;
   // -webkit-filter: blur(5px); /* Safari 6.0 - 9.0 */
   // filter: blur(5px);
