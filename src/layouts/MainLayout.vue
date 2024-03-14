@@ -88,11 +88,16 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useLazyQuery } from '@vue/apollo-composable'
-import { useSessionStore } from 'src/stores/sessionStore.js'
 import { useRouter } from 'vue-router'
 import { SessionStorage } from 'quasar'
 import EssentialLink from 'src/components/EssentialLink.vue'
 import { LISTA_MENUS } from 'src/graphql/menus'
+import { userSessionService } from 'src/composables/login/useSessionService'
+
+/**
+ * composable
+ */
+const sessionService = userSessionService()
 
 /**
  * state
@@ -104,7 +109,7 @@ const essentialLinks = ref([])
 /**
  * stores
  */
-const sessionStorage = useSessionStore()
+// const sessionStorage = useSessionStore()
 const router = useRouter()
 /**
  * graphql
@@ -127,17 +132,19 @@ onResultCargarMenu(({ data }) => {
 onErrorCargarMenu((error) => {
   console.error(error)
 })
-
 /**
  * onMounted
  */
 onMounted(() => {
-  user.value = SessionStorage.getItem('user')
-  if (!!user.value) {
-    cargarMenu(null, { usuarioId: user.value.id })
-  } else {
-    router.push('/login')
-  }
+  const email = SessionStorage.getItem('credentials')?.email || undefined
+
+  if (!email) router.push('/home')
+
+  user.value = JSON.parse(SessionStorage.getItem('current_user'))
+
+  if (!user.value) router.push('login')
+
+  cargarMenu(null, { usuarioId: user.value.id })
 })
 /**
  * methods
@@ -147,18 +154,27 @@ function toggleLeftDrawer() {
 }
 
 function logout() {
-  const promise = sessionStorage.logoutUser()
-  if (promise) {
-    promise.then(
-      (result) => {
-        router.push('/login')
-      },
-      (error) => {
-        router.push('/login')
-      }
-    )
-  }
+  // const promise = sessionStorage.logoutUser()
+  // if (promise) {
+  //   promise.then(
+  //     (result) => {
+  //       router.push('/login')
+  //     },
+  //     (error) => {
+  //       router.push('/login')
+  //     }
+  //   )
+  // }
+  sessionService.userLogout()
 }
+sessionService.onDoneUserLogout(() => {
+  console.log('Session cerrada')
+  router.push('/login')
+})
+
+sessionService.onDoneUserLogout(() => {
+  throw NotImplementedException('NO implementado')
+})
 
 function onClickAccount() {}
 

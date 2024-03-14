@@ -7,7 +7,7 @@ import {
 } from 'vue-router'
 import routes from './routes'
 import { SessionStorage } from 'quasar'
-import { api } from 'boot/axios'
+// import { api } from 'boot/axios'
 
 /*
  * If not building with SSR mode, you can
@@ -36,19 +36,12 @@ export default route(function (/* { store, ssrContext } */) {
   })
 
   Router.beforeEach((to, from) => {
-    console.log('to an from ', to, from)
+    // console.log('to an from ', to, from)
     const publicPages = ['/login', '/403', '/']
     const authRequired = !publicPages.includes(to.path)
 
-    // setTimeout(() => {
-    //   console.log('timer')
-    // }, 1500)
-
     if (authRequired) {
-      console.log('La pagina requiere authenticacion...', to.fullPath)
-      console.log('Token...', SessionStorage.getItem('auth_token'))
-      // console.log("token en api", api.defaults.headers.common["Authorization"]);
-      if (!SessionStorage.getItem('auth_token')) {
+      if (!SessionStorage.getItem('credentials')) {
         return '/'
       }
     }

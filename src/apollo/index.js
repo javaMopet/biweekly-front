@@ -29,15 +29,18 @@ export /* async */ function getClientOptions(/* {app, router, ...} */ options) {
   })
 
   const authLink = setContext((_, { headers }) => {
-    // get the authentication token from local storage if it exists
-    const user = SessionStorage.getItem('user')
-    const auth_token = SessionStorage.getItem('auth_token')
     // return the headers to the context so httpLink can read them
-    console.log('token', auth_token)
+    let credentials = ''
+    if (!!SessionStorage.getItem('credentials')) {
+      credentials = JSON.parse(SessionStorage.getItem('credentials'))
+    }
+
     return {
       headers: {
         ...headers,
-        Authorization: auth_token.toString()
+        uid: credentials.uid,
+        client: credentials.client,
+        access_token: credentials.accessToken
       }
     }
   })

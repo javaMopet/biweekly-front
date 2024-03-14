@@ -76,6 +76,7 @@ module.exports = configure(function (/* ctx */) {
 
       // publicPath: '/',
       // analyze: true,
+      sourcemap: true,
       env: {
         API_URL:
           process.env.API_URL ||

@@ -2,7 +2,7 @@
   <q-card class="my-card">
     <q-card-section>
       <div class="text-h5">Bienvenido</div>
-      <div class="text-subtitle2">{{ user.name }}</div>
+      <div class="text-subtitle2">{{ username }} ({{ email }})</div>
     </q-card-section>
     <q-card-section>
       Inicia seleccionando una opción en el menú de la izquierda.
@@ -14,12 +14,12 @@
 import { ref, onMounted } from 'vue'
 import { SessionStorage } from 'quasar'
 
-const user = SessionStorage.getItem('user')
-
+const email = ref('')
 const username = ref('')
 
 onMounted(() => {
-  console.log(user)
-  username.value = user.name
+  const current_user = JSON.parse(SessionStorage.getItem('current_user'))
+  email.value = current_user.email
+  username.value = current_user.name
 })
 </script>

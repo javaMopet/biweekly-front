@@ -7,7 +7,7 @@
           v-bind:style="
             $q.screen.lt.sm || $q.screen.lt.md
               ? { width: '70%' }
-              : { width: '20%' }
+              : { width: '35%' }
           "
         >
           <q-card-section>
@@ -17,26 +17,9 @@
               Iniciar Sesión
             </div>
           </q-card-section>
-          <!-- <q-card-section class="q-pt-xl">
-            <q-btn-toggle
-              icon="login"
-              v-model="loginAction"
-              class="my-custom-toggle"
-              spread
-              toggle-color="primary-button"
-              toggle-text-color="white"
-              text-color="grey-6"
-              :options="[
-                { label: 'Entrar', value: 'one' }
-              ]"
-              padding="0.8rem"
-              push
-              style="border: 0px solid !important"
-            />
-          </q-card-section> -->
           <q-card-section style="border: 0px solid red" align="center">
             <q-form
-              @submit.prevent="submitForm"
+              @submit.prevent="login"
               class="q-gutter-md q-pa-lg"
               style="max-width: 350px; border: 0px solid yellow"
               fit
@@ -94,25 +77,37 @@
 <script setup>
 import { useQuasar, SessionStorage } from 'quasar'
 import { ref, reactive, computed, onMounted } from 'vue'
-import { useSessionStore } from 'src/stores/sessionStore'
+// import { useSessionStore } from 'src/stores/sessionStore'
 import { useRouter } from 'vue-router'
 import { api } from 'src/boot/axios'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
+// import { LOGIN } from 'src/graphql/opertations/login'
+// import { useMutation } from '@vue/apollo-composable'
+import { userSessionService } from 'src/composables/login/useSessionService'
 
 /**
  * composables
  */
 const $q = useQuasar()
 const router = useRouter()
-const sessionStore = useSessionStore()
 const { mostrarNotificacionNegativa } = useNotificacion()
+const sessionService = userSessionService()
+
+/**
+ * GRAPHQL
+ */
+// const {
+//   mutate: userLogin,
+//   onDone: onDoneUserLogin,
+//   onError: onErrorUserLogin
+// } = useMutation(LOGIN)
 
 /**
  * state
  */
 const form = reactive({
   name: '',
-  email: '',
+  email: 'horaciopenamendoza@gmail.com',
   password: '',
   password_confirmation: ''
 })
@@ -136,33 +131,50 @@ onMounted(() => {
   resetUserInfo()
 })
 
-function submitForm() {
-    const payload = {
-      user: {
-        email: form.email,
-        password: form.password
-      }
-    }
-    const promise = sessionStore.loginUser(payload)
-    promise.then(
-      (result) => {
-        // console.log('Resultado correcto', result)
-        router.push('/home')
-      },
-      (error) => {
-        console.error('error', error)
-        console.log(error)
-        if (error.toString().includes('Request failed with status code 401')) {
-          mostrarNotificacionNegativa('Usuario y/o password incorrectos', 2100)
-        } else {
-          mostrarNotificacionNegativa(
-            'Ocurrió un error al intentar iniciar sesión',
-            2100
-          )
-        }
-      }
-    )
+function login() {
+  const email = form.email.toString()
+  const password = form.password.toString()
+  sessionService.userLogin({
+    email,
+    password
+  })
 }
+
+sessionService.onDoneUserLogin(({ data }) => {
+  console.log('mandando al home')
+  router.push('/home')
+})
+sessionService.onErrorUserLogin((response) => {
+  // console.log(response)
+})
+
+// function login() {
+//     const payload = {
+//       user: {
+//         email: form.email,
+//         password: form.password
+//       }
+//     }
+//     const promise = sessionStore.loginUser(payload)
+//     promise.then(
+//       (result) => {
+//         // console.log('Resultado correcto', result)
+//         router.push('/home')
+//       },
+//       (error) => {
+//         console.error('error', error)
+//         console.log(error)
+//         if (error.toString().includes('Request failed with status code 401')) {
+//           mostrarNotificacionNegativa('Usuario y/o password incorrectos', 2100)
+//         } else {
+//           mostrarNotificacionNegativa(
+//             'Ocurrió un error al intentar iniciar sesión',
+//             2100
+//           )
+//         }
+//       }
+//     )
+// }
 
 function showNotification(error) {
   $q.notify({

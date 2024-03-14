@@ -1,3 +1,5 @@
+import LoginPage from 'src/pages/LoginPage.vue'
+
 const routes = [
   {
     path: '',
@@ -9,7 +11,7 @@ const routes = [
   },
   {
     path: '/login',
-    component: () => import('pages/LoginPage.vue')
+    component: LoginPage //() => import('pages/LoginPage.vue')
   },
   {
     path: '/home',

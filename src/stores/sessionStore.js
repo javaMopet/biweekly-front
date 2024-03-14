@@ -1,7 +1,9 @@
 import { defineStore } from 'pinia'
 import { api } from 'src/boot/axios'
-import { ref, reactive } from 'vue'
-import { SessionStorage } from 'quasar'
+import { ref } from 'vue'
+import { Platform, SessionStorage } from 'quasar'
+import { useMutation } from '@vue/apollo-composable'
+import { LOGIN } from 'src/graphql/opertations/login'
 // import { useRouter } from 'vue-router'
 
 // const BASE_URL = "http://localhost:3000/";
@@ -9,15 +11,29 @@ import { SessionStorage } from 'quasar'
 export const useSessionStore = defineStore('session', () => {
   // const $router = useRouter()
 
+  /**
+   * constants
+   */
   const defaultUser = {
     id: null,
     username: null,
     email: null
   }
 
+  /**
+   * state
+   */
   const auth_token = ref(null)
   const user = ref(null)
 
+  /**
+   * Methods
+   */
+
+  /**
+   *
+   * @returns
+   */
   const getAuthToken = () => {
     return auth_token.value
   }
@@ -61,22 +77,26 @@ export const useSessionStore = defineStore('session', () => {
         })
     })
   }
-
-  const loginUser = (payload) => {
-    return new Promise((resolve, reject) => {
-      api
-        .post('users/sign_in/', payload)
-        .then((response) => {
-          console.log('response.data', response)
-          setUserInfoOnLogin(response)
-          resolve(response)
-        })
-        .catch((error) => {
-          console.log(error)
-          reject(error)
-        })
-    })
+  const login = (payload) => {
+    userLogin(payload)
   }
+
+  // const loginUser = (payload) => {
+  //   return new Promise((resolve, reject) => {
+  //     api
+  //       .post('users/sign_in/', payload)
+  //       .then((response) => {
+  //         console.log('response.data', response)
+  //         setUserInfoOnLogin(response)
+  //         resolve(response)
+  //       })
+  //       .catch((error) => {
+  //         console.log(error)
+  //         reject(error)
+  //       })
+  //   })
+  // }
+
   const logoutUser = async () => {
     const config = {
       headers: { authorization: auth_token }
@@ -113,6 +133,9 @@ export const useSessionStore = defineStore('session', () => {
   //       });
   //   });
   // }
+  /**
+   * GRAPHQL
+   */
 
   /**
    * mutations
@@ -162,7 +185,7 @@ export const useSessionStore = defineStore('session', () => {
     getUserId,
     isLoggetIn,
     registerUser,
-    loginUser,
+    login,
     logoutUser
   }
 })
