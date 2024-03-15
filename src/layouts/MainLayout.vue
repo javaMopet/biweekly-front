@@ -80,23 +80,39 @@
     </q-drawer>
 
     <q-page-container>
+      <p>Idle: {{ idleFirst }}</p>
+      <p>IdleLast: {{ idleLast }}</p>
       <router-view />
     </q-page-container>
   </q-layout>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useLazyQuery } from '@vue/apollo-composable'
 import { useRouter } from 'vue-router'
-import { SessionStorage } from 'quasar'
+import { SessionStorage, useQuasar } from 'quasar'
 import EssentialLink from 'src/components/EssentialLink.vue'
 import { LISTA_MENUS } from 'src/graphql/menus'
 import { userSessionService } from 'src/composables/login/useSessionService'
+import { useCounter, useIdle } from '@vueuse/core'
+
+// const { idle, lastActive, reset } = useIdle(5 * 60 * 1000) // 5 min
+const {
+  idle: idleFirst,
+  lastActive: lastAciveFirst,
+  reset: resetFirst
+} = useIdle(1 * 10 * 1000) // 2 min
+const {
+  idle: idleLast,
+  lastActive: lastActiveLast,
+  reset: resetLast
+} = useIdle(1 * 20 * 1000) // 3 min
 
 /**
  * composable
  */
+const $q = useQuasar()
 const sessionService = userSessionService()
 
 /**
@@ -167,6 +183,44 @@ function logout() {
   // }
   sessionService.userLogout()
 }
+const dialogCloseSession = ref()
+
+watch(idleFirst, (idlevalue) => {
+  if (idlevalue && !dialogCloseSession.value) {
+    dialogCloseSession.value = $q
+      .dialog({
+        title: 'Confirmar',
+        style: 'width:500px',
+        message: ` ¿Desea cerra sessión?`,
+        ok: {
+          push: true,
+          color: 'positive',
+          label: 'Continuar'
+        },
+        cancel: {
+          push: true,
+          color: 'negative',
+          flat: true,
+          label: 'cancelar'
+        },
+        persistent: true
+      })
+      .onOk(() => {
+        // usuariosCrud.cuentaDelete({ id: item.row.id })
+      })
+      .onCancel(() => {})
+      .onDismiss(() => {})
+    resetFirst()
+  }
+})
+
+watch(idleLast, (idlevalue) => {
+  if (idlevalue) {
+    dialogCloseSession.value.hide()
+    sessionService.userLogout()
+  }
+})
+
 sessionService.onDoneUserLogout(() => {
   console.log('Session cerrada')
   router.push('/login')

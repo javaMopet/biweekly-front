@@ -2,9 +2,7 @@
   <q-layout>
     <q-page-container class="">
       <q-page class="flex flex-center bg-color">
-        <q-card
-          class="bg-dark text-accent card-login"
-          v-bind:style="
+        <!-- v-bind:style="
             $q.screen.lt.sm
               ? { width: '85%' }
               : $q.screen.lt.md
@@ -12,66 +10,80 @@
               : $q.screen.lt.lg
               ? { width: '40%' }
               : { width: '25%' }
-          "
+          " -->
+        <q-card
+          class="card-login"
+          :style="$q.screen.lt.sm ? { width: '300px' } : { width: '380px' }"
         >
-          <q-card-section>
+          <div class="">
             <div
-              class="row inline full-width justify-center text-h4 q-pt-lg text-accent-light"
+              class="column full-width items-center text-h6 q-pt-lg text-dark"
             >
-              Iniciar Sesión
+              <span class="text-blue-grey-8">Bienvenido</span>
+              <span class="text-caption">Identifiquese antes de continuar</span>
             </div>
-          </q-card-section>
-          <q-card-section style="border: 0px solid red" align="center">
+          </div>
+          <q-separator spaced inset horizontal color="accent-light" />
+          <q-card-section align="center">
             <q-form
               @submit.prevent="login"
-              class="q-gutter-md q-pa-lg"
-              style="max-width: 350px; border: 0px solid yellow"
+              class="q-gutter-md q-py-xs q-px-lg"
+              style="max-width: 95%; border: 0px solid yellow"
               fit
             >
-              <q-input
-                v-model="form.email"
-                label="Correo"
-                input-class="grey"
-                class="text-accent-light"
-                label-color="accent-light"
-                lazy-rules
-                type="email"
-                dark
-                outlined
-                :rules="[(val) => !!val || 'Correo es requerido']"
-              >
-                <template v-slot:prepend>
-                  <q-icon name="mail" />
-                </template>
-              </q-input>
+              <!-- Estilo solo de la parte donde se digita el valor  -->
+              <!-- input-style="border: 1px solid green" -->
+              <div class="column fit items-start justify-start">
+                <q-label class="text-primary">Usuario:</q-label>
+                <q-input
+                  v-model="form.email"
+                  type="email"
+                  label="Correo"
+                  color="bg-blue-1"
+                  input-class="text-secondary"
+                  label-color="accent-light"
+                  lazy-rules
+                  outlined
+                  :rules="[(val) => !!val || 'Correo es requerido']"
+                  class="fit"
+                >
+                  <template v-slot:prepend>
+                    <q-icon name="mail" class="text-blue-grey-7" />
+                  </template>
+                </q-input>
+              </div>
+              <div class="column fit items-start">
+                <q-label class="text-primary">Contraseña:</q-label>
+                <q-input
+                  v-model="form.password"
+                  type="password"
+                  label="Contraseña"
+                  color="bg-blue-1"
+                  input-class="text-secondary"
+                  label-color="accent-light"
+                  lazy-rules
+                  outlined=""
+                  :rules="[(val) => !!val || 'Correo es requerido']"
+                  class="fit"
+                >
+                  <!-- standout="bg-form-input-standout-dark" -->
+                  <template v-slot:prepend>
+                    <q-icon name="lock" class="text-blue-grey-7" />
+                  </template>
+                </q-input>
+              </div>
 
-              <q-input
-                type="password"
-                dark
-                v-model="form.password"
-                label="Contraseña"
-                input-class="grey"
-                label-color="accent-light"
-                class="border-accent"
-                lazy-rules
-                :rules="[(val) => !!val || 'Contraseña es requerida']"
-                outlined
-              >
-                <template v-slot:prepend>
-                  <q-icon name="lock" />
-                </template>
-              </q-input>
               <div class="text-negative-pastel" v-if="invalidCredentials">
                 El usuario y/o contraseña son incorrectos
               </div>
-              <div class="row justify-center">
+              <div class="column fit justify-center items-center">
                 <q-btn
                   label="Entrar"
                   type="submit"
                   :loading="submitting"
-                  outline
-                  color="secondary"
-                  class="text-bold"
+                  push
+                  color="primary-button"
+                  class="text-bold fit"
                 >
                   <template v-slot:loading>
                     <q-spinner-pie />
@@ -213,23 +225,19 @@ function resetUserInfo() {
   background: url('/images/1.jpg') 0 / cover fixed;
   // -webkit-filter: blur(5px); /* Safari 6.0 - 9.0 */
   // filter: blur(5px);
+  // background-color: $accent-light;
   z-index: 2 !important;
 }
 .card-login {
-  box-shadow: 0 5px 70px -25px #f69068;
-  opacity: 0.9;
+  box-shadow: 0 5px 70px -25px #643a29;
+  background-color: white;
   // -webkit-filter: none !important; /* Safari 6.0 - 9.0 */
   // filter: none !important;
   z-index: 1 !important;
 }
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus,
-input:-webkit-autofill:active {
-  color: rgb(170, 27, 27) !important;
-  -webkit-text-fill-color: rgb(223, 169, 169) !important;
-  -webkit-box-shadow: 0 0 0 1000px darken($color: $dark, $amount: 1) inset !important;
-  -webkit-background-clip: text !important;
+
+input {
   background-clip: text !important;
+  -webkit-background-clip: text !important;
 }
 </style>
