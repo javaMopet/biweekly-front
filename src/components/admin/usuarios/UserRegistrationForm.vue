@@ -1,55 +1,54 @@
 <template>
   <div class="my-card" style="width: 500px">
     <DialogTitle>{{ actionName }}</DialogTitle>
-    <div class="row fit q-pa-lg justify-center" style="border: 0px solid red">
+    <div class="column fit q-pa-lg items-center" style="border: 0px solid red">
       <q-form
-        autocorrect="off"
-        autocapitalize="off"
-        autocomplete="off"
-        spellcheck="false"
         @submit="registerUser"
-        class="q-gutter-md"
+        class="column q-gutter-md"
         style="width: 75%"
+        autocomplete="off"
       >
-        <div>
-          <div class="q-pt-md">
-            <q-input
-              v-model="authenticable.email"
-              autocomplete="off"
-              type="email"
-              label="Email"
-              class="fit"
-              :rules="[(val) => !!val || 'Email required!']"
-            />
-          </div>
-          <div class="row">
-            <q-input
-              v-model="authenticable.password"
-              type="password"
-              label="Password"
-              class="fit"
-              :rules="[(val) => !!val || 'Password required!']"
-            />
-          </div>
-          <div class="row">
-            <q-input
-              v-model="authenticable.passwordConfirmation"
-              type="password"
-              label="Password Confirmation"
-              class="fit"
-              :rules="[(val) => !!val || 'Password Confirmation required!']"
-            />
-          </div>
-          <div class="row">
-            <q-input
-              v-model="authenticable.name"
-              type="text"
-              label="Name"
-              class="fit"
-              :rules="[(val) => !!val || 'Name required!']"
-            />
-          </div>
-        </div>
+        <q-input
+          v-model="authenticable.name"
+          type="text"
+          label="Nombre"
+          stack-label
+          class="fit"
+          :rules="[(val) => !!val || 'Nombre requerido.']"
+        />
+        <q-input
+          v-model="authenticable.email"
+          type="email"
+          label="Email"
+          stack-label
+          class="fit"
+          :rules="[(val) => !!val || 'Email required!']"
+        />
+        <q-input
+          v-model="authenticable.email"
+          type="email"
+          label="algo"
+          hidden
+        />
+        <q-input
+          v-model="authenticable.password"
+          type="password"
+          autocomplete="new-password"
+          label="Password"
+          stack-label
+          class="fit"
+          :rules="[(val) => !!val || 'Password required!']"
+        />
+
+        <q-input
+          v-model="authenticable.passwordConfirmation"
+          type="password"
+          label="Password Confirmation"
+          stack-label
+          class="fit"
+          :rules="[(val) => !!val || 'Password Confirmation required!']"
+        />
+
         <div class="col row justify-end q-pt-lg q-gutter-lg">
           <q-btn
             label="Cancelar"
@@ -354,14 +353,7 @@ function colorSelecionado(value) {
 </script>
 
 <style lang="scss" scoped>
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus,
-input:-webkit-autofill:active {
-  color: rgb(170, 27, 27) !important;
-  -webkit-text-fill-color: white !important;
-  -webkit-box-shadow: 0 0 0 1000px darken($color: $dark, $amount: 1) inset !important;
-  -webkit-background-clip: text !important;
-  background-clip: text !important;
+input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px white inset !important;
 }
 </style>

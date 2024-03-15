@@ -85,6 +85,7 @@
       <router-view />
     </q-page-container>
   </q-layout>
+  <div id="modal"></div>
 </template>
 
 <script setup>
@@ -107,7 +108,7 @@ const {
   idle: idleLast,
   lastActive: lastActiveLast,
   reset: resetLast
-} = useIdle(1 * 20 * 1000) // 3 min
+} = useIdle(1 * 15 * 1000) // 3 min
 
 /**
  * composable
@@ -186,30 +187,48 @@ function logout() {
 const dialogCloseSession = ref()
 
 watch(idleFirst, (idlevalue) => {
-  if (idlevalue && !dialogCloseSession.value) {
-    dialogCloseSession.value = $q
-      .dialog({
-        title: 'Confirmar',
-        style: 'width:500px',
-        message: ` ¿Desea cerra sessión?`,
-        ok: {
-          push: true,
-          color: 'positive',
-          label: 'Continuar'
-        },
-        cancel: {
-          push: true,
-          color: 'negative',
-          flat: true,
-          label: 'cancelar'
-        },
-        persistent: true
-      })
-      .onOk(() => {
-        // usuariosCrud.cuentaDelete({ id: item.row.id })
-      })
-      .onCancel(() => {})
-      .onDismiss(() => {})
+  if (idlevalue) {
+    if (!!dialogCloseSession.value) {
+      console.log(
+        '%csrc/layouts/MainLayout.vue:192 dialogcloesSession.value',
+        'color: #007acc;',
+        dialogCloseSession.value
+      )
+      // dialogCloseSession.value.show()
+    } else {
+      dialogCloseSession.value = $q
+        .dialog({
+          title: 'Confirmar',
+          style: 'width:500px',
+          message: ` ¿Desea cerra sessión?`,
+          ok: {
+            push: true,
+            color: 'positive',
+            label: 'Continuar'
+          },
+          cancel: {
+            push: true,
+            color: 'negative',
+            flat: true,
+            label: 'cancelar'
+          },
+          persistent: true
+        })
+        .onOk(() => {
+          // usuariosCrud.cuentaDelete({ id: item.row.id })
+          // dialogCloseSession.value.hide()
+          // dialogCloseSession.value = null
+        })
+        .onCancel(() => {
+          // dialogCloseSession.value.hide()
+          // dialogCloseSession.value = null
+        })
+        .onDismiss(() => {
+          // dialogCloseSession.value.hide()
+          console.log('%csrc/layouts/MainLayout.vue:22', 'color: #007acc;')
+          dialogCloseSession.value = null
+        })
+    }
     resetFirst()
   }
 })
@@ -217,6 +236,7 @@ watch(idleFirst, (idlevalue) => {
 watch(idleLast, (idlevalue) => {
   if (idlevalue) {
     dialogCloseSession.value.hide()
+    dialogCloseSession.value = null
     sessionService.userLogout()
   }
 })
