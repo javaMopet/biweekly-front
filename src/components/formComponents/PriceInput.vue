@@ -39,7 +39,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, toRef, watch, watchEffect } from 'vue'
+import { ref, computed, onMounted, toRef, watchEffect } from 'vue'
 import { formatMoney } from 'accounting-js'
 /**
  * state
@@ -178,7 +178,6 @@ onMounted(() => {
   onBlur()
 })
 function onBlur(e) {
-  console.log('onblur input')
   editing.value = false
   emit('blur')
   isErrores.value = false
@@ -189,7 +188,7 @@ function onFocus() {
 }
 
 const validar = () => {
-  console.log('validando el precio', inputValue.value)
+  // console.log('validando el precio', inputValue.value)
   // errorActive.value = false
   // if (inputValue.value === '$0.00') {
   //   errorActive.value = true
@@ -276,7 +275,7 @@ function setCurrency(code) {
   }
 }
 .input-no-error {
-  border: 1px solid $positive;
+  border: 1px solid #f2f2f2;
   border-radius: 4px;
   padding: 1px;
 }

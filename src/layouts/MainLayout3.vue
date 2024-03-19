@@ -159,7 +159,7 @@ const router = useRouter()
  * onMounted
  */
 onMounted(() => {
-  user.value = SessionStorage.getItem('user')
+  user.value = SessionStorage.getItem('current_user')
 })
 
 function onClick() {}

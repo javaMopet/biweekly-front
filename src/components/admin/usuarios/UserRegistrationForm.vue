@@ -13,41 +13,59 @@
           type="text"
           label="Nombre"
           stack-label
+          clearable
           class="fit"
           :rules="[(val) => !!val || 'Nombre requerido.']"
         />
+        <!-- standout="bg-contrast" -->
         <q-input
           v-model="authenticable.email"
+          clearable
+          autocomplete="false"
           type="email"
           label="Email"
           stack-label
           class="fit"
           :rules="[(val) => !!val || 'Email required!']"
-        />
-        <q-input
-          v-model="authenticable.email"
-          type="email"
-          label="algo"
-          hidden
+          :readonly="isEditing"
         />
         <q-input
           v-model="authenticable.password"
-          type="password"
-          autocomplete="new-password"
+          :type="isPwd ? 'password' : 'text'"
           label="Password"
-          stack-label
-          class="fit"
-          :rules="[(val) => !!val || 'Password required!']"
-        />
-
+          :rules="[(val) => !!val || 'Requerido']"
+          v-if="!isEditing"
+          clearable
+        >
+          <template v-slot:append>
+            <q-icon
+              :name="isPwd ? 'visibility_off' : 'visibility'"
+              class="cursor-pointer"
+              @click="isPwd = !isPwd"
+            />
+          </template>
+        </q-input>
         <q-input
           v-model="authenticable.passwordConfirmation"
-          type="password"
+          :type="isPwd ? 'password' : 'text'"
           label="Password Confirmation"
-          stack-label
-          class="fit"
-          :rules="[(val) => !!val || 'Password Confirmation required!']"
-        />
+          :rules="[
+            (val) => !!val || 'Campo requerido.',
+            (val) =>
+              val === authenticable.password ||
+              'Password Confirmation doesn\'t match'
+          ]"
+          v-if="!isEditing"
+          clearable
+        >
+          <template v-slot:append>
+            <q-icon
+              :name="isPwd ? 'visibility_off' : 'visibility'"
+              class="cursor-pointer"
+              @click="isPwd = !isPwd"
+            />
+          </template>
+        </q-input>
 
         <div class="col row justify-end q-pt-lg q-gutter-lg">
           <q-btn
@@ -88,11 +106,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import IconPicker from '/src/components/IconPicker.vue'
-
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
-import { SessionStorage } from 'quasar'
-
-import { useTipoMovimientoStore } from 'src/stores/common/useTipoMovimientoStore'
 import DialogTitle from 'src/components/formComponents/modal/DialogTitle.vue'
 import { useUserService } from 'src/composables/admin/useUserService'
 
@@ -101,7 +115,6 @@ import { useUserService } from 'src/composables/admin/useUserService'
  */
 const { mostrarNotificacionPositiva, mostrarNotificacionNegativa } =
   useNotificacion()
-const tipoMovimientoStore = useTipoMovimientoStore()
 
 const userService = useUserService()
 
@@ -109,35 +122,20 @@ const userService = useUserService()
  * state
  */
 const defaultItem = {
-  id: null,
-  nombre: null,
-  icono: 'insert_emoticon',
-  descripcion: null,
-  color: '#019A9D',
-  tipoMovimiento: null,
-  tipoMovimientoId: '2',
-  cuentaContable: null
-}
-const formItem = ref({ ...defaultItem })
-const ppproxy = ref(null)
-
-const cuentaContableOptions = ref({
-  cuentaContableSubnivel: 0,
-  clasificacion: '',
-  tipoAfectacion: 'C'
-})
-
-const authenticable = ref({
+  id: undefined,
+  name: '',
   email: '',
   password: '',
-  name: ''
-})
+  passwordConfirmation: ''
+}
+const isPwd = ref(true)
+const formItem = ref({ ...defaultItem })
 
 /**
  * props
  */
 const props = defineProps({
-  editedItem: {
+  userToEdit: {
     type: Object,
     required: false,
     default: () => {
@@ -145,30 +143,18 @@ const props = defineProps({
         id: null
       }
     }
-  },
-  editedIndex: {
-    type: Number,
-    required: false,
-    default: -1
   }
 })
 /**
  * emits
  */
-const emit = defineEmits(['registeredUser', 'updatedUser'])
+const emit = defineEmits(['userRegistered', 'updatedUser'])
 /**
  * computed
  */
-const tiposMovimientoOptions = computed({
+const authenticable = computed({
   get() {
-    return (tiposMovimientoDao.listaTiposMovimiento.value ?? []).filter(
-      (tipoMovimiento) => tipoMovimiento.id != '3'
-    )
-  }
-})
-const editedFormItem = computed({
-  get() {
-    return !!props.editedItem ? props.editedItem : formItem.value
+    return !!props.userToEdit ? props.userToEdit : formItem.value
   },
   set(val) {
     formItem.value = val
@@ -176,28 +162,17 @@ const editedFormItem = computed({
 })
 const actionName = computed({
   get() {
-    return !!editedFormItem.value.id ? 'Actualizar Usuario' : 'Nuevo Usuario'
+    return !!authenticable.value.id ? 'Actualizar Usuario' : 'Nuevo Usuario'
   }
 })
 const isEditing = computed({
   get() {
-    return !!editedFormItem.value.id
+    return !!authenticable.value.id
   }
 })
 const lblSubmit = computed({
   get() {
-    return !!editedFormItem.value.id ? 'Actualizar' : 'Registrar'
-  }
-})
-const color = new Map([
-  ['1', 'ingreso-button'],
-  ['2', 'egreso-button'],
-  ['3', 'traspaso-button']
-])
-
-const active_color = computed({
-  get() {
-    return color.get(editedFormItem.value.tipoMovimientoId)
+    return !!authenticable.value.id ? 'Actualizar' : 'Registrar'
   }
 })
 
@@ -205,124 +180,61 @@ const active_color = computed({
  * METHODS
  */
 
-function onChangeTipoMovimiento(tipoMovimientoId) {
-  console.log('cambio en el tipo de usuario', tipoMovimientoId)
-  editedFormItem.value.cuentaContable = null
-  obtenerCuentasContables(tipoMovimientoId)
-}
-function obtenerCuentasContables(tipoMovimientoId) {
-  switch (tipoMovimientoId) {
-    case '1': //Ingreso
-      cuentaContableOptions.value.tipoAfectacion = 'A'
-      break
-    case '2': //Gasto
-      cuentaContableOptions.value.tipoAfectacion = 'C'
-      break
-    case '3':
-      break
-    case '4': //Inversion
-      cuentaContableOptions.value.tipoAfectacion = 'A'
-      break
-    default:
-      break
-  }
-}
 /**
- * Guardar o actualizar una categoría.
+ * Guardar o actualizar un usuario,
+ * mandar a llamar en el servicio de usuarios.
  */
 function registerUser() {
-  // console.log('registering user')
-
-  // const input = {
-  //   ...editedFormItem.value,
-  //   cuentaContableId: parseInt(cuenta_contable_id),
-  //   cuentaDefaultId: parseInt(cuentaDefaultId),
-  //   tipoMovimientoId: parseInt(editedFormItem.value.tipoMovimientoId),
-  //   importeDefault: parseFloat(editedFormItem.value.importeDefault ?? '0'),
-  //   userId,
-  //   orden: 1000,
-  //   tipoMovimiento: undefined,
-  //   cuentaContable: undefined,
-  //   cuentaDefault: undefined,
-  //   __typename: undefined
-  // }
-  // console.log('guardando item:', input)
-  // if (!editedFormItem.value.id) {
-  //   // usuarioCrud.usuarioCreate({ input })
-  // } else {
-  //   const id = editedFormItem.value.id
-  //   // usuarioCrud.usuarioUpdate({ id, input })
-  // }
-  console.log('registrando usuario')
-  userService.userRegister(authenticable.value)
+  if (!isEditing.value) {
+    // if (isFormValid()) {
+    userService.userRegister(authenticable.value)
+    // }
+  } else {
+    userService.userUpdate({
+      id: authenticable.value.id,
+      userInput: {
+        name: authenticable.value.name
+      }
+    })
+  }
 }
+// function isFormValid() {
+//   if (
+//     authenticable.value.password !== authenticable.value.passwordConfirmation
+//   ) {
+//     mostrarNotificacionNegativa("",  2100)
+//     return false
+//   }
+//   return true
+// }
 
 userService.onDoneUserRegister(({ data }) => {
-  console.log(
-    '%csrc/components/admin/usuarios/UserRegistrationForm.vue:253 data',
-    'color: #007acc;',
-    data
-  )
+  const newUser = data.userRegister.authenticatable
+
+  userService.userUpdate({
+    id: newUser.id,
+    userInput: { name: authenticable.value.name }
+  })
+})
+
+userService.onDoneUserUpdate(({ data }) => {
+  mostrarNotificacionPositiva('El usuario se registró correctamente', 2500)
+  const newUser = data.userUpdate.user
+  emit('userRegistered', newUser)
 })
 
 userService.onErrorUserRegister((error) => {
-  console.log(
-    '%csrc/components/admin/usuarios/UserRegistrationForm.vue:261 error',
-    'color: #007acc;',
-    error
-  )
+  mostrarNotificacionNegativa('El usuario no puede ser registrado', 2500)
 })
-
-/**
- *
- */
-// usuarioCrud.onDoneUsuarioCreate(({ data }) => {
-//   if (!!data) {
-//     const itemSaved = data.usuarioCreate.usuario
-//     mostrarNotificacionPositiva(
-//       `Categoría "${itemSaved.nombre}" creada correctamente.`,
-//       1600
-//     )
-//     emit('usuarioSaved', itemSaved)
-//   }
-// })
-
-// usuarioCrud.onDoneUsuarioUpdate(({ data }) => {
-//   if (!!data) {
-//     const itemUpdated = data.usuarioUpdate.usuario
-//     mostrarNotificacionPositiva(
-//       `Categoría "${itemUpdated.nombre}" actualizada correctamente.`,
-//       1600
-//     )
-//     emit('usuarioUpdated', itemUpdated, props.editedIndex)
-//   }
-// })
-
-// usuarioCrud.onErrorUsuarioCreate((error) => {
-//   const nombreError = error.graphQLErrors[0]?.extensions?.nombre ?? null
-
-//   const errorString = !!nombreError
-//     ? 'No fue posible guardar la usuario. Ya existe una usuario con el nombre que intenta guardar'
-//     : 'No fue posible guardar la usuario. Favor de intentar nuevamente'
-
-//   mostrarNotificacionNegativa(errorString, 2100)
-// })
-
-// usuarioCrud.onErrorUsuarioUpdate((error) => {
-//   const nombreError = error.graphQLErrors[0]?.extensions?.nombre ?? null
-
-//   const errorString = !!nombreError
-//     ? 'No fue posible guardar la usuario. Ya existe una usuario con el nombre que intenta guardar'
-//     : 'No fue posible guardar la usuario. Favor de intentar nuevamente'
-
-//   mostrarNotificacionNegativa(errorString, 2100)
-// })
 
 /**
  * onMounted
  */
 onMounted(() => {
-  obtenerCuentasContables(editedFormItem.value.tipoMovimientoId)
+  if (!isEditing.value) {
+    authenticable.value.email = ''
+    authenticable.value.password = ''
+  }
 })
 
 /**
@@ -339,16 +251,11 @@ const show_icon_picker = ref(false)
 function cancelIconPicker() {
   show_icon_picker.value = false
 }
-function selectIcon() {
-  show_icon_picker.value = true
-}
+
 function onIconSelected(value) {
   console.log('IconoSeleccionado', value)
-  editedFormItem.value.icono = value
+  authenticable.value.icono = value
   show_icon_picker.value = false
-}
-function colorSelecionado(value) {
-  ppproxy.value.hide()
 }
 </script>
 

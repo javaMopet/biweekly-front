@@ -43,6 +43,7 @@
               currency-code="MNX"
               v-model="editedFormItem.importe"
               :opcional="false"
+              label="Importe traspaso:"
               :rules="[
                 (val) =>
                   (!!val &&
@@ -54,10 +55,11 @@
             ></PriceInput>
           </div>
         </div>
-        <div class="">
+        <div class="" style="min-height: 60px">
           <CuentaSelect
             v-model="editedFormItem.cuenta"
             :readonly="cuentaReadOnly"
+            :label="lblCuentaOrigen"
           ></CuentaSelect>
         </div>
         <div class="">
@@ -307,6 +309,17 @@ const active_color = computed({
   }
 })
 
+const lblCuentaOrigen = computed({
+  get() {
+    switch (editedFormItem.value.tipoMovimientoId) {
+      case '3':
+        return 'Cuenta Origen'
+      default:
+        return 'Cuenta Bancaria'
+    }
+  }
+})
+
 /**
  * METHODS
  */
@@ -318,7 +331,12 @@ function onChangeTipoMovimiento(value) {
 }
 
 function saveItem() {
-  const userId = SessionStorage.getItem('user').id
+  console.log(
+    '[ SessionStorage.getItem(current_user) ] >',
+    SessionStorage.getItem('current_user')
+  )
+  const currentUser = JSON.parse(SessionStorage.getItem('current_user'))
+  const userId = currentUser.id
   const categoria = editedFormItem.value.categoria
   const importe = parseFloat(editedFormItem.value.importe)
   console.dir(editedFormItem.value)
@@ -371,7 +389,7 @@ function saveItem() {
         observaciones: editedFormItem.value.observaciones,
         userId
       }
-
+      console.log('[ input ] >', input)
       inputDetalle.push({
         cuentaId: parseInt(editedFormItem.value.cuenta.id),
         tipoCuentaTraspasoId: 1,
@@ -457,7 +475,10 @@ const graphqlOptions = reactive({
 })
 
 function obtenerDatosTraspasoSiAplica() {
-  console.log('verificando si es traspaso', editedFormItem.value)
+  console.log(
+    '[ editedFormItem.value ] >',
+    editedFormItem.value.traspasoDetalle
+  )
   if (!!editedFormItem.value.traspasoDetalle) {
     const id = editedFormItem.value.traspasoDetalle.traspasoId
     traspasosCrud.loadListaTraspasos(null, { id }, graphqlOptions)

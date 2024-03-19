@@ -50,14 +50,9 @@
   <div class="main-content">
     <div class="cuenta-content">
       <q-card class="my-card" flat bordered>
-        <q-toolbar class="">
-          <PeriodoSelect
-            v-model:year="ejercicio_fiscal"
-            v-model:month="mes"
-            @onChangePeriodo="onChangePeriodo"
-          ></PeriodoSelect>
+        <!-- <q-toolbar class="">
           <q-toolbar-title> </q-toolbar-title>
-        </q-toolbar>
+        </q-toolbar> -->
         <q-card-actions
           class="row bg-white full-width text-accent text-subtitle2 resumen"
           bordered
@@ -123,6 +118,7 @@
           row-key="id"
           :filter="filter"
           no-data-label="No se han registrado movimientos"
+          :loading="loadingRegistros"
         >
           <template v-slot:header-selection="scope">
             <q-checkbox v-model="scope.selected" dense />
@@ -137,7 +133,14 @@
           </template>
           <template #top-left>
             <q-tr class="cuenta__data-subtitle">
-              <div class="table-title">Movimientos del periodo</div>
+              <div class="table-title column">
+                <PeriodoSelect
+                  v-model:year="ejercicio_fiscal"
+                  v-model:month="mes"
+                  @onChangePeriodo="onChangePeriodo"
+                ></PeriodoSelect>
+                <span class="q-pl-lg q-pt-sm">Movimientos del periodo</span>
+              </div>
             </q-tr>
           </template>
           <template #top-right>
@@ -263,6 +266,9 @@
               }}</q-td>
             </q-tr>
           </template> -->
+          <template v-slot:loading>
+            <q-inner-loading showing color="primary" />
+          </template>
         </q-table>
       </div>
       <div class="summary">
@@ -321,10 +327,8 @@ import { useRegistrosCrud } from 'src/composables/useRegistrosCrud'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { useQuasar } from 'quasar'
 import FormCuentaRegistro from 'src/components/movimientos/FormCuentaRegistro.vue'
-import MesSelect from 'src/components/formComponents/MesSelect.vue'
 import { OBTENER_SALDO_A_FECHA } from 'src/graphql/cuentas'
 import ImportarRegistrosCuenta from 'src/components/cuentas/ImportarRegistrosCuenta.vue'
-import { useTraspasosCrud } from 'src/composables/useTraspasosCrud'
 import { useCuentaStore } from 'src/stores/common/useCuentaStore'
 import { useCuentasCrud } from 'src/composables/useCuentasCrud'
 import PeriodoSelect from 'src/components/formComponents/PeriodoSelect.vue'
@@ -338,7 +342,6 @@ const router = useRouter()
 const formato = useFormato()
 const registrosCrud = useRegistrosCrud()
 const $q = useQuasar()
-const traspasosCrud = useTraspasosCrud()
 const cuentaStore = useCuentaStore()
 const cuentasCrud = useCuentasCrud()
 const generalStore = useGeneralStore()
@@ -363,6 +366,7 @@ const variablesSaldoAnterior = reactive({
   cuentaId: route.params.id,
   fechaFin: DateTime.now().startOf('month').plus({ days: -1 }).toISODate()
 })
+// const loadingRegistros = ref(false)
 
 // const variablesSaldoAlPeriodo = reactive({
 //   cuentaId: route.params.id,
@@ -388,13 +392,13 @@ const showFormCarga = ref(false)
  * on before mount
  */
 onBeforeMount(() => {
-  console.log('On before mount ..............')
+  // console.log('On before mount ..............')
 })
 /**
  * onMounted
  */
 onMounted(() => {
-  console.log('On mounted ................')
+  // console.log('On mounted ................')
   mes.value = generalStore.meses.find(
     (mesOption) => mesOption.id === DateTime.now().month
   )
@@ -422,12 +426,12 @@ const graphqlOptions = reactive({
 const {
   onError: onErrorListaRegistros,
   onResult: onResultListaRegistros,
-  refetch: refetchListaRegistros
+  refetch: refetchListaRegistros,
+  loading: loadingRegistros
 } = useQuery(LISTA_REGISTROS, detalleVariables, graphqlOptions)
 
 onResultListaRegistros(({ data }) => {
   if (!!data) {
-    console.log('on result lista registros.....')
     listaRegistros.value = data?.obtenerRegistros ?? []
   }
 })
@@ -449,8 +453,6 @@ const {
 
 onResultObtenerSaldoAFecha(({ data }) => {
   if (!!data) {
-    console.log('onResultObtenerSaldoAFecha anterior.....')
-    // saldoFinalPeriodo.value = data.obtenerSaldoAFecha
     saldo_periodo_anterior.value = data.obtenerSaldoAFecha
   }
 })
@@ -531,7 +533,7 @@ function editItem(item) {
   registroEditedItem.value.tipoMovimientoId =
     registroEditedItem.value.categoria?.tipoMovimientoId || '3'
 
-  console.log('item to edit', registroEditedItem.value)
+  console.log('[ registroEditedItem.value ] >', registroEditedItem.value)
   showForm.value = true
 }
 
@@ -541,7 +543,6 @@ function editItem(item) {
  * @returns {Float} Retornar el importe formateado de acuerdo al tipo de movimiento
  */
 function obtenerImporteByTipoMovimiento(editedItem) {
-  console.log('obtenerImporteByTipoMovimiento item...', editedItem)
   if (!!editedItem.categoria) {
     return editedItem.categoria.tipoMovimientoId === '2'
       ? editedItem.importe * -1

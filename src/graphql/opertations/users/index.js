@@ -37,3 +37,29 @@ export const USER_REGISTER = gql`
     }
   }
 `
+
+export const USER_UPDATE = gql`
+  mutation userUpdate($id: ID!, $userInput: UserInput!) {
+    userUpdate(id: $id, userInput: $userInput) {
+      user {
+        id
+        email
+        name
+        createdAt
+      }
+    }
+  }
+`
+
+export const USER_DELETE = gql`
+  mutation userDelete($id: ID!) {
+    userDelete(id: $id) {
+      user {
+        id
+        email
+        name
+        createdAt
+      }
+    }
+  }
+`

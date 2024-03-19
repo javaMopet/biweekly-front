@@ -1,10 +1,14 @@
 <template>
   <q-card class="my-card">
     <q-card-section>
-      <div class="text-h5">Bienvenido</div>
-      <div class="text-subtitle2">{{ username }} ({{ email }})</div>
+      <div class="text-h4">Bienvenido al Sistema de Ingresos y Egresos</div>
     </q-card-section>
     <q-card-section>
+      <div class="text-h6">
+        <span class="text-weight-bold">{{ username }}</span> ({{ email }})
+      </div>
+    </q-card-section>
+    <q-card-section class="text-blue-grey-4">
       Inicia seleccionando una opción en el menú de la izquierda.
     </q-card-section>
   </q-card>

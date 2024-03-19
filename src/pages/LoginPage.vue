@@ -17,10 +17,14 @@
         >
           <div class="">
             <div class="column full-width items-center text-h6 q-pt-lg">
-              <span class="text-weight-bold q-py-sm text-blue-grey-3"
+              <!-- <span class="text-weight-bold q-py-sm text-blue-grey-3"
                 >Bienvenido
-              </span>
+              </span> -->
               <!-- <span class="text-caption">Identifiquese antes de continuar</span> -->
+              <q-icon name="account_circle" size="100px" />
+            </div>
+            <div class="row justify-center">
+              <span>Login to your account</span>
             </div>
           </div>
           <!-- <q-separator spaced inset horizontal color="accent-light" /> -->
@@ -37,7 +41,7 @@
               <q-input
                 v-model="form.email"
                 type="email"
-                label="Correo"
+                label="Usuario o Email"
                 label-color="input-label"
                 bg-color="blue-1"
                 color="blue-gray-10"
@@ -46,8 +50,8 @@
                 :rules="[(val) => !!val || 'Correo es requerido']"
                 class="fit"
               >
-                <template v-slot:before>
-                  <q-icon name="mail" class="text-blue-grey-3" />
+                <template v-slot:prepend>
+                  <q-icon name="mail" class="text-blue-grey-5" />
                 </template>
               </q-input>
 
@@ -64,8 +68,8 @@
                 class="fit"
               >
                 <!-- standout="bg-form-input-standout-dark" -->
-                <template v-slot:before>
-                  <q-icon name="lock" class="text-blue-grey-3" />
+                <template v-slot:prepend>
+                  <q-icon name="lock" class="text-blue-grey-5" />
                 </template>
                 <template #append>
                   <div class="bg-blue-1"></div>
@@ -146,7 +150,6 @@ function login() {
 }
 
 sessionService.onDoneUserLogin(({ data }) => {
-  console.log('mandando al home')
   submitting.value = false
   router.push('/home')
 })

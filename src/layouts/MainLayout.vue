@@ -80,12 +80,11 @@
     </q-drawer>
 
     <q-page-container>
-      <p>Idle: {{ idleFirst }}</p>
-      <p>IdleLast: {{ idleLast }}</p>
+      <!-- <p>Idle: {{ idleFirst }}</p>
+      <p>IdleLast: {{ idleLast }}</p> -->
       <router-view />
     </q-page-container>
   </q-layout>
-  <div id="modal"></div>
 </template>
 
 <script setup>
@@ -103,12 +102,12 @@ const {
   idle: idleFirst,
   lastActive: lastAciveFirst,
   reset: resetFirst
-} = useIdle(1 * 10 * 1000) // 2 min
+} = useIdle(2 * 60 * 1000) // 2 min
 const {
   idle: idleLast,
   lastActive: lastActiveLast,
   reset: resetLast
-} = useIdle(1 * 15 * 1000) // 3 min
+} = useIdle(3 * 60 * 1000) // 3 min
 
 /**
  * composable

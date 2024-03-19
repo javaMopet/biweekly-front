@@ -547,7 +547,7 @@ function addItemToSave(row, index, fecha, importe, tipo_afectacion) {
 function obtenerRegistros() {
   var registrosInput = []
   var opciones = ['1', '2']
-  const userId = SessionStorage.getItem('user').id
+  const userId = SessionStorage.getItem('current_user').id
   listaRegistrosFiltrados.value.forEach((item) => {
     console.log('recorriendo arreglo')
     console.dir(item.tipoMovimiento)
@@ -584,7 +584,7 @@ function obtenerTraspasos() {
   var traspasosInput = []
   listaRegistrosFiltrados.value.forEach((item) => {
     const fecha = DateTime.fromFormat(item.fecha, 'dd/MM/yyyy')
-    const userId = SessionStorage.getItem('user').id
+    const userId = SessionStorage.getItem('current_user').id
     if (item.tipoMovimiento.tipoMovimientoId === '3') {
       traspasosInput.push({
         fecha,

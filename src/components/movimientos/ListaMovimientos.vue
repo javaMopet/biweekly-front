@@ -493,7 +493,7 @@ function saveItem() {
         importe,
         fecha: formato.convertDateFromInputToIso(formItem.value.fecha),
         observaciones: formItem.value.observaciones,
-        userId: SessionStorage.getItem('user').id
+        userId: SessionStorage.getItem('current_user').id
       }
       if (!!editingItem.value) {
         const id = editingItem.value.row.id
