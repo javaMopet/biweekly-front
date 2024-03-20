@@ -108,7 +108,7 @@ import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { api } from 'src/boot/axios'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
-import { userSessionService } from 'src/composables/login/useSessionService'
+import { useSessionService } from 'src/composables/login/useSessionService'
 
 /**
  * composables
@@ -116,7 +116,7 @@ import { userSessionService } from 'src/composables/login/useSessionService'
 const $q = useQuasar()
 const router = useRouter()
 const { mostrarNotificacionNegativa } = useNotificacion()
-const sessionService = userSessionService()
+const sessionService = useSessionService()
 
 /**
  * state

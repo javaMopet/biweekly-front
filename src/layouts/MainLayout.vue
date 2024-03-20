@@ -94,7 +94,7 @@ import { useRouter } from 'vue-router'
 import { SessionStorage, useQuasar } from 'quasar'
 import EssentialLink from 'src/components/EssentialLink.vue'
 import { LISTA_MENUS } from 'src/graphql/menus'
-import { userSessionService } from 'src/composables/login/useSessionService'
+import { useSessionService } from 'src/composables/login/useSessionService'
 import { useCounter, useIdle } from '@vueuse/core'
 
 // const { idle, lastActive, reset } = useIdle(5 * 60 * 1000) // 5 min
@@ -102,18 +102,18 @@ const {
   idle: idleFirst,
   lastActive: lastAciveFirst,
   reset: resetFirst
-} = useIdle(2 * 60 * 1000) // 2 min
+} = useIdle(30 * 60 * 1000) // 2 min
 const {
   idle: idleLast,
   lastActive: lastActiveLast,
   reset: resetLast
-} = useIdle(3 * 60 * 1000) // 3 min
+} = useIdle(31 * 60 * 1000) // 3 min
 
 /**
  * composable
  */
 const $q = useQuasar()
-const sessionService = userSessionService()
+const sessionService = useSessionService()
 
 /**
  * state

@@ -216,13 +216,11 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useLazyQuery, useQuery } from '@vue/apollo-composable'
-import DateInput from '../formComponents/DateInput.vue'
 import InputPrice from '../formComponents/InputPrice.vue'
 import { DateTime } from 'luxon'
 import { LISTA_REGISTROS } from 'src/graphql/registros'
 import { CATEGORIA_BY_ID } from 'src/graphql/categorias'
 import { useFormato } from 'src/composables/utils/useFormato'
-import CuentaSelect from '../formComponents/CuentaSelect.vue'
 import { useRegistrosCrud } from 'src/composables/useRegistrosCrud'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { SessionStorage, useQuasar } from 'quasar'
@@ -849,3 +847,4 @@ function buscarMovimientos() {
   }
 }
 </style>
+../formComponents/CuentaSelect~.vue.bak../formComponents/deprecated/CuentaSelect.vue

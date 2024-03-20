@@ -27,13 +27,18 @@
           grid
           style="width: 100%"
           dense
-          :rows="cuentaStore.listaCuentasTarjeta"
+          :rows="listaCuentasTarjeta"
           :columns="columns"
           row-key="id"
           :filter="filter"
           :rows-per-page-options="[0]"
           hide-pagination
+          :loading="loadingListaCuentas"
+          loading-label="Cargando lista de Tarjetas..."
         >
+          <template v-slot:loading>
+            <q-inner-loading showing color="primary" />
+          </template>
           <template #top-left>
             <div class="page-title">Tarjetas de crédito</div>
           </template>
@@ -162,19 +167,18 @@
         transition-show="jump-up"
         transition-hide="jump-down"
       >
-        <FormRegistroCuenta
+        <AccountRegistrationForm
           :edited-item="editedItem"
           @cuentaSaved="cuentaSaved"
           @cuentaUpdated="cuentaUpdated"
-        ></FormRegistroCuenta>
+        ></AccountRegistrationForm>
       </q-dialog>
     </Teleport>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onActivated } from 'vue'
-import FormRegistroCuenta from 'src/components/cuentas/FormRegistroCuenta.vue'
+import { ref, onMounted } from 'vue'
 import { useQuasar } from 'quasar'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { useRouter } from 'vue-router'
@@ -182,6 +186,8 @@ import { useFormato } from 'src/composables/utils/useFormato'
 import { useCuentaStore } from 'src/stores/common/useCuentaStore'
 import { useRegistrosTarjetaCrud } from 'src/composables/useRegistrosTarjetaCrud'
 import { useCuentasCrud } from 'src/composables/useCuentasCrud'
+import { useCuentaService } from 'src/composables/cuentas/useCuentaService'
+import AccountRegistrationForm from 'src/components/cuentas/AccountRegistrationForm.vue'
 
 /**
  * composables
@@ -192,6 +198,8 @@ const router = useRouter()
 const cuentaStore = useCuentaStore()
 const registrosTarjetaCrud = useRegistrosTarjetaCrud()
 const cuentasCrud = useCuentasCrud()
+const cuentaService = useCuentaService()
+const { loadingListaCuentas } = useCuentaService()
 
 const { toCurrencyAbsoluteFormat } = useFormato()
 const { mostrarNotificacionPositiva, mostrarNotificacionNegativa } =
@@ -201,9 +209,11 @@ const { mostrarNotificacionPositiva, mostrarNotificacionNegativa } =
  * state
  */
 const loadingCard = ref([])
+const listaCuentasTarjeta = ref([])
 /**
  * GRAPHQL
  */
+
 // const {
 //   mutate: deleteCuenta,
 //   onDone: onDoneDeleteCuenta,
@@ -224,6 +234,11 @@ registrosTarjetaCrud.onErrorRegistroTarjetaDelete((error) => {
     'No es posible eliminar esta tarjeta de crédito debido a que tiene movimientos',
     1500
   )
+})
+
+cuentaService.onResultListaCuentas(({ data }) => {
+  listaCuentasTarjeta.value =
+    data.listaCuentas.filter((c) => c.tipoCuenta.id === '3') ?? []
 })
 /**
  * state
@@ -286,7 +301,7 @@ const columns = [
  * onMounted
  */
 onMounted(() => {
-  cuentaStore.loadOrRefetchListaCuentas()
+  // cuentaStore.loadOrRefetchListaCuentas()
 })
 
 // onResultCuentas(({ data }) => {

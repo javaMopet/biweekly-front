@@ -56,21 +56,21 @@
           </div>
         </div>
         <div class="" style="min-height: 60px">
-          <CuentaSelect
+          <SelectCuenta
             v-model="editedFormItem.cuenta"
             :readonly="cuentaReadOnly"
             :label="lblCuentaOrigen"
-          ></CuentaSelect>
+          ></SelectCuenta>
         </div>
         <div class="">
-          <CuentaSelect
+          <SelectCuenta
             v-if="isTraspaso"
             v-model="editedFormItem.cuentaDestino"
             label="Cuenta Destino"
             :filter-array="['1', '2']"
             :filter-id-array="filterIdArray"
             :rules="[(val) => !!val || 'Favor de ingresar la cuenta destino']"
-          ></CuentaSelect>
+          ></SelectCuenta>
         </div>
         <div>
           <q-input
@@ -109,7 +109,6 @@
 import { ref, computed, onMounted, reactive } from 'vue'
 import DateInput from '../formComponents/DateInput.vue'
 import CategoriaSelect from '../formComponents/CategoriaSelect.vue'
-import CuentaSelect from '../formComponents/CuentaSelect.vue'
 import { useFormato } from 'src/composables/utils/useFormato'
 import PriceInput from '../formComponents/PriceInput.vue'
 import { useRegistrosCrud } from 'src/composables/useRegistrosCrud'
@@ -118,6 +117,7 @@ import { SessionStorage } from 'quasar'
 import { useTipoMovimientoStore } from 'src/stores/common/useTipoMovimientoStore'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import DialogTitle from '../formComponents/modal/DialogTitle.vue'
+import SelectCuenta from '../formComponents/SelectCuenta.vue'
 
 /**
  * composables
@@ -485,3 +485,4 @@ function obtenerDatosTraspasoSiAplica() {
   }
 }
 </script>
+../formComponents/CuentaSelect~.vue.bak../formComponents/deprecated/CuentaSelect.vue

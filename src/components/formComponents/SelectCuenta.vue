@@ -33,10 +33,6 @@
   <div v-if="agregar" class="q-mt-xs" style="border: 0px solid red">
     <q-btn color="accent" outline icon="add" dense @click="registrarCuenta" />
   </div>
-  <!-- <div class="">
-    {{ props.filterIdArray }}
-    {{ filteredOptions }}
-  </div> -->
 
   <Teleport to="#modal">
     <q-dialog
@@ -45,19 +41,18 @@
       transition-show="jump-up"
       transition-hide="jump-down"
     >
-      <!-- :edited-item="editedItem" -->
-      <FormRegistroCuenta
+      <AccountRegistrationForm
         @cuentaSaved="cuentaSaved"
         @cuentaUpdated="cuentaUpdated"
-      ></FormRegistroCuenta>
+      ></AccountRegistrationForm>
     </q-dialog>
   </Teleport>
 </template>
 
 <script>
-import { ref, computed } from 'vue'
-import { useCuentaStore } from 'src/stores/common/useCuentaStore'
-import FormRegistroCuenta from '../cuentas/FormRegistroCuenta.vue'
+import { ref, computed, onMounted } from 'vue'
+import AccountRegistrationForm from '../cuentas/AccountRegistrationForm.vue'
+import { useCuentaService } from 'src/composables/cuentas/useCuentaService'
 
 export default {
   props: {
@@ -126,17 +121,31 @@ export default {
     }
   },
   emits: ['update:modelValue'],
+  components: { AccountRegistrationForm },
   setup(props, { emit }) {
     /**
      * composable
      */
-    const cuentaStore = useCuentaStore()
+    const cuentaService = useCuentaService()
     /**
      * state
      */
     const filteredOptions = ref([])
     const form_cuenta_show = ref(false)
     const containsError = ref(false)
+    const listaCuentas = ref([])
+
+    /**
+     * graphql
+     */
+    cuentaService.onResultListaCuentas(({ data }) => {
+      if (!!data) {
+        console.log('Se obtuvo la lista de cuentas', data)
+        listaCuentas.value = JSON.parse(
+          JSON.stringify(data?.listaCuentas ?? [])
+        )
+      }
+    })
     /**
      * computed
      */
@@ -151,7 +160,7 @@ export default {
     const listaOptions = computed({
       get() {
         return (
-          cuentaStore.listaCuentas
+          listaCuentas.value
             ?.filter((option) => {
               return props.filterArray.includes(option.tipoCuenta.id)
             })
@@ -207,8 +216,7 @@ export default {
       filterFn,
       validar
     }
-  },
-  components: { FormRegistroCuenta }
+  }
 }
 </script>
 
@@ -258,3 +266,4 @@ export default {
   transition: all 0.1s ease-out;
 }
 </style>
+../cuentas/AccountRegistrationForm.vue../cuentas/AccountRegisterForm.vue

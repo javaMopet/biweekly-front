@@ -41,8 +41,11 @@ export default route(function (/* { store, ssrContext } */) {
     const authRequired = !publicPages.includes(to.path)
 
     if (authRequired) {
-      if (!SessionStorage.getItem('credentials')) {
-        return '/'
+      if (
+        !SessionStorage.getItem('credentials') ||
+        !SessionStorage.getItem('current_user')
+      ) {
+        return '/login'
       }
     }
   })

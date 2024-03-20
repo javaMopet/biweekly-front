@@ -10,13 +10,13 @@
       :agregar="false"
       @update:model-value="onSelectCategoriaCuenta"
     ></CategoriaSelect>
-    <CuentaSelect
+    <SelectCuenta
       v-else
       v-model="cuenta"
       label="Cuenta Destino"
       :filter-array="['1', '2']"
       @update:model-value="onSelectCategoriaCuenta"
-    ></CuentaSelect>
+    ></SelectCuenta>
     <q-btn
       round
       icon="more_vert"
@@ -92,8 +92,8 @@
 <script setup>
 import { computed, ref, onMounted, toRef } from 'vue'
 import CategoriaSelect from './CategoriaSelect.vue'
-import CuentaSelect from './CuentaSelect.vue'
 import FormRegistroCategoria from '../categorias/FormRegistroCategoria.vue'
+import SelectCuenta from './SelectCuenta.vue'
 
 /**
  * props
@@ -198,3 +198,4 @@ function onCategoriaSaved(categoriaSaved) {
 </script>
 
 <style lang="scss" scoped></style>
+./CuentaSelect~.vue.bak./deprecated/CuentaSelect.vue

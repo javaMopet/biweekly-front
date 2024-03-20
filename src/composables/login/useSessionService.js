@@ -3,7 +3,7 @@ import { SessionStorage } from 'quasar'
 import { LOGIN, LOGOUT } from 'src/graphql/opertations/login'
 import { api } from 'src/boot/axios'
 
-export function userSessionService() {
+export function useSessionService() {
   /**
    * composable
    */
@@ -48,7 +48,9 @@ export function userSessionService() {
     removeCredentials()
   })
 
-  onErrorUserLogout((response) => {})
+  onErrorUserLogout((response) => {
+    console.log('error al hacer el logout', response)
+  })
 
   function removeCredentials() {
     console.log('removiento credenciales...')
@@ -63,6 +65,7 @@ export function userSessionService() {
     onErrorUserLogin,
     userLogout,
     onDoneUserLogout,
-    onErrorUserLogout
+    onErrorUserLogout,
+    removeCredentials
   }
 }

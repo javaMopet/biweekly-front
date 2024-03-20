@@ -23,13 +23,18 @@
           grid
           style="width: 100%"
           dense
-          :rows="cuentaStore.listaCuentasAhorro"
+          :rows="listaCuentasAhorro"
           :columns="columns"
           row-key="id"
           :filter="filter"
           :rows-per-page-options="[0]"
           hide-pagination
+          :loading="loadingListaCuentas"
+          loading-label="Cargando lista de Cuentas"
         >
+          <template v-slot:loading>
+            <q-inner-loading showing color="primary" />
+          </template>
           <template #top-left>
             <div class="page-title">Cuentas</div>
           </template>
@@ -171,11 +176,11 @@
           transition-show="jump-up"
           transition-hide="jump-down"
         >
-          <FormRegistroCuenta
+          <AccountRegistrationForm
             :edited-item="editedItem"
             @cuentaSaved="cuentaSaved"
             @cuentaUpdated="cuentaUpdated"
-          ></FormRegistroCuenta>
+          ></AccountRegistrationForm>
         </q-dialog>
       </Teleport>
     </div>
@@ -183,14 +188,15 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onActivated } from 'vue'
-import FormRegistroCuenta from 'src/components/cuentas/FormRegistroCuenta.vue'
+import { ref, onActivated } from 'vue'
 import { useQuasar } from 'quasar'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { useFormato } from 'src/composables/utils/useFormato'
 import { useRouter } from 'vue-router'
 import { useCuentaStore } from 'src/stores/common/useCuentaStore'
 import { useCuentasCrud } from 'src/composables/useCuentasCrud'
+import { useCuentaService } from 'src/composables/cuentas/useCuentaService'
+import AccountRegistrationForm from 'src/components/cuentas/AccountRegistrationForm.vue'
 
 /**
  * composables
@@ -201,9 +207,13 @@ const formato = useFormato()
 const router = useRouter()
 const cuentaStore = useCuentaStore()
 const cuentasCrud = useCuentasCrud()
+const cuentaService = useCuentaService()
+
+const { loadingListaCuentas } = useCuentaService()
 /**
  * GRAPHQL
  */
+
 cuentasCrud.onErrorCuentaDelete((error) => {
   notificacion.mostrarNotificacionNegativa(
     'No es posible eliminar esta cuenta, favor de verificar que no contenga movimientos',
@@ -213,6 +223,7 @@ cuentasCrud.onErrorCuentaDelete((error) => {
 /**
  * state
  */
+const listaCuentasAhorro = ref([])
 const defaultItem = {
   id: null,
   nombre: null,
@@ -225,8 +236,13 @@ const defaultItem = {
 const filter = ref()
 const showFormItem = ref(false)
 const editedItem = ref({ ...defaultItem })
+
 const loadingAccount = ref([])
 
+cuentaService.onResultListaCuentas(({ data }) => {
+  listaCuentasAhorro.value =
+    data.listaCuentas.filter((c) => c.tipoCuenta.id !== '3') ?? []
+})
 /**
  * computed
  */
@@ -328,6 +344,7 @@ function deleteRow(item) {
 cuentasCrud.onDoneCuentaDelete(({ data }) => {
   const itemDeleted = data.cuentaDelete.cuenta
   console.log('itemDeleted', itemDeleted)
+  cuentaService.refetchListaCuentas()
   notificacion.mostrarNotificacionPositiva(
     `La cuenta ${itemDeleted.nombre} se eliminó correctamente`,
     1400
@@ -336,6 +353,7 @@ cuentasCrud.onDoneCuentaDelete(({ data }) => {
 
 function cuentaSaved(itemSaved) {
   showFormItem.value = false
+  cuentaService.refetchListaCuentas()
 }
 function cuentaUpdated(itemUpdated) {
   showFormItem.value = false

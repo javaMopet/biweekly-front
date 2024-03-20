@@ -1,11 +1,11 @@
 import { createHttpLink, InMemoryCache } from '@apollo/client/core'
 import { onError } from '@apollo/client/link/error'
 import { setContext } from '@apollo/client/link/context'
-import { useSessionStore } from 'src/stores/sessionStore.js'
 import { SessionStorage } from 'quasar'
+import { useSessionService } from 'src/composables/login/useSessionService'
 
 export /* async */ function getClientOptions(/* {app, router, ...} */ options) {
-  const { logoutUser } = useSessionStore()
+  const { userLogout, removeCredentials } = useSessionService()
 
   const errorLink = onError(({ operation, graphQLErrors, networkError }) => {
     // console.log(
@@ -19,12 +19,17 @@ export /* async */ function getClientOptions(/* {app, router, ...} */ options) {
           `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
         )
         console.log('location', location)
+        if (message.includes('requires authentication')) {
+          console.log('logging out desde el apollo index.js ...............')
+          removeCredentials()
+          userLogout()
+        }
       })
     }
     if (networkError) {
       // console.error('Error el intentar Graphql:', networkError)
       console.log(`[Network error]: ${networkError}`)
-      if (networkError.statusCode === 401) logoutUser()
+      if (networkError.statusCode === 401) userLogout()
     }
   })
 

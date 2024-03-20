@@ -142,12 +142,13 @@
 
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
-import CuentaContableSelect from '../formComponents/CuentaContableSelect.vue'
+import CuentaContableSelect from 'src/components/formComponents/CuentaContableSelect.vue'
 import BancoSelect from '../formComponents/BancoSelect.vue'
 import { useTipoCuentaStore } from 'src/stores/common/useTipoCuentaStore'
 import { useCuentasCrud } from 'src/composables/useCuentasCrud'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import DialogTitle from '../formComponents/modal/DialogTitle.vue'
+import { useCuentaService } from 'src/composables/cuentas/useCuentaService'
 
 /**
  * composable
@@ -155,6 +156,7 @@ import DialogTitle from '../formComponents/modal/DialogTitle.vue'
 // const tipoMovimientoStore = useTipoMovimientoStore()
 const tipoCuentaStore = useTipoCuentaStore()
 const cuentasCrud = useCuentasCrud()
+const cuentaService = useCuentaService()
 const {
   mostrarNotificacionPositiva,
   mostrarNotificacionNegativa,
@@ -179,7 +181,7 @@ const cuentaContableProps = reactive({
   clasificacion: ''
 })
 
-cuentasCrud.onDoneCuentaCreate(({ data }) => {
+cuentaService.onDoneCuentaCreate(({ data }) => {
   console.log('saved data...', data)
   if (!!data) {
     const itemSaved = data.cuentaCreate.cuenta
@@ -342,7 +344,7 @@ function saveItem() {
   if (!editedFormItem.value.id) {
     console.log('guardando cuenta nueva', input)
     input.saldo = parseFloat(0)
-    cuentasCrud.cuentaCreate({ input })
+    cuentaService.cuentaCreate({ input })
   } else {
     if (tipo_cuenta_id === '2') {
       console.log('se cambio el tipo de cuenta', tipo_cuenta_id)
@@ -356,7 +358,7 @@ function saveItem() {
     cuentasCrud.cuentaUpdate({ id, input })
   }
 }
-cuentasCrud.onErrorCuentaCreate((error) => {
+cuentaService.onErrorCuentaCreate((error) => {
   const nombreError = error.graphQLErrors[0]?.extensions?.nombre ?? null
 
   const errorString = !!nombreError

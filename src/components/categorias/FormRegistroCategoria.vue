@@ -130,13 +130,13 @@
               ></PriceInput>
             </div>
             <div class="col-7">
-              <CuentaSelect
+              <SelectCuenta
                 v-model="editedFormItem.cuentaDefault"
                 :opcional="true"
                 :filter-array="['1', '2']"
                 label="Cuenta Bancaria (opcional)"
                 hint="Esta cuenta se tomará por defecto al agregar un movimiento"
-              ></CuentaSelect>
+              ></SelectCuenta>
             </div>
           </div>
 
@@ -190,7 +190,6 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import IconPicker from '/src/components/IconPicker.vue'
-import CuentaSelect from '../formComponents/CuentaSelect.vue'
 import PriceInput from '../formComponents/PriceInput.vue'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { SessionStorage } from 'quasar'
@@ -199,6 +198,7 @@ import { useTipoMovimientoStore } from 'src/stores/common/useTipoMovimientoStore
 import { useCategoriasCrud } from 'src/composables/useCategoriasCrud'
 import CuentaContableSelect from '../formComponents/CuentaContableSelect.vue'
 import DialogTitle from '../formComponents/modal/DialogTitle.vue'
+import SelectCuenta from '../formComponents/SelectCuenta.vue'
 
 /**
  * composables
@@ -436,3 +436,4 @@ function colorSelecionado(value) {
 </script>
 
 <style lang="sass" scoped></style>
+../formComponents/CuentaSelect~.vue.bak../formComponents/deprecated/CuentaSelect.vue

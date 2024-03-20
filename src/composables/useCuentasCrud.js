@@ -1,11 +1,9 @@
-import { useLazyQuery, useMutation } from '@vue/apollo-composable'
+import { useMutation } from '@vue/apollo-composable'
 import {
   CUENTA_CREATE,
   CUENTA_UPDATE,
   CUENTA_DELETE,
-  CUENTA_SALDO_UPDATE,
-  SALDO_TARJETA_CREDITO
-  // SALDO_TARJETA_CREDITO
+  CUENTA_SALDO_UPDATE
 } from 'src/graphql/cuentas'
 import { useCuentaStore } from 'src/stores/common/useCuentaStore'
 
@@ -14,12 +12,6 @@ export function useCuentasCrud() {
    * composables
    */
   const cuentaStore = useCuentaStore()
-
-  const {
-    mutate: cuentaCreate,
-    onDone: onDoneCuentaCreate,
-    onError: onErrorCuentaCreate
-  } = useMutation(CUENTA_CREATE)
 
   const {
     mutate: cuentaUpdate,
@@ -39,29 +31,25 @@ export function useCuentasCrud() {
     onError: onErrorCuentaSaldoUpdate
   } = useMutation(CUENTA_SALDO_UPDATE)
 
-  onDoneCuentaCreate(({ data }) => {
-    const itemSaved = data.cuentaCreate.cuenta
-    cuentaStore.listaCuentas.push(itemSaved)
-  })
   onDoneCuentaUpdate(({ data }) => {
     if (!!data) {
       // console.log('ejecutando onDonecuentaUpdate useCuentaCrud', data)
-      const itemUpdated = data.cuentaUpdate.cuenta
+      // const itemUpdated = data.cuentaUpdate.cuenta
       // console.log('itemUpdated... ', itemUpdated)
-      const index = cuentaStore.listaCuentas.findIndex(
-        (c) => c.id === itemUpdated.id
-      )
+      // const index = cuentaStore.listaCuentas.findIndex(
+      //   (c) => c.id === itemUpdated.id
+      // )
       // console.log('index updated', index)
-      cuentaStore.listaCuentas[index] = itemUpdated
+      // cuentaStore.listaCuentas[index] = itemUpdated
     }
   })
   onDoneCuentaDelete(({ data }) => {
-    const itemDeleted = data.cuentaDelete.cuenta
-    const index = cuentaStore.listaCuentas.findIndex(
-      (c) => c.id === itemDeleted.id
-    )
+    // const itemDeleted = data.cuentaDelete.cuenta
+    // const index = cuentaStore.listaCuentas.findIndex(
+    //   (c) => c.id === itemDeleted.id
+    // )
     // console.log('index item deleted', index)
-    cuentaStore.listaCuentas.splice(index, 1)
+    // cuentaStore.listaCuentas.splice(index, 1)
   })
 
   onDoneCuentaSaldoUpdate(({ data }) => {
@@ -72,18 +60,12 @@ export function useCuentasCrud() {
   })
 
   function updateCuentaInterfaz(saldoUpdated) {
-    console.log('Se actualiza el saldo de la cuenta interfaz', saldoUpdated)
-    const index = cuentaStore.listaCuentas.findIndex(
-      (c) => c.id === saldoUpdated.id
-    )
-    cuentaStore.listaCuentas[index].saldo = saldoUpdated.saldo
+    // console.log('Se actualiza el saldo de la cuenta interfaz', saldoUpdated)
+    // const index = cuentaStore.listaCuentas.findIndex(
+    //   (c) => c.id === saldoUpdated.id
+    // )
+    // cuentaStore.listaCuentas[index].saldo = saldoUpdated.saldo
   }
-
-  onErrorCuentaCreate((error) => {
-    console.trace(error)
-    // console.log('error', error.graphQLErrors[0])
-    // console.log('error', error.graphQLErrors[0]?.extensions)
-  })
 
   onErrorCuentaUpdate((error) => {
     console.trace(error)
@@ -98,15 +80,12 @@ export function useCuentasCrud() {
   // })
 
   return {
-    cuentaCreate,
     cuentaUpdate,
     cuentaDelete,
     cuentaSaldoUpdate,
-    onDoneCuentaCreate,
     onDoneCuentaUpdate,
     onDoneCuentaDelete,
     onDoneCuentaSaldoUpdate,
-    onErrorCuentaCreate,
     onErrorCuentaUpdate,
     onErrorCuentaDelete
     // loadSaldoTarjetaCredito,

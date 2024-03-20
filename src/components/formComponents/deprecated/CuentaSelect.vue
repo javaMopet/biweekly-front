@@ -39,18 +39,18 @@
       transition-hide="jump-down"
     >
       <!-- :edited-item="editedItem" -->
-      <FormRegistroCuenta
+      <AccountForm
         @cuentaSaved="cuentaSaved"
         @cuentaUpdated="cuentaUpdated"
-      ></FormRegistroCuenta>
+      ></AccountForm>
     </q-dialog>
   </Teleport>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
-import FormRegistroCuenta from '../cuentas/FormRegistroCuenta.vue'
 import { useCuentaStore } from 'src/stores/common/useCuentaStore'
+import AccountForm from '../cuentas/AccountForm.vue'
 
 /**
  * composable
@@ -186,3 +186,4 @@ function cuentaSaved(itemSaved) {
 </script>
 
 <style lang="scss" scoped></style>
+../cuentas/AccountRegistrationForm.vue
