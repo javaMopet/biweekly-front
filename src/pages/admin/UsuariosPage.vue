@@ -140,7 +140,7 @@ import { useFormato } from 'src/composables/utils/useFormato'
 import { useRouter } from 'vue-router'
 import { useUserService } from 'src/composables/admin/useUserService'
 import UserRegistrationForm from 'src/components/admin/usuarios/UserRegistrationForm.vue'
-import { userSessionService } from 'src/composables/login/useSessionService'
+import { useSessionService } from 'src/composables/login/useSessionService'
 
 /**
  * composables
@@ -152,7 +152,7 @@ const formato = useFormato()
 const router = useRouter()
 const userService = useUserService()
 // const usuariosCrud = useUsuariosCrud()
-const sessionService = userSessionService()
+const sessionService = useSessionService()
 /**
  * GRAPHQL
  */

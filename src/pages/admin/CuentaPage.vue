@@ -433,6 +433,7 @@ const {
 onResultListaRegistros(({ data }) => {
   if (!!data) {
     listaRegistros.value = data?.obtenerRegistros ?? []
+    console.log('[ listaRegistros.value ] >', listaRegistros.value)
   }
 })
 
@@ -522,6 +523,7 @@ function refetchDatos() {
  */
 function editItem(item) {
   registroEditedItem.value = JSON.parse(JSON.stringify(item.row))
+  console.log('[ registroEditedItem.value ] >', registroEditedItem.value)
 
   registroEditedItem.value.importe = obtenerImporteByTipoMovimiento(
     registroEditedItem.value

@@ -140,7 +140,6 @@ export default {
      */
     cuentaService.onResultListaCuentas(({ data }) => {
       if (!!data) {
-        console.log('Se obtuvo la lista de cuentas', data)
         listaCuentas.value = JSON.parse(
           JSON.stringify(data?.listaCuentas ?? [])
         )

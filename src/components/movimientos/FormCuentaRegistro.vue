@@ -245,7 +245,7 @@ traspasosCrud.onResultListaTraspasos(({ data }) => {
   const detalleContrario = traspaso.value.traspasoDetalles.find((detalle) => {
     return detalle.tipoCuentaTraspasoId !== tipoCuentaTraspasoId
   })
-  editedFormItem.value.cuentaDestino = detalleContrario.cuenta
+  // editedFormItem.value.cuentaDestino = detalleContrario.cuenta
   editedFormItem.value.observaciones = traspaso.value.observaciones
 })
 
@@ -476,7 +476,7 @@ const graphqlOptions = reactive({
 
 function obtenerDatosTraspasoSiAplica() {
   console.log(
-    '[ editedFormItem.value ] >',
+    '[ editedFormItem.value.traspasoDetalle ] >',
     editedFormItem.value.traspasoDetalle
   )
   if (!!editedFormItem.value.traspasoDetalle) {

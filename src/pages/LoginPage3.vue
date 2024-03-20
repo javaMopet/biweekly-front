@@ -60,7 +60,7 @@ import { api } from 'src/boot/axios'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 // import { LOGIN } from 'src/graphql/opertations/login'
 // import { useMutation } from '@vue/apollo-composable'
-import { userSessionService } from 'src/composables/login/useSessionService'
+import { useSessionService } from 'src/composables/login/useSessionService'
 
 /**
  * composables
@@ -68,7 +68,7 @@ import { userSessionService } from 'src/composables/login/useSessionService'
 const $q = useQuasar()
 const router = useRouter()
 const { mostrarNotificacionNegativa } = useNotificacion()
-const sessionService = userSessionService()
+const sessionService = useSessionService()
 
 /**
  * GRAPHQL
