@@ -330,23 +330,14 @@ function onChangeTipoMovimiento(value) {
 }
 
 function saveItem() {
-  console.log(
-    '[ SessionStorage.getItem(current_user) ] >',
-    SessionStorage.getItem('current_user')
-  )
   const currentUser = JSON.parse(SessionStorage.getItem('current_user'))
   const userId = currentUser.id
   const categoria = editedFormItem.value.categoria
   const importe = parseFloat(editedFormItem.value.importe)
-  console.dir(editedFormItem.value)
 
   if (isTraspaso.value) {
     if (isEditing.value) {
       // Actualizacion de un traspaso
-      console.log(
-        '[ editedFormItem.value.traspaso ] >',
-        editedFormItem.value.traspaso
-      )
       const traspaso = JSON.parse(JSON.stringify(editedFormItem.value.traspaso))
       const id = traspaso.id
       const input = {
@@ -365,10 +356,7 @@ function saveItem() {
         let inputDet = {
           ...traspasoDetalle,
           importe,
-          cuentaId:
-            traspasoDetalle.tipoCuentaTraspasoId === 1
-              ? traspasoDetalle.cuenta.id.toString()
-              : editedFormItem.value.cuentaDestino.id,
+          cuentaId: traspasoDetalle.cuenta.id,
           cuenta: undefined,
           __typename: undefined,
           registro: undefined
@@ -443,7 +431,6 @@ function saveItem() {
 }
 
 traspasosCrud.onDoneTraspasoUpdate(({ data }) => {
-  console.log('Al terminar de actualizar traspaso', data)
   mostrarNotificacionPositiva('Traspaso actualizado', 2100)
   emit('itemUpdated')
 })
@@ -475,7 +462,7 @@ const graphqlOptions = reactive({
 })
 
 function obtenerDatosTraspasoSiAplica() {
-  console.log('[ editedFormItem.value ] >', editedFormItem.value)
+  // console.log('[ editedFormItem.value ] >', editedFormItem.value)
 
   if (!!editedFormItem.value.traspaso) {
     // const id = editedFormItem.value.traspasoDetalle.traspasoId
@@ -486,8 +473,8 @@ function obtenerDatosTraspasoSiAplica() {
     const cuentaDestino = editedFormItem.value.traspaso.traspasoDetalles.find(
       (det) => det.tipoCuentaTraspasoId === '2'
     )
-    console.log('[ cuentaOrigen ] >', cuentaOrigen)
-    console.log('[ cuentaDestino ] >', cuentaDestino)
+    // console.log('[ cuentaOrigen ] >', cuentaOrigen)
+    // console.log('[ cuentaDestino ] >', cuentaDestino)
     editedFormItem.value.cuenta = cuentaOrigen.cuenta
     editedFormItem.value.cuentaDestino = cuentaDestino.cuenta
   }

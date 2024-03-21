@@ -431,9 +431,10 @@ const {
 } = useQuery(LISTA_REGISTROS, detalleVariables, graphqlOptions)
 
 onResultListaRegistros(({ data }) => {
+  console.log('[ data ] >', data)
   if (!!data) {
-    listaRegistros.value = data?.obtenerRegistros ?? []
-    console.log('[ listaRegistros.value ] >', listaRegistros.value)
+    listaRegistros.value =
+      JSON.parse(JSON.stringify(data?.obtenerRegistros)) ?? []
   }
 })
 

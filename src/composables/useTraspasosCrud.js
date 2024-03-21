@@ -49,19 +49,18 @@ export function useTraspasosCrud() {
   })
 
   onDoneTraspasoUpdate(({ data }) => {
-    console.log('onDonetraspasoUpdate', data)
-    const traspaso = data.traspasoUpdate.traspaso
-    const cuentasIds = data.traspasoUpdate.cuentasIds
-    const cuentas = data.traspasoUpdate.cuentas
-
-    cuentas.forEach((element) => {
-      console.log(element)
-      // cuentasCrud.cuentaSaldoUpdate({ cuentaId: element })
-      const index = cuentaStore.listaCuentas.findIndex(
-        (c) => c.id === element.id
-      )
-      cuentaStore.listaCuentas[index].saldo = element.saldo
-    })
+    // console.log('onDonetraspasoUpdate', data)
+    // const traspaso = data.traspasoUpdate.traspaso
+    // const cuentasIds = data.traspasoUpdate.cuentasIds
+    // const cuentas = data.traspasoUpdate.cuentas
+    // cuentas.forEach((element) => {
+    //   console.log(element)
+    //   // cuentasCrud.cuentaSaldoUpdate({ cuentaId: element })
+    //   const index = cuentaStore.listaCuentas.findIndex(
+    //     (c) => c.id === element.id
+    //   )
+    //   cuentaStore.listaCuentas[index].saldo = element.saldo
+    // })
   })
 
   onDoneTraspasoDelete(({ data }) => {
