@@ -67,6 +67,7 @@
             v-if="isTraspaso"
             v-model="editedFormItem.cuentaDestino"
             label="Cuenta Destino"
+            :readonly="isEditing"
             :filter-array="['1', '2']"
             :filter-id-array="filterIdArray"
             :rules="[(val) => !!val || 'Favor de ingresar la cuenta destino']"
@@ -132,8 +133,6 @@ const { mostrarNotificacionPositiva, mostrarNotificacionNegativa } =
 /**
  * state
  */
-const traspaso = ref(null)
-
 const defaultItem = {
   tipoMovimientoId: '1',
   tipoAfectacion: 'A',
@@ -343,46 +342,47 @@ function saveItem() {
 
   if (isTraspaso.value) {
     if (isEditing.value) {
-      const id = traspaso.value.id
+      // Actualizacion de un traspaso
+      console.log(
+        '[ editedFormItem.value.traspaso ] >',
+        editedFormItem.value.traspaso
+      )
+      const traspaso = JSON.parse(JSON.stringify(editedFormItem.value.traspaso))
+      const id = traspaso.id
       const input = {
-        ...traspaso.value,
+        ...traspaso,
         fecha: formato.convertDateFromInputToIso(editedFormItem.value.fecha),
         observaciones: editedFormItem.value.observaciones,
         __typename: undefined,
         traspasoDetalles: undefined
       }
       const inputDetalle = []
-      console.table(traspaso.value.traspasoDetalles)
+      // const inputDetalle = JSON.parse(JSON.stringify(traspaso.traspasoDetalles))
 
-      console.log('inputDetalle', inputDetalle)
-      traspaso.value.traspasoDetalles.forEach((detalle) => {
-        console.log(
-          'cuenta',
-          detalle.tipoCuentaTraspasoId,
-          detalle.cuenta.id.toString()
-        )
-        console.assert(detalle.tipoCuentaTraspasoId === 1)
-        let traspasoDetalle = {
-          ...detalle,
+      // console.log('inputDetalle', inputDetalle)
+
+      traspaso.traspasoDetalles.forEach((traspasoDetalle) => {
+        let inputDet = {
+          ...traspasoDetalle,
           importe,
           cuentaId:
-            detalle.tipoCuentaTraspasoId === 1
-              ? detalle.cuenta.id.toString()
+            traspasoDetalle.tipoCuentaTraspasoId === 1
+              ? traspasoDetalle.cuenta.id.toString()
               : editedFormItem.value.cuentaDestino.id,
           cuenta: undefined,
           __typename: undefined,
-          registroId: detalle.registro.id.toString(),
           registro: undefined
         }
 
-        console.log('traspasoDetalle', traspasoDetalle)
-        inputDetalle.push(traspasoDetalle)
+        //   console.log('traspasoDetalle', traspasoDetalle)
+        inputDetalle.push(inputDet)
       })
 
       console.log('Mandar actualizar traspaso', id, input, inputDetalle)
 
       traspasosCrud.traspasoUpdate({ id, input, inputDetalle })
     } else {
+      // Se guarda un traspaso detalle
       const inputDetalle = []
       const input = {
         fecha: formato.convertDateFromInputToIso(editedFormItem.value.fecha),
@@ -475,14 +475,21 @@ const graphqlOptions = reactive({
 })
 
 function obtenerDatosTraspasoSiAplica() {
-  console.log(
-    '[ editedFormItem.value.traspasoDetalle ] >',
-    editedFormItem.value.traspasoDetalle
-  )
-  if (!!editedFormItem.value.traspasoDetalle) {
-    const id = editedFormItem.value.traspasoDetalle.traspasoId
-    traspasosCrud.loadListaTraspasos(null, { id }, graphqlOptions)
+  console.log('[ editedFormItem.value ] >', editedFormItem.value)
+
+  if (!!editedFormItem.value.traspaso) {
+    // const id = editedFormItem.value.traspasoDetalle.traspasoId
+    // traspasosCrud.loadListaTraspasos(null, { id }, graphqlOptions)
+    const cuentaOrigen = editedFormItem.value.traspaso.traspasoDetalles.find(
+      (det) => det.tipoCuentaTraspasoId === '1'
+    )
+    const cuentaDestino = editedFormItem.value.traspaso.traspasoDetalles.find(
+      (det) => det.tipoCuentaTraspasoId === '2'
+    )
+    console.log('[ cuentaOrigen ] >', cuentaOrigen)
+    console.log('[ cuentaDestino ] >', cuentaDestino)
+    editedFormItem.value.cuenta = cuentaOrigen.cuenta
+    editedFormItem.value.cuentaDestino = cuentaDestino.cuenta
   }
 }
 </script>
-../formComponents/CuentaSelect~.vue.bak../formComponents/deprecated/CuentaSelect.vue

@@ -16,15 +16,15 @@ export const TRASPASO_CREATE = gql`
           cuentaId
           tipoCuentaTraspasoId
         }
-        detalleDestino {
-          id
-          cuentaId
-          tipoCuentaTraspasoId
-        }
       }
     }
   }
 `
+// detalleDestino {
+//   id
+//   cuentaId
+//   tipoCuentaTraspasoId
+// }
 
 export const TRASPASO_UPDATE = gql`
   mutation traspasoUpdate(
@@ -39,11 +39,6 @@ export const TRASPASO_UPDATE = gql`
     ) {
       traspaso {
         detalleOrigen {
-          id
-          cuentaId
-          tipoCuentaTraspasoId
-        }
-        detalleDestino {
           id
           cuentaId
           tipoCuentaTraspasoId
@@ -65,11 +60,6 @@ export const TRASPASO_DELETE = gql`
       traspaso {
         id
         detalleOrigen {
-          id
-          cuentaId
-          tipoCuentaTraspasoId
-        }
-        detalleDestino {
           id
           cuentaId
           tipoCuentaTraspasoId

@@ -50,9 +50,11 @@
 </template>
 
 <script>
-import { ref, computed, onMounted } from 'vue'
+import { useQuery } from '@vue/apollo-composable'
+import { LISTA_CUENTAS } from 'src/graphql/cuentas'
+import { ref, computed, reactive } from 'vue'
 // import AccountRegistrationForm from '../cuentas/AccountRegistrationForm.vue'
-import { useCuentaStore } from 'src/stores/common/useCuentaStore'
+// import { useCuentaStore } from 'src/stores/common/useCuentaStore'
 
 export default {
   props: {
@@ -126,7 +128,7 @@ export default {
     /**
      * composable
      */
-    const cuentaStore = useCuentaStore()
+    // const cuentaStore = useCuentaStore()
     /**
      * state
      */
@@ -138,13 +140,24 @@ export default {
     /**
      * graphql
      */
-    // cuentaService.onResultListaCuentas(({ data }) => {
-    //   if (!!data) {
-    //     listaCuentas.value = JSON.parse(
-    //       JSON.stringify(data?.listaCuentas ?? [])
-    //     )
-    //   }
-    // })
+    const graphql_options = reactive({
+      fetchPolicy: 'cache-first'
+    })
+    const {
+      onResult: onResultListaCuentas,
+      onError: onErrorListaCuentas,
+      // load: loadListaCuentas,
+      refetch: refetchListaCuentas
+      // result: resultListaCuentas,
+      // loading: loadingListaCuentas
+    } = useQuery(LISTA_CUENTAS, null, graphql_options)
+    onResultListaCuentas(({ data }) => {
+      if (!!data) {
+        listaCuentas.value = JSON.parse(
+          JSON.stringify(data?.listaCuentas ?? [])
+        )
+      }
+    })
     /**
      * computed
      */
@@ -159,7 +172,7 @@ export default {
     const listaOptions = computed({
       get() {
         return (
-          cuentaStore.listaCuentas.value
+          listaCuentas.value
             ?.filter((option) => {
               return props.filterArray.includes(option.tipoCuenta.id)
             })
@@ -265,4 +278,3 @@ export default {
   transition: all 0.1s ease-out;
 }
 </style>
-../cuentas/AccountRegistrationForm.vue../cuentas/AccountRegisterForm.vue

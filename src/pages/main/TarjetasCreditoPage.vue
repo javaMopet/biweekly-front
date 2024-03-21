@@ -178,7 +178,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, reactive, computed } from 'vue'
 import { useQuasar } from 'quasar'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { useRouter } from 'vue-router'
@@ -186,8 +186,9 @@ import { useFormato } from 'src/composables/utils/useFormato'
 import { useCuentaStore } from 'src/stores/common/useCuentaStore'
 import { useRegistrosTarjetaCrud } from 'src/composables/useRegistrosTarjetaCrud'
 import { useCuentasCrud } from 'src/composables/useCuentasCrud'
-import { useCuentaService } from 'src/composables/cuentas/useCuentaService'
 import AccountRegistrationForm from 'src/components/cuentas/AccountRegistrationForm.vue'
+import { LISTA_CUENTAS } from 'src/graphql/cuentas'
+import { useQuery } from '@vue/apollo-composable'
 
 /**
  * composables
@@ -198,8 +199,6 @@ const router = useRouter()
 const cuentaStore = useCuentaStore()
 const registrosTarjetaCrud = useRegistrosTarjetaCrud()
 const cuentasCrud = useCuentasCrud()
-const cuentaService = useCuentaService()
-const { loadingListaCuentas } = useCuentaService()
 
 const { toCurrencyAbsoluteFormat } = useFormato()
 const { mostrarNotificacionPositiva, mostrarNotificacionNegativa } =
@@ -209,16 +208,38 @@ const { mostrarNotificacionPositiva, mostrarNotificacionNegativa } =
  * state
  */
 const loadingCard = ref([])
-const listaCuentasTarjeta = ref([])
+const listaCuentas = ref([])
 /**
  * GRAPHQL
  */
 
+const graphql_options = reactive({
+  fetchPolicy: 'cache-first'
+})
+const {
+  onResult: onResultListaCuentas,
+  onError: onErrorListaCuentas,
+  refetch: refetchListaCuentas,
+  loading: loadingListaCuentas
+} = useQuery(LISTA_CUENTAS, null, graphql_options)
+
+onResultListaCuentas(({ data }) => {
+  if (!!data) {
+    // console.log('recupeando datos desde el store', 'color: #007acc;', data)
+    listaCuentas.value = JSON.parse(JSON.stringify(data.listaCuentas ?? []))
+  }
+})
 // const {
 //   mutate: deleteCuenta,
 //   onDone: onDoneDeleteCuenta,
 //   onError: onErrorDeleteCuenta
 // } = useMutation(CUENTA_DELETE)
+
+const listaCuentasTarjeta = computed({
+  get() {
+    return listaCuentas.value.filter((c) => c.tipoCuenta.id === '3') ?? []
+  }
+})
 
 registrosTarjetaCrud.onDoneRegistroTarjetaDelete(({ data }) => {
   if (!!data) {

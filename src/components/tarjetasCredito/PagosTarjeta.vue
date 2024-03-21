@@ -57,10 +57,10 @@
         </div>
         <div class="column">
           <div class="row input-label">Cuenta de egreso:</div>
-          <CuentaSelect
+          <SelectCuenta
             v-model="formItem.cuenta_egreso"
             :rules="[(val) => !!val || 'Favor de ingresar la cuenta de egreso']"
-          ></CuentaSelect>
+          ></SelectCuenta>
         </div>
         <div align="right">
           <q-btn
@@ -85,7 +85,6 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useLazyQuery } from '@vue/apollo-composable'
-import CuentaSelect from '../formComponents/CuentaSelect.vue'
 import DateInput from '../formComponents/DateInput.vue'
 import PriceInput from '../formComponents/PriceInput.vue'
 import { useFormato } from 'src/composables/utils/useFormato'
@@ -95,6 +94,7 @@ import { api } from 'src/boot/axios'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { SessionStorage } from 'quasar'
 import DialogTitle from '../formComponents/modal/DialogTitle.vue'
+import SelectCuenta from '../formComponents/SelectCuenta.vue'
 
 /**
  * composables
@@ -233,4 +233,3 @@ const isNotPagable = computed({
 </script>
 
 <style lang="scss" scoped></style>
-../formComponents/CuentaSelect~.vue.bak../formComponents/deprecated/CuentaSelect.vue

@@ -43,8 +43,8 @@ export function useTraspasosCrud() {
     const traspaso = data.traspasoCreate.traspaso
     console.log('onDonetraspasoCreate', traspaso)
     actualizarInterfazCuentas(
-      traspaso.detalleOrigen.cuentaId,
-      traspaso.detalleDestino.cuentaId
+      traspaso.detalleOrigen.cuentaId
+      // traspaso.detalleDestino.cuentaId
     )
   })
 
@@ -68,8 +68,8 @@ export function useTraspasosCrud() {
     const traspaso = data.traspasoDelete.traspaso
     console.log('onDonetraspasoDelete', traspaso)
     actualizarInterfazCuentas(
-      traspaso.detalleOrigen.cuentaId,
-      traspaso.detalleDestino.cuentaId
+      traspaso.detalleOrigen.cuentaId
+      // traspaso.detalleDestino.cuentaId
     )
   })
 

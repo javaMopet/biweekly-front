@@ -22,6 +22,7 @@ export const LISTA_REGISTROS = gql`
       importe
       cargo
       abono
+      tipoCuentaTraspasoId
       disable
       cuenta {
         id
@@ -45,6 +46,20 @@ export const LISTA_REGISTROS = gql`
         traspasoId
         tipoCuentaTraspasoId
         importe
+      }
+      traspaso {
+        id
+        fecha
+        observaciones
+        userId
+        traspasoDetalles {
+          id
+          tipoCuentaTraspasoId
+          cuenta {
+            id
+            nombre
+          }
+        }
       }
       userId
     }

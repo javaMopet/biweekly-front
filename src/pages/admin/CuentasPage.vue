@@ -23,12 +23,13 @@
           grid
           style="width: 100%"
           dense
-          :rows="cuentaStore.listaCuentas"
+          :rows="listaCuentasAhorro"
           :columns="columns"
           row-key="id"
           :filter="filter"
           :rows-per-page-options="[0]"
           hide-pagination
+          :loading="loadingListaCuentas"
           loading-label="Cargando lista de Cuentas"
         >
           <template v-slot:loading>
@@ -188,15 +189,16 @@
 </template>
 
 <script setup>
-import { ref, onActivated, watch, onMounted } from 'vue'
+import { ref, reactive, computed, watch, onMounted } from 'vue'
 import { useQuasar } from 'quasar'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { useFormato } from 'src/composables/utils/useFormato'
 import { useRouter } from 'vue-router'
-import { useCuentaStore } from 'src/stores/common/useCuentaStore'
+// import { useCuentaStore } from 'src/stores/common/useCuentaStore'
 import { useCuentasCrud } from 'src/composables/useCuentasCrud'
 import AccountRegistrationForm from 'src/components/cuentas/AccountRegistrationForm.vue'
-// import { LISTA_CUENTAS_CONTABLES } from 'src/graphql/cuentasContables'
+import { useQuery } from '@vue/apollo-composable'
+import { LISTA_CUENTAS } from 'src/graphql/cuentas'
 
 /**
  * composables
@@ -206,11 +208,37 @@ const notificacion = useNotificacion()
 const formato = useFormato()
 const router = useRouter()
 const cuentasCrud = useCuentasCrud()
-const cuentaStore = useCuentaStore()
+// const cuentaStore = useCuentaStore()
 
+const listaCuentas = ref([])
 /**
  * GRAPHQL
  */
+const graphql_options = reactive({
+  fetchPolicy: 'cache-first'
+})
+
+const {
+  onResult: onResultListaCuentas,
+  onError: onErrorListaCuentas,
+  // load: loadListaCuentas,
+  refetch: refetchListaCuentas,
+  // result: resultListaCuentas,
+  loading: loadingListaCuentas
+} = useQuery(LISTA_CUENTAS, null, graphql_options)
+
+onResultListaCuentas(({ data }) => {
+  if (!!data) {
+    // console.log('recupeando datos desde el store', 'color: #007acc;', data)
+    listaCuentas.value = JSON.parse(JSON.stringify(data.listaCuentas ?? []))
+  }
+})
+const listaCuentasAhorro = computed(
+  () => listaCuentas.value?.filter((c) => c.tipoCuenta.id !== '3') ?? []
+)
+onErrorListaCuentas((error) => {
+  console.error(error)
+})
 
 cuentasCrud.onErrorCuentaDelete((error) => {
   notificacion.mostrarNotificacionNegativa(
@@ -314,7 +342,7 @@ onMounted(() => {
   // console.log('onMounted CuentasPage.vue', cuentaStore.listaCuentas.length)
   // if (cuentaStore.listaCuentas.length <= 0) {
   //   console.log('onMounted CuentasPage.vue', cuentaStore.listaCuentas.length)
-  cuentaStore.fetchOrRefetch()
+  // cuentaStore.fetchOrRefetch()
   // }
 })
 
@@ -370,7 +398,7 @@ function deleteRow(item) {
 cuentasCrud.onDoneCuentaDelete(({ data }) => {
   const itemDeleted = data.cuentaDelete.cuenta
   console.log('itemDeleted', itemDeleted)
-  cuentaService.refetchListaCuentas()
+  refetchListaCuentas()
   notificacion.mostrarNotificacionPositiva(
     `La cuenta ${itemDeleted.nombre} se eliminó correctamente`,
     1400
@@ -379,11 +407,12 @@ cuentasCrud.onDoneCuentaDelete(({ data }) => {
 
 function cuentaSaved(itemSaved) {
   showFormItem.value = false
-  cuentaService.refetchListaCuentas()
+  refetchListaCuentas()
 }
 function cuentaUpdated(itemUpdated) {
   showFormItem.value = false
   editedItem.value = { ...defaultItem }
+  refetchListaCuentas()
 }
 </script>
 
