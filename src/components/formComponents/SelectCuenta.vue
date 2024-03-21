@@ -34,7 +34,7 @@
     <q-btn color="accent" outline icon="add" dense @click="registrarCuenta" />
   </div>
 
-  <Teleport to="#modal">
+  <!-- <Teleport to="#modal">
     <q-dialog
       v-model="form_cuenta_show"
       persistent
@@ -46,13 +46,13 @@
         @cuentaUpdated="cuentaUpdated"
       ></AccountRegistrationForm>
     </q-dialog>
-  </Teleport>
+  </Teleport> -->
 </template>
 
 <script>
 import { ref, computed, onMounted } from 'vue'
-import AccountRegistrationForm from '../cuentas/AccountRegistrationForm.vue'
-import { useCuentaService } from 'src/composables/cuentas/useCuentaService'
+// import AccountRegistrationForm from '../cuentas/AccountRegistrationForm.vue'
+import { useCuentaStore } from 'src/stores/common/useCuentaStore'
 
 export default {
   props: {
@@ -121,12 +121,12 @@ export default {
     }
   },
   emits: ['update:modelValue'],
-  components: { AccountRegistrationForm },
+  // components: { AccountRegistrationForm },
   setup(props, { emit }) {
     /**
      * composable
      */
-    const cuentaService = useCuentaService()
+    const cuentaStore = useCuentaStore()
     /**
      * state
      */
@@ -138,13 +138,13 @@ export default {
     /**
      * graphql
      */
-    cuentaService.onResultListaCuentas(({ data }) => {
-      if (!!data) {
-        listaCuentas.value = JSON.parse(
-          JSON.stringify(data?.listaCuentas ?? [])
-        )
-      }
-    })
+    // cuentaService.onResultListaCuentas(({ data }) => {
+    //   if (!!data) {
+    //     listaCuentas.value = JSON.parse(
+    //       JSON.stringify(data?.listaCuentas ?? [])
+    //     )
+    //   }
+    // })
     /**
      * computed
      */
@@ -159,7 +159,7 @@ export default {
     const listaOptions = computed({
       get() {
         return (
-          listaCuentas.value
+          cuentaStore.listaCuentas.value
             ?.filter((option) => {
               return props.filterArray.includes(option.tipoCuenta.id)
             })

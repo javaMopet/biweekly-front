@@ -236,10 +236,10 @@ registrosTarjetaCrud.onErrorRegistroTarjetaDelete((error) => {
   )
 })
 
-cuentaService.onResultListaCuentas(({ data }) => {
-  listaCuentasTarjeta.value =
-    data.listaCuentas.filter((c) => c.tipoCuenta.id === '3') ?? []
-})
+// cuentaService.onResultListaCuentas(({ data }) => {
+//   listaCuentasTarjeta.value =
+//     data.listaCuentas.filter((c) => c.tipoCuenta.id === '3') ?? []
+// })
 /**
  * state
  */

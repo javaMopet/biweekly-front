@@ -1,20 +1,73 @@
-import { useQuery } from '@vue/apollo-composable'
+import { useLazyQuery } from '@vue/apollo-composable'
 import { defineStore } from 'pinia'
-import { useCuentaService } from 'src/composables/cuentas/useCuentaService'
-import { useCuentasCrud } from 'src/composables/useCuentasCrud'
 import { LISTA_CUENTAS } from 'src/graphql/cuentas'
-import { computed, ref } from 'vue'
+import { ref, reactive } from 'vue'
 
 export const useCuentaStore = defineStore('cuentaStore', () => {
+  const listaCuentas = ref([])
   /**
    * composables
    */
-  // const cuentaService = useCuentaService()
+  /**
+   * grapqhl
+   */
+  const graphql_options = reactive({
+    fetchPolicy: 'no-cache'
+    // pollInterval: 1000
+    // fetchPolicy: 'cache-and-network'
+    // fetchPolicy: 'network-only'
+  })
 
+  const {
+    onResult: onResultListaCuentas,
+    onError: onErrorListaCuentas,
+    load: loadListaCuentas,
+    refetch: refetchListaCuentas
+    // result: resultListaCuentas,
+    // loading: loadingListaCuentas
+  } = useLazyQuery(LISTA_CUENTAS, null, graphql_options)
+
+  onResultListaCuentas(({ data }) => {
+    if (!!data) {
+      console.log('recupeando datos desde el store', 'color: #007acc;', data)
+      listaCuentas.value = JSON.parse(JSON.stringify(data.listaCuentas ?? []))
+    }
+  })
+  onErrorListaCuentas((error) => {
+    console.error(error)
+  })
+  function fetchOrRefetch() {
+    loadListaCuentas() || refetchListaCuentas()
+  }
+  // onMounted(() => {
+  //   if (listaCuentas.value.length <= 0) {
+  //     console.log('Refetching lista de cuentas')
+  //     refetchListaCuentas()
+  //   }
+  // })
+  // const {
+  //   onResultListaCuentas,
+  //   onErrorListaCuentas,
+  //   loadingListaCuentas
+  //   // loadOrRefetchListaCuentas
+  // } = useCuentaService()
+  /**
+   * onMoun
+   */
+  // onMounted(() => {
+  //   console.log('Iniciando el store')
+  //   console.log(
+  //     '%csrc/stores/common/useCuentaStore.js:24 listaCuentas.value',
+  //     'color: #007acc;',
+  //     listaCuentas.value
+  //   )
+  //   // loadOrRefetchListaCuentas()
+  // })
   /**
    * state
    */
-  // const listaCuentas = ref([])
+
+  // const listaCuentasAhorro = ref([])
   /**
    * graphql
    */
@@ -23,21 +76,30 @@ export const useCuentaStore = defineStore('cuentaStore', () => {
   //   fetchPolicy: 'no-cache'
   //   // fetchPolicy: 'network-only'
   // })
+  // const listaCuentas = computed(
+  //   () => resultListaCuentas.value?.listaCuentas ?? []
+  // )
+  // const listaCuentasAhorro = computed(
+  //   () =>
+  //     resultListaCuentas.value?.listaCuentas.filter(
+  //       (c) => c.tipoCuenta.id !== '3'
+  //     ) ?? []
+  // )
 
-  // cuentaService.onResultListaCuentas(({ data }) => {
-  //   if (!!data) {
-  //     console.log('Se obtuvo la lista de cuentas', data)
-  //     listaCuentas.value = JSON.parse(JSON.stringify(data?.listaCuentas ?? []))
-  //   }
-  // })
-
-  // cuentaService.onErrorListaCuentas((error) => {
-  //   console.error(error)
+  // watch(resultListaCuentas, (value) => {
+  //   console.log(
+  //     '%csrc/stores/common/useCuentaStore.js:58 value',
+  //     'color: #007acc;',
+  //     value.listaCuentas
+  //   )
+  //   listaCuentas.value = JSON.parse(JSON.stringify(value.listaCuentas ?? []))
+  //   listaCuentasAhorro.value =
+  //     listaCuentas.value.filter((c) => c.tipoCuenta.id !== '3') ?? []
   // })
 
   // function loadOrRefetchListaCuentas() {
   //   // loadListaCuentas() ||
-  //   cuentaService.refetchListaCuentas()
+  //   // refetchListaCuentas()
   // }
 
   /**
@@ -51,6 +113,7 @@ export const useCuentaStore = defineStore('cuentaStore', () => {
   // })
   // const listaCuentasAhorro = computed({
   //   get() {
+  //     console.log('calculando lista de cuentas de ahorro', listaCuentas.value)
   //     return listaCuentas.value.filter((c) => c.tipoCuenta.id !== '3') ?? []
   //   }
   // })
@@ -74,7 +137,10 @@ export const useCuentaStore = defineStore('cuentaStore', () => {
    */
 
   return {
-    // listaCuentas,
+    listaCuentas,
+    fetchOrRefetch
+    // loadOrRefetchListaCuentas
+    // onResultListaCuentas,
     // loadOrRefetchListaCuentas
     // listaCuentasTarjeta,
     // listaCuentasAhorro,

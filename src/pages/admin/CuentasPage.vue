@@ -23,13 +23,12 @@
           grid
           style="width: 100%"
           dense
-          :rows="listaCuentasAhorro"
+          :rows="cuentaStore.listaCuentas"
           :columns="columns"
           row-key="id"
           :filter="filter"
           :rows-per-page-options="[0]"
           hide-pagination
-          :loading="loadingListaCuentas"
           loading-label="Cargando lista de Cuentas"
         >
           <template v-slot:loading>
@@ -185,18 +184,19 @@
       </Teleport>
     </div>
   </div>
+  <!-- <pre>{{ listaCuentasAhorro }}</pre> -->
 </template>
 
 <script setup>
-import { ref, onActivated } from 'vue'
+import { ref, onActivated, watch, onMounted } from 'vue'
 import { useQuasar } from 'quasar'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { useFormato } from 'src/composables/utils/useFormato'
 import { useRouter } from 'vue-router'
 import { useCuentaStore } from 'src/stores/common/useCuentaStore'
 import { useCuentasCrud } from 'src/composables/useCuentasCrud'
-import { useCuentaService } from 'src/composables/cuentas/useCuentaService'
 import AccountRegistrationForm from 'src/components/cuentas/AccountRegistrationForm.vue'
+// import { LISTA_CUENTAS_CONTABLES } from 'src/graphql/cuentasContables'
 
 /**
  * composables
@@ -205,11 +205,9 @@ const $q = useQuasar()
 const notificacion = useNotificacion()
 const formato = useFormato()
 const router = useRouter()
-const cuentaStore = useCuentaStore()
 const cuentasCrud = useCuentasCrud()
-const cuentaService = useCuentaService()
+const cuentaStore = useCuentaStore()
 
-const { loadingListaCuentas } = useCuentaService()
 /**
  * GRAPHQL
  */
@@ -220,10 +218,17 @@ cuentasCrud.onErrorCuentaDelete((error) => {
     1600
   )
 })
+// cuentaStore.onResultListaCuentas(({ data }) => {
+//   console.log(
+//     '%csrc/pages/admin/CuentasPage.vue:223 data',
+//     'color: #007acc;',
+//     data
+//   )
+// })
 /**
  * state
  */
-const listaCuentasAhorro = ref([])
+
 const defaultItem = {
   id: null,
   nombre: null,
@@ -239,10 +244,28 @@ const editedItem = ref({ ...defaultItem })
 
 const loadingAccount = ref([])
 
-cuentaService.onResultListaCuentas(({ data }) => {
-  listaCuentasAhorro.value =
-    data.listaCuentas.filter((c) => c.tipoCuenta.id !== '3') ?? []
-})
+// cuentaService.onResultListaCuentas(({ data }) => {
+//   listaCuentasAhorro.value =
+//     data.listaCuentas.filter((c) => c.tipoCuenta.id !== '3') ?? []
+// })
+// watch(
+//   listaCuentas,
+//   (oldValue, newValue) => {
+//     console.log(
+//       '%csrc/pages/admin/CuentasPage.vue:245 oldValue',
+//       'color: #007acc;',
+//       oldValue
+//     )
+//     console.log(
+//       '%csrc/pages/admin/CuentasPage.vue:245 newValue',
+//       'color: #007acc;',
+//       newValue
+//     )
+//     listaCuentasAhorro.value =
+//       listaCuentas.filter((c) => c.tipoCuenta.id !== '3') ?? []
+//   },
+//   { deep: true }
+// )
 /**
  * computed
  */
@@ -286,10 +309,13 @@ const columns = [
 /**
  * onMounted
  */
-onActivated(() => {
+onMounted(() => {
   // cuentasCrud.loadListaCuentas()
-  cuentaStore.loadOrRefetchListaCuentas()
-  console.log('onMounted CuentasPage.vue', cuentaStore.listaCuentas.length > 0)
+  // console.log('onMounted CuentasPage.vue', cuentaStore.listaCuentas.length)
+  // if (cuentaStore.listaCuentas.length <= 0) {
+  //   console.log('onMounted CuentasPage.vue', cuentaStore.listaCuentas.length)
+  cuentaStore.fetchOrRefetch()
+  // }
 })
 
 function addRow(tipoCuentaId) {
