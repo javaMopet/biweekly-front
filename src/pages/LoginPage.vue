@@ -57,7 +57,7 @@
 
               <q-input
                 v-model="form.password"
-                type="password"
+                :type="isPwd ? 'password' : 'text'"
                 label="Contraseña"
                 label-color="input-label"
                 color="blue-10"
@@ -71,12 +71,16 @@
                 <template v-slot:prepend>
                   <q-icon name="lock" class="text-blue-grey-5" />
                 </template>
-                <template #append>
-                  <div class="bg-blue-1"></div>
+                <template v-slot:append>
+                  <q-icon
+                    :name="isPwd ? 'visibility_off' : 'visibility'"
+                    class="cursor-pointer"
+                    @click="isPwd = !isPwd"
+                  />
                 </template>
               </q-input>
 
-              <div class="text-negative-pastel" v-if="invalidCredentials">
+              <div class="text-red-3" v-if="invalidCredentials">
                 El usuario y/o contraseña son incorrectos
               </div>
               <div class="column fit justify-center items-center">
@@ -104,11 +108,12 @@
 
 <script setup>
 import { useQuasar, SessionStorage } from 'quasar'
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, callWithAsyncErrorHandling } from 'vue'
 import { useRouter } from 'vue-router'
 import { api } from 'src/boot/axios'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { useSessionService } from 'src/composables/login/useSessionService'
+import { toast } from 'vue3-toastify'
 
 /**
  * composables
@@ -128,6 +133,7 @@ const form = reactive({
 
 const invalidCredentials = ref(false)
 const submitting = ref(false)
+const isPwd = ref(true)
 
 /**
  * computed
@@ -155,17 +161,34 @@ sessionService.onDoneUserLogin(({ data }) => {
 })
 
 sessionService.onErrorUserLogin((response) => {
+  console.log(
+    '%csrc/pages/LoginPage.vue:158 response',
+    'color: #007acc;',
+    response
+  )
+  let message = ''
+  let error = false
+
+  if (response.toString().includes('Failed to fetch')) {
+    message = 'Error de comunicación con servidor de datos'
+    error = true
+  } else if (response.toString().includes('Received status code 500')) {
+    message = 'Error(500) originado en el servidor de datos, verificar.'
+    error = true
+  }
+
+  if (error) {
+    toast.error(message, {
+      position: toast.POSITION.TOP_RIGHT,
+      autoClose: 10000,
+      theme: 'dark'
+    })
+  } else {
+    invalidCredentials.value = true
+  }
   submitting.value = false
-  invalidCredentials.value = true
-  showNotification('Credenciales no válidas')
 })
 
-function showNotification(error) {
-  $q.notify({
-    type: 'negative',
-    message: error
-  })
-}
 function resetUserInfo() {
   SessionStorage.remove('credentials')
   SessionStorage.remove('current_user')

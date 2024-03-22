@@ -11,6 +11,17 @@ export /* async */ function getClientOptions(/* {app, router, ...} */ options) {
     // console.log(
     //   `[operation]: ${operation.operationName}, Variables: ${operation.variables}`
     // )
+    console.log('[Error]: Operation', operation)
+    console.log(
+      '%csrc/apollo/index.js:15 graphQLErrors',
+      'color: #007acc;',
+      graphQLErrors
+    )
+    console.log(
+      '%csrc/apollo/index.js:20 networkError',
+      'color: #22FF55;',
+      networkError
+    )
     console.log('[Error]: Operation', operation.operationName)
     console.log('Variables', operation.variables.input)
     if (graphQLErrors) {
@@ -27,8 +38,12 @@ export /* async */ function getClientOptions(/* {app, router, ...} */ options) {
       })
     }
     if (networkError) {
-      // console.error('Error el intentar Graphql:', networkError)
-      console.log(`[Network error]: ${networkError}`)
+      console.log(
+        '%csrc/apollo/index.js:43 networkError',
+        'color: pink;',
+        networkError
+      )
+      console.log(`[Network error code]: ${networkError.statusCode}`)
       if (networkError.statusCode === 401) userLogout()
     }
   })
