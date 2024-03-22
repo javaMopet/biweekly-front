@@ -42,7 +42,7 @@ export const useSessionStore = defineStore('session', () => {
   }
   const getUserId = () => {
     user.value = SessionStorage.getItem('current_user')
-      ? SessionStorage.getItem('current_user')
+      ? JSON.parse(SessionStorage.getItem('current_user'))
       : null
 
     if (!!user.value && !!user.value.id) {

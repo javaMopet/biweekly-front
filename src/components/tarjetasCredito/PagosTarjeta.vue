@@ -178,7 +178,7 @@ function generarPago() {
 onResultListaRegistros(({ data }) => {
   const listaRegistros = data?.listaRegistrosTarjeta ?? []
   const fecha = formato.convertDateFromInputToIso(formItem.value.fecha)
-  const user_id = SessionStorage.getItem('current_user').id
+  const user = JSON.parse(SessionStorage.getItem('current_user'))
 
   console.dir(user_id)
   var lista_registros = []
@@ -192,7 +192,7 @@ onResultListaRegistros(({ data }) => {
       fecha,
       observaciones: item.concepto,
       registro_id: item.id,
-      user_id
+      user_id: user.id
     }
     lista_registros.push(registro)
   })

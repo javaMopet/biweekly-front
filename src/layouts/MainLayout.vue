@@ -152,7 +152,8 @@ onErrorCargarMenu((error) => {
  * onMounted
  */
 onMounted(() => {
-  const email = SessionStorage.getItem('credentials')?.email || undefined
+  const email =
+    JSON.parse(SessionStorage.getItem('credentials'))?.email || undefined
 
   if (!email) router.push('/home')
 
