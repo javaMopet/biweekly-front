@@ -1,60 +1,63 @@
 <template>
-  <div class="row q-gutter-x-xs">
-    <q-select
-      v-model="year"
-      :options="yearOptions"
-      option-label="nombre"
-      label="Año"
-      dense
-      outlined
-      color="secondary"
-      label-color="dark"
-      @update:model-value="onChangeYear"
-    >
-      <template #before>
-        <q-btn
-          color="primary"
-          round
-          icon="arrow_left"
-          @click="onClickPrevious"
-          dense
-          flat
-        />
-      </template>
-      <template #prepend>
-        <q-icon name="calendar_month" />
-      </template>
-    </q-select>
-    <q-select
-      v-model="month"
-      :options="monthOptions"
-      option-label="nombre"
-      label="Mes"
-      dense
-      color="secondary"
-      label-color="dark"
-      @update:model-value="onChangeMonth"
-      use-input
-      hide-selected
-      fill-input
-      style="width: 200px"
-      hide-dropdown-icon
-      outlined
-    >
-      <template #prepend>
-        <q-icon name="calendar_month" />
-      </template>
-      <template #after>
-        <q-btn
-          color="primary"
-          round
-          icon="arrow_right"
-          dense
-          flat
-          @click="onClickNext"
-        />
-      </template>
-    </q-select>
+  <div class="" style="border: 1px solid #cccccc; width: 365px">
+    <div class="row q-pl-md q-gutter-x-xs">
+      <q-select
+        v-model="year"
+        :options="yearOptions"
+        option-label="nombre"
+        label="Año"
+        dense
+        color="secondary"
+        label-color="dark"
+        @update:model-value="onChangeYear"
+        :disable="props.disable"
+        borderless
+      >
+        <template #before>
+          <q-btn
+            color="accent"
+            icon="arrow_left"
+            @click="onClickPrevious"
+            dense
+            :disable="props.disable"
+            size="sm"
+          />
+        </template>
+        <template #prepend>
+          <q-icon name="calendar_month" />
+        </template>
+      </q-select>
+      <q-select
+        v-model="month"
+        :options="monthOptions"
+        option-label="nombre"
+        label="Mes"
+        dense
+        color="secondary"
+        label-color="dark"
+        @update:model-value="onChangeMonth"
+        use-input
+        hide-selected
+        fill-input
+        style="width: 200px"
+        :disable="props.disable"
+        borderless
+      >
+        <template #prepend>
+          <q-icon name="calendar_month" />
+        </template>
+        <template #after>
+          <q-btn
+            color="accent"
+            icon="arrow_right"
+            dense
+            @click="onClickNext"
+            :disable="props.disable"
+            size="sm"
+          />
+        </template>
+      </q-select>
+    </div>
   </div>
 </template>
 
@@ -77,6 +80,16 @@ const month = defineModel('month')
 const monthOptions = generalStore.meses
 
 const emit = defineEmits(['onChangePeriodo', 'onChangeMonth'])
+/**
+ * properties
+ */
+const props = defineProps({
+  disable: {
+    type: Boolean,
+    required: false,
+    default: false
+  }
+})
 /**
  * cambiar el metodo de obtener ejercicios
  */

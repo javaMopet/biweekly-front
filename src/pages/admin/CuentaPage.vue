@@ -50,9 +50,16 @@
   <div class="main-content">
     <div class="cuenta-content">
       <q-card class="my-card" flat bordered>
-        <!-- <q-toolbar class="">
-          <q-toolbar-title> </q-toolbar-title>
-        </q-toolbar> -->
+        <q-toolbar class="">
+          <q-toolbar-title>
+            <PeriodoSelect
+              v-model:year="ejercicio_fiscal"
+              v-model:month="mes"
+              @onChangePeriodo="onChangePeriodo"
+              :disable="loadingRegistros"
+            ></PeriodoSelect>
+          </q-toolbar-title>
+        </q-toolbar>
         <q-card-actions
           class="row bg-white full-width text-accent text-subtitle2 resumen"
           bordered
@@ -133,14 +140,7 @@
           </template>
           <template #top-left>
             <q-tr class="cuenta__data-subtitle">
-              <div class="table-title column">
-                <PeriodoSelect
-                  v-model:year="ejercicio_fiscal"
-                  v-model:month="mes"
-                  @onChangePeriodo="onChangePeriodo"
-                ></PeriodoSelect>
-                <span class="q-pl-lg q-pt-sm">Movimientos del periodo</span>
-              </div>
+              <span>Movimientos del periodo</span>
             </q-tr>
           </template>
           <template #top-right>

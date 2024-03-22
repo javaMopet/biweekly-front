@@ -9,7 +9,7 @@
             separator=">"
             separator-color="primary"
           >
-            <q-breadcrumbs-el icon="home" to="/" label="Inicio" />
+            <q-breadcrumbs-el icon="home" to="/home" label="Inicio" />
             <q-breadcrumbs-el label="Categorias" icon="category" />
           </q-breadcrumbs>
         </div>
@@ -256,7 +256,6 @@ const defaultItem = {
 
 const filterIngresos = ref()
 const filterGastos = ref()
-const filterInversiones = ref()
 const editedItem = ref({ ...defaultItem })
 const editedIndex = ref(-1)
 

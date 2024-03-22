@@ -333,14 +333,14 @@ function saveItem() {
   console.log('save item')
   const cuenta_contable_id = editedFormItem.value.cuentaContable?.id
   const cuentaDefaultId = editedFormItem.value.cuentaDefault?.id
-  const userId = SessionStorage.getItem('current_user').id
+  const user = JSON.parse(SessionStorage.getItem('current_user'))
   const input = {
     ...editedFormItem.value,
     cuentaContableId: parseInt(cuenta_contable_id),
     cuentaDefaultId: parseInt(cuentaDefaultId),
     tipoMovimientoId: parseInt(editedFormItem.value.tipoMovimientoId),
     importeDefault: parseFloat(editedFormItem.value.importeDefault ?? '0'),
-    userId,
+    userId: user.id,
     orden: 1000,
     tipoMovimiento: undefined,
     cuentaContable: undefined,
@@ -436,4 +436,3 @@ function colorSelecionado(value) {
 </script>
 
 <style lang="sass" scoped></style>
-../formComponents/CuentaSelect~.vue.bak../formComponents/deprecated/CuentaSelect.vue

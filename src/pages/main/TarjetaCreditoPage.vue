@@ -52,13 +52,14 @@
           style="border: 0px solid red"
         >
           <q-toolbar class="" style="border: 0px solid green">
-            <div class="row q-gutter-x-sm">
+            <div class="row inline q-gutter-x-sm items-center">
               <PeriodoSelect
                 v-model:year="ejercicio_fiscal"
                 v-model:month="mes"
                 @onChangePeriodo="onChangePeriodo"
+                :disable="loadingListaRegistros"
               ></PeriodoSelect>
-              <q-separator spaced vertical inset />
+              <q-separator spaced inset vertical />
               <q-btn
                 color="toolbar-button"
                 label="pagos"
@@ -322,11 +323,17 @@
             :pagination-label="obtenerMensajePaginacion"
             selection="multiple"
             v-model:selected="selectedItems"
+            :loading="loadingListaRegistros"
             row-key="id"
           >
+            <template v-slot:loading>
+              <q-inner-loading showing color="primary" />
+            </template>
             <template #top-left>
               <q-tr class="cuenta__data-subtitle">
-                <div class="table-title">Movimientos de la tarjeta</div>
+                <div class="table-title row items-center">
+                  Movimientos de la tarjeta
+                </div>
               </q-tr>
             </template>
 
@@ -476,7 +483,7 @@
       ></PagosTarjeta>
     </q-dialog>
   </Teleport>
-  <pre>{{ fechaInicioPeriodo }}</pre>
+  <!-- <pre>{{ fechaInicioPeriodo }}</pre> -->
 </template>
 
 <script setup>
@@ -491,7 +498,6 @@ import { useFormato } from 'src/composables/utils/useFormato'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { useQuasar } from 'quasar'
 import PagosTarjeta from 'src/components/tarjetasCredito/PagosTarjeta.vue'
-import MesSelect from 'src/components/formComponents/MesSelect.vue'
 import ImportarRegistrosTarjeta from 'src/components/tarjetasCredito/ImportarRegistrosTarjeta.vue'
 import { useRegistrosTarjetaCrud } from 'src/composables/useRegistrosTarjetaCrud'
 import { useCuentasCrud } from 'src/composables/useCuentasCrud'
@@ -585,7 +591,8 @@ const {
   load: loadListaRegistrosTarjeta,
   onResult: onResultListaRegistrosTarjeta,
   onError: onErrorListaRegistros,
-  refetch: refetchListaRegistros
+  refetch: refetchListaRegistros,
+  loading: loadingListaRegistros
 } = useLazyQuery(
   LISTA_REGISTROS_TARJETA,
   listaRegistrosVariables,
