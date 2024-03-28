@@ -9,7 +9,7 @@
             separator=">"
             separator-color="primary"
           >
-            <q-breadcrumbs-el icon="home" label="Home" to="/" />
+            <q-breadcrumbs-el icon="home" label="Home" to="/Home" />
             <q-breadcrumbs-el
               label="Cuentas Contables"
               icon="account_balance"

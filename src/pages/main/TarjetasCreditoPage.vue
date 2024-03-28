@@ -9,7 +9,7 @@
             separator=">"
             separator-color="primary"
           >
-            <q-breadcrumbs-el icon="home" to="/" />
+            <q-breadcrumbs-el icon="home" label="Home" to="/home" />
             <q-breadcrumbs-el
               label="Tarjetas de Crédito"
               icon="account_balance"
@@ -352,7 +352,6 @@ function editRow(item) {
   showFormItem.value = true
 }
 function abrirMovimientos(props_row) {
-  console.log('abriendo movimientos', props_row)
   loadingCard.value[props_row.rowIndex] = true
   router.push(`/tarjetas_credito/${props_row.row.id}`)
 }

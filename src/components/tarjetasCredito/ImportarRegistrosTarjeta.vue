@@ -286,7 +286,7 @@ const props = defineProps({
 onMounted(() => {
   let desde = formato.formatoFechaFromISO(props.fecha_desde)
   let hasta = formato.formatoFechaFromISO(props.fecha_hasta)
-  console.log('desde', desde)
+  console.log('[ desde ] >', desde)
   fecha_inicio.value = desde
   fecha_fin.value = hasta
 })

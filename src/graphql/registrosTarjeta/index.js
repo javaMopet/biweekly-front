@@ -27,6 +27,7 @@ export const LISTA_REGISTROS_TARJETA = gql`
       cargo
       abono
       importeMensual
+      isPago
       estadoRegistroTarjeta {
         id
         nombre

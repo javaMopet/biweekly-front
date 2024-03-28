@@ -65,17 +65,18 @@
                 label="pagos"
                 @click="pagosTarjeta"
                 push
+                :disable="!isPagable"
               />
             </div>
           </q-toolbar>
         </q-card-section>
         <q-card-actions class="resumen bg-white">
-          <q-item-label
+          <!-- <q-item-label
             v-if="expanded"
             class="q-pr-md text-primary text-subtitle1 text-bold"
           >
             RESUMEN: &nbsp;
-          </q-item-label>
+          </q-item-label> -->
           <!-- -->
           <div class="row text-condensed" v-if="!expanded">
             <div class="column items-center justify-center">
@@ -406,19 +407,21 @@
             <template #body-cell-acciones="props">
               <q-td :props="props" class="q-gutter-x-sm">
                 <q-btn
+                  v-if="!props.row.isPago"
                   class="button-edit"
                   icon="las la-edit"
                   @click="editItem(props)"
                   flat
                   dense
                 />
-                <!-- <q-btn
+                <q-btn
+                  v-if="props.row.isPago"
                   class="button-delete"
                   icon="la la-trash-alt"
                   @click="deleteItem(props)"
                   flat
                   dense
-                /> -->
+                />
               </q-td>
             </template>
             <template v-slot:bottom-row>
@@ -483,7 +486,8 @@
       ></PagosTarjeta>
     </q-dialog>
   </Teleport>
-  <!-- <pre>{{ fechaInicioPeriodo }}</pre> -->
+  <!-- <pre>{{ Math.round(sumaMovimientos) }}</pre>
+  <pre>{{ Math.round(sumaMovimientos) != 0 }}</pre> -->
 </template>
 
 <script setup>
@@ -611,7 +615,6 @@ onResultListaRegistrosTarjeta(({ data }) => {
     listaRegistrosMsi.value = data?.listaRegistrosTarjeta.filter(
       (registro) => registro.isMsi
     )
-    console.table(listaRegistrosMsi.value)
   }
 })
 
@@ -626,7 +629,7 @@ const sumaMovimientos = computed({
   get() {
     return Math.abs(
       listaRegistros.value.reduce((accumulator, registro) => {
-        return accumulator + registro.importe * -1
+        return accumulator + parseFloat(registro.importe) * -1
       }, 0)
     )
   }
@@ -661,6 +664,30 @@ const suma_msi = computed({
     }, 0)
   }
 })
+
+const isPagable = computed({
+  get() {
+    return (
+      Math.round(
+        listaRegistros.value.reduce(
+          (acumulador, registro) => acumulador + parseFloat(registro.importe),
+          0
+        )
+      ) !== 0
+    )
+  }
+})
+
+// const sumaMovimientos = computed({
+//   get() {
+//     return (
+//       listaRegistros.value.reduce(
+//         (acumulador, registro) => acumulador + parseFloat(registro.importe),
+//         0
+//       ) != 0
+//     )
+//   }
+// })
 
 const ejercicio_inicial_id = computed({
   get() {
@@ -700,11 +727,12 @@ const fechaInicioPeriodo = computed({
     let mesInicio = 0
     let anioInicio = 0
 
+    console.log('[ mes.value.id ] >', mes.value.id)
     if (mes.value.id - 1 <= 0) {
       mesInicio = 12
       anioInicio = ejercicio_fiscal.value - 1
     } else {
-      mesInicio = mes.value.id
+      mesInicio = mes.value.id - 1
       anioInicio = ejercicio_fiscal.value
     }
 
@@ -764,7 +792,6 @@ const periodoFin = computed({
 
 const fecha_limite_pago = computed({
   get() {
-    console.log(cuenta.value.dias_gracia)
     const fecha = DateTime.fromISO(fechaFinPeriodo.value).plus({
       days: cuenta.value.dias_gracia
     })
@@ -792,7 +819,6 @@ const {
 } = useQuery(SALDO_TARJETA_CREDITO, saldoTarjetaVariables, opcionesGraphql)
 
 onResultSaldoTarjetaCredito(({ data }) => {
-  console.log('resultado', data.saldoTarjetaCredito)
   saldo_final_periodo.value = data.saldoTarjetaCredito
 })
 
@@ -820,7 +846,6 @@ function loadOrRefetchSaldoAnteriorTC() {
 }
 
 onResultSaldoAnteriorTC(({ data }) => {
-  console.log('resultado saldo anterior', data)
   saldo_final_perido_anterior.value = data.saldoTarjetaCredito
 })
 
@@ -848,7 +873,6 @@ const {
 )
 
 onResultSaldoPagarTarjetaCredito(({ data }) => {
-  console.log('resultado saldo pagar', data.saldoPagarTarjetaCredito)
   saldo_pagar_periodo.value = data.saldoPagarTarjetaCredito
 })
 
@@ -858,7 +882,6 @@ onErrorSaldoPagarTarjetaCredito((error) => {
 })
 
 registrosTarjetaCrud.onDoneRegistroTarjetaDelete((response) => {
-  console.log('registro eliminado', response)
   loadOrRefetchListaRegistrosTarjeta()
   refetchSaldoPagarTarjetaCredito()
   showSuccessMessage('eliminó')
@@ -975,11 +998,9 @@ function obtenerFechasInicialFinal() {
   listaRegistrosVariables.fechaInicio = `${ejercicioFiscal}-${(
     '0' + mesInicio
   ).slice(-2)}-${dia_inicio}`
-  console.log('fechaInicio', listaRegistrosVariables.fechaInicio)
   listaRegistrosVariables.fechaFin = `${ejercicio_fiscal.value}-${(
     '0' + mes.value.id
   ).slice(-2)}-${dia_fin}`
-  console.log('fechaFin', listaRegistrosVariables.fechaFin)
 }
 
 function onChangePeriodo() {

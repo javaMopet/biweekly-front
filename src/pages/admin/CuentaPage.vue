@@ -135,6 +135,7 @@
             <q-checkbox
               v-model="scope.selected"
               :disable="scope.row.disable"
+              v-if="!scope.row.disable"
               dense
             />
           </template>
@@ -197,6 +198,18 @@
             </q-tr>
           </template>
 
+          <template #body-cell-fecha="props">
+            <q-td key="fecha" :props="props">
+              <button
+                class="link-button"
+                @click="cambiarFecha(props.row)"
+                v-if="!!props.row.registroTarjeta"
+              >
+                {{ props.row.fecha }}
+              </button>
+              <span v-else>{{ props.row.fecha }}</span>
+            </q-td>
+          </template>
           <template #body-cell-categoria="props">
             <q-td key="categoria" :props="props">
               {{ props.row.categoria?.nombre }}
@@ -217,6 +230,7 @@
             <q-td key="observaciones" :props="props">
               {{ props.row.observaciones }}
               <q-popup-edit
+                v-if="!props.row.disable"
                 v-model="props.row.observaciones"
                 title="Editar observaciones"
                 buttons
@@ -246,6 +260,7 @@
                 dense
                 @click="editItem(props)"
                 flat
+                v-if="!props.row.disable"
               />
               <!-- <q-btn
                 icon="las la-trash-alt"
@@ -312,6 +327,17 @@
         :fecha_hasta="detalleVariables.fechaFin"
       ></ImportarRegistrosCuenta>
     </q-dialog>
+    <q-dialog
+      v-model="showCambioFecha"
+      persistent
+      transition-show="jump-down"
+      transition-hide="jump-down"
+    >
+      <CambioFechaPage
+        :registro="registroToEdit"
+        @date-updated="dateUpdated"
+      ></CambioFechaPage>
+    </q-dialog>
   </Teleport>
 </template>
 
@@ -327,6 +353,7 @@ import { useRegistrosCrud } from 'src/composables/useRegistrosCrud'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { useQuasar } from 'quasar'
 import FormCuentaRegistro from 'src/components/movimientos/FormCuentaRegistro.vue'
+import CambioFechaPage from 'src/pages/cuentas/CambioFechaPage.vue'
 import { OBTENER_SALDO_A_FECHA } from 'src/graphql/cuentas'
 import ImportarRegistrosCuenta from 'src/components/cuentas/ImportarRegistrosCuenta.vue'
 import { useCuentaStore } from 'src/stores/common/useCuentaStore'
@@ -366,6 +393,7 @@ const variablesSaldoAnterior = reactive({
   cuentaId: route.params.id,
   fechaFin: DateTime.now().startOf('month').plus({ days: -1 }).toISODate()
 })
+const showCambioFecha = ref(false)
 // const loadingRegistros = ref(false)
 
 // const variablesSaldoAlPeriodo = reactive({
@@ -379,6 +407,7 @@ const listaRegistros = ref([])
 const ejercicio_fiscal = ref(DateTime.now().year)
 const mes = ref({})
 const registroEditedItem = ref(null)
+const registroToEdit = ref(null)
 const selectedItems = ref([])
 const saldo_periodo_anterior = ref(0)
 // const saldoFinalPeriodo = ref(0)
@@ -435,6 +464,7 @@ onResultListaRegistros(({ data }) => {
   if (!!data) {
     listaRegistros.value =
       JSON.parse(JSON.stringify(data?.obtenerRegistros)) ?? []
+    console.log('[ listaRegistros.value ] >', listaRegistros.value)
   }
 })
 
@@ -782,6 +812,17 @@ function importarMovimientos() {
   showFormCarga.value = true
 }
 
+function cambiarFecha(row) {
+  console.log('[ row ] >', row)
+  registroToEdit.value = row
+  fecha_registro.value
+  showCambioFecha.value = true
+}
+function dateUpdated() {
+  refetchDatos()
+  showCambioFecha.value = false
+}
+
 // function onChangePeriodo(){
 //   console.log('periodo cambiado',ejercicio_fiscal.value, mes.value)
 // }
@@ -923,6 +964,17 @@ const columns = [
     font-family: 'Roboto Slab';
     padding-inline: 15px;
     color: #463161;
+  }
+}
+.link-button {
+  font-size: 0.8rem;
+  cursor: pointer;
+  border: 0px solid white;
+  background: none;
+  text-decoration: underline;
+  &:hover {
+    text-decoration: none;
+    background-color: #cdfeaa;
   }
 }
 </style>

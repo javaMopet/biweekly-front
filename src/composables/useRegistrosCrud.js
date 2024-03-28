@@ -5,7 +5,8 @@ import {
   REGISTRO_UPDATE,
   REGISTRO_DELETE,
   REGISTROS_DELETE,
-  IMPORTAR_REGISTROS
+  IMPORTAR_REGISTROS,
+  REGISTRO_DATE_UPDATE
 } from 'src/graphql/registros'
 import { useCuentasCrud } from './useCuentasCrud'
 
@@ -88,6 +89,19 @@ export function useRegistrosCrud() {
     console.log(error)
   })
 
+  const {
+    mutate: registroDateUpdate,
+    onDone: onDoneRegistroDateUpdate,
+    onError: onErrorRegistroDateUpdate
+  } = useMutation(REGISTRO_DATE_UPDATE)
+
+  onDoneRegistroDateUpdate(({ data }) => {
+    console.log('[ data ] >', data)
+  })
+  onErrorRegistroDateUpdate((error) => {
+    console.error(error)
+  })
+
   return {
     createRegistro,
     importarRegistros,
@@ -103,6 +117,9 @@ export function useRegistrosCrud() {
     onErrorRegistroUpdate,
     registrosDelete,
     onDoneRegistrosDelete,
-    onErrorRegistrosDelete
+    onErrorRegistrosDelete,
+    registroDateUpdate,
+    onDoneRegistroDateUpdate,
+    onErrorRegistroDateUpdate
   }
 }

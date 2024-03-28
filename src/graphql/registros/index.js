@@ -36,6 +36,7 @@ export const LISTA_REGISTROS = gql`
       registroTarjeta {
         id
         fecha
+        pagoTarjetaId
         cuenta {
           id
           nombre
@@ -163,6 +164,17 @@ export const IMPORTAR_REGISTROS = gql`
           tipoMovimientoId
         }
       }
+    }
+  }
+`
+
+export const REGISTRO_DATE_UPDATE = gql`
+  mutation registroTarjetaDateUpdate(
+    $pagoTarjetaId: ID!
+    $fecha: ISO8601Date!
+  ) {
+    registroTarjetaDateUpdate(pagoTarjetaId: $pagoTarjetaId, fecha: $fecha) {
+      fechaNueva
     }
   }
 `

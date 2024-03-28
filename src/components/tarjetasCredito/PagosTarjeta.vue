@@ -62,10 +62,10 @@
             :rules="[(val) => !!val || 'Favor de ingresar la cuenta de egreso']"
           ></SelectCuenta>
         </div>
-        <div align="right">
+        <div align="right" class="q-gutter-sm">
           <q-btn
             label="Cancelar"
-            color="primary"
+            color="negative"
             flat
             class="q-ml-sm"
             v-close-popup
@@ -75,6 +75,7 @@
             type="submit"
             color="primary-button"
             :disable="isNotPagable"
+            :loading="loadingGenerarPago"
           />
         </div>
       </q-form>
@@ -101,6 +102,8 @@ import SelectCuenta from '../formComponents/SelectCuenta.vue'
  */
 const notificacion = useNotificacion()
 const formato = useFormato()
+const { mostrarNotificacionPositiva, mostrarNotificacionNegativa } =
+  useNotificacion()
 /**
  * graphql
  */
@@ -123,6 +126,7 @@ const formItem = ref({
   cuenta_egreso: null,
   saldo_periodo: ''
 })
+const loadingGenerarPago = ref(false)
 /**
  * props
  */
@@ -163,6 +167,7 @@ onMounted(() => {
  * funciones
  */
 function generarPago() {
+  loadingGenerarPago.value = true
   cargaListaRegistrosTarjeta(
     null,
     {
@@ -177,50 +182,76 @@ function generarPago() {
 }
 onResultListaRegistros(({ data }) => {
   const listaRegistros = data?.listaRegistrosTarjeta ?? []
-  const fecha = formato.convertDateFromInputToIso(formItem.value.fecha)
-  const user = JSON.parse(SessionStorage.getItem('current_user'))
+  // console.log('[ listaRegistros.size ] >', listaRegistros.size)
+  if (listaRegistros.length > 0) {
+    const fecha_aplicacion = formato.convertDateFromInputToIso(
+      formItem.value.fecha
+    )
+    const user = JSON.parse(SessionStorage.getItem('current_user'))
+    var lista_registros = []
+    listaRegistros.forEach((item) => {
+      const registro = {
+        estado_registro_id: 2, //cerrado
+        tipo_afectacion: item.tipoAfectacion,
+        cuenta_id: formItem.value.cuenta_egreso.id,
+        categoria_id: item.categoriaId,
+        importe: parseFloat(item.importe),
+        fecha: fecha_aplicacion,
+        observaciones: item.concepto,
+        registro_id: item.id,
+        user_id: user.id
+      }
+      lista_registros.push(registro)
+    })
 
-  console.dir(user_id)
-  var lista_registros = []
-  listaRegistros.forEach((item) => {
-    const registro = {
-      estado_registro_id: 2, //cerrado
-      tipo_afectacion: item.tipoAfectacion,
-      cuenta_id: formItem.value.cuenta_egreso.id,
-      categoria_id: item.categoriaId,
-      importe: parseFloat(item.importe),
-      fecha,
-      observaciones: item.concepto,
-      registro_id: item.id,
-      user_id: user.id
-    }
-    lista_registros.push(registro)
-  })
-  console.table(lista_registros)
+    const importe_total = listaRegistros.reduce(
+      (sum, registro) => sum + parseFloat(registro.importe),
+      0
+    )
 
-  api
-    .post('/registros_tarjeta/create_pago', {
-      lista_registros,
-      fecha_fin: props.fecha_fin,
-      cuenta_id: props.cuenta.id
-    })
-    .then((response) => {
-      console.log('guardado correctamente')
-      console.log('response', response)
-      notificacion.mostrarNotificacionPositiva(
-        'Los registros han sido guardados correctamente.',
-        1200
-      )
-      emit('itemsSaved')
-    })
-    .catch(function (error) {
-      console.log(error.response.data)
-      console.log(error.response.status)
-      console.log(error.response.data.exception)
-    })
+    api
+      .post('/registros_tarjeta/create_pago', {
+        lista_registros,
+        fecha_fin: props.fecha_fin,
+        fecha_aplicacion,
+        importe_total,
+        cuenta_id: props.cuenta.id
+      })
+      .then((response) => {
+        console.log('guardado correctamente')
+        console.log('response', response)
+        notificacion.mostrarNotificacionPositiva(
+          'Los registros han sido guardados correctamente.',
+          1200
+        )
+        emit('itemsSaved')
+        loadingGenerarPago.value = false
+      })
+      .catch(function (error) {
+        console.log(error.response.data)
+        console.log(error.response.status)
+        console.log(error.response.data.exception)
+        loadingGenerarPago.value = false
+        mostrarNotificacionPositiva(
+          'No se pudo generar el pago. Favor de verificar.',
+          1600
+        )
+      })
+  } else {
+    loadingGenerarPago.value = false
+    mostrarNotificacionNegativa(
+      'No existen registros para conformar el pago',
+      2100
+    )
+  }
 })
 onErrorListaRegistros((error) => {
   console.error(error)
+  mostrarNotificacionPositiva(
+    'No fue posible generar el pago, favor de verificar.',
+    1900
+  )
+  loadingGenerarPago.value = false
 })
 /**
  * computed
