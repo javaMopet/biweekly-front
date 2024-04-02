@@ -980,11 +980,27 @@ function deleteItem(props_row) {
     persistent: true
   })
     .onOk(() => {
-      registrosTarjetaCrud.registroTarjetaDelete({ id: row.id })
+      // registrosTarjetaCrud.registroTarjetaDelete({ id: row.id })
+      confirmDeleteRegistroTarjeta(row)
     })
     .onCancel(() => {})
     .onDismiss(() => {})
 }
+function confirmDeleteRegistroTarjeta(row) {
+  console.log('[ row ] >', row)
+  if (row.isPago) {
+    registrosTarjetaCrud.registroTarjetaPagoDelete({ id: row.id })
+  } else {
+    registrosTarjetaCrud.registroTarjetaDelete({ id: row.id })
+  }
+}
+
+registrosTarjetaCrud.onDoneRegistroTarjetaPagoDelete(({ data }) => {
+  console.log('[ data ] >', data)
+  loadOrRefetchListaRegistrosTarjeta()
+  refetchSaldoPagarTarjetaCredito()
+  showSuccessMessage('eliminó')
+})
 
 function obtenerFechasInicialFinal() {
   let mesInicio = mes.value.id - 1

@@ -133,3 +133,12 @@ export const REGISTROS_TARJETA_DELETE = gql`
     }
   }
 `
+export const REGISTRO_TARJETA_PAGO_DELETE = gql`
+  mutation registroTarjetaPagoDelete($id: ID!) {
+    registroTarjetaPagoDelete(id: $id) {
+      registroTarjeta {
+        id
+      }
+    }
+  }
+`
