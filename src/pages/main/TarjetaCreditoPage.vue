@@ -327,6 +327,17 @@
             :loading="loadingListaRegistros"
             row-key="id"
           >
+            <template v-slot:header-selection>
+              <!-- <q-checkbox v-model="scope.selected" dense /> -->
+              <!-- <div class=""></div> -->
+            </template>
+            <template v-slot:body-selection="scope">
+              <q-checkbox
+                v-model="scope.selected"
+                v-if="scope.row.estadoRegistroTarjeta?.id === '1'"
+                dense
+              />
+            </template>
             <template v-slot:loading>
               <q-inner-loading showing color="primary" />
             </template>
@@ -337,7 +348,6 @@
                 </div>
               </q-tr>
             </template>
-
             <template #top-right>
               <div class="">
                 <div class="row q-gutter-x-md">
@@ -615,6 +625,7 @@ onResultListaRegistrosTarjeta(({ data }) => {
     listaRegistrosMsi.value = data?.listaRegistrosTarjeta.filter(
       (registro) => registro.isMsi
     )
+    console.table(listaRegistros)
   }
 })
 
@@ -896,6 +907,13 @@ registrosTarjetaCrud.onDoneRegistrosTarjetaDelete(({ data }) => {
 
 registrosTarjetaCrud.onErrorRegistroTarjetaDelete((error) => {
   console.error(error)
+  mostrarNotificacionNegativa('No es posible realizar la eliminacion', 2100)
+})
+registrosTarjetaCrud.onErrorRegistrosTarjetaDelete((error) => {
+  mostrarNotificacionNegativa(
+    'No es posible realizar la eliminación de los registros seleccionados',
+    2100
+  )
 })
 
 /**

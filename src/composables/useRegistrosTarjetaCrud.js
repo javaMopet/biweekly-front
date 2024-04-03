@@ -96,6 +96,7 @@ export function useRegistrosTarjetaCrud() {
     // onErrorImportarRegistrosTarjeta,
     registrosTarjetaDelete,
     onDoneRegistrosTarjetaDelete,
+    onErrorRegistrosTarjetaDelete,
     registroTarjetaPagoDelete,
     onDoneRegistroTarjetaPagoDelete,
     onErrorRegistroTarjetaPagoDelete

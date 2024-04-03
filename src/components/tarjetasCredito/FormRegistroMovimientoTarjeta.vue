@@ -23,6 +23,7 @@
                     (!!val && isFechaValida(val)) ||
                     'Favor de ingresar una fecha correcta'
                 ]"
+                :readonly="isComponentNotUpdatable"
               ></DateInput>
             </div>
             <div class="col column">
@@ -32,6 +33,7 @@
                 :rules="[
                   (val) => !!val || 'Favor de ingresar un importe válido'
                 ]"
+                :readonly="isComponentNotUpdatable"
               ></PriceInput>
             </div>
           </div>
@@ -42,6 +44,7 @@
               right-label
               v-model="editedFormItem.isMsi"
               label="Meses sin Intereses"
+              :disable="isComponentNotUpdatable"
             />
           </div>
           <div
@@ -58,6 +61,7 @@
                 style="width: 90px"
                 lazy-rules
                 :rules="[(val) => (!!val && val > 1) || 'Requerido']"
+                :disable="isComponentNotUpdatable"
               />
             </div>
           </div>
@@ -82,7 +86,16 @@
       </q-form>
       <!-- <pre>{{ props.fecha }}</pre> -->
     </div>
-    <q-card-section> </q-card-section>
+    <q-card-section>
+      <pre>Editing Action: {{ isEditionAction }} </pre>
+      <pre>Registro abierto: {{ isRegisterOpen }}</pre>
+      <pre>Actualizar componente: {{ !isComponentNotUpdatable }}</pre>
+      <pre>{{ editedFormItem.estadoRegistroTarjeta }}</pre>
+      <pre>{{ props.registroEditedItem?.estadoRegistroTarjeta }}</pre>
+      <pre>{{
+        props.registroEditedItem?.estadoRegistroTarjeta?.id === '1'
+      }}</pre>
+    </q-card-section>
   </div>
 </template>
 
@@ -229,7 +242,7 @@ const actionName = computed({
 })
 const lblSubmit = computed({
   get() {
-    return 'Guardar'
+    return editedFormItem.value?.id ? 'Actualizar' : 'Guardar'
   }
 })
 const editedFormItem = computed({
@@ -242,20 +255,44 @@ const editedFormItem = computed({
     formItem.value = val
   }
 })
-
-const isEditing = computed({
+const isEditionAction = computed({
   get() {
     return !!props.registroEditedItem?.id
   }
 })
+const isRegisterOpen = computed({
+  get() {
+    return (
+      !isEditionAction.value ||
+      props.registroEditedItem?.estadoRegistroTarjeta?.id === '1'
+    )
+  }
+})
 
+const isComponentNotUpdatable = computed({
+  get() {
+    return isEditionAction.value && !isRegisterOpen.value //|| !isEditionAction.value
+  }
+})
+/**
+ * Methods
+ */
+/**
+ *
+ * @param {*} val
+ */
 function isFechaValida(val) {
   const date = DateTime.fromFormat(val, 'dd/MM/yyyy')
   return date.isValid
 }
 
+/**
+ * Al seleccionar una categoria se toma el importe y las observaciones por default,
+ * sin embargo si estamos en actualización no debe tomar dichos valores.
+ * @param {*} value - Valor de la categoria seleccionada.
+ */
 function onSelectCategoria(value) {
-  if (!isEditing.value && !!value) {
+  if (isEditionAction.value && !!value) {
     console.log('Nuevo registros tarjeta categoria:', value)
     editedFormItem.value.importe =
       parseFloat(value.importeDefault) === 0

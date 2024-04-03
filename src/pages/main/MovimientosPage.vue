@@ -16,7 +16,7 @@
   >
     <template #top-left>
       <div class="row inline q-gutter-x-md items-center">
-        <q-select
+        <!-- <q-select
           v-model="ejercicio_fiscal"
           :options="ejercicioFiscalOptions"
           option-label="nombre"
@@ -31,7 +31,13 @@
             <q-icon name="calendar_month" />
           </template>
         </q-select>
-        <MesSelect v-model="mes" @update:model-value="onChangeMes"></MesSelect>
+        <MesSelect v-model="mes" @update:model-value="onChangeMes"></MesSelect> -->
+        <PeriodoSelect
+          v-model:year="ejercicio_fiscal"
+          v-model:month="mes"
+          @onChangePeriodo="onChangePeriodo"
+        ></PeriodoSelect>
+        <!-- :disable="loadingRegistros" -->
       </div>
     </template>
     <template #top-right>
@@ -332,6 +338,7 @@ import ListaMovimientos from 'src/components/movimientos/ListaMovimientos.vue'
 import MesSelect from 'src/components/formComponents/MesSelect.vue'
 import FormCuentaRegistro from 'src/components/movimientos/FormCuentaRegistro.vue'
 import FormRegistroCategoria from 'src/components/categorias/FormRegistroCategoria.vue'
+import PeriodoSelect from 'src/components/formComponents/PeriodoSelect.vue'
 
 /**
  * composables
@@ -675,16 +682,11 @@ function onRegistroDeleted(cuentasIds) {
   cargarDatos()
 }
 
-function onChangeMes(value) {
-  obtenerColumnas(ejercicio_fiscal.value, value.id)
-}
-function onChangeEjercicio(newValue) {
-  console.dir(mes.value)
-  // obtenerColumnas(newValue, mes.value.id)
-  mes.value = mesOptions.value[0]
+function onChangePeriodo() {
   cargarDatos()
   obtenerColumnas(ejercicio_fiscal.value, mes.value.id)
 }
+
 function categoriaSaved() {}
 function categoriaUpdated() {}
 /**
