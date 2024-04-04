@@ -3,7 +3,7 @@
     <DialogTitle>{{ actionName }}</DialogTitle>
     <div class="main-content q-pt-md" style="border: 0px solid red">
       <q-form
-        @submit="saveItem"
+        @submit="saveUpdateItem"
         class="q-gutter-y-md q-mt-xs form-componente__body"
       >
         <div style="border: 0px solid red">
@@ -30,8 +30,14 @@
               <PriceInput
                 label="Importe"
                 v-model="editedFormItem.importe"
+                :opcional="false"
                 :rules="[
-                  (val) => !!val || 'Favor de ingresar un importe válido'
+                  (val) =>
+                    (!!val &&
+                      val !== '0' &&
+                      val !== '$0.00' &&
+                      val !== '$NaN.undefined') ||
+                    'Favor de ingresar un valor mayor a cero'
                 ]"
                 :readonly="isComponentNotUpdatable"
               ></PriceInput>
@@ -79,14 +85,14 @@
           <div class="column q-py-md">
             <div align="right" class="q-gutter-x-sm">
               <q-btn label="Cancelar" flat class="q-ml-sm" v-close-popup />
-              <q-btn :label="lblSubmit" type="submit" color="primary-button" />
+              <q-btn :label="lblSubmit" type="submit" color="primary-button" :loading="registrosTarjetaCrud.loadingRegistroTarjetaCreate"/>
             </div>
           </div>
         </div>
       </q-form>
       <!-- <pre>{{ props.fecha }}</pre> -->
     </div>
-    <q-card-section>
+    <!-- <q-card-section>
       <pre>Editing Action: {{ isEditionAction }} </pre>
       <pre>Registro abierto: {{ isRegisterOpen }}</pre>
       <pre>Actualizar componente: {{ !isComponentNotUpdatable }}</pre>
@@ -95,7 +101,7 @@
       <pre>{{
         props.registroEditedItem?.estadoRegistroTarjeta?.id === '1'
       }}</pre>
-    </q-card-section>
+    </q-card-section> -->
   </div>
 </template>
 
@@ -177,42 +183,86 @@ const props = defineProps({
 const emit = defineEmits(['registroCreated', 'registroUpdated'])
 
 /**
- * Guardar movimiento a tarjeta
+ * Guardar o actualizar movimiento a tarjeta
  */
-function saveItem() {
+function saveUpdateItem() {
+  if (isEditionAction.value) {
+    updateItem()
+  } else {
+    saveNewItem()
+  }
+
   console.log('onsubmit', editedFormItem.value)
   const isMsi = editedFormItem.value.isMsi
   const numero_msi = isMsi ? parseInt(editedFormItem.value.numeroMsi) : 0
   const importe = parseFloat(editedFormItem.value.importe) * -1 || 0
   console.log('importe', importe)
-  if (importe !== 0) {
-    const tipoAfectacion = importe >= 0 ? 'A' : 'C'
-    const input = {
-      estadoRegistroTarjetaId: 1,
-      cuentaId: props.cuentaId,
-      tipoAfectacion,
-      categoriaId: parseInt(editedFormItem.value.categoria.id),
-      importe: importe,
-      fecha: formato.convertDateFromInputToIso(editedFormItem.value.fecha), //convert
-      concepto: editedFormItem.value.concepto,
-      isMsi,
-      numeroMsi: numero_msi
-    }
-    console.log('item guardando...', input)
-    if (!!editedFormItem.value.id) {
-      registrosTarjetaCrud.registroTarjetaUpdate({
-        id: editedFormItem.value.id,
-        input
-      })
-    } else {
-      registrosTarjetaCrud.createRegistroTarjeta({ input })
-    }
-  } else {
-    notificacion.mostrarNotificacionNegativa(
-      'Ingresar un importe mayo a cero.',
-      200
-    )
+
+  const tipoAfectacion = importe >= 0 ? 'A' : 'C'
+  const input = {
+    estadoRegistroTarjetaId: 1,
+    cuentaId: props.cuentaId,
+    tipoAfectacion,
+    categoriaId: parseInt(editedFormItem.value.categoria.id),
+    importe: importe,
+    fecha: formato.convertDateFromInputToIso(editedFormItem.value.fecha), //convert
+    concepto: editedFormItem.value.concepto,
+    isMsi,
+    numeroMsi: numero_msi
   }
+}
+
+function updateItem() {
+  let input = getInputToUpdate()
+
+  registrosTarjetaCrud.registroTarjetaUpdate({
+    id: props.registroEditedItem.id,
+    input
+  })
+}
+function getInputToUpdate() {
+  if (isRegisterOpen.value) {
+    const input = { ...editedFormItem.value }
+    return input
+  } else {
+    const input = {
+      id: editedFormItem.value.id,
+      categoriaId: parseInt(editedFormItem.value.categoria.id),
+      concepto: editedFormItem.value.concepto
+    }
+    return input
+  }
+}
+
+function saveNewItem() {
+  const input = getInputToCreate()
+  console.log(
+    '%csrc/components/tarjetasCredito/FormRegistroMovimientoTarjeta.vue:239 input',
+    'color: #007acc;',
+    input
+  )
+  registrosTarjetaCrud.createRegistroTarjeta({ input })
+}
+function getInputToCreate() {
+  const isMsi = editedFormItem.value.isMsi
+  const importe = parseFloat(editedFormItem.value.importe) * -1 || 0
+  const tipoAfectacion = importe >= 0 ? 'A' : 'C'
+
+  const input = {
+    ...editedFormItem.value,
+    categoriaId: editedFormItem.value.categoria.id,
+    estadoRegistroTarjetaId: '1',
+    cuentaId: props.cuentaId,
+    importe,
+    fecha: formato.convertDateFromInputToIso(editedFormItem.value.fecha),
+    concepto: editedFormItem.value.concepto,
+    numeroMsi: isMsi ? parseInt(editedFormItem.value.numeroMsi) : 0,
+    tipoAfectacion,
+    numero_msi: undefined,
+    categoria: undefined
+  }
+
+  return input
 }
 
 registrosTarjetaCrud.onDoneRegistroTarjetaCreate(({ data }) => {
@@ -292,7 +342,12 @@ function isFechaValida(val) {
  * @param {*} value - Valor de la categoria seleccionada.
  */
 function onSelectCategoria(value) {
-  if (isEditionAction.value && !!value) {
+  console.log(
+    '%csrc/components/tarjetasCredito/FormRegistroMovimientoTarjeta.vue:295 value',
+    'color: #007acc;',
+    value
+  )
+  if (!isEditionAction.value && !!value) {
     console.log('Nuevo registros tarjeta categoria:', value)
     editedFormItem.value.importe =
       parseFloat(value.importeDefault) === 0

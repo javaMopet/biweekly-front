@@ -25,7 +25,8 @@ export function useRegistrosTarjetaCrud() {
   const {
     mutate: createRegistroTarjeta,
     onDone: onDoneRegistroTarjetaCreate,
-    onError: onErrorRegistroTarjetaCreate
+    onError: onErrorRegistroTarjetaCreate,
+    loading: loadingRegistroTarjetaCreate
   } = useMutation(REGISTRO_TARJETA_CREATE)
 
   const {
@@ -99,6 +100,7 @@ export function useRegistrosTarjetaCrud() {
     onErrorRegistrosTarjetaDelete,
     registroTarjetaPagoDelete,
     onDoneRegistroTarjetaPagoDelete,
-    onErrorRegistroTarjetaPagoDelete
+    onErrorRegistroTarjetaPagoDelete,
+    loadingRegistroTarjetaCreate
   }
 }
