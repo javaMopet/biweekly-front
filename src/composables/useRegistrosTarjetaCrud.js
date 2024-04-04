@@ -53,17 +53,17 @@ export function useRegistrosTarjetaCrud() {
   } = useMutation(REGISTRO_TARJETA_PAGO_DELETE)
 
   onDoneRegistroTarjetaCreate(({ data }) => {
-    console.log('registroTarjeta creado', data)
+    // console.log('registroTarjeta creado', data)
     const itemCreated = data.registroTarjetaCreate.registroTarjeta
     cuentaCrud.cuentaSaldoUpdate({ cuentaId: itemCreated.cuenta.id })
   })
   onDoneRegistroTarjetaUpdate(({ data }) => {
-    console.log('registroTarjeta actualizado', data)
+    // console.log('registroTarjeta actualizado', data)
     const itemUpdated = data.registroTarjetaUpdate.registroTarjeta
     cuentaCrud.cuentaSaldoUpdate({ cuentaId: itemUpdated.cuenta.id })
   })
   onDoneRegistroTarjetaDelete(({ data }) => {
-    console.log('registroTarjeta actualizado', data)
+    // console.log('registroTarjeta actualizado', data)
     const itemDeleted = data.registroTarjetaDelete.registroTarjeta
     cuentaCrud.cuentaSaldoUpdate({ cuentaId: itemDeleted.cuenta.id })
   })

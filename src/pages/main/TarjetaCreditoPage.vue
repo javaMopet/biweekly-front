@@ -625,7 +625,7 @@ onResultListaRegistrosTarjeta(({ data }) => {
     listaRegistrosMsi.value = data?.listaRegistrosTarjeta.filter(
       (registro) => registro.isMsi
     )
-    console.table(listaRegistros)
+    // console.table(listaRegistros)
   }
 })
 
@@ -738,7 +738,7 @@ const fechaInicioPeriodo = computed({
     let mesInicio = 0
     let anioInicio = 0
 
-    console.log('[ mes.value.id ] >', mes.value.id)
+    // console.log('[ mes.value.id ] >', mes.value.id)
     if (mes.value.id - 1 <= 0) {
       mesInicio = 12
       anioInicio = ejercicio_fiscal.value - 1
@@ -766,8 +766,8 @@ const fecha_registro = computed({
     const begin_date = DateTime.fromISO(fechaInicioPeriodo.value)
     const end_date = DateTime.fromISO(fechaFinPeriodo.value)
     const today = DateTime.now()
-    console.log(begin_date)
-    console.log(end_date)
+    // console.log(begin_date)
+    // console.log(end_date)
     return begin_date <= today && today <= end_date
       ? undefined
       : fechaFinPeriodo.value
@@ -939,7 +939,7 @@ function editItem(item) {
 }
 
 function deleteSelectedItems() {
-  console.table(selectedItems.value)
+  // console.table(selectedItems.value)
   if (selectedItems.value.length > 0) {
     const message = `Esta a punto de eliminar ${selectedItems.value.length} movimientos. ¿Desea continuar?`
     $q.dialog({
@@ -975,7 +975,6 @@ function onConfirmDeleteItems(toDelete) {
 }
 
 function deleteItem(props_row) {
-  console.log('eliminar')
   const row = props_row.row
 
   $q.dialog({

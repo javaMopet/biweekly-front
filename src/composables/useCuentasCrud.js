@@ -53,7 +53,7 @@ export function useCuentasCrud() {
   })
 
   onDoneCuentaSaldoUpdate(({ data }) => {
-    console.log('Se actualizo el saldo de la cuenta', data)
+    // console.log('Se actualizo el saldo de la cuenta', data)
     // console.log('Actualizar en la interfaz')
     const saldoUpdated = data.cuentaSaldoUpdate.cuenta
     updateCuentaInterfaz(saldoUpdated)

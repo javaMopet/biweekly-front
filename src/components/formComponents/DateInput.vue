@@ -115,7 +115,7 @@ const valor_fecha = computed({
   }
 })
 function dateSelected(value, reason, details) {
-  console.log('seleccionado', value, reason, details)
+  // console.log('seleccionado', value, reason, details)
   if (!!value) {
     popUpDate.value.hide()
   }
