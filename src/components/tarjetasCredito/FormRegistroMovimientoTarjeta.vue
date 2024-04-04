@@ -85,7 +85,12 @@
           <div class="column q-py-md">
             <div align="right" class="q-gutter-x-sm">
               <q-btn label="Cancelar" flat class="q-ml-sm" v-close-popup />
-              <q-btn :label="lblSubmit" type="submit" color="primary-button" :loading="registrosTarjetaCrud.loadingRegistroTarjetaCreate"/>
+              <q-btn
+                :label="lblSubmit"
+                type="submit"
+                color="primary-button"
+                :loading="loadingSubmit"
+              />
             </div>
           </div>
         </div>
@@ -125,12 +130,12 @@ const registrosTarjetaCrud = useRegistrosTarjetaCrud()
 
 const { mostrarNotificacionPositiva, mostrarNotificacionNegativa } =
   useNotificacion()
-
 /**
  * state
  */
 const tipoMovimientoId = ref('2')
 const formItem = ref({ fecha: '10/05/2023' })
+const loadingSubmit = ref(false)
 /**
  * onMounted
  */
@@ -186,6 +191,7 @@ const emit = defineEmits(['registroCreated', 'registroUpdated'])
  * Guardar o actualizar movimiento a tarjeta
  */
 function saveUpdateItem() {
+  loadingSubmit.value = true
   if (isEditionAction.value) {
     updateItem()
   } else {
@@ -268,6 +274,7 @@ function getInputToCreate() {
 registrosTarjetaCrud.onDoneRegistroTarjetaCreate(({ data }) => {
   const item = data?.registroTarjetaCreate?.registroTarjeta
   console.log('item guardado', item)
+  loadingSubmit.value = false
   emit('registroCreated', item)
 })
 
@@ -342,13 +349,8 @@ function isFechaValida(val) {
  * @param {*} value - Valor de la categoria seleccionada.
  */
 function onSelectCategoria(value) {
-  console.log(
-    '%csrc/components/tarjetasCredito/FormRegistroMovimientoTarjeta.vue:295 value',
-    'color: #007acc;',
-    value
-  )
   if (!isEditionAction.value && !!value) {
-    console.log('Nuevo registros tarjeta categoria:', value)
+    console.log('Cambio de categoria, importe y concepto')
     editedFormItem.value.importe =
       parseFloat(value.importeDefault) === 0
         ? ''
