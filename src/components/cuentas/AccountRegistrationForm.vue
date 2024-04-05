@@ -149,6 +149,7 @@ import { useCuentasCrud } from 'src/composables/useCuentasCrud'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import DialogTitle from '../formComponents/modal/DialogTitle.vue'
 import { useCuentaService } from 'src/composables/cuentas/useCuentaService'
+import { SessionStorage } from 'quasar'
 
 /**
  * composable
@@ -326,6 +327,7 @@ function saveItem() {
     : 0
 
   let cuenta_contable_id = null
+  const current_user = JSON.parse(SessionStorage.getItem('current_user'))
   if (!!editedFormItem.value.cuentaContable) {
     cuenta_contable_id = parseInt(editedFormItem.value.cuentaContable.id)
   }
@@ -337,6 +339,7 @@ function saveItem() {
     tipoCuentaId: parseInt(tipo_cuenta_id),
     bancoId,
     diaCorte: parseInt(editedFormItem.value.diaCorte),
+    instanceId: current_user.instance.id,
     diasGracia,
     banco: undefined,
     tipoCuenta: undefined,
