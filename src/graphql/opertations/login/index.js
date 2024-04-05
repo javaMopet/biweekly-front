@@ -7,6 +7,11 @@ export const LOGIN = gql`
         id
         email
         name
+        instance {
+          id
+          name
+          logoImage
+        }
       }
       credentials {
         uid

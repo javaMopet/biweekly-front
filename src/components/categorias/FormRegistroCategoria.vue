@@ -341,6 +341,7 @@ function saveItem() {
     tipoMovimientoId: parseInt(editedFormItem.value.tipoMovimientoId),
     importeDefault: parseFloat(editedFormItem.value.importeDefault ?? '0'),
     userId: user.id,
+    instanceId: user.instance.id,
     orden: 1000,
     tipoMovimiento: undefined,
     cuentaContable: undefined,

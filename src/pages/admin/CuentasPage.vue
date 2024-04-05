@@ -190,7 +190,7 @@
 
 <script setup>
 import { ref, reactive, computed, watch, onMounted } from 'vue'
-import { useQuasar } from 'quasar'
+import { SessionStorage, useQuasar } from 'quasar'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { useFormato } from 'src/composables/utils/useFormato'
 import { useRouter } from 'vue-router'
@@ -338,12 +338,8 @@ const columns = [
  * onMounted
  */
 onMounted(() => {
-  // cuentasCrud.loadListaCuentas()
-  // console.log('onMounted CuentasPage.vue', cuentaStore.listaCuentas.length)
-  // if (cuentaStore.listaCuentas.length <= 0) {
-  //   console.log('onMounted CuentasPage.vue', cuentaStore.listaCuentas.length)
-  // cuentaStore.fetchOrRefetch()
-  // }
+  const user = JSON.parse(SessionStorage.getItem("current_user"))
+  console.log('user:', user)
 })
 
 function addRow(tipoCuentaId) {

@@ -108,7 +108,7 @@
 
 <script setup>
 import { useQuasar, SessionStorage } from 'quasar'
-import { ref, reactive, onMounted, callWithAsyncErrorHandling } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { api } from 'src/boot/axios'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
