@@ -32,7 +32,7 @@ export default route(function (/* { store, ssrContext } */) {
     // Leave this as is and make changes in quasar.conf.js instead!
     // quasar.conf.js -> build -> vueRouterMode
     // quasar.conf.js -> build -> publicPath
-    history: createHistory(process.env.VUE_ROUTER_BASE)
+    history: createWebHistory() //createHistory(process.env.VUE_ROUTER_BASE)
   })
 
   Router.beforeEach((to, from) => {

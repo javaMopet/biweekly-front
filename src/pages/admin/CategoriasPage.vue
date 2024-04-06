@@ -308,9 +308,7 @@ categoriasCrud.onErrorCategoriaDelete((error) => {
  */
 
 function addRow(tipoMovimientoId) {
-  console.log('tipoMovimientoId', tipoMovimientoId)
   editedItem.value = { ...defaultItem, tipoMovimientoId: tipoMovimientoId }
-  console.log('editeditem', editedItem.value)
   editedIndex.value = null
   showFormItem.value = true
 }

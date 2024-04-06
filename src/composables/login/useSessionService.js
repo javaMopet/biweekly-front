@@ -1,6 +1,6 @@
 import { useMutation } from '@vue/apollo-composable'
 import { SessionStorage } from 'quasar'
-import { LOGIN, LOGOUT } from 'src/graphql/opertations/login'
+import { LOGIN, LOGOUT } from 'src/graphql/operations/login'
 import { api } from 'src/boot/axios'
 
 export function useSessionService() {

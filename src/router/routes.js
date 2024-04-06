@@ -1,14 +1,14 @@
 import LoginPage from 'src/pages/LoginPage.vue'
 
 const routes = [
-  {
-    path: '',
-    redirect: 'login'
-  },
-  {
-    path: '/index.html',
-    redirect: '/home/main'
-  },
+  // {
+  //   path: '',
+  //   redirect: 'login'
+  // },
+  // {
+  //   path: '/index.html',
+  //   redirect: '/home'
+  // },
   {
     path: '/login',
     component: LoginPage //() => import('pages/LoginPage.vue')
@@ -18,7 +18,7 @@ const routes = [
     component: () => import('layouts/MainLayout.vue'),
     children: [
       { path: '', component: () => import('src/pages/HomePage.vue') },
-      { path: '/main', component: () => import('src/pages/HomeMainPage.vue') },
+      // { path: '', component: () => import('src/pages/HomeMainPage.vue') },
       {
         path: '/movimientos',
         component: () => import('src/pages/main/MovimientosPage.vue')

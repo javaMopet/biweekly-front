@@ -4,7 +4,7 @@ import {
   USER_DELETE,
   USER_REGISTER,
   USER_UPDATE
-} from 'src/graphql/opertations/users'
+} from 'src/graphql/operations/users'
 
 export function useUserService() {
   const {

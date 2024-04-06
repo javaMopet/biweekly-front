@@ -58,7 +58,6 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { api } from 'src/boot/axios'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
-// import { LOGIN } from 'src/graphql/opertations/login'
 // import { useMutation } from '@vue/apollo-composable'
 import { useSessionService } from 'src/composables/login/useSessionService'
 

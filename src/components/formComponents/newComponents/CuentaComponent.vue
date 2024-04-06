@@ -39,18 +39,19 @@
       transition-hide="jump-down"
     >
       <!-- :edited-item="editedItem" -->
-      <AccountForm
+      <AccountRegistrationForm
         @cuentaSaved="cuentaSaved"
         @cuentaUpdated="cuentaUpdated"
-      ></AccountForm>
+      ></AccountRegistrationForm>
     </q-dialog>
   </Teleport>
+  <!-- <pre>{{ cuentaStore.listaCuentas }}</pre> -->
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useCuentaStore } from 'src/stores/common/useCuentaStore'
-import AccountForm from '../cuentas/AccountForm.vue'
+import AccountRegistrationForm from 'src/components/cuentas/AccountRegistrationForm.vue'
 
 /**
  * composable
@@ -134,7 +135,13 @@ const props = defineProps({
  * emits
  */
 const emit = defineEmits(['update:modelValue'])
-
+/**
+ * onMounted
+ */
+onMounted(() => {
+  console.log('OnMounted Cuenta Component')
+  // cuentaStore.fetchOrRefetch()
+})
 /**
  * computed
  */

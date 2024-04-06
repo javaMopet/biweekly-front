@@ -2,8 +2,7 @@ import { defineStore } from 'pinia'
 import { api } from 'src/boot/axios'
 import { ref } from 'vue'
 import { Platform, SessionStorage } from 'quasar'
-import { useMutation } from '@vue/apollo-composable'
-import { LOGIN } from 'src/graphql/opertations/login'
+
 // import { useRouter } from 'vue-router'
 
 // const BASE_URL = "http://localhost:3000/";

@@ -179,7 +179,7 @@
 
 <script setup>
 import { ref, onMounted, reactive, computed } from 'vue'
-import { useQuasar } from 'quasar'
+import { SessionStorage, useQuasar } from 'quasar'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { useRouter } from 'vue-router'
 import { useFormato } from 'src/composables/utils/useFormato'
@@ -216,12 +216,16 @@ const listaCuentas = ref([])
 const graphql_options = reactive({
   fetchPolicy: 'cache-first'
 })
+const variables = reactive({
+  instanceId: undefined
+})
+
 const {
   onResult: onResultListaCuentas,
   onError: onErrorListaCuentas,
   refetch: refetchListaCuentas,
   loading: loadingListaCuentas
-} = useQuery(LISTA_CUENTAS, null, graphql_options)
+} = useQuery(LISTA_CUENTAS, variables, graphql_options)
 
 onResultListaCuentas(({ data }) => {
   if (!!data) {
@@ -323,6 +327,9 @@ const columns = [
  */
 onMounted(() => {
   // cuentaStore.loadOrRefetchListaCuentas()
+  const user = JSON.parse(SessionStorage.getItem('current_user'))
+  console.log('user:', user)
+  variables.instanceId = user.instance.id
 })
 
 // onResultCuentas(({ data }) => {

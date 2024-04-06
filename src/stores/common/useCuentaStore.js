@@ -1,7 +1,7 @@
-import { useLazyQuery } from '@vue/apollo-composable'
+import { useLazyQuery, useQuery } from '@vue/apollo-composable'
 import { defineStore } from 'pinia'
 import { LISTA_CUENTAS } from 'src/graphql/cuentas'
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 
 export const useCuentaStore = defineStore('cuentaStore', () => {
   const listaCuentas = ref([])
@@ -11,21 +11,29 @@ export const useCuentaStore = defineStore('cuentaStore', () => {
   /**
    * grapqhl
    */
-  const graphql_options = reactive({
-    fetchPolicy: 'no-cache'
-    // pollInterval: 1000
-    // fetchPolicy: 'cache-and-network'
-    // fetchPolicy: 'network-only'
+  // const graphql_options = reactive({
+  //   // fetchPolicy: 'no-cache'
+  //   // pollInterval: 1000
+  //   // fetchPolicy: 'cache-and-network'
+  //   fetchPolicy: 'network-only'
+  // })
+
+  onMounted(() => {
+    console.log('On mounted cuenta Store')
+  })
+
+  const variables = reactive({
+    instanceId: 1
   })
 
   const {
     onResult: onResultListaCuentas,
     onError: onErrorListaCuentas,
-    load: loadListaCuentas,
+    // load: loadListaCuentas,
     refetch: refetchListaCuentas
     // result: resultListaCuentas,
     // loading: loadingListaCuentas
-  } = useLazyQuery(LISTA_CUENTAS, null, graphql_options)
+  } = useQuery(LISTA_CUENTAS, variables)
 
   onResultListaCuentas(({ data }) => {
     if (!!data) {
@@ -37,7 +45,8 @@ export const useCuentaStore = defineStore('cuentaStore', () => {
     console.error(error)
   })
   function fetchOrRefetch() {
-    loadListaCuentas() || refetchListaCuentas()
+    // loadListaCuentas() ||
+    refetchListaCuentas()
   }
   // onMounted(() => {
   //   if (listaCuentas.value.length <= 0) {

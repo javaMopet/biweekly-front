@@ -130,13 +130,13 @@
               ></PriceInput>
             </div>
             <div class="col-7">
-              <SelectCuenta
+              <CuentaComponent
                 v-model="editedFormItem.cuentaDefault"
                 :opcional="true"
                 :filter-array="['1', '2']"
                 label="Cuenta Bancaria (opcional)"
                 hint="Esta cuenta se tomará por defecto al agregar un movimiento"
-              ></SelectCuenta>
+              ></CuentaComponent>
             </div>
           </div>
 
@@ -198,7 +198,7 @@ import { useTipoMovimientoStore } from 'src/stores/common/useTipoMovimientoStore
 import { useCategoriasCrud } from 'src/composables/useCategoriasCrud'
 import CuentaContableSelect from '../formComponents/CuentaContableSelect.vue'
 import DialogTitle from '../formComponents/modal/DialogTitle.vue'
-import SelectCuenta from '../formComponents/SelectCuenta.vue'
+import CuentaComponent from '../formComponents/newComponents/CuentaComponent.vue'
 
 /**
  * composables

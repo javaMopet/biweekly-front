@@ -49,7 +49,6 @@
           label-key="label"
           v-model:selected="selected"
           v-model:expanded="expanded"
-          default-expand-all
           color="secondary"
           selected-color="accent"
           @update:selected="onSelected"
@@ -59,6 +58,7 @@
           :filter="filter"
           class="font-tree"
         >
+          <!-- default-expand-all -->
           <template v-slot:default-header="props">
             <div
               :class="{
@@ -181,7 +181,7 @@ const { loadingArbolCuentas, onDoneDeleteCuentaContable } = cuentaContableStore
 /**
  * state
  */
-const expanded = ref([])
+const expanded = ref([0, 1])
 const selected = ref(null)
 const filter = ref('')
 const showFormItem = ref(false)

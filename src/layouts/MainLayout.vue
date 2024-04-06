@@ -16,6 +16,7 @@
           spinner-size="72px"
           width="380px"
         /> -->
+        <span>{{ instanceName }}</span>
         <q-toolbar-title class="font-title"> </q-toolbar-title>
         <span class="q-pr-sm text-bold" v-if="user">{{ user.name }}</span>
         <!-- {{ user.id }} -->
@@ -29,6 +30,14 @@
         >
           <q-menu>
             <q-list style="min-width: 150px">
+              <q-item>
+                <q-item-section top avatar>
+                  <q-avatar color="secondary" text-color="white" icon="email" />
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label>{{ email }}</q-item-label>
+                </q-item-section>
+              </q-item>
               <q-item clickable v-close-popup @click="logout">
                 <q-item-section>Cerrar Sesion</q-item-section>
               </q-item>
@@ -88,7 +97,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, createTextVNode } from 'vue'
 import { useLazyQuery } from '@vue/apollo-composable'
 import { useRouter } from 'vue-router'
 import { SessionStorage, useQuasar } from 'quasar'
@@ -121,6 +130,8 @@ const sessionService = useSessionService()
 const leftDrawerOpen = ref(false)
 const user = ref(null)
 const essentialLinks = ref([])
+const instanceName = ref('')
+const email = ref('')
 
 /**
  * stores
@@ -152,14 +163,18 @@ onErrorCargarMenu((error) => {
  * onMounted
  */
 onMounted(() => {
-  const email =
-    JSON.parse(SessionStorage.getItem('credentials'))?.email || undefined
+  const credentials =
+    JSON.parse(SessionStorage.getItem('credentials')) || undefined
+  console.log('credentials:', credentials)
+  // if (!email) router.push('/home')
 
-  if (!email) router.push('/home')
+  email.value = credentials.uid
 
   user.value = JSON.parse(SessionStorage.getItem('current_user'))
 
   if (!user.value) router.push('login')
+
+  instanceName.value = user.value.instance.name
 
   cargarMenu(null, { usuarioId: user.value.id })
 })
