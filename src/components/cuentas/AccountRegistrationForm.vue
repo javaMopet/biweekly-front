@@ -339,7 +339,6 @@ function saveItem() {
     tipoCuentaId: parseInt(tipo_cuenta_id),
     bancoId,
     diaCorte: parseInt(editedFormItem.value.diaCorte),
-    instanceId: current_user.instance.id,
     diasGracia,
     banco: undefined,
     tipoCuenta: undefined,

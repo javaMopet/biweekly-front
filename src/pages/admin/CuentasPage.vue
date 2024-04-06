@@ -218,6 +218,10 @@ const graphql_options = reactive({
   fetchPolicy: 'cache-first'
 })
 
+const variables = reactive({
+  instanceId: undefined
+})
+
 const {
   onResult: onResultListaCuentas,
   onError: onErrorListaCuentas,
@@ -225,7 +229,7 @@ const {
   refetch: refetchListaCuentas,
   // result: resultListaCuentas,
   loading: loadingListaCuentas
-} = useQuery(LISTA_CUENTAS, null, graphql_options)
+} = useQuery(LISTA_CUENTAS, variables, graphql_options)
 
 onResultListaCuentas(({ data }) => {
   if (!!data) {
@@ -338,8 +342,9 @@ const columns = [
  * onMounted
  */
 onMounted(() => {
-  const user = JSON.parse(SessionStorage.getItem("current_user"))
+  const user = JSON.parse(SessionStorage.getItem('current_user'))
   console.log('user:', user)
+  variables.instanceId = user.instance.id
 })
 
 function addRow(tipoCuentaId) {
