@@ -165,7 +165,7 @@ onErrorCargarMenu((error) => {
 onMounted(() => {
   const credentials =
     JSON.parse(SessionStorage.getItem('credentials')) || undefined
-  console.log('credentials:', credentials)
+  // console.log('credentials:', credentials)
   // if (!email) router.push('/home')
 
   email.value = credentials.uid
@@ -261,9 +261,9 @@ sessionService.onDoneUserLogout(() => {
   router.push('/login')
 })
 
-sessionService.onDoneUserLogout(() => {
-  throw NotImplementedException('NO implementado')
-})
+// sessionService.onDoneUserLogout(() => {
+//   throw NotImplementedException('NO implementado')
+// })
 
 function onClickAccount() {}
 

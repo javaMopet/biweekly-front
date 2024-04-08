@@ -139,7 +139,7 @@ const emit = defineEmits(['update:modelValue'])
  * onMounted
  */
 onMounted(() => {
-  console.log('OnMounted Cuenta Component')
+  // console.log('OnMounted Cuenta Component')
   // cuentaStore.fetchOrRefetch()
 })
 /**

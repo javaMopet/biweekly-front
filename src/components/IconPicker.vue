@@ -78,7 +78,7 @@ class onTags {
 const emit = defineEmits(['onClose', 'onIconSelected'])
 
 function setValue(name) {
-  console.log('setting value', name)
+  // console.log('setting value', name)
   data.value.value = name
   emit('onIconSelected', name)
 }

@@ -460,11 +460,11 @@ const {
 } = useQuery(LISTA_REGISTROS, detalleVariables, graphqlOptions)
 
 onResultListaRegistros(({ data }) => {
-  console.log('[ data ] >', data)
+  // console.log('[ data ] >', data)
   if (!!data) {
     listaRegistros.value =
       JSON.parse(JSON.stringify(data?.obtenerRegistros)) ?? []
-    console.log('[ listaRegistros.value ] >', listaRegistros.value)
+    // console.log('[ listaRegistros.value ] >', listaRegistros.value)
   }
 })
 
@@ -716,8 +716,6 @@ function onChangeEjercicio() {
  * Lista de registros de la tarjeta
  */
 function onChangePeriodo() {
-  console.log('Periodo cambiado', ejercicio_fiscal.value, mes.value)
-
   const fechaString = `${ejercicio_fiscal.value}-${('0' + mes.value.id).slice(
     -2
   )}-01`

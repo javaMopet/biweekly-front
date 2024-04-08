@@ -80,7 +80,7 @@ export const useCuentaContableStore = defineStore('cuentaContableStore', () => {
 
   onResultListaCuentasContables(({ data }) => {
     if (!!data) {
-      console.log('loading lista de cuentas contables...', data)
+      // console.log('loading lista de cuentas contables...', data)
       listaCuentasContables.value = JSON.parse(
         JSON.stringify(data.listaCuentasContables ?? [])
       )

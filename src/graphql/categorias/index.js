@@ -24,6 +24,7 @@ export const LISTA_CATEGORIAS = gql`
         id
         nombre
       }
+      instanceId
     }
   }
 `

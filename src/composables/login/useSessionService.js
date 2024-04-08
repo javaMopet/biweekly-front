@@ -27,7 +27,7 @@ export function useSessionService() {
     setUserInfo(data.userLogin)
   })
   onErrorUserLogin((error) => {
-    console.log(error)
+    // console.log(error)
   })
 
   function setUserInfo(userLogin) {

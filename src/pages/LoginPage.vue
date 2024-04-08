@@ -114,6 +114,7 @@ import { api } from 'src/boot/axios'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { useSessionService } from 'src/composables/login/useSessionService'
 import { toast } from 'vue3-toastify'
+import { getActivePinia } from 'pinia'
 
 /**
  * composables
@@ -193,6 +194,9 @@ function resetUserInfo() {
   SessionStorage.remove('credentials')
   SessionStorage.remove('current_user')
   api.defaults.headers.common['Authorization'] = null
+  console.log('Clearing pinia')
+  getActivePinia()._s.forEach((store) => store.$reset())
+  getActivePinia()._s.forEach((store) => store.$dispose())
 }
 </script>
 

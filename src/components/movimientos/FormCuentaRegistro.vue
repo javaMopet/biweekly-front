@@ -99,6 +99,7 @@
             color="primary-button"
             push
             no-caps
+            :loading="isSaving"
           />
         </div>
       </q-form>
@@ -149,6 +150,8 @@ const cuentaReadOnly = ref(true)
 const formItem = ref({ ...defaultItem })
 // const cuentaDestino = ref(null)
 const filterIdArray = ref([])
+
+const isSaving = ref(false)
 
 /**
  * onMounted
@@ -202,10 +205,12 @@ const emit = defineEmits(['itemSaved', 'itemUpdated'])
 registrosCrud.onDoneRegistroCreate(({ data }) => {
   mostrarNotificacionPositiva('El registro se creó correctamente.', 2100)
   const item = data.registroCreate.registro
+  isSaving.value = false
   emit('itemSaved', item)
 })
 
 registrosCrud.onErrorRegistroCreate((error) => {
+  isSaving.value = false
   mostrarNotificacionNegativa(
     'Surgió un error al intentar guardar el movimiento.',
     2100
@@ -213,12 +218,14 @@ registrosCrud.onErrorRegistroCreate((error) => {
 })
 
 traspasosCrud.onDoneTraspasoCreate(({ data }) => {
+  isSaving.value = false
   console.log('traspaso creado', data)
   mostrarNotificacionPositiva('El traspaso se creó correctamente.', 2100)
   emit('itemSaved')
 })
 
 traspasosCrud.onErrorTraspasoCreate((error) => {
+  isSaving.value = false
   mostrarNotificacionNegativa(
     'No fue posible generar el traspaso. Revisar log.',
     2100
@@ -226,11 +233,13 @@ traspasosCrud.onErrorTraspasoCreate((error) => {
 })
 
 registrosCrud.onDoneRegistroUpdate(({ data }) => {
+  isSaving.value = false
   console.log('Registro update', data)
   const item = data.registroUpdate.registro
   emit('itemUpdated', item)
 })
 registrosCrud.onErrorRegistroUpdate((error) => {
+  isSaving.value = false
   mostrarNotificacionNegativa(
     'No es posible actualizar el movimiento con la información ingresada. Favor de verificar.',
     2100
@@ -330,6 +339,7 @@ function onChangeTipoMovimiento(value) {
 }
 
 function saveItem() {
+  isSaving.value = true
   const currentUser = JSON.parse(SessionStorage.getItem('current_user'))
   const userId = currentUser.id
   const categoria = editedFormItem.value.categoria

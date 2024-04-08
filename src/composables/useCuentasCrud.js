@@ -1,10 +1,5 @@
 import { useMutation } from '@vue/apollo-composable'
-import {
-  CUENTA_CREATE,
-  CUENTA_UPDATE,
-  CUENTA_DELETE,
-  CUENTA_SALDO_UPDATE
-} from 'src/graphql/cuentas'
+import { CUENTA_SALDO_UPDATE } from 'src/graphql/cuentas'
 import { useCuentaStore } from 'src/stores/common/useCuentaStore'
 
 export function useCuentasCrud() {
@@ -14,36 +9,13 @@ export function useCuentasCrud() {
   const cuentaStore = useCuentaStore()
 
   const {
-    mutate: cuentaUpdate,
-    onDone: onDoneCuentaUpdate,
-    onError: onErrorCuentaUpdate
-  } = useMutation(CUENTA_UPDATE)
-
-  const {
-    mutate: cuentaDelete,
-    onDone: onDoneCuentaDelete,
-    onError: onErrorCuentaDelete
-  } = useMutation(CUENTA_DELETE)
-
-  const {
     mutate: cuentaSaldoUpdate,
     onDone: onDoneCuentaSaldoUpdate,
     onError: onErrorCuentaSaldoUpdate
   } = useMutation(CUENTA_SALDO_UPDATE)
 
-  onDoneCuentaUpdate(({ data }) => {
-    if (!!data) {
-      // console.log('ejecutando onDonecuentaUpdate useCuentaCrud', data)
-      // const itemUpdated = data.cuentaUpdate.cuenta
-      // console.log('itemUpdated... ', itemUpdated)
-      // const index = cuentaStore.listaCuentas.findIndex(
-      //   (c) => c.id === itemUpdated.id
-      // )
-      // console.log('index updated', index)
-      // cuentaStore.listaCuentas[index] = itemUpdated
-    }
-  })
-  onDoneCuentaDelete(({ data }) => {
+  cuentaStore.onDoneCuentaDelete(({ data }) => {
+    // cuentaStore.refetchListaCuentas()
     // const itemDeleted = data.cuentaDelete.cuenta
     // const index = cuentaStore.listaCuentas.findIndex(
     //   (c) => c.id === itemDeleted.id
@@ -67,11 +39,6 @@ export function useCuentasCrud() {
     // cuentaStore.listaCuentas[index].saldo = saldoUpdated.saldo
   }
 
-  onErrorCuentaUpdate((error) => {
-    console.trace(error)
-    // console.log('error', error.graphQLErrors[0])
-    // console.log('error', error.graphQLErrors[0]?.extensions)
-  })
   onErrorCuentaSaldoUpdate((error) => {
     console.trace(error)
   })
@@ -80,14 +47,10 @@ export function useCuentasCrud() {
   // })
 
   return {
-    cuentaUpdate,
-    cuentaDelete,
     cuentaSaldoUpdate,
-    onDoneCuentaUpdate,
-    onDoneCuentaDelete,
-    onDoneCuentaSaldoUpdate,
-    onErrorCuentaUpdate,
-    onErrorCuentaDelete
+
+    onDoneCuentaSaldoUpdate
+
     // loadSaldoTarjetaCredito,
     // onResultSaldoTarjetaCredito,
     // onErrorSaldoTarjetaCredito

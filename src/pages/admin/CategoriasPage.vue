@@ -174,9 +174,6 @@
                   {{ props.row.descripcion }}
                 </q-tooltip>
               </div>
-              <!-- <span class="text-positive text-condensed">{{
-                props.row.descripcion
-              }}</span> -->
             </div>
           </q-td>
         </template>
@@ -227,17 +224,18 @@ import FormRegistroCategoria from 'src/components/categorias/FormRegistroCategor
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { useQuasar } from 'quasar'
 import { useCategoriaStore } from 'src/stores/common/categoriaStore'
-import { useCategoriasCrud } from 'src/composables/useCategoriasCrud'
+import { useCategoriaService } from 'src/composables/useCategoriaService'
 /**
  * composables
  */
 const notificacion = useNotificacion()
 const $q = useQuasar()
+const { mostrarNotificacionNegativa } = useNotificacion()
 
 /**
  * stores
  */
-const categoriasCrud = useCategoriasCrud()
+const categoriasCrud = useCategoriaService()
 const categoriaStore = useCategoriaStore()
 /**
  * state
@@ -278,6 +276,13 @@ categoriasCrud.onErrorCategoriaDelete((error) => {
     : 'No es posible eliminar esta categoría, favor de verificar.'
 
   notificacion.mostrarNotificacionNegativa(mensaje, 2200)
+})
+
+categoriaStore.onErrorListaCategorias((error) => {
+  mostrarNotificacionNegativa(
+    'NO es posible obtener el listado de categorias.',
+    2100
+  )
 })
 /**
  * computed
@@ -320,7 +325,7 @@ function editRow(item) {
       : '',
     tipoMovimientoId: item.row.tipoMovimiento.id
   }
-  console.log('item', editedItem.value)
+  // console.log('item', editedItem.value)
   editedIndex.value = item.rowIndex
   showFormItem.value = true
 }

@@ -410,7 +410,7 @@ function obtenerMovimientosSantander(wb) {
       // console.log(`${key}: ${value}`)
       fecha = fecha.replace(key.toString(), value.toString())
     }
-    console.log('fecha', fecha)
+    // console.log('fecha', fecha)
     const validDate = DateTime.fromFormat(fecha, 'dd/MM/yyyy')
     if (validDate.isValid) {
       const tipo_afectacion =
@@ -549,8 +549,8 @@ function obtenerRegistros() {
   var opciones = ['1', '2']
   const user = JSON.parse(SessionStorage.getItem('current_user'))
   listaRegistrosFiltrados.value.forEach((item) => {
-    console.log('recorriendo arreglo')
-    console.dir(item.tipoMovimiento)
+    // console.log('recorriendo arreglo')
+    // console.dir(item.tipoMovimiento)
     if (opciones.indexOf(item.tipoMovimiento.tipoMovimientoId) !== -1) {
       const fecha = fechaFromFormat(item.fecha)
       registrosInput.push({
@@ -627,9 +627,6 @@ function saveItems() {
 }
 
 function saveItemsAfterValidate(registrosInput, traspasosInput) {
-  console.table(registrosInput)
-  console.table(traspasosInput)
-
   isLoading.value = true
   registrosCrud.importarRegistros({
     registrosInput,
@@ -637,7 +634,6 @@ function saveItemsAfterValidate(registrosInput, traspasosInput) {
   })
 }
 registrosCrud.onDoneImportarRegistros(({ data }) => {
-  console.dir(data)
   afterSaveItems()
 })
 

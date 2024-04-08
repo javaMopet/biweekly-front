@@ -23,7 +23,7 @@ export const useTipoCuentaStore = defineStore('tipoCuentaStore', () => {
   )
 
   onResultLista(({ data }) => {
-    console.dir(data)
+    // console.dir(data)
     listaTiposCuenta.value = JSON.parse(JSON.stringify(data.listaTiposCuenta))
   })
 

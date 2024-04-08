@@ -1,8 +1,9 @@
 import { useQuery } from '@vue/apollo-composable'
 import { defineStore } from 'pinia'
-import { useCategoriasCrud } from 'src/composables/useCategoriasCrud'
+import { useCategoriaService } from 'src/composables/useCategoriaService'
 import { LISTA_CATEGORIAS } from 'src/graphql/categorias'
 import { ref, computed } from 'vue'
+
 export const useCategoriaStore = defineStore('categoriaStore', () => {
   /**
    * state
@@ -11,7 +12,7 @@ export const useCategoriaStore = defineStore('categoriaStore', () => {
   /**
    * composables
    */
-  const categoriasCrud = useCategoriasCrud()
+  const categoriasCrud = useCategoriaService()
 
   /**
    * graphql
@@ -27,34 +28,37 @@ export const useCategoriaStore = defineStore('categoriaStore', () => {
 
   onResultListaCategorias(({ data }) => {
     if (!!data) {
-      console.log('recuperando datos desde el store', data)
       listaCategorias.value = JSON.parse(
         JSON.stringify(data.listaCategorias ?? [])
       )
     }
   })
 
-  const {
-    onDoneCategoriaCreate,
-    onDoneCategoriaDelete,
-    onErrorCategoriaCreate,
-    onErrorCategoriaDelete
-  } = categoriasCrud
-
-  categoriasCrud.onDoneCategoriaCreate(({ data }) => {
-    if (!!data) {
-      const itemSaved = data.categoriaCreate.categoria
-      listaCategorias.value.push(itemSaved)
-    }
+  onErrorListaCategorias((error) => {
+    console.error(error)
   })
 
-  onDoneCategoriaDelete(({ data }) => {
-    console.log('aqui eliminar elemento de la lista', data)
-    const id = data.categoriaDelete.categoria.id
-    const index = listaCategorias.value.findIndex((c) => c.id === id)
-    console.dir(index)
-    listaCategorias.value.splice(index, 1)
-  })
+  // const {
+  //   onDoneCategoriaCreate,
+  //   onDoneCategoriaDelete,
+  //   onErrorCategoriaCreate,
+  //   onErrorCategoriaDelete
+  // } = categoriasCrud
+
+  // categoriasCrud.onDoneCategoriaCreate(({ data }) => {
+  //   if (!!data) {
+  //     const itemSaved = data.categoriaCreate.categoria
+  //     listaCategorias.value.push(itemSaved)
+  //   }
+  // })
+
+  // onDoneCategoriaDelete(({ data }) => {
+  //   console.log('aqui eliminar elemento de la lista', data)
+  //   const id = data.categoriaDelete.categoria.id
+  //   const index = listaCategorias.value.findIndex((c) => c.id === id)
+  //   console.dir(index)
+  //   listaCategorias.value.splice(index, 1)
+  // })
 
   const listaCategoriasIngresos = computed({
     get() {
@@ -76,7 +80,8 @@ export const useCategoriaStore = defineStore('categoriaStore', () => {
 
   return {
     listaCategorias,
-    onErrorCategoriaDelete,
+    onErrorListaCategorias,
+    // onErrorCategoriaDelete,
     listaCategoriasIngresos,
     listaCategoriasEgresos
   }

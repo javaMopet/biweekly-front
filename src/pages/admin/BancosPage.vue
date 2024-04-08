@@ -136,38 +136,42 @@ import { ref, onMounted } from 'vue'
 import { useQuasar } from 'quasar'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import FormRegistroBanco from 'src/components/bancos/FormRegistroBanco.vue'
-import { useBancosCrud } from 'src/composables/useBancosCrud'
+// import { useBancosCrud } from 'src/composables/useBancosCrud'
 import { useBancoStore } from 'src/stores/common/useBancoStore'
+import { useBancoService } from 'src/composables/admin/useBancoService'
 
 /**
  * composables
  */
 const $q = useQuasar()
-const notificacion = useNotificacion()
-const bancosCrud = useBancosCrud()
+// const notificacion = useNotificacion()
+// const bancosCrud = useBancosCrud()
 const bancoStore = useBancoStore()
+const bancoService = useBancoService()
+const { mostrarNotificacionNegativa, mostrarNotificacionPositiva } =
+  useNotificacion()
 
 /**
  * GRAPHQL
  */
 
-bancosCrud.onDoneDeleteBanco(({ data }) => {
+bancoService.onDoneBancoDelete(({ data }) => {
   if (!!data) {
-    console.log('item deleted ', data)
+    // console.log('item deleted ', data)
     const deletedItem = data.bancoDelete.banco
-    notificacion.mostrarNotificacionPositiva(
+    mostrarNotificacionPositiva(
       `El banco "${deletedItem.nombre}" se elimininó correctamente`,
       1500
     )
   }
 })
-bancosCrud.onErrorDeleteBanco((error) => {
+bancoService.onErrorBancoDelete((error) => {
   const errorString = error?.toString() ?? ''
   const mensaje = errorString.includes('REFERENCE constraint')
     ? 'El banco ha sido utilizado en alguna cuenta, no es posible eliminar'
     : 'No es posible eliminar este banco, favor de verificar.'
 
-  notificacion.mostrarNotificacionNegativa(mensaje, 1600)
+  mostrarNotificacionNegativa(mensaje, 1600)
 })
 
 /**
@@ -253,7 +257,7 @@ function editItem(item) {
     ...item.row
   }
   editedIndex.value = item.rowIndex
-  console.log(editedItem.value)
+  // console.log(editedItem.value)
   showFormRegisterItem.value = true
 }
 
@@ -277,7 +281,7 @@ function deleteItem(item) {
     persistent: true
   })
     .onOk(() => {
-      bancosCrud.bancoDelete(
+      bancoService.bancoDelete(
         { id: item.row.id },
         // ,{ refetchQueries: ['listaBancos'] }
         null,

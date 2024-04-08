@@ -64,18 +64,22 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useBancosCrud } from 'src/composables/useBancosCrud'
+// import { useBancosCrud } from 'src/composables/useBancosCrud'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
-import { useBancoStore } from 'src/stores/common/useBancoStore'
+// import { useBancoStore } from 'src/stores/common/useBancoStore'
 import DialogTitle from '../formComponents/modal/DialogTitle.vue'
+import { useBancoService } from 'src/composables/admin/useBancoService'
 
 /**
  * composable
  */
 
-const bancosCrud = useBancosCrud()
-const notificacion = useNotificacion()
-const bancoStore = useBancoStore()
+// const bancosCrud = useBancosCrud()
+const bancoService = useBancoService()
+const { mostrarNotificacionNegativa, mostrarNotificacionPositiva } =
+  useNotificacion()
+// const bancoStore = useBancoStore()
+
 /**
  * state
  */
@@ -138,26 +142,26 @@ const lblSubmit = computed({
  * onMounted
  */
 onMounted(() => {
-  console.table(bancoStore.listaBancos)
+  // console.table(bancoStore.listaBancos)
 })
 /**
  * methods
  */
 function saveItem() {
-  console.log('save item', editedFormItem.value)
+  // console.log('save item', editedFormItem.value)
   const input = {
     ...editedFormItem.value,
     __typename: undefined
   }
   if (!editedFormItem.value.id) {
-    console.log('guardando banco nueva', input)
-    bancosCrud.createBanco({
+    // console.log('guardando banco nueva', input)
+    bancoService.createBanco({
       input
     })
   } else {
     const id = editedFormItem.value.id
-    console.log('actualizando banco', id, input)
-    bancosCrud.updateBanco({
+    // console.log('actualizando banco', id, input)
+    bancoService.updateBanco({
       id,
       input
     })
@@ -167,7 +171,7 @@ function saveItem() {
  * GRAPHQL
  */
 
-bancosCrud.onDoneCreateBanco(({ data }) => {
+bancoService.onDoneBancoCreate(({ data }) => {
   console.log('saved data...', data)
   if (!!data) {
     const itemSaved = data.bancoCreate.banco
@@ -178,7 +182,7 @@ bancosCrud.onDoneCreateBanco(({ data }) => {
      */
   }
 })
-bancosCrud.onDoneUpdateBanco(({ data }) => {
+bancoService.onDoneBancoUpdate(({ data }) => {
   console.log('data updated', data)
   if (!!data) {
     const itemUpdated = data.bancoUpdate.banco
@@ -191,21 +195,25 @@ bancosCrud.onDoneUpdateBanco(({ data }) => {
 })
 
 function mostrarNotificacion(action, banco) {
-  notificacion.mostrarNotificacionPositiva(
+  mostrarNotificacionPositiva(
     `El banco "${banco.nombre}" se ${action} correctamente`,
     1500
   )
 }
 
-bancosCrud.onErrorCreateBanco((error) => {
-  notificacion.mostrarNotificacionNegativa(
+bancoService.onErrorBancoCreate((error) => {
+  mostrarNotificacionNegativa(
     `Surgió un error al intentar crear el banco.`,
     1500
   )
 })
 
-bancosCrud.onErrorUpdateBanco((error) => {
-  console.error(error)
+bancoService.onErrorBancoUpdate((error) => {
+  // console.error(error)
+  mostrarNotificacionNegativa(
+    'Ocurrió un error al intentar actualizar el banco.',
+    1900
+  )
 })
 </script>
 

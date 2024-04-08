@@ -7,9 +7,7 @@ import {
 } from 'src/graphql/categorias'
 import { useCategoriaStore } from 'src/stores/common/categoriaStore'
 
-import { ref, watch } from 'vue'
-
-export function useCategoriasCrud() {
+export function useCategoriaService() {
   /**
    * store
    */
@@ -48,7 +46,7 @@ export function useCategoriasCrud() {
 
   onDoneCategoriaUpdate(({ data }) => {
     if (!!data) {
-      console.log('categoria actualizada', data)
+      // console.log('categoria actualizada', data)
       const index = findItemIndexOnList(data.categoriaUpdate.categoria)
       categoriaStore.listaCategorias[index] = {
         ...data.categoriaUpdate.categoria
@@ -58,7 +56,7 @@ export function useCategoriasCrud() {
 
   onDoneCategoriaDelete(({ data }) => {
     if (!!data) {
-      console.log('categoria eliminada', data)
+      // console.log('categoria eliminada', data)
       const index = findItemIndexOnList(data.categoriaDelete.categoria)
       categoriaStore.listaCategorias.splice(index, 1)
     }

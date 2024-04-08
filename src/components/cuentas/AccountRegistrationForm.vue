@@ -184,16 +184,15 @@ const cuentaContableProps = reactive({
 })
 
 cuentaService.onDoneCuentaCreate(({ data }) => {
-  console.log('saved data...', data)
+  // console.log('saved data...', data)
   if (!!data) {
     const itemSaved = data.cuentaCreate.cuenta
     mostrarNotificacion('guardó', itemSaved)
     emit('cuentaSaved', itemSaved)
   }
 })
-cuentasCrud.onDoneCuentaUpdate(({ data }) => {
+cuentaService.onDoneCuentaUpdate(({ data }) => {
   if (!!data) {
-    console.log('updated data...', data)
     const itemUpdated = data.cuentaUpdate.cuenta
     mostrarNotificacion('actualizó', itemUpdated)
     emit('cuentaUpdated', itemUpdated)
@@ -314,7 +313,7 @@ onMounted(() => {
  * methods
  */
 function saveItem() {
-  console.log('save item', editedFormItem.value)
+  // console.log('save item', editedFormItem.value)
   const tipo_cuenta_id = editedFormItem.value.tipoCuenta.id
   const bancoId = !!editedFormItem.value.banco
     ? editedFormItem.value.banco.id
@@ -345,7 +344,7 @@ function saveItem() {
     __typename: undefined
   }
   if (!editedFormItem.value.id) {
-    console.log('guardando cuenta nueva', input)
+    // console.log('guardando cuenta nueva', input)
     input.saldo = parseFloat(0)
     cuentaService.cuentaCreate({ input })
   } else {
@@ -356,9 +355,9 @@ function saveItem() {
       input.identificador = null
     }
     const id = editedFormItem.value.id
-    console.log('actualizando cuenta', id, input)
-    // input.saldo = parseFloat(0)
-    cuentasCrud.cuentaUpdate({ id, input })
+    // console.log('actualizando cuenta', id, input)
+    // // input.saldo = parseFloat(0)
+    cuentaService.cuentaUpdate({ id, input })
   }
 }
 cuentaService.onErrorCuentaCreate((error) => {
@@ -371,7 +370,7 @@ cuentaService.onErrorCuentaCreate((error) => {
   mostrarNotificacionNegativa(errorString, 2100)
 })
 
-cuentasCrud.onErrorCuentaUpdate((error) => {
+cuentaService.onErrorCuentaUpdate((error) => {
   const nombreError = error.graphQLErrors[0]?.extensions?.nombre ?? null
 
   const errorString = !!nombreError
@@ -385,7 +384,7 @@ function tipoCuentaUpdated(value) {
   obtenerCuentasContables(value)
 }
 function obtenerCuentasContables(value) {
-  console.log('tipo de cuenta actualizado', value)
+  // console.log('tipo de cuenta actualizado', value)
   switch (value) {
     case '1':
       cuentaContableProps.tipoAfectacion = 'C'

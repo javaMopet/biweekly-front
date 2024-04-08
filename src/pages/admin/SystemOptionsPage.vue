@@ -13,8 +13,8 @@ const cuentaStore = useCuentaStore()
 
 function clearPinia() {
   console.log('Clearing pinia')
-
   getActivePinia()._s.forEach((store) => store.$reset())
+  getActivePinia()._s.forEach((store) => store.$dispose())
 }
 
 function onClick() {

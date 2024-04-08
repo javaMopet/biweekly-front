@@ -1,6 +1,10 @@
 import { useQuery, useMutation, useLazyQuery } from '@vue/apollo-composable'
 import FormCuentaRegistro from 'src/components/movimientos/FormCuentaRegistro.vue'
-import { CUENTA_CREATE, LISTA_CUENTAS } from 'src/graphql/cuentas'
+import {
+  CUENTA_CREATE,
+  CUENTA_UPDATE,
+  LISTA_CUENTAS
+} from 'src/graphql/cuentas'
 import { useCuentaStore } from 'src/stores/common/useCuentaStore'
 import { ref } from 'vue'
 
@@ -13,12 +17,34 @@ export function useCuentaService() {
     onError: onErrorCuentaCreate
   } = useMutation(CUENTA_CREATE)
 
+  const {
+    mutate: cuentaUpdate,
+    onDone: onDoneCuentaUpdate,
+    onError: onErrorCuentaUpdate
+  } = useMutation(CUENTA_UPDATE)
+
   onDoneCuentaCreate(({ data }) => {
     const itemSaved = data.cuentaCreate.cuenta
+    cuentaStore.addItem(itemSaved)
+  })
+  onDoneCuentaUpdate(({ data }) => {
+    if (!!data) {
+      // console.log('ejecutando onDonecuentaUpdate useCuentaCrud', data)
+      const itemUpdated = data.cuentaUpdate.cuenta
+      // console.log('itemUpdated... ', itemUpdated)
+      const index = cuentaStore.listaCuentas.findIndex(
+        (c) => c.id === itemUpdated.id
+      )
+      // console.log('index updated', index)
+      cuentaStore.listaCuentas[index] = itemUpdated
+    }
   })
 
   onErrorCuentaCreate((error) => {
-    console.trace(error)
+    // console.trace(error)
+  })
+  onErrorCuentaUpdate((error) => {
+    // console.log('error', error)
   })
 
   // function loadOrRefetchListaCuentas() {
@@ -31,7 +57,10 @@ export function useCuentaService() {
     // loadingListaCuentas,
     // onErrorListaCuentas,
     cuentaCreate,
+    cuentaUpdate,
     onDoneCuentaCreate,
-    onErrorCuentaCreate
+    onDoneCuentaUpdate,
+    onErrorCuentaCreate,
+    onErrorCuentaUpdate
   }
 }

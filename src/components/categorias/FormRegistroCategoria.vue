@@ -21,6 +21,36 @@
           <div class="q-pt-md">
             <div class="row q-gutter-x-md items-start">
               <div
+                :style="{
+                  backgroundColor: `${editedFormItem.color}`,
+                  height: 40 + 'px',
+                  width: 40 + 'px'
+                }"
+                class="row items-center justify-center"
+              >
+                <q-icon
+                  name="colorize"
+                  size="sm"
+                  class="clickable text-grey-4"
+                  style="cursor: pointer"
+                  ><q-popup-proxy
+                    cover
+                    transition-show="scale"
+                    transition-hide="scale"
+                    ref="ppproxy"
+                  >
+                    <q-color
+                      v-model="editedFormItem.color"
+                      no-footer
+                      :palette="colours"
+                      default-view="palette"
+                      class="my-picker"
+                      @update:model-value="colorSelecionado"
+                    />
+                  </q-popup-proxy>
+                </q-icon>
+              </div>
+              <div
                 class="col-auto bg-high-contrast clickable"
                 @click="selectIcon"
               >
@@ -47,75 +77,14 @@
             </div>
           </div>
           <div class="row">
-            <div class="col-3 q-pr-md">
-              <q-input
-                outlined
-                color="main-menu"
-                v-model="editedFormItem.color"
-                :rules="['anyColor']"
-                class="my-input"
-                dense
-                input-style="color:white;width:10px"
-              >
-                <!-- style="min-width: 100%" -->
-                <template #default>
-                  <div
-                    :style="{
-                      backgroundColor: `${editedFormItem.color}`,
-                      height: 40 + 'px',
-                      width: 250 + 'px'
-                    }"
-                  >
-                    &nbsp;
-                  </div>
-                </template>
-                <template v-slot:append>
-                  <q-icon name="colorize" class="cursor-pointer">
-                    <q-popup-proxy
-                      cover
-                      transition-show="scale"
-                      transition-hide="scale"
-                      ref="ppproxy"
-                    >
-                      <q-color
-                        v-model="editedFormItem.color"
-                        no-footer
-                        :palette="[
-                          '#D9B801',
-                          '#019A9D',
-                          '#9c592d',
-                          '#E8045A',
-                          '#B2028A',
-                          '#6d3ee6',
-                          '#ffd04f',
-                          '#227fd6',
-                          '#1ad560',
-                          '#e6763e',
-                          '#45c5f7',
-                          '#02c46a',
-                          '#4a0f36',
-                          '#fa75ce',
-                          '#b9d422',
-                          '#0f4d40'
-                        ]"
-                        default-view="palette"
-                        class="my-picker"
-                        @update:model-value="colorSelecionado"
-                      />
-                    </q-popup-proxy>
-                  </q-icon>
-                </template>
-              </q-input>
-            </div>
-            <div class="col-9">
+            <div class="col">
               <q-input
                 v-model="editedFormItem.descripcion"
                 type="text"
-                placeholder="* Descripción"
+                placeholder="Descripción"
                 dense
                 outlined
                 color="positive"
-                :rules="[(val) => !!val || 'Favor de ingresar la descripción']"
                 lazyRules
               />
             </div>
@@ -195,10 +164,11 @@ import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { SessionStorage } from 'quasar'
 import { useCategoriaStore } from 'src/stores/common/categoriaStore'
 import { useTipoMovimientoStore } from 'src/stores/common/useTipoMovimientoStore'
-import { useCategoriasCrud } from 'src/composables/useCategoriasCrud'
+import { useCategoriaService } from 'src/composables/useCategoriaService'
 import CuentaContableSelect from '../formComponents/CuentaContableSelect.vue'
 import DialogTitle from '../formComponents/modal/DialogTitle.vue'
 import CuentaComponent from '../formComponents/newComponents/CuentaComponent.vue'
+import { toast } from 'vue3-toastify'
 
 /**
  * composables
@@ -207,7 +177,7 @@ const { mostrarNotificacionPositiva, mostrarNotificacionNegativa } =
   useNotificacion()
 const tipoMovimientoStore = useTipoMovimientoStore()
 const categoriaStore = useCategoriaStore()
-const categoriaCrud = useCategoriasCrud()
+const categoriaService = useCategoriaService()
 /**
  * state
  */
@@ -229,6 +199,25 @@ const cuentaContableOptions = ref({
   clasificacion: '',
   tipoAfectacion: 'C'
 })
+
+const colours = ref([
+  '#D9B801',
+  '#019A9D',
+  '#9c592d',
+  '#E8045A',
+  '#B2028A',
+  '#6d3ee6',
+  '#ffd04f',
+  '#227fd6',
+  '#1ad560',
+  '#e6763e',
+  '#45c5f7',
+  '#02c46a',
+  '#4a0f36',
+  '#fa75ce',
+  '#b9d422',
+  '#0f4d40'
+])
 
 /**
  * props
@@ -305,7 +294,7 @@ const active_color = computed({
  */
 
 function onChangeTipoMovimiento(tipoMovimientoId) {
-  console.log('cambio en el tipo de categoria', tipoMovimientoId)
+  // console.log('cambio en el tipo de categoria', tipoMovimientoId)
   editedFormItem.value.cuentaContable = null
   obtenerCuentasContables(tipoMovimientoId)
 }
@@ -330,7 +319,7 @@ function obtenerCuentasContables(tipoMovimientoId) {
  * Guardar o actualizar una categoría.
  */
 function saveItem() {
-  console.log('save item')
+  // console.log('save item')
   const cuenta_contable_id = editedFormItem.value.cuentaContable?.id
   const cuentaDefaultId = editedFormItem.value.cuentaDefault?.id
   const user = JSON.parse(SessionStorage.getItem('current_user'))
@@ -348,19 +337,19 @@ function saveItem() {
     cuentaDefault: undefined,
     __typename: undefined
   }
-  console.log('guardando item:', input)
+  // console.log('guardando item:', input)
   if (!editedFormItem.value.id) {
-    categoriaCrud.categoriaCreate({ input })
+    categoriaService.categoriaCreate({ input })
   } else {
     const id = editedFormItem.value.id
-    categoriaCrud.categoriaUpdate({ id, input })
+    categoriaService.categoriaUpdate({ id, input })
   }
 }
 
 /**
  *
  */
-categoriaCrud.onDoneCategoriaCreate(({ data }) => {
+categoriaService.onDoneCategoriaCreate(({ data }) => {
   if (!!data) {
     const itemSaved = data.categoriaCreate.categoria
     mostrarNotificacionPositiva(
@@ -371,7 +360,7 @@ categoriaCrud.onDoneCategoriaCreate(({ data }) => {
   }
 })
 
-categoriaCrud.onDoneCategoriaUpdate(({ data }) => {
+categoriaService.onDoneCategoriaUpdate(({ data }) => {
   if (!!data) {
     const itemUpdated = data.categoriaUpdate.categoria
     mostrarNotificacionPositiva(
@@ -382,17 +371,22 @@ categoriaCrud.onDoneCategoriaUpdate(({ data }) => {
   }
 })
 
-categoriaCrud.onErrorCategoriaCreate((error) => {
+categoriaService.onErrorCategoriaCreate((error) => {
   const nombreError = error.graphQLErrors[0]?.extensions?.nombre ?? null
 
   const errorString = !!nombreError
     ? 'No fue posible guardar la categoria. Ya existe una categoria con el nombre que intenta guardar'
     : 'No fue posible guardar la categoria. Favor de intentar nuevamente'
 
-  mostrarNotificacionNegativa(errorString, 2100)
+  // mostrarNotificacionNegativa(errorString, 2100)
+  toast.error(errorString, {
+    position: toast.POSITION.TOP_RIGHT,
+    autoClose: 10000,
+    theme: 'dark'
+  })
 })
 
-categoriaCrud.onErrorCategoriaUpdate((error) => {
+categoriaService.onErrorCategoriaUpdate((error) => {
   const nombreError = error.graphQLErrors[0]?.extensions?.nombre ?? null
 
   const errorString = !!nombreError
@@ -427,7 +421,7 @@ function selectIcon() {
   show_icon_picker.value = true
 }
 function onIconSelected(value) {
-  console.log('IconoSeleccionado', value)
+  // console.log('IconoSeleccionado', value)
   editedFormItem.value.icono = value
   show_icon_picker.value = false
 }

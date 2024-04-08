@@ -27,13 +27,13 @@
           grid
           style="width: 100%"
           dense
-          :rows="listaCuentasTarjeta"
+          :rows="cuentaStore.listaCuentasTarjeta"
           :columns="columns"
           row-key="id"
           :filter="filter"
           :rows-per-page-options="[0]"
           hide-pagination
-          :loading="loadingListaCuentas"
+          :loading="cuentaStore.loadingListaCuentas"
           loading-label="Cargando lista de Tarjetas..."
         >
           <template v-slot:loading>
@@ -178,17 +178,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted, reactive, computed } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { SessionStorage, useQuasar } from 'quasar'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { useRouter } from 'vue-router'
 import { useFormato } from 'src/composables/utils/useFormato'
 import { useCuentaStore } from 'src/stores/common/useCuentaStore'
 import { useRegistrosTarjetaCrud } from 'src/composables/useRegistrosTarjetaCrud'
-import { useCuentasCrud } from 'src/composables/useCuentasCrud'
 import AccountRegistrationForm from 'src/components/cuentas/AccountRegistrationForm.vue'
-import { LISTA_CUENTAS } from 'src/graphql/cuentas'
-import { useQuery } from '@vue/apollo-composable'
 
 /**
  * composables
@@ -198,7 +195,6 @@ const notificacion = useNotificacion()
 const router = useRouter()
 const cuentaStore = useCuentaStore()
 const registrosTarjetaCrud = useRegistrosTarjetaCrud()
-const cuentasCrud = useCuentasCrud()
 
 const { toCurrencyAbsoluteFormat } = useFormato()
 const { mostrarNotificacionPositiva, mostrarNotificacionNegativa } =
@@ -213,26 +209,6 @@ const listaCuentas = ref([])
  * GRAPHQL
  */
 
-const graphql_options = reactive({
-  fetchPolicy: 'cache-first'
-})
-const variables = reactive({
-  instanceId: undefined
-})
-
-const {
-  onResult: onResultListaCuentas,
-  onError: onErrorListaCuentas,
-  refetch: refetchListaCuentas,
-  loading: loadingListaCuentas
-} = useQuery(LISTA_CUENTAS, variables, graphql_options)
-
-onResultListaCuentas(({ data }) => {
-  if (!!data) {
-    // console.log('recupeando datos desde el store', 'color: #007acc;', data)
-    listaCuentas.value = JSON.parse(JSON.stringify(data.listaCuentas ?? []))
-  }
-})
 // const {
 //   mutate: deleteCuenta,
 //   onDone: onDoneDeleteCuenta,
@@ -254,7 +230,7 @@ registrosTarjetaCrud.onDoneRegistroTarjetaDelete(({ data }) => {
 })
 
 registrosTarjetaCrud.onErrorRegistroTarjetaDelete((error) => {
-  console.error(error)
+  // console.error(error)
   notificacion.mostrarNotificacionNegativa(
     'No es posible eliminar esta tarjeta de crédito debido a que tiene movimientos',
     1500
@@ -328,8 +304,7 @@ const columns = [
 onMounted(() => {
   // cuentaStore.loadOrRefetchListaCuentas()
   const user = JSON.parse(SessionStorage.getItem('current_user'))
-  console.log('user:', user)
-  variables.instanceId = user.instance.id
+  // console.log('user:', user)
 })
 
 // onResultCuentas(({ data }) => {
@@ -347,7 +322,7 @@ onMounted(() => {
  * @param {*} tipoCuentaId
  */
 function addRow(tipoCuentaId) {
-  console.log('tipo de cuenta', tipoCuentaId)
+  // console.log('tipo de cuenta', tipoCuentaId)
   editedItem.value = { ...defaultItem }
   editedItem.value.tipoCuenta.id = tipoCuentaId.toString()
   showFormItem.value = true
@@ -382,41 +357,50 @@ function deleteRow(item) {
     persistent: true
   })
     .onOk(() => {
-      cuentasCrud.cuentaDelete({ id: item.row.id })
+      cuentaStore.cuentaDelete({ id: item.row.id })
     })
     .onCancel(() => {})
     .onDismiss(() => {})
 }
 
-cuentasCrud.onDoneCuentaDelete(({ data }) => {
-  console.log('tarjeta eliminada', data)
+cuentaStore.onDoneCuentaDelete(({ data }) => {
+  // console.log('tarjeta eliminada', data)
   const cuentaDeleted = data.cuentaDelete.cuenta
+  // cuentaStore.refetchListaCuentas()
   mostrarNotificacionPositiva(
-    `Se eliminó la tarjeta "${cuentaDeleted.nombre}".`,
+    `La tarjeta "${cuentaDeleted.nombre}" se eliminó correctamente.`,
     2100
   )
 })
-cuentasCrud.onErrorCuentaDelete((error) => {
-  console.trace(error)
+
+cuentaStore.onErrorCuentaDelete((error) => {
+  // console.trace(error)
   mostrarNotificacionNegativa('No es posible eliminar la tarjeta', 2100)
 })
-
+/**
+ * Run after save an item.
+ * @param {*} itemSaved
+ */
 function cuentaSaved(itemSaved) {
-  console.log('tarjetaSaved', itemSaved)
+  // console.log('tarjetaSaved', itemSaved)
   showFormItem.value = false
-  // mostrarNotificacion('guardó', itemSaved)
 }
+/**
+ * Run after update an item.
+ * @param {*} itemUpdated
+ */
 function cuentaUpdated(itemUpdated) {
   showFormItem.value = false
-  // mostrarNotificacion('actualizó', itemUpdated)
   editedItem.value = { ...defaultItem }
 }
+
 function mostrarNotificacion(action, cuenta) {
   notificacion.mostrarNotificacionPositiva(
     `La cuenta "${cuenta.nombre}" se ${action} correctamente`,
     1500
   )
 }
+
 function movimientosTarjeta() {
   console.log('movimientostarjta')
 }

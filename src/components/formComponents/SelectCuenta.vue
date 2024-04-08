@@ -51,10 +51,10 @@
 
 <script>
 import { useQuery } from '@vue/apollo-composable'
-import { LISTA_CUENTAS } from 'src/graphql/cuentas'
+
 import { ref, computed, reactive } from 'vue'
 // import AccountRegistrationForm from '../cuentas/AccountRegistrationForm.vue'
-// import { useCuentaStore } from 'src/stores/common/useCuentaStore'
+import { useCuentaStore } from 'src/stores/common/useCuentaStore'
 
 export default {
   props: {
@@ -135,29 +135,7 @@ export default {
     const filteredOptions = ref([])
     const form_cuenta_show = ref(false)
     const containsError = ref(false)
-    const listaCuentas = ref([])
 
-    /**
-     * graphql
-     */
-    const graphql_options = reactive({
-      fetchPolicy: 'cache-first'
-    })
-    const {
-      onResult: onResultListaCuentas,
-      onError: onErrorListaCuentas,
-      // load: loadListaCuentas,
-      refetch: refetchListaCuentas
-      // result: resultListaCuentas,
-      // loading: loadingListaCuentas
-    } = useQuery(LISTA_CUENTAS, null, graphql_options)
-    onResultListaCuentas(({ data }) => {
-      if (!!data) {
-        listaCuentas.value = JSON.parse(
-          JSON.stringify(data?.listaCuentas ?? [])
-        )
-      }
-    })
     /**
      * computed
      */
@@ -172,7 +150,7 @@ export default {
     const listaOptions = computed({
       get() {
         return (
-          listaCuentas.value
+          cuentaStore.listaCuentas
             ?.filter((option) => {
               return props.filterArray.includes(option.tipoCuenta.id)
             })

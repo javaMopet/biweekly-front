@@ -1,8 +1,8 @@
 import gql from 'graphql-tag'
 
 export const LISTA_CUENTAS = gql`
-  query listaCuentas($instanceId: ID!) {
-    listaCuentas(instanceId: $instanceId) {
+  query listaCuentas {
+    listaCuentas {
       id
       nombre
       identificador
