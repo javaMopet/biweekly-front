@@ -1,5 +1,5 @@
 import { useMutation } from '@vue/apollo-composable'
-import { logErrorMessages } from '@vue/apollo-util'
+// import { logErrorMessages } from '@vue/apollo-util'
 import {
   CATEGORIA_CREATE,
   CATEGORIA_UPDATE,
@@ -70,13 +70,13 @@ export function useCategoriaService() {
   }
 
   onErrorCategoriaCreate((error) => {
-    logErrorMessages(error)
-    console.log('error', error.graphQLErrors[0])
-    console.log('error', error.graphQLErrors[0]?.extensions)
+    // logErrorMessages(error)
+    // console.log('error', error.graphQLErrors[0])
+    // console.log('error', error.graphQLErrors[0]?.extensions)
   })
 
   onErrorCategoriaUpdate((error) => {
-    logErrorMessages(error)
+    // logErrorMessages(error)
     // console.dir(error)
     // const problems = error.graphQLErrors[0].extensions.problems
     // if (!!problems) {

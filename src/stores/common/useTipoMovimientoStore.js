@@ -18,7 +18,7 @@ export const useTipoMovimientoStore = defineStore('tipoMovimientoStore', () => {
 
   onResultListaTiposMovimiento(({ data }) => {
     if (!!data) {
-      console.dir(data)
+      // console.dir(data)
       listaTiposMovimiento.value = JSON.parse(
         JSON.stringify(data.listaTiposMovimiento)
       )
