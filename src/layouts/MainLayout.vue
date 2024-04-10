@@ -240,7 +240,7 @@ watch(idleFirst, (idlevalue) => {
         })
         .onDismiss(() => {
           // dialogCloseSession.value.hide()
-          console.log('%csrc/layouts/MainLayout.vue:22', 'color: #007acc;')
+          // console.log('%csrc/layouts/MainLayout.vue:22', 'color: #007acc;')
           dialogCloseSession.value = null
         })
     }
@@ -257,7 +257,7 @@ watch(idleLast, (idlevalue) => {
 })
 
 sessionService.onDoneUserLogout(() => {
-  console.log('Session cerrada')
+  // console.log('Session cerrada')
   router.push('/login')
 })
 

@@ -349,7 +349,7 @@ const columns = [
  * onMounted
  */
 onMounted(() => {
-  console.log('OnMountedCuentasPage')
+  // console.log('OnMountedCuentasPage')
   const user = JSON.parse(SessionStorage.getItem('current_user'))
   variables.instanceId = user.instance.id
   // cuentaStore.fetchOrRefetchListaCuentas()

@@ -145,6 +145,7 @@
         no-data-label="No existen datos disponibles"
         hide-pagination
         class="my-sticky-header-table"
+        :loading="loadingRows"
       >
         <template #body-cell-concepto="props">
           <q-td :props="props" :class="props.row.clase">
@@ -250,6 +251,7 @@ const fecha_inicio = ref('01/01/1900')
 const fecha_fin = ref('01/01/1900')
 const errorItems = ref([])
 const isLoading = ref(false)
+const loadingRows = ref(false)
 /**
  * composables
  */
@@ -286,7 +288,7 @@ const props = defineProps({
 onMounted(() => {
   let desde = formato.formatoFechaFromISO(props.fecha_desde)
   let hasta = formato.formatoFechaFromISO(props.fecha_hasta)
-  console.log('[ desde ] >', desde)
+  // console.log('[ desde ] >', desde)
   fecha_inicio.value = desde
   fecha_fin.value = hasta
 })
@@ -302,6 +304,7 @@ const emit = defineEmits(['itemsSaved'])
 const monthsMap = new Map()
 // assuming `todos` is a standard VueJS `ref`
 async function updateFile(v) {
+  loadingRows.value = true
   try {
     // `v.target.files[0]` is the desired file object
     const files = v.target.files
@@ -343,7 +346,9 @@ async function updateFile(v) {
     }
   } catch (e) {
     console.log(e)
+    loadingRows.value = false
   }
+  loadingRows.value = false
 }
 
 /**
@@ -508,16 +513,16 @@ function saveItems() {
         lista_registros_tarjeta
       })
       .then((response) => {
-        console.log('guardado correctamente')
-        console.log('response', response)
+        // console.log('guardado correctamente')
+        // console.log('response', response)
         const cuenta_id = response.data.retorno[0].cuenta_id
-        console.log('cuenta', cuenta_id)
+        // console.log('cuenta', cuenta_id)
         isLoading.value = false
         emit('itemsSaved', cuenta_id)
       })
       .catch((error) => {
         isLoading.value = false
-        console.error(error.response.data.exception)
+        // console.error(error.response.data.exception)
         notificacion.mostrarNotificacionNegativa(
           'No fue posible posible guardar los registro, revisar consola',
           900
@@ -539,7 +544,7 @@ function validarMovimientos() {
       message: 'Favor de ingresar los datos que desea guardar.'
     })
   } else {
-    console.table(listaRegistroFiltrados.value)
+    // console.table(listaRegistroFiltrados.value)
     listaRegistroFiltrados.value.forEach((item, index) => {
       if (!item.categoria) {
         errorItems.value.push({
@@ -557,7 +562,7 @@ function validarMovimientos() {
  * Funcion utilizada para eliminar varios movimientos seleccionados
  */
 function eliminarSeleccionados() {
-  console.log('eliminar seleccionados', registrosSelected.value)
+  // console.log('eliminar seleccionados', registrosSelected.value)
   registrosSelected.value.forEach((item) => {
     var index = listaRegistrosTarjeta.value.indexOf(item)
     if (index !== -1) {
@@ -570,7 +575,7 @@ function eliminarSeleccionados() {
 function deleteRow(props) {
   // const rowIndex = props.rowIndex
   const id = props.row.id
-  console.log(id)
+  // console.log(id)
   const index = listaRegistrosTarjeta.value.findIndex((r) => r.id == id)
   // listaRegistrosTarjeta.find
 

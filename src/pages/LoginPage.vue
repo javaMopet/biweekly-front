@@ -162,11 +162,11 @@ sessionService.onDoneUserLogin(({ data }) => {
 })
 
 sessionService.onErrorUserLogin((response) => {
-  console.log(
-    '%csrc/pages/LoginPage.vue:158 response',
-    'color: #007acc;',
-    response
-  )
+  // console.log(
+  //   '%csrc/pages/LoginPage.vue:158 response',
+  //   'color: #007acc;',
+  //   response
+  // )
   let message = ''
   let error = false
 
@@ -194,7 +194,7 @@ function resetUserInfo() {
   SessionStorage.remove('credentials')
   SessionStorage.remove('current_user')
   api.defaults.headers.common['Authorization'] = null
-  console.log('Clearing pinia')
+  // console.log('Clearing pinia')
   getActivePinia()._s.forEach((store) => store.$reset())
   getActivePinia()._s.forEach((store) => store.$dispose())
 }

@@ -146,6 +146,7 @@
             no-data-label="No existen datos disponibles"
             hide-pagination
             class="my-sticky-header-table"
+            :loading="loadingRows"
           >
             <template #body-cell-categoria="props">
               <q-td :props="props">
@@ -273,7 +274,7 @@ const errorsList = ref([])
 const fecha_inicio = ref('01/01/1900')
 const fecha_fin = ref('01/01/1900')
 const isLoading = ref(false)
-
+const loadingRows = ref(true)
 /**
  * composables
  */
@@ -325,6 +326,7 @@ const emit = defineEmits(['itemsSaved'])
  */
 // assuming `todos` is a standard VueJS `ref`
 async function updateFile(v) {
+  loadingRows.value = true
   try {
     // `v.target.files[0]` is the desired file object
     const files = v.target.files
@@ -359,7 +361,9 @@ async function updateFile(v) {
     }
   } catch (e) {
     console.log(e)
+    loadingRows.value = false
   }
+  loadingRows.value = false
 }
 function getSelectedString() {
   return registrosSelected.value.length === 0
