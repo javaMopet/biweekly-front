@@ -2,14 +2,17 @@
   <div>Opciones</div>
   <q-btn color="primary" icon="check" label="clear" @click="clearPinia" />
   <q-btn color="primary" icon="check" label="OK" @click="onClick" />
-  <pre>{{ cuentaStore.listaCuentas }}</pre>
+  <pre>{{ user }}</pre>
 </template>
 
 <script setup>
 import { getActivePinia } from 'pinia'
+import { SessionStorage } from 'quasar'
 import { useCuentaStore } from 'src/stores/common/useCuentaStore'
 
+/**state */
 const cuentaStore = useCuentaStore()
+const user = JSON.parse(SessionStorage.getItem('current_user'))
 
 function clearPinia() {
   console.log('Clearing pinia')

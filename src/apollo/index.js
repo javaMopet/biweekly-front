@@ -11,25 +11,45 @@ export /* async */ function getClientOptions(/* {app, router, ...} */ options) {
     // console.log(
     //   `[operation]: ${operation.operationName}, Variables: ${operation.variables}`
     // )
-    console.log('[Error]: Operation', operation)
-    console.log(
-      '%csrc/apollo/index.js:15 graphQLErrors',
-      'color: #007acc;',
-      graphQLErrors
-    )
-    console.log(
-      '%csrc/apollo/index.js:20 networkError',
-      'color: #22FF55;',
-      networkError
-    )
-    console.log('[Error]: Operation', operation.operationName)
-    console.log('Variables', operation.variables.input)
+    if (!!operation?.variables) {
+      console.log(
+        '%c[Error]: Operation -> name',
+        'color: #03fc0f;',
+        operation.operationName
+      )
+      console.log('%c[Error]: Operation -> variables', 'color: #03fc0f;')
+      console.debug(
+        'operation.variables',
+        JSON.stringify(operation.variables, null, 2)
+      )
+      // operation.variables.forEach((variable) => {
+      //   console.log(variable)
+      // })
+    }
+    // console.log('%csrc/apollo/index.js:15 graphQLErrors', 'color: #007acc;', {
+    //   graphQLErrors
+    // })
+    graphQLErrors.forEach((element) => {
+      console.log(element.message)
+    })
+    if (!!networkError) {
+      console.log(
+        '%csrc/apollo/index.js:20 networkError',
+        'color: #22FF55;',
+        networkError
+      )
+    }
     if (graphQLErrors) {
-      graphQLErrors.map(({ message, locations, path }) => {
+      graphQLErrors.map(({ message, extensions, path }) => {
+        console.log(`%c[GraphQL error path]: ${path}`, 'color: #e99ff5;')
+        console.log(`%c[GraphQL error message]: ${message}`, 'color: #ffe77d;')
         console.log(
-          `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
+          `%c[GraphQL error location]: ${location}`,
+          'color: #63fffc;'
         )
-        console.log('location', location)
+        if (!!extensions) {
+          console.debug('extensions', JSON.stringify(extensions, null, 2))
+        }
         if (message.includes('requires authentication')) {
           console.log('logging out desde el apollo index.js ...............')
           removeCredentials()

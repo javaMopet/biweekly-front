@@ -12,6 +12,7 @@ export const LOGIN = gql`
           name
           logoImage
         }
+        canModify
       }
       credentials {
         uid
