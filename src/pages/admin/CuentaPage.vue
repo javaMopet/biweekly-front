@@ -147,39 +147,45 @@
           <template #top-right>
             <q-tr>
               <div class="row q-gutter-x-sm">
-                <q-btn
-                  class="medium-button"
-                  color="negative-pastel"
-                  :disable="selectedItems.length <= 0"
-                  no-caps
-                  label="Eliminar"
-                  @click="deleteSelectedItems"
-                  icon="las la-trash"
-                  rounded
-                  push
-                />
-                <q-btn
-                  class="medium-button"
-                  color="primary-button"
-                  no-caps
-                  label="Nuevo"
-                  @click="addItem"
-                  icon="add_circle"
-                  rounded
-                  push
-                />
-                <q-btn
-                  color="primary-button"
-                  @click="importarMovimientos"
-                  no-caps
-                  rounded
-                  outline
-                >
-                  <q-avatar square size="24px">
-                    <q-img src="/icons/excel.png" width="24px" height="24px" />
-                  </q-avatar>
-                  <span class="q-ml-sm">Importar</span>
-                </q-btn>
+                <div class="" v-if="isModificable">
+                  <q-btn
+                    class="medium-button"
+                    color="negative-pastel"
+                    :disable="selectedItems.length <= 0"
+                    no-caps
+                    label="Eliminar"
+                    @click="deleteSelectedItems"
+                    icon="las la-trash"
+                    rounded
+                    push
+                  />
+                  <q-btn
+                    class="medium-button"
+                    color="primary-button"
+                    no-caps
+                    label="Nuevo"
+                    @click="addItem"
+                    icon="add_circle"
+                    rounded
+                    push
+                  />
+                  <q-btn
+                    color="primary-button"
+                    @click="importarMovimientos"
+                    no-caps
+                    rounded
+                    outline
+                  >
+                    <q-avatar square size="24px">
+                      <q-img
+                        src="/icons/excel.png"
+                        width="24px"
+                        height="24px"
+                      />
+                    </q-avatar>
+                    <span class="q-ml-sm">Importar</span>
+                  </q-btn>
+                </div>
                 <q-input
                   outlined
                   dense
@@ -351,7 +357,7 @@ import { useQuery } from '@vue/apollo-composable'
 import { useFormato } from 'src/composables/utils/useFormato'
 import { useRegistrosCrud } from 'src/composables/useRegistrosCrud'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
-import { useQuasar } from 'quasar'
+import { SessionStorage, useQuasar } from 'quasar'
 import FormCuentaRegistro from 'src/components/movimientos/FormCuentaRegistro.vue'
 import CambioFechaPage from 'src/pages/cuentas/CambioFechaPage.vue'
 import { OBTENER_SALDO_A_FECHA } from 'src/graphql/cuentas'
@@ -499,6 +505,11 @@ onErrorObtenerSaldo((error) => {
 /**
  * computed
  */
+const isModificable = computed({
+  get() {
+    return JSON.parse(SessionStorage.getItem('current_user')).canModify
+  }
+})
 
 const sumaMovimientos = computed({
   get() {

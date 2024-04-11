@@ -24,7 +24,7 @@
           style="width: 100%"
           card
           dense
-          :rows="listaUsuarios"
+          :rows="usuarioStore.listaUsuarios"
           :columns="columns"
           row-key="id"
           :filter="filter"
@@ -35,6 +35,7 @@
             <div class="page-title">
               <span class="q-pr-md">Usuarios</span>
               <q-btn
+                v-if="isModificable"
                 icon="add_circle"
                 color="primary-button"
                 label="Add User"
@@ -67,20 +68,35 @@
                   <div class="col-auto">
                     <q-icon
                       name="account_box"
-                      size="60px"
+                      size="80px"
                       color="accent-light"
                     />
                   </div>
                   <div
-                    class="col items-center"
-                    style="max-width: 200px; width: 200px"
+                    class="col items-center q-pl-sm"
+                    style="max-width: 220px; width: 220px"
                   >
-                    <div class="text-primary q-pl-sm">
+                    <div class="text-bold" v-if="props.row.isAdmin">
+                      Administrador
+                    </div>
+                    <div class="" v-else>&nbsp;</div>
+                    <div class="text-primary">
                       {{ props.row.name }}
                     </div>
+                    <div class="">{{ props.row.instance.name }}</div>
+                    <div class="">
+                      Roles: [{{ props.row.roles.toString() }}]
+                    </div>
+                    <router-link
+                      :to="{
+                        name: 'usuarioMenuConfig',
+                        params: { id: props.row.id }
+                      }"
+                      >Configurar menú</router-link
+                    >
                   </div>
                 </div>
-                <div class="row text-blue-grey-5 justify-center">
+                <div class="row text-blue-grey-5 justify-center q-pt-lg">
                   {{ props.row.email }}
                 </div>
                 <q-separator spaced inset horizontal />
@@ -89,6 +105,7 @@
                 >
                   <div class="col" align="right" style="cursor: normal">
                     <q-btn
+                      v-if="isModificable"
                       flat
                       round
                       icon="las la-edit"
@@ -97,6 +114,7 @@
                       ><q-tooltip> Editar </q-tooltip></q-btn
                     >
                     <q-btn
+                      v-if="isModificable"
                       flat
                       round
                       icon="las la-trash-alt"
@@ -112,6 +130,7 @@
             <q-icon :name="props.row.icono" size="35px" color="cyan" />
           </template>
         </q-table>
+        <router-view></router-view>
       </div>
 
       <Teleport to="#modal">
@@ -133,14 +152,15 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useQuasar } from 'quasar'
+import { ref, onMounted, computed } from 'vue'
+import { SessionStorage, useQuasar } from 'quasar'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { useFormato } from 'src/composables/utils/useFormato'
-import { useRouter } from 'vue-router'
+import { useRouter, RouterLink } from 'vue-router'
 import { useUserService } from 'src/composables/admin/useUserService'
 import UserRegistrationForm from 'src/components/admin/usuarios/UserRegistrationForm.vue'
 import { useSessionService } from 'src/composables/login/useSessionService'
+import { useUsuarioStore } from 'src/stores/admin/useUsuarioStore'
 
 /**
  * composables
@@ -151,6 +171,7 @@ const { mostrarNotificacionPositiva, mostrarNotificacionNegativa } =
 const formato = useFormato()
 const router = useRouter()
 const userService = useUserService()
+const usuarioStore = useUsuarioStore()
 // const usuariosCrud = useUsuariosCrud()
 const sessionService = useSessionService()
 /**
@@ -173,18 +194,21 @@ const defaultItem = {
   },
   usuario: null
 }
-// const listaUsuarios = ref([])
+
 const userToEdit = ref({})
 const filter = ref()
 const showFormItem = ref(false)
 // const userToEdit = ref({ ...defaultItem })
 const loadingAccount = ref([])
-const listaUsuarios = ref([])
 
 /**
  * computed
  */
-
+const isModificable = computed({
+  get() {
+    return JSON.parse(SessionStorage.getItem('current_user')).canModify
+  }
+})
 /**
  * Columns
  */
@@ -222,16 +246,7 @@ const columns = [
 /**
  * onMounted
  */
-onMounted(() => {
-  userService.loadOrRefetchUsers()
-})
-
-userService.onResulLoadUsers(({ data }) => {
-  listaUsuarios.value.length = 0
-  if (!!data) {
-    listaUsuarios.value = JSON.parse(JSON.stringify(data.usersList))
-  }
-})
+onMounted(() => {})
 
 function addRow(tipoUsuarioId) {
   console.log('tipo de cuenta', tipoUsuarioId)

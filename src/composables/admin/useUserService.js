@@ -1,19 +1,11 @@
-import { useLazyQuery, useMutation } from '@vue/apollo-composable'
+import { useMutation } from '@vue/apollo-composable'
 import {
-  USERS_LIST,
   USER_DELETE,
   USER_REGISTER,
   USER_UPDATE
 } from 'src/graphql/operations/users'
 
 export function useUserService() {
-  const {
-    load: loadUsers,
-    onResult: onResulLoadUsers,
-    onError: onErrorLoadUsers,
-    refetch: refetchUsers
-  } = useLazyQuery(USERS_LIST)
-
   const {
     mutate: userRegister,
     onDone: onDoneUserRegister,
@@ -32,14 +24,7 @@ export function useUserService() {
     onError: onErrorUserDelete
   } = useMutation(USER_DELETE)
 
-  function loadOrRefetchUsers() {
-    loadUsers() || refetchUsers()
-  }
-
   return {
-    loadUsers,
-    onResulLoadUsers,
-    onErrorLoadUsers,
     userRegister,
     onDoneUserRegister,
     onErrorUserRegister,
@@ -48,6 +33,6 @@ export function useUserService() {
     userDelete,
     onDoneUserDelete,
     onErrorUserDelete,
-    loadOrRefetchUsers
+    onErrorUserUpdate
   }
 }

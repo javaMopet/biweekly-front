@@ -61,6 +61,7 @@
               ></PeriodoSelect>
               <q-separator spaced inset vertical />
               <q-btn
+                v-if="isModificable"
                 color="toolbar-button"
                 label="pagos"
                 @click="pagosTarjeta"
@@ -262,6 +263,7 @@
             hide-pagination
             table-header-class="bg-primary-light text-accent text-condensed"
             separator="horizontal"
+            :filter="filterMsi"
           >
             <template #top-left>
               <q-tr class="">
@@ -276,12 +278,27 @@
               <div class="">
                 <div class="row q-gutter-x-md">
                   <q-btn
+                  v-if="isModificable"
                     color="primary"
                     icon="add_circle"
                     @click="addItem"
                     flat
                     rounded
                   />
+                  <q-input
+                    outlined
+                    dense
+                    debounce="300"
+                    v-model="filterMsi"
+                    placeholder="Buscar"
+                    clearable
+                    class="bg-accent-light"
+                    style="width: 180px; min-width: 180px"
+                  >
+                    <template v-slot:append>
+                      <q-icon name="search" />
+                    </template>
+                  </q-input>
                 </div>
               </div>
             </template>
@@ -326,6 +343,7 @@
             v-model:selected="selectedItems"
             :loading="loadingListaRegistros"
             row-key="id"
+            :filter="filter"
           >
             <template v-slot:header-selection>
               <!-- <q-checkbox v-model="scope.selected" dense /> -->
@@ -351,43 +369,59 @@
             <template #top-right>
               <div class="">
                 <div class="row q-gutter-x-md">
-                  <q-btn
-                    :disable="selectedItems.length <= 0"
-                    class="medium-button"
-                    no-caps
-                    color="negative-pastel"
-                    label="Eliminar"
-                    @click="deleteSelectedItems"
-                    push
-                    icon="las la-trash"
-                    rounded
-                  />
-                  <q-btn
-                    no-caps
-                    class="medium-button"
-                    color="primary-button"
-                    label="Agregar"
-                    @click="addItem"
-                    push
-                    icon="add_circle"
-                    rounded
-                  />
-                  <q-btn
-                    color="primary-button"
-                    flat
-                    @click="cargarMovimientos"
-                    no-caps
-                    rounded
+                  <div class="" v-if="isModificable">
+                    <q-btn
+                      :disable="selectedItems.length <= 0"
+                      class="medium-button"
+                      no-caps
+                      color="negative-pastel"
+                      label="Eliminar"
+                      @click="deleteSelectedItems"
+                      push
+                      icon="las la-trash"
+                      rounded
+                    />
+                    <q-btn
+                      no-caps
+                      class="medium-button"
+                      color="primary-button"
+                      label="Agregar"
+                      @click="addItem"
+                      push
+                      icon="add_circle"
+                      rounded
+                    />
+                    <q-btn
+                      color="primary-button"
+                      flat
+                      @click="cargarMovimientos"
+                      no-caps
+                      rounded
+                    >
+                      <q-avatar square size="24px">
+                        <q-img
+                          src="/icons/excel.png"
+                          width="24px"
+                          height="24px"
+                        />
+                      </q-avatar>
+                      <span class="q-ml-sm">Importar</span>
+                    </q-btn>
+                  </div>
+                  <q-input
+                    outlined
+                    dense
+                    debounce="300"
+                    v-model="filter"
+                    placeholder="Buscar"
+                    clearable
+                    class="bg-accent-light"
+                    style="width: 180px; min-width: 180px"
                   >
-                    <q-avatar square size="24px">
-                      <q-img
-                        src="/icons/excel.png"
-                        width="24px"
-                        height="24px"
-                      />
-                    </q-avatar>
-                    <span class="q-ml-sm">Importar</span>
-                  </q-btn>
+                    <template v-slot:append>
+                      <q-icon name="search" />
+                    </template>
+                  </q-input>
                 </div>
               </div>
             </template>
@@ -510,7 +544,7 @@ import { LISTA_REGISTROS_TARJETA } from 'src/graphql/registrosTarjeta'
 import { useLazyQuery, useQuery } from '@vue/apollo-composable'
 import { useFormato } from 'src/composables/utils/useFormato'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
-import { useQuasar } from 'quasar'
+import { SessionStorage, useQuasar } from 'quasar'
 import PagosTarjeta from 'src/components/tarjetasCredito/PagosTarjeta.vue'
 import ImportarRegistrosTarjeta from 'src/components/tarjetasCredito/ImportarRegistrosTarjeta.vue'
 import { useRegistrosTarjetaCrud } from 'src/composables/useRegistrosTarjetaCrud'
@@ -573,6 +607,8 @@ const listaRegistrosVariables = reactive({
 
 const selectedItems = ref([])
 const expanded = ref(false)
+const filter = ref('')
+const filterMsi = ref('')
 
 /**
  * onMounted
@@ -636,6 +672,12 @@ onErrorListaRegistros((error) => {
 /**
  * computed
  */
+const isModificable = computed({
+  get() {
+    return JSON.parse(SessionStorage.getItem('current_user')).canModify
+  }
+})
+
 const sumaMovimientos = computed({
   get() {
     return Math.abs(

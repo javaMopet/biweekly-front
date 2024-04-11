@@ -6,6 +6,13 @@ export const USERS_LIST = gql`
       id
       name
       email
+      instance {
+        id
+        name
+        logoImage
+      }
+      isAdmin
+      roles
       createdAt
       __typename
     }

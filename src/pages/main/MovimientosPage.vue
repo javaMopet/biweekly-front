@@ -16,22 +16,6 @@
   >
     <template #top-left>
       <div class="row inline q-gutter-x-md items-center">
-        <!-- <q-select
-          v-model="ejercicio_fiscal"
-          :options="ejercicioFiscalOptions"
-          option-label="nombre"
-          label="Año"
-          dense
-          outlined
-          color="secondary"
-          label-color="dark"
-          @update:model-value="onChangeEjercicio"
-        >
-          <template #prepend>
-            <q-icon name="calendar_month" />
-          </template>
-        </q-select>
-        <MesSelect v-model="mes" @update:model-value="onChangeMes"></MesSelect> -->
         <PeriodoSelect
           v-model:year="ejercicio_fiscal"
           v-model:month="mes"
@@ -100,7 +84,6 @@
     </template>
   </q-table>
   <!-- END Lista del detalle de ingresos -->
-
   <!-- tabla de saldos totales de ingresos -->
   <q-table
     :rows="saldosIngreso"
@@ -327,24 +310,22 @@
 
 <script setup>
 import { useMutation } from '@vue/apollo-composable'
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { MOVIMIENTO_DELETE } from '/src/graphql/movimientos'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
-import { useQuasar } from 'quasar'
 import { DateTime } from 'luxon'
 import { useFormato } from 'src/composables/utils/useFormato'
 import { api } from 'src/boot/axios'
 import ListaMovimientos from 'src/components/movimientos/ListaMovimientos.vue'
-import MesSelect from 'src/components/formComponents/MesSelect.vue'
 import FormCuentaRegistro from 'src/components/movimientos/FormCuentaRegistro.vue'
 import FormRegistroCategoria from 'src/components/categorias/FormRegistroCategoria.vue'
 import PeriodoSelect from 'src/components/formComponents/PeriodoSelect.vue'
+import { SessionStorage } from 'quasar'
 
 /**
  * composables
  */
 const notificacion = useNotificacion()
-const $q = useQuasar()
 const formato = useFormato()
 
 /**
@@ -443,30 +424,34 @@ function cargarDatos() {
  */
 //
 function addItem(props) {
-  const row = { ...props.row }
-  const col = { ...props.col }
-  console.log('row', row)
-  // console.log('col', col)
-  cellData.value = {
-    categoriaId: row.categoria_id,
-    nombre_categoria: row.nombre_categoria,
-    tipo_movimiento_id: row.tipo_movimiento_id.toString(),
-    icono: row.icono,
-    fecha_inicio: col.fecha_inicio,
-    fecha_fin: col.fecha_fin,
-    fecha_inicio_formato: formato.toFormatoInputDateFromISO(col.fecha_inicio),
-    fecha_fin_formato: formato.toFormatoInputDateFromISO(col.fecha_fin),
-    periodo_id: col.periodo_id,
-    label: col.label
-  }
-  if (!!cellData.value.periodo_id) {
-    show_movimientos.value = true
+  if (isModificable.value) {
+    const row = { ...props.row }
+    const col = { ...props.col }
+    // console.log('row', row)
+    // console.log('col', col)
+    cellData.value = {
+      categoriaId: row.categoria_id,
+      nombre_categoria: row.nombre_categoria,
+      tipo_movimiento_id: row.tipo_movimiento_id.toString(),
+      icono: row.icono,
+      fecha_inicio: col.fecha_inicio,
+      fecha_fin: col.fecha_fin,
+      fecha_inicio_formato: formato.toFormatoInputDateFromISO(col.fecha_inicio),
+      fecha_fin_formato: formato.toFormatoInputDateFromISO(col.fecha_fin),
+      periodo_id: col.periodo_id,
+      label: col.label
+    }
+    if (!!cellData.value.periodo_id) {
+      show_movimientos.value = true
+    }
+  } else {
+    console.log("Can't modify")
   }
 }
 
 function addCategoria(tipoMovimientoId) {
-  console.log('Agregando nueva categoria', tipoMovimientoId)
-  console.log('tipoMovimientoId', tipoMovimientoId)
+  // console.log('Agregando nueva categoria', tipoMovimientoId)
+  // console.log('tipoMovimientoId', tipoMovimientoId)
   registroCategoriaItem.value = {
     ...defaultCategoriaItem,
     tipoMovimientoId: tipoMovimientoId
@@ -495,7 +480,7 @@ function obtenerColumnas(ejercicio_fiscal, mes) {
       })
     })
     .catch((error) => {
-      console.log('error', error)
+      // console.log('error', error)
     })
   api
     .get('/columnas', {
@@ -513,10 +498,10 @@ function obtenerColumnas(ejercicio_fiscal, mes) {
           column.format = (val) => (!!val ? `${formato.toCurrency(val)}` : '')
         }
       })
-      console.table(columnasSaldos)
+      // console.table(columnasSaldos)
     })
     .catch((error) => {
-      console.log('error', error)
+      // console.log('error', error)
     })
 }
 /**
@@ -710,6 +695,16 @@ onDoneDeleteMovimiento(({ data }) => {
 
 onErrorDeleteMovimiento((error) => {
   console.error(error)
+})
+
+/**
+ * computed
+ */
+
+const isModificable = computed({
+  get() {
+    return JSON.parse(SessionStorage.getItem('current_user')).canModify
+  }
 })
 </script>
 

@@ -456,7 +456,7 @@ registrosCrud.onErrorRegistrosDelete((error) => {
   console.trace(error)
 })
 registrosCrud.onDoneRegistrosDelete(({ data }) => {
-  console.log('data', data)
+  // console.log('data', data)
   mostrarNotificacionPositiva('los registros se eliminaron correctamente')
   selectedItems.value = []
   reloadListaRegistros()
@@ -464,7 +464,7 @@ registrosCrud.onDoneRegistrosDelete(({ data }) => {
 })
 
 function inicializarFecha() {
-  console.log('fecha_inicio', props.cellData.fecha_inicio)
+  // console.log('fecha_inicio', props.cellData.fecha_inicio)
   formItem.value.fecha = formato.convertDateFromIsoToInput(
     props.cellData.fecha_inicio
   )
@@ -637,7 +637,7 @@ const {
 )
 
 onResultListaRegistros(({ data }) => {
-  console.log('data registros', data.obtenerRegistros)
+  // console.log('data registros', data.obtenerRegistros)
   if (data.obtenerRegistros.length > 0) {
     listaRegistros.value = JSON.parse(JSON.stringify(data.obtenerRegistros))
     listaRegistros.value.forEach((element) => {
@@ -653,7 +653,7 @@ onResultListaRegistros(({ data }) => {
 onResultCategoriaById(({ data }) => {
   // console.log('data', data)
   categoria.value = data.categoriaById
-  console.dir(categoria.value)
+  // console.dir(categoria.value)
   buscarMovimientos()
   inicializarFormulario()
 })

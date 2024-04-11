@@ -46,18 +46,8 @@ const routes = [
         component: () => import('src/pages/admin/SystemOptionsPage.vue')
       },
       {
-        path: 'usuarios',
-        component: () => import('pages/UsuariosPage.vue')
-      },
-      {
         path: 'catalogos',
         component: () => import('pages/CatalogosPage.vue')
-        // children: [
-        //   {
-        //     path: '/main/catalogos/cuentas',
-        //     component: () => import('pages/CuentasPage.vue')
-        //   }
-        // ]
       }
     ]
   },
@@ -80,7 +70,14 @@ const routes = [
       },
       {
         path: 'usuarios',
-        component: () => import('src/pages/admin/UsuariosPage.vue')
+        component: () => import('src/pages/admin/UsuariosPage.vue'),
+        children: [
+          {
+            path: 'menuConfig/:id',
+            component: () => import('src/pages/admin/user/UserMenuConfig.vue'),
+            name: 'usuarioMenuConfig'
+          }
+        ]
       },
       {
         path: 'carousel_cards',

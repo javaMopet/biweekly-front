@@ -46,6 +46,7 @@
             <div class="row inline items-center q-gutter-x-md">
               <div class="">
                 <q-btn
+                  v-if="isModificable"
                   color="primary-button"
                   icon="add_card"
                   @click="addRow(3)"
@@ -132,7 +133,7 @@
                 <span class="text-caption text-blue-grey-7">{{
                   props.row.propietario
                 }}</span>
-                <div class="row inline">
+                <div class="row inline" v-if="isModificable">
                   <q-btn
                     flat
                     round
@@ -262,6 +263,11 @@ const editedItem = ref({ ...defaultItem })
  * computed
  */
 
+const isModificable = computed({
+  get() {
+    return JSON.parse(SessionStorage.getItem('current_user')).canModify
+  }
+})
 /**
  *
  */

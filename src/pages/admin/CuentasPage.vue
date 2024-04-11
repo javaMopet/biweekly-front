@@ -42,6 +42,7 @@
             <div class="row inline items-center q-gutter-x-md">
               <div class="">
                 <q-btn-dropdown
+                  v-if="isModificable"
                   split
                   color="primary-button"
                   push
@@ -142,7 +143,12 @@
                 <div
                   class="row full-width items-center justify-between q-pt-sm cuenta-card__acciones"
                 >
-                  <div class="col" align="right" style="cursor: normal">
+                  <div
+                    class="col"
+                    align="right"
+                    style="cursor: normal"
+                    v-if="isModificable"
+                  >
                     <q-btn
                       flat
                       round
@@ -239,18 +245,6 @@ const variables = reactive({
 //   }
 // })
 
-// const listaCuentasAhorro = computed({
-//   get() {
-//     return (
-//       cuentaStore.listaCuentas.value?.filter((c) => c.tipoCuenta.id !== '3') ??
-//       []
-//     )
-//   }
-// })
-// onErrorListaCuentas((error) => {
-//   console.error(error)
-// })
-
 cuentaStore.onErrorCuentaDelete((error) => {
   notificacion.mostrarNotificacionNegativa(
     'No es posible eliminar esta cuenta, favor de verificar que no contenga movimientos',
@@ -308,7 +302,11 @@ const loadingAccount = ref([])
 /**
  * computed
  */
-
+const isModificable = computed({
+  get() {
+    return JSON.parse(SessionStorage.getItem('current_user')).canModify
+  }
+})
 /**
  * Columns
  */

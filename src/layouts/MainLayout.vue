@@ -80,7 +80,7 @@
 
       <q-list class="no-shadow q-mt-lg">
         <EssentialLink
-          v-for="link in essentialLinks"
+          v-for="link in menuStore.arbolMenus"
           :key="link.nombre"
           v-bind="link"
         >
@@ -97,14 +97,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, createTextVNode } from 'vue'
-import { useLazyQuery } from '@vue/apollo-composable'
+import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { SessionStorage, useQuasar } from 'quasar'
 import EssentialLink from 'src/components/EssentialLink.vue'
-import { LISTA_MENUS } from 'src/graphql/menus'
 import { useSessionService } from 'src/composables/login/useSessionService'
-import { useCounter, useIdle } from '@vueuse/core'
+import { useIdle } from '@vueuse/core'
+import { useMenuStore } from 'src/stores/common/useMenuStore'
 
 // const { idle, lastActive, reset } = useIdle(5 * 60 * 1000) // 5 min
 const {
@@ -123,13 +122,14 @@ const {
  */
 const $q = useQuasar()
 const sessionService = useSessionService()
+const menuStore = useMenuStore()
 
 /**
  * state
  */
 const leftDrawerOpen = ref(false)
 const user = ref(null)
-const essentialLinks = ref([])
+// const essentialLinks = ref([])
 const instanceName = ref('')
 const email = ref('')
 
@@ -138,27 +138,7 @@ const email = ref('')
  */
 // const sessionStorage = useSessionStore()
 const router = useRouter()
-/**
- * graphql
- */
-const {
-  /*  result,
-  loading,
-  error,*/
-  onResult: onResultCargarMenu,
-  onError: onErrorCargarMenu,
-  load: cargarMenu
-} = useLazyQuery(LISTA_MENUS)
 
-onResultCargarMenu(({ data }) => {
-  if (!!data) {
-    essentialLinks.value = JSON.parse(JSON.stringify(data.menuLevels))
-  }
-})
-
-onErrorCargarMenu((error) => {
-  console.error(error)
-})
 /**
  * onMounted
  */
@@ -175,8 +155,6 @@ onMounted(() => {
   if (!user.value) router.push('login')
 
   instanceName.value = user.value.instance.name
-
-  cargarMenu(null, { usuarioId: user.value.id })
 })
 /**
  * methods
@@ -186,17 +164,6 @@ function toggleLeftDrawer() {
 }
 
 function logout() {
-  // const promise = sessionStorage.logoutUser()
-  // if (promise) {
-  //   promise.then(
-  //     (result) => {
-  //       router.push('/login')
-  //     },
-  //     (error) => {
-  //       router.push('/login')
-  //     }
-  //   )
-  // }
   sessionService.userLogout()
 }
 const dialogCloseSession = ref()
