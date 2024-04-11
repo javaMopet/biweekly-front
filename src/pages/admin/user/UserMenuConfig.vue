@@ -1,12 +1,21 @@
 <template>
   <q-card class="my-card">
-    <div>menu config user {{ route.params.id }}</div>
+    <div>menu config user {{ user?.name }}</div>
     <q-card-section>
       <div class="text-h6">Our Changing Planet</div>
       <div class="text-subtitle2">by John Doe</div>
     </q-card-section>
     <q-card-section>
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit
+      <div class="column">
+        <q-checkbox
+          v-model="selection"
+          v-for="menu in menuStore.listaMenus"
+          :key="menu.id"
+          :label="menu.nombre"
+          :val="menu.id"
+          dense
+        />
+      </div>
     </q-card-section>
   </q-card>
 
@@ -16,16 +25,7 @@
       >
     </li>
   </ul> -->
-  <div class="column">
-    <q-checkbox
-      v-model="selection"
-      v-for="menu in menuStore.listaMenus"
-      :key="menu.id"
-      :label="menu.nombre"
-      :val="menu.id"
-      dense
-    />
-  </div>
+
   <!-- <pre>{{ menuStore.listaMenus }}</pre> -->
 </template>
 
@@ -50,7 +50,12 @@ watch(
   () => route.params.id,
   (newValue, oldValue) => {
     console.log('newValue:', newValue)
-    console.log('oldValue:', oldValue)
+    const index = usuarioStore.listaUsuarios.findIndex(
+      (usuario) => usuario.id === newValue
+    )
+    console.log('index:', index)
+    user.value = usuarioStore.listaUsuarios[index]
+    console.log('user.value:', user.value)
   }
 )
 </script>

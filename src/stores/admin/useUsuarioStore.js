@@ -30,6 +30,7 @@ export const useUsuarioStore = defineStore('usuarioStore', () => {
   onResultUsersList(({ data }) => {
     if (!!data) {
       listaUsuarios.value = JSON.parse(JSON.stringify(data.usersList ?? []))
+      console.log('listaUsuarios.value:', listaUsuarios.value)
     }
   })
 

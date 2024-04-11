@@ -13,6 +13,11 @@ export const USERS_LIST = gql`
       }
       isAdmin
       roles
+      menus {
+        id
+        nombre
+        activo
+      }
       createdAt
       __typename
     }

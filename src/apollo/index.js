@@ -29,9 +29,11 @@ export /* async */ function getClientOptions(/* {app, router, ...} */ options) {
     // console.log('%csrc/apollo/index.js:15 graphQLErrors', 'color: #007acc;', {
     //   graphQLErrors
     // })
-    graphQLErrors.forEach((element) => {
-      console.log(element.message)
-    })
+    if (!!graphQLErrors) {
+      graphQLErrors.forEach((element) => {
+        console.log(element.message)
+      })
+    }
     if (!!networkError) {
       console.log(
         '%csrc/apollo/index.js:20 networkError',

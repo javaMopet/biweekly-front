@@ -40,7 +40,7 @@ export const useMenuStore = defineStore('menuStore', () => {
 
   onResultMenusList(({ data }) => {
     if (!!data) {
-      console.log('data:', data.menusList)
+      // console.log('data:', data.menusList)
       listaMenus.value = JSON.parse(JSON.stringify(data.menusList))
     }
   })
