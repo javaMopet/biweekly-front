@@ -1,21 +1,27 @@
 <template>
   <q-card class="my-card">
-    <div>menu config user {{ user?.name }}</div>
+    <div>Configuración del menú para el usuario: {{ user?.name }}</div>
     <q-card-section>
-      <div class="text-h6">Our Changing Planet</div>
-      <div class="text-subtitle2">by John Doe</div>
+      <div class="text-h6">Lista de menús</div>
+      <!-- <div class="text-subtitle2">by John Doe</div> -->
     </q-card-section>
     <q-card-section>
       <div class="column">
         <q-checkbox
+          :disable="isAdmin"
           v-model="selection"
           v-for="menu in menuStore.listaMenus"
           :key="menu.id"
           :label="menu.nombre"
           :val="menu.id"
           dense
+          checked-icon="las la-laugh-wink"
+          color="primary"
         />
       </div>
+    </q-card-section>
+    <q-card-section align="center">
+      <q-btn color="accent" icon="save" label="Guardar" @click="guardar()" />
     </q-card-section>
   </q-card>
 
@@ -32,7 +38,7 @@
 <script setup>
 import { useUsuarioStore } from 'src/stores/admin/useUsuarioStore'
 import { useMenuStore } from 'src/stores/common/useMenuStore'
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
@@ -56,8 +62,19 @@ watch(
     console.log('index:', index)
     user.value = usuarioStore.listaUsuarios[index]
     console.log('user.value:', user.value)
+    selection.value = user.value.menus.map((menu) => menu.id)
+    console.log('selection:', selection)
   }
 )
+
+const isAdmin = computed({
+  get() {
+    return user.value?.isAdmin
+  }
+})
+function guardar() {
+  console.log('Guardando..')
+}
 </script>
 
 <style lang="scss" scoped></style>
