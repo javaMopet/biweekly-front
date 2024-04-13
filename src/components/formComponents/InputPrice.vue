@@ -11,14 +11,15 @@
       input-class="text-right"
       placeholder="0.00"
       ref="inputEditing"
-      outlined
-      color="secondary"
+      color="primary"
       dense
       :label="label"
       :readonly="readonly"
       :autofocus="autofocus"
       lazy-rules
       :rules="rules"
+      filled
+      :bg-color="bgColor"
     >
       <template #append>
         <div class="text-subtitle1">{{ editingLabel }}</div>
@@ -74,7 +75,13 @@ export default {
       type: Boolean,
       required: false,
       default: false
+    },
+    bgColor: {
+      type: String,
+      required: false,
+      default: 'accent'
     }
+
     // currencyCode: {
     //   type: String,
     //   required: false,

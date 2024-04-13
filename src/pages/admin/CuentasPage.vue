@@ -414,12 +414,12 @@ cuentaStore.onDoneCuentaDelete(({ data }) => {
 
 function cuentaSaved(itemSaved) {
   showFormItem.value = false
-  cuentaStore.refetchListaCuentas()
+  // cuentaStore.refetchListaCuentas()
 }
 function cuentaUpdated(itemUpdated) {
   showFormItem.value = false
   editedItem.value = { ...defaultItem }
-  cuentaStore.refetchListaCuentas()
+  // cuentaStore.refetchListaCuentas()
 }
 </script>
 

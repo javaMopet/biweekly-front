@@ -203,7 +203,12 @@
 .text-form-input-standout-dark {
   color: $form-input-standout-dark !important;
 }
-
+.bg-input-form {
+  background: $bg-input-form !important;
+}
+.bg-form-input {
+  background: $secondary !important;
+}
 /* *************************** */
 
 .btn-add {

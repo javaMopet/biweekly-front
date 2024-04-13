@@ -78,7 +78,7 @@
       </q-td>
     </template>
     <template v-slot:body-cell="props">
-      <q-td dense :props="props" clickable @click="addItem(props)">
+      <q-td dense :props="props" clickable @dblclick="addItem(props)">
         <span class="movimientos__celda--importe"> {{ props.value }}</span>
       </q-td>
     </template>
@@ -166,7 +166,7 @@
       </q-td>
     </template>
     <template v-slot:body-cell="props">
-      <q-td dense :props="props" clickable @click="addItem(props)">
+      <q-td dense :props="props" clickable @dblclick="addItem(props)">
         <span class="movimientos__celda--importe"> {{ props.value }}</span>
       </q-td>
     </template>

@@ -2,7 +2,7 @@
   <div class="col">
     <q-select
       outlined
-      color="positive"
+      color="primary"
       v-model="cuenta"
       :options="filteredOptions"
       option-label="nombre"
@@ -20,6 +20,8 @@
       :readonly="readonly"
       :style="style"
       :disable="disable"
+      :bg-color="bgColor"
+      filled
     >
     </q-select>
     <transition name="fade">
@@ -120,6 +122,11 @@ export default {
       type: Boolean,
       required: false,
       default: false
+    },
+    bgColor: {
+      type: String,
+      required: false,
+      default: 'bg-input-form'
     }
   },
   emits: ['update:modelValue'],
@@ -128,7 +135,7 @@ export default {
     /**
      * composable
      */
-    // const cuentaStore = useCuentaStore()
+    const cuentaStore = useCuentaStore()
     /**
      * state
      */
@@ -171,6 +178,7 @@ export default {
         return
       }
       update(() => {
+        console.log('update()')
         const needle = val.toLowerCase()
         filteredOptions.value = listaOptions.value.filter(
           (v) => v.nombre.toLowerCase().indexOf(needle) > -1
@@ -200,6 +208,7 @@ export default {
 
     return {
       cuenta,
+      cuentaStore,
       form_cuenta_show,
       filteredOptions,
       containsError,

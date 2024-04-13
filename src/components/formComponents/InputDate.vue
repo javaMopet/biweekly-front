@@ -2,13 +2,14 @@
   <q-input
     v-model="valor_fecha"
     dense
-    outlined
-    color="secondary"
+    color="primary"
     :label="lbl_field"
     lazy-rules
     :rules="rules"
     :readonly="readonly"
     :autofocus="autofocus"
+    filled
+    :bg-color="bgColor"
   >
     <template v-slot:append>
       <q-icon name="event" class="cursor-pointer">
@@ -91,6 +92,11 @@ export default {
       default: () => {
         return []
       }
+    },
+    bgColor: {
+      type: String,
+      required: false,
+      default: 'accent'
     }
   },
   emits: ['update:modelValue'],

@@ -45,7 +45,12 @@
             selection="multiple"
             v-model:selected="selectedItems"
             no-data-label="No hay registros para esta categoria y periodo"
+            :loading="loadingListaRegistros"
+            loading-label="Cargando Registros..."
           >
+            <template v-slot:loading>
+              <q-inner-loading showing color="primary" />
+            </template>
             <template #top>
               <q-td class="full-width">
                 <q-toolbar>
@@ -59,7 +64,14 @@
                     dense
                   />
                   <q-toolbar-title></q-toolbar-title>
-
+                  <div class="row q-pl-lg q-gutter-x-md">
+                    <span class="text-condensed text-primary">
+                      Importe total registros:</span
+                    >
+                    <span class="text-bold">
+                      {{ formato.toCurrency(sumatoriaRegistros) }}</span
+                    >
+                  </div>
                   <!--  -->
                   <div
                     v-if="isEditing"
@@ -86,7 +98,7 @@
               </q-td>
             </template>
             <template #header-cell-fecha="props">
-              <q-th :props="props" class="bg-white">
+              <q-th :props="props">
                 <!-- Fecha -->
                 <InputDate
                   v-model="formItem.fecha"
@@ -95,16 +107,18 @@
                   :rango-fecha-inicio="categoria.fecha_inicio_formato"
                   :rango-fecha-fin="categoria.fecha_fin_formato"
                   ref="inputDate"
+                  :bg-color="inputBgColor"
                 ></InputDate
               ></q-th>
             </template>
             <template #header-cell-importe="props">
-              <q-th :props="props">
+              <q-th :props="props" class="bg-primary">
                 <!-- Precio -->
                 <InputPrice
                   v-model="formItem.importe"
                   :autofocus="true"
                   ref="inputPrecio"
+                  :bg-color="inputBgColor"
                 ></InputPrice>
               </q-th>
             </template>
@@ -116,6 +130,7 @@
                   :agregar="false"
                   :filter-array="['1', '2']"
                   ref="selectCuenta"
+                  :bg-color="inputBgColor"
                 ></SelectCuenta>
               </q-th>
             </template>
@@ -126,10 +141,11 @@
                   type="textarea"
                   label="observaciones"
                   dense
-                  outlined
-                  color="secondary"
+                  color="primary"
                   rows="1"
                   lazy-rules
+                  :bg-color="inputBgColor"
+                  filled
                 />
               </q-th>
             </template>
@@ -191,25 +207,9 @@
             </template>
           </q-table>
         </div>
-        <q-card-actions vertical>
-          <div class="row q-pl-lg q-gutter-x-md">
-            <span class="text-condensed text-primary">
-              Importe total registros:</span
-            >
-            <span class="text-bold">
-              {{ formato.toCurrency(sumatoriaRegistros) }}</span
-            >
-          </div>
-          <!-- <div class="row inline justify-between items-center fit q-pa-md">
-            <div class="">
-              <div class="">
-                <pre>{{ formItem.importe }}</pre>
-              </div>
-            </div>
-          </div> -->
-        </q-card-actions>
       </div>
     </div>
+    <pre>{{ inputBgColor }}</pre>
   </div>
 </template>
 
@@ -269,6 +269,9 @@ const errors = ref({
 const selectedItems = ref([])
 const editingItem = ref(null)
 
+/**
+ * defineProps
+ */
 const props = defineProps({
   cellData: {
     type: Object,
@@ -624,7 +627,8 @@ const {
   onError: onErrorListaRegistros,
   onResult: onResultListaRegistros,
   load: loadListaRegistros,
-  refetch: reloadListaRegistros
+  refetch: reloadListaRegistros,
+  loading: loadingListaRegistros
 } = useLazyQuery(
   LISTA_REGISTROS,
   {
@@ -669,6 +673,12 @@ onErrorCategoriaById((error) => {
 /**
  * computed
  */
+const inputBgColor = computed({
+  get() {
+    return isEditing.value ? 'accent-light' : 'bg-input-form'
+  }
+})
+
 const periodoFormato = computed({
   get() {
     return `Del: ${formato.convertDateFromIsoToInput(
