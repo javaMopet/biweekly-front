@@ -75,3 +75,18 @@ export const USER_DELETE = gql`
     }
   }
 `
+
+export const USER_MENU_UPDATE = gql`
+  mutation userMenuUpdate($id: ID!, $menuInput: JSON!) {
+    userMenuUpdate(id: $id, menuInput: $menuInput) {
+      user {
+        id
+        menus {
+          id
+          nombre
+          activo
+        }
+      }
+    }
+  }
+`

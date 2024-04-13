@@ -2,7 +2,8 @@ import { useMutation } from '@vue/apollo-composable'
 import {
   USER_DELETE,
   USER_REGISTER,
-  USER_UPDATE
+  USER_UPDATE,
+  USER_MENU_UPDATE
 } from 'src/graphql/operations/users'
 
 export function useUserService() {
@@ -24,6 +25,22 @@ export function useUserService() {
     onError: onErrorUserDelete
   } = useMutation(USER_DELETE)
 
+  const {
+    mutate: userMenuUpdate,
+    onDone: onDoneUserMenuUpdate,
+    onError: onErrorUserMenuUpdate
+  } = useMutation(USER_MENU_UPDATE)
+
+  onDoneUserMenuUpdate(({ data }) => {
+    console.log('data:', data)
+    const user = data.userMenuUpdate.user
+
+    console.log('user.id:', user.id)
+
+    const menus = user.menus
+    console.log('menus:', menus)
+  })
+
   return {
     userRegister,
     onDoneUserRegister,
@@ -33,6 +50,9 @@ export function useUserService() {
     userDelete,
     onDoneUserDelete,
     onErrorUserDelete,
-    onErrorUserUpdate
+    onErrorUserUpdate,
+    userMenuUpdate,
+    onDoneUserMenuUpdate,
+    onErrorUserMenuUpdate
   }
 }
