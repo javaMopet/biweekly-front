@@ -209,7 +209,6 @@
         </div>
       </div>
     </div>
-    <pre>{{ inputBgColor }}</pre>
   </div>
 </template>
 

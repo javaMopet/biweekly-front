@@ -264,11 +264,11 @@ function getInputToUpdate() {
 
 function saveNewItem() {
   const input = getInputToCreate()
-  // console.log(
-  //   '%csrc/components/tarjetasCredito/FormRegistroMovimientoTarjeta.vue:239 input',
-  //   'color: #007acc;',
-  //   input
-  // )
+  console.log(
+    '%csrc/components/tarjetasCredito/FormRegistroMovimientoTarjeta.vue:239 input',
+    'color: #007acc;',
+    input
+  )
   registrosTarjetaCrud.createRegistroTarjeta({ input })
 }
 function getInputToCreate() {
@@ -302,9 +302,11 @@ registrosTarjetaCrud.onDoneRegistroTarjetaCreate(({ data }) => {
 
 registrosTarjetaCrud.onErrorRegistroTarjetaCreate((error) => {
   loadingSubmit.value = false
-  console.trace(error)
-  // console.log('error', error)
-  // console.log('error', error.graphQLErrors[0].extensions)
+  // console.trace(error)
+  mostrarNotificacionNegativa(
+    'Ocurrió un error al intengar guardar el registro',
+    1900
+  )
 })
 
 registrosTarjetaCrud.onErrorRegistroTarjetaUpdate((error) => {

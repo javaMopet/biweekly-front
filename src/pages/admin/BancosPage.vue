@@ -136,9 +136,9 @@ import { ref, onMounted } from 'vue'
 import { useQuasar } from 'quasar'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import FormRegistroBanco from 'src/components/bancos/FormRegistroBanco.vue'
-// import { useBancosCrud } from 'src/composables/useBancosCrud'
 import { useBancoStore } from 'src/stores/common/useBancoStore'
 import { useBancoService } from 'src/composables/admin/useBancoService'
+import { toast } from 'vue3-toastify'
 
 /**
  * composables
@@ -157,7 +157,6 @@ const { mostrarNotificacionNegativa, mostrarNotificacionPositiva } =
 
 bancoService.onDoneBancoDelete(({ data }) => {
   if (!!data) {
-    // console.log('item deleted ', data)
     const deletedItem = data.bancoDelete.banco
     mostrarNotificacionPositiva(
       `El banco "${deletedItem.nombre}" se elimininó correctamente`,
@@ -171,7 +170,12 @@ bancoService.onErrorBancoDelete((error) => {
     ? 'El banco ha sido utilizado en alguna cuenta, no es posible eliminar'
     : 'No es posible eliminar este banco, favor de verificar.'
 
-  mostrarNotificacionNegativa(mensaje, 1600)
+  // mostrarNotificacionNegativa(mensaje, 1600)
+  toast.error(mensaje, {
+    position: toast.POSITION.TOP_CENTER,
+    autoClose: 4000,
+    theme: 'dark'
+  })
 })
 
 /**
@@ -242,7 +246,6 @@ const columns = [
 // })
 
 onMounted(() => {
-  // console.log('onMounted BancosPage <<<<<....')
   // Las variables en el segundo
   // Las options se colocan en el 3er parámetro
   // loadListaBancos(null, { id: null }, graphlOptions)
@@ -257,7 +260,6 @@ function editItem(item) {
     ...item.row
   }
   editedIndex.value = item.rowIndex
-  // console.log(editedItem.value)
   showFormRegisterItem.value = true
 }
 

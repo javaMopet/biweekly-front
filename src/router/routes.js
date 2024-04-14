@@ -1,17 +1,17 @@
 import LoginPage from 'src/pages/LoginPage.vue'
 
 const routes = [
-  // {
-  //   path: '',
-  //   redirect: 'login'
-  // },
+  {
+    path: '',
+    redirect: '/home'
+  },
   // {
   //   path: '/index.html',
   //   redirect: '/home'
   // },
   {
     path: '/login',
-    component: LoginPage //() => import('pages/LoginPage.vue')
+    component: LoginPage
   },
   {
     path: '/home',

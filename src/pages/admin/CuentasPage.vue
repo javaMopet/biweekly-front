@@ -405,7 +405,6 @@ function deleteRow(item) {
 cuentaStore.onDoneCuentaDelete(({ data }) => {
   const itemDeleted = data.cuentaDelete.cuenta
   console.log('CuentasPage.vue itemDeleted', itemDeleted)
-  // cuentaStore.refetchListaCuentas()
   notificacion.mostrarNotificacionPositiva(
     `La cuenta "${itemDeleted.nombre}" se eliminó correctamente`,
     1400

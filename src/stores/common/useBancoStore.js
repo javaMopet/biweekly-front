@@ -30,7 +30,7 @@ export const useBancoStore = defineStore('bancoStore', () => {
     }
   })
   onErrorListaBancos((error) => {
-    console.trace(error)
+    console.log('error.toString():', error.toString())
   })
   /**
    * methods

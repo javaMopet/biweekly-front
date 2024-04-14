@@ -1,8 +1,5 @@
-import { ref } from 'vue'
 import { useMutation } from '@vue/apollo-composable'
-import { logErrorMessages } from '@vue/apollo-util'
 import { BANCO_CREATE, BANCO_DELETE, BANCO_UPDATE } from 'src/graphql/bancos'
-
 import { useBancoStore } from 'src/stores/common/useBancoStore'
 
 export function useBancoService() {
@@ -36,7 +33,6 @@ export function useBancoService() {
    * onDone
    */
   onDoneBancoCreate(({ data }) => {
-    console.log('refrescando bancos')
     const itemCreated = data.bancoCreate.banco
     bancoStore.bancoCreated(itemCreated)
   })
@@ -55,13 +51,13 @@ export function useBancoService() {
    * onError
    */
   onErrorBancoCreate((error) => {
-    logErrorMessages(error)
+    console.log('error.toString():', error.toString())
   })
   onErrorBancoUpdate((error) => {
-    logErrorMessages(error)
+    console.log('error.toString():', error.toString())
   })
   onErrorBancoDelete((error) => {
-    logErrorMessages(error)
+    console.log('error.toString():', error.toString())
   })
 
   return {

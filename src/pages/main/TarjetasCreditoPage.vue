@@ -205,22 +205,9 @@ const { mostrarNotificacionPositiva, mostrarNotificacionNegativa } =
  * state
  */
 const loadingCard = ref([])
-const listaCuentas = ref([])
 /**
  * GRAPHQL
  */
-
-// const {
-//   mutate: deleteCuenta,
-//   onDone: onDoneDeleteCuenta,
-//   onError: onErrorDeleteCuenta
-// } = useMutation(CUENTA_DELETE)
-
-const listaCuentasTarjeta = computed({
-  get() {
-    return listaCuentas.value.filter((c) => c.tipoCuenta.id === '3') ?? []
-  }
-})
 
 registrosTarjetaCrud.onDoneRegistroTarjetaDelete(({ data }) => {
   if (!!data) {
@@ -231,17 +218,12 @@ registrosTarjetaCrud.onDoneRegistroTarjetaDelete(({ data }) => {
 })
 
 registrosTarjetaCrud.onErrorRegistroTarjetaDelete((error) => {
-  // console.error(error)
   notificacion.mostrarNotificacionNegativa(
     'No es posible eliminar esta tarjeta de crédito debido a que tiene movimientos',
     1500
   )
 })
 
-// cuentaService.onResultListaCuentas(({ data }) => {
-//   listaCuentasTarjeta.value =
-//     data.listaCuentas.filter((c) => c.tipoCuenta.id === '3') ?? []
-// })
 /**
  * state
  */
@@ -254,7 +236,7 @@ const defaultItem = {
   },
   cuentaContable: null
 }
-// const listaCuentas = ref([])
+
 const filter = ref()
 const showFormItem = ref(false)
 const editedItem = ref({ ...defaultItem })
@@ -308,17 +290,9 @@ const columns = [
  * onMounted
  */
 onMounted(() => {
-  // cuentaStore.loadOrRefetchListaCuentas()
   const user = JSON.parse(SessionStorage.getItem('current_user'))
-  // console.log('user:', user)
 })
 
-// onResultCuentas(({ data }) => {
-//   if (!!data) {
-//     console.log('response', data)
-//     listaCuentas.value = JSON.parse(JSON.stringify(data.listaCuentas))
-//   }
-// })
 /**
  * Methods
  */
@@ -328,7 +302,6 @@ onMounted(() => {
  * @param {*} tipoCuentaId
  */
 function addRow(tipoCuentaId) {
-  // console.log('tipo de cuenta', tipoCuentaId)
   editedItem.value = { ...defaultItem }
   editedItem.value.tipoCuenta.id = tipoCuentaId.toString()
   showFormItem.value = true
@@ -370,9 +343,7 @@ function deleteRow(item) {
 }
 
 cuentaStore.onDoneCuentaDelete(({ data }) => {
-  // console.log('tarjeta eliminada', data)
   const cuentaDeleted = data.cuentaDelete.cuenta
-  // cuentaStore.refetchListaCuentas()
   mostrarNotificacionPositiva(
     `La tarjeta "${cuentaDeleted.nombre}" se eliminó correctamente.`,
     2100
@@ -380,7 +351,6 @@ cuentaStore.onDoneCuentaDelete(({ data }) => {
 })
 
 cuentaStore.onErrorCuentaDelete((error) => {
-  // console.trace(error)
   mostrarNotificacionNegativa('No es posible eliminar la tarjeta', 2100)
 })
 /**
@@ -388,7 +358,6 @@ cuentaStore.onErrorCuentaDelete((error) => {
  * @param {*} itemSaved
  */
 function cuentaSaved(itemSaved) {
-  // console.log('tarjetaSaved', itemSaved)
   showFormItem.value = false
 }
 /**
@@ -407,13 +376,13 @@ function mostrarNotificacion(action, cuenta) {
   )
 }
 
-function movimientosTarjeta() {
-  console.log('movimientostarjta')
-}
-function mostrarMovimientos(value) {
-  console.log('movimientos tarjeta', value)
-  router.push(`/tarjetas_credito/${value}`)
-}
+// function movimientosTarjeta() {
+//   console.log('movimientostarjta')
+// }
+// function mostrarMovimientos(value) {
+//   console.log('movimientos tarjeta', value)
+//   router.push(`/tarjetas_credito/${value}`)
+// }
 </script>
 
 <style lang="scss">

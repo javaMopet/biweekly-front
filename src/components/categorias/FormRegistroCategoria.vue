@@ -162,7 +162,6 @@ import IconPicker from '/src/components/IconPicker.vue'
 import PriceInput from '../formComponents/PriceInput.vue'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { SessionStorage } from 'quasar'
-import { useCategoriaStore } from 'src/stores/common/categoriaStore'
 import { useTipoMovimientoStore } from 'src/stores/common/useTipoMovimientoStore'
 import { useCategoriaService } from 'src/composables/useCategoriaService'
 import CuentaContableSelect from '../formComponents/CuentaContableSelect.vue'
@@ -176,7 +175,6 @@ import { toast } from 'vue3-toastify'
 const { mostrarNotificacionPositiva, mostrarNotificacionNegativa } =
   useNotificacion()
 const tipoMovimientoStore = useTipoMovimientoStore()
-const categoriaStore = useCategoriaStore()
 const categoriaService = useCategoriaService()
 /**
  * state
