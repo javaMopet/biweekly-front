@@ -21,29 +21,47 @@ const routes = [
       // { path: '', component: () => import('src/pages/HomeMainPage.vue') },
       {
         path: '/movimientos',
-        component: () => import('src/pages/main/MovimientosPage.vue')
+        component: () => import('src/pages/main/MovimientosPage.vue'),
+        meta: {
+          permission: 'movimientos'
+        }
       },
       {
         path: '/cuentas',
-        component: () => import('src/pages/admin/CuentasPage.vue')
+        component: () => import('src/pages/admin/CuentasPage.vue'),
+        meta: {
+          permission: 'cuentas'
+        }
       },
       {
         path: '/cuentas/:id',
         name: 'cuenta',
-        component: () => import('src/pages/admin/CuentaPage.vue')
+        component: () => import('src/pages/admin/CuentaPage.vue'),
+        meta: {
+          permission: 'cuentas'
+        }
       },
       {
         path: '/tarjetas_credito',
-        component: () => import('src/pages/main/TarjetasCreditoPage.vue')
+        component: () => import('src/pages/main/TarjetasCreditoPage.vue'),
+        meta: {
+          permission: 'tarjetas_credito'
+        }
       },
       {
         path: '/tarjetas_credito/:id',
         name: 'tarjetaCredito',
-        component: () => import('src/pages/main/TarjetaCreditoPage.vue')
+        component: () => import('src/pages/main/TarjetaCreditoPage.vue'),
+        meta: {
+          permission: 'tarjetas_credito'
+        }
       },
       {
         path: '/system_options',
-        component: () => import('src/pages/admin/SystemOptionsPage.vue')
+        component: () => import('src/pages/admin/SystemOptionsPage.vue'),
+        meta: {
+          permission: 'system_options'
+        }
       },
       {
         path: 'catalogos',
@@ -57,25 +75,40 @@ const routes = [
     children: [
       {
         path: 'categorias',
-        component: () => import('src/pages/admin/CategoriasPage.vue')
+        component: () => import('src/pages/admin/CategoriasPage.vue'),
+        meta: {
+          permission: 'categorias'
+        }
       },
 
       {
         path: 'bancos',
-        component: () => import('src/pages/admin/BancosPage.vue')
+        component: () => import('src/pages/admin/BancosPage.vue'),
+        meta: {
+          permission: 'bancos'
+        }
       },
       {
         path: 'cuentas_contables',
-        component: () => import('src/pages/admin/CuentasContablesPage.vue')
+        component: () => import('src/pages/admin/CuentasContablesPage.vue'),
+        meta: {
+          permission: 'cuentas_contables'
+        }
       },
       {
         path: 'usuarios',
         component: () => import('src/pages/admin/UsuariosPage.vue'),
+        meta: {
+          permission: 'usuarios'
+        },
         children: [
           {
             path: 'menuConfig/:id',
             component: () => import('src/pages/admin/user/UserMenuConfig.vue'),
-            name: 'usuarioMenuConfig'
+            name: 'usuarioMenuConfig',
+            meta: {
+              permission: 'usuarios'
+            }
           }
         ]
       },
@@ -87,6 +120,10 @@ const routes = [
       // Always leave this as last one,
       // but you can also remove it
     ]
+  },
+  {
+    path: '/403',
+    component: () => import('src/pages/ErrorForbidden.vue')
   },
   {
     path: '/:catchAll(.*)*',

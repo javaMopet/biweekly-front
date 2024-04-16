@@ -12,6 +12,12 @@ export const LOGIN = gql`
           name
           logoImage
         }
+        menus {
+          id
+          nombre
+          icono
+          ruta
+        }
         canModify
         isAdmin
       }

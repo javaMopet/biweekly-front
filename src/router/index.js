@@ -7,6 +7,7 @@ import {
 } from 'vue-router'
 import routes from './routes'
 import { SessionStorage } from 'quasar'
+import { usePermissionService } from 'src/composables/admin/usePermissionService'
 // import { api } from 'boot/axios'
 
 /*
@@ -35,6 +36,8 @@ export default route(function (/* { store, ssrContext } */) {
     history: createWebHistory() //createHistory(process.env.VUE_ROUTER_BASE)
   })
 
+  const permissionService = usePermissionService()
+
   Router.beforeEach((to, from) => {
     // console.log('to an from ', to, from)
     const publicPages = ['/login', '/403', '/']
@@ -46,6 +49,15 @@ export default route(function (/* { store, ssrContext } */) {
         !SessionStorage.getItem('current_user')
       ) {
         return '/login'
+      }
+      // Validará las rutas que asi se definan si no tenemos un problema con las rutas que no se
+      // ponen como menú del usuario
+      if (to.meta && to.meta.permission) {
+        console.log('to.meta.permission:', to.meta.permission)
+        const tienePermiso = permissionService.can(to.meta.permission)
+        if (!tienePermiso) {
+          return '/403'
+        }
       }
     }
   })

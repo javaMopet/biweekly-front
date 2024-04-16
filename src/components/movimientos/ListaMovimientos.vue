@@ -17,7 +17,6 @@
         </div>
       </div></DialogTitle
     >
-
     <div class="main-content q-py-lg">
       <div class="cuenta-content">
         <q-card-section>
@@ -215,7 +214,6 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useLazyQuery, useQuery } from '@vue/apollo-composable'
-import InputPrice from '../formComponents/InputPrice.vue'
 import { DateTime } from 'luxon'
 import { LISTA_REGISTROS } from 'src/graphql/registros'
 import { CATEGORIA_BY_ID } from 'src/graphql/categorias'
@@ -223,8 +221,9 @@ import { useFormato } from 'src/composables/utils/useFormato'
 import { useRegistrosCrud } from 'src/composables/useRegistrosCrud'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { SessionStorage, useQuasar } from 'quasar'
-import DialogTitle from '../formComponents/modal/DialogTitle.vue'
 import { toast } from 'vue3-toastify'
+import InputPrice from '../formComponents/InputPrice.vue'
+import DialogTitle from '../formComponents/modal/DialogTitle.vue'
 import SelectCuenta from '../formComponents/SelectCuenta.vue'
 import InputDate from '../formComponents/InputDate.vue'
 
