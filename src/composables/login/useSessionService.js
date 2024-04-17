@@ -1,6 +1,11 @@
 import { useMutation } from '@vue/apollo-composable'
 import { SessionStorage } from 'quasar'
-import { LOGIN, LOGOUT } from 'src/graphql/operations/login'
+import {
+  LOGIN,
+  LOGOUT,
+  SEND_PASSWORD_RESET,
+  UPDATE_PASSWORD_WITH_TOKEN
+} from 'src/graphql/operations/login'
 import { api } from 'src/boot/axios'
 
 export function useSessionService() {
@@ -23,11 +28,36 @@ export function useSessionService() {
     onError: onErrorUserLogout
   } = useMutation(LOGOUT)
 
+  const {
+    mutate: userSendPasswordReset,
+    onDone: onDoneUserSendPasswordReset,
+    onError: onErrorUserSendPasswordReset
+  } = useMutation(SEND_PASSWORD_RESET)
+
+  const {
+    mutate: userUpdatePassword,
+    onDone: onDoneUserUpdatePassword,
+    onError: onErrorUserUpdatePassword
+  } = useMutation(UPDATE_PASSWORD_WITH_TOKEN)
+
   onDoneUserLogin(({ data }) => {
     setUserInfo(data.userLogin)
   })
   onErrorUserLogin((error) => {
     // console.log(error)
+  })
+
+  onDoneUserSendPasswordReset(({ data }) => {
+    console.log('data:', data)
+  })
+  onErrorUserSendPasswordReset((error) => {
+    console.log('error:', error)
+  })
+  onDoneUserUpdatePassword(({ data }) => {
+    console.log('data:', data)
+  })
+  onErrorUserUpdatePassword((error) => {
+    console.log('error:', error)
   })
 
   function setUserInfo(userLogin) {
@@ -73,6 +103,12 @@ export function useSessionService() {
     userLogout,
     onDoneUserLogout,
     onErrorUserLogout,
-    removeCredentials
+    removeCredentials,
+    userSendPasswordReset,
+    onDoneUserSendPasswordReset,
+    onErrorUserSendPasswordReset,
+    userUpdatePassword,
+    onDoneUserUpdatePassword,
+    onErrorUserUpdatePassword
   }
 }

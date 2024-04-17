@@ -2,45 +2,20 @@
   <div class="container column items-center q-pa-xl">
     <q-card class="reset-container">
       <q-card-section>
-        <div class="text-h5">Reestablecer contraseña</div>
+        <div class="text-h5">Contraseña actualizada</div>
       </q-card-section>
       <q-card-section>
-        <div class="">
-          Hemos recibido una solicitud para reestablecer tu contraseña.
-        </div>
+        <div class="">Puede ingresar con su nueva contraseña</div>
         <q-separator spaced horizontal />
         <div class="text-subtitle2">Ingresa la nueva contraseña y guarda.</div>
       </q-card-section>
-      <q-card-section>
-        <div class="">
-          <q-form @submit="savePassword" class="q-gutter-md">
-            <q-input
-              v-model="password"
-              type="password"
-              label="Nueva contraseña"
-              filled
-              :rules="[(val) => !!val || 'Campo requerido.']"
-            />
-            <q-input
-              v-model="passwordConfirmation"
-              type="password"
-              label="Confirma tu nueva contraseña "
-              filled
-              :rules="[(val) => !!val || 'Campo requerido.']"
-            />
-            <div class="column justify-center q-gutter-md">
-              <q-btn label="Guardar" type="submit" color="primary-button" />
-              <q-btn label="Cancelar" type="reset" color="negative" outline />
-            </div>
-          </q-form>
-        </div>
-      </q-card-section>
+      <q-card-section> </q-card-section>
     </q-card>
   </div>
 </template>
 
 <script setup>
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { onMounted, ref } from 'vue'
 import { useSessionService } from 'src/composables/login/useSessionService'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
@@ -61,7 +36,7 @@ onMounted(() => {
  */
 const password = ref('')
 const passwordConfirmation = ref('')
-const router = useRouter()
+
 /**
  * methods
  */

@@ -14,8 +14,20 @@ const routes = [
     component: LoginPage
   },
   {
+    path: '/forgotPassword',
+    component: () => import('src/pages/ForgotPassword.vue')
+  },
+  {
+    path: '/forgotPasswordSended',
+    component: () => import('src/pages/ForgotPasswordSended.vue')
+  },
+  {
     path: '/resetPassword',
     component: () => import('src/pages/ResetPassword.vue')
+  },
+  {
+    path: '/resetPasswordSuccess',
+    component: () => import('src/pages/ResetPasswordSuccess.vue')
   },
   {
     path: '/home',

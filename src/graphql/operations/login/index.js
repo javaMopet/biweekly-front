@@ -45,3 +45,41 @@ export const LOGOUT = gql`
     }
   }
 `
+export const SEND_PASSWORD_RESET = gql`
+  mutation userSendPasswordResetWithToken(
+    $email: String!
+    $redirectUrl: String!
+  ) {
+    userSendPasswordResetWithToken(email: $email, redirectUrl: $redirectUrl) {
+      message
+    }
+  }
+`
+export const UPDATE_PASSWORD_WITH_TOKEN = gql`
+  mutation updatePasswordWithToken(
+    $password: String!
+    $passwordConfirmation: String!
+    $resetPasswordToken: String!
+  ) {
+    userUpdatePasswordWithToken(
+      password: $password
+      passwordConfirmation: $passwordConfirmation
+      resetPasswordToken: $resetPasswordToken
+    ) {
+      authenticatable {
+        id
+        name
+        email
+        isAdmin
+        isSuperuser
+      }
+      credentials {
+        uid
+        client
+        accessToken
+        tokenType
+        expiry
+      }
+    }
+  }
+`

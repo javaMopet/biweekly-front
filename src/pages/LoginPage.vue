@@ -24,7 +24,7 @@
               <q-icon name="account_circle" size="100px" />
             </div>
             <div class="row justify-center">
-              <span>Login to your account</span>
+              <span>Ingresa con tu cuenta de correo y contraseña</span>
             </div>
           </div>
           <!-- <q-separator spaced inset horizontal color="accent-light" /> -->
@@ -83,7 +83,8 @@
               <div class="text-red-3" v-if="invalidCredentials">
                 El usuario y/o contraseña son incorrectos
               </div>
-              <div class="column fit justify-center items-center">
+
+              <div class="column fit justify-center items-center q-gutter-y-md">
                 <q-btn
                   label="Entrar"
                   type="submit"
@@ -97,6 +98,10 @@
                     <q-spinner-pie />
                   </template>
                 </q-btn>
+                <q-separator spaced inset horizontal color="white" />
+                <router-link to="/forgotPassword" class="link_forgot-password"
+                  >¿Olvidaste tu contraseña?</router-link
+                >
               </div>
             </q-form>
           </q-card-section>
@@ -220,5 +225,8 @@ function resetUserInfo() {
   // background-color: white;
   // -webkit-filter: none !important; /* Safari 6.0 - 9.0 */
   // filter: none !important;
+}
+.link_forgot-password {
+  color: rgb(192, 248, 229);
 }
 </style>
