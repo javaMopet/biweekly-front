@@ -326,7 +326,7 @@ function saveItem() {
     : 0
 
   let cuenta_contable_id = null
-  const current_user = JSON.parse(SessionStorage.getItem('current_user'))
+  const current_user = SessionStorage.getItem('current_user')
   if (!!editedFormItem.value.cuentaContable) {
     cuenta_contable_id = parseInt(editedFormItem.value.cuentaContable.id)
   }

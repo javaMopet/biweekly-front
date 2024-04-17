@@ -51,7 +51,7 @@ import { useCuentaStore } from 'src/stores/common/useCuentaStore'
 
 /**state */
 const cuentaStore = useCuentaStore()
-const user = JSON.parse(SessionStorage.getItem('current_user'))
+const user = SessionStorage.getItem('current_user')
 
 function clearPinia() {
   console.log('Clearing pinia')

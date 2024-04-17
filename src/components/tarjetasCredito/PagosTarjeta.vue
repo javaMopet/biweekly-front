@@ -187,7 +187,7 @@ onResultListaRegistros(({ data }) => {
     const fecha_aplicacion = formato.convertDateFromInputToIso(
       formItem.value.fecha
     )
-    const user = JSON.parse(SessionStorage.getItem('current_user'))
+    const user = SessionStorage.getItem('current_user')
     var lista_registros = []
     listaRegistros.forEach((item) => {
       const registro = {

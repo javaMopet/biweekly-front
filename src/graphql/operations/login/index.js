@@ -20,6 +20,7 @@ export const LOGIN = gql`
         }
         canModify
         isAdmin
+        isSuperuser
       }
       credentials {
         uid

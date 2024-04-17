@@ -304,7 +304,7 @@ const loadingAccount = ref([])
  */
 const isModificable = computed({
   get() {
-    return JSON.parse(SessionStorage.getItem('current_user')).canModify
+    return SessionStorage.getItem('current_user').canModify
   }
 })
 /**
@@ -348,7 +348,7 @@ const columns = [
  */
 onMounted(() => {
   // console.log('OnMountedCuentasPage')
-  const user = JSON.parse(SessionStorage.getItem('current_user'))
+  const user = SessionStorage.getItem('current_user')
   variables.instanceId = user.instance.id
   // cuentaStore.fetchOrRefetchListaCuentas()
 })

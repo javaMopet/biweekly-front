@@ -320,7 +320,7 @@ function saveItem() {
   // console.log('save item')
   const cuenta_contable_id = editedFormItem.value.cuentaContable?.id
   const cuentaDefaultId = editedFormItem.value.cuentaDefault?.id
-  const user = JSON.parse(SessionStorage.getItem('current_user'))
+  const user = SessionStorage.getItem('current_user')
   const input = {
     ...editedFormItem.value,
     cuentaContableId: parseInt(cuenta_contable_id),

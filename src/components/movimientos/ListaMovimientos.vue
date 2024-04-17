@@ -483,7 +483,7 @@ function saveItem() {
         tipoAfectacion === 'C'
           ? parseFloat(formItem.value.importe) * -1
           : parseFloat(formItem.value.importe)
-      const user = JSON.parse(SessionStorage.getItem('current_user'))
+      const user = SessionStorage.getItem('current_user')
       const input = {
         id: editingItem.value?.row.id ?? undefined,
         categoriaId: categoria.value.id,

@@ -18,7 +18,7 @@ export const useMenuStore = defineStore('menuStore', () => {
     fetchPolicy: 'no-cache'
   })
   const menuVariables = reactive({
-    usuarioId: JSON.parse(SessionStorage.getItem('current_user')).id
+    usuarioId: SessionStorage.getItem('current_user')?.id || 1
   })
 
   const { onResult: onResultListaMenus, onError: onErrorListaMenus } = useQuery(

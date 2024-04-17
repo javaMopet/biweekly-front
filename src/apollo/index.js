@@ -74,7 +74,7 @@ export /* async */ function getClientOptions(/* {app, router, ...} */ options) {
     // return the headers to the context so httpLink can read them
     let credentials = ''
     if (!!SessionStorage.getItem('credentials')) {
-      credentials = JSON.parse(SessionStorage.getItem('credentials'))
+      credentials = SessionStorage.getItem('credentials')
     }
 
     return {

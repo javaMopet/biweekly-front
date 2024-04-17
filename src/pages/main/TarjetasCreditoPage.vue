@@ -247,7 +247,7 @@ const editedItem = ref({ ...defaultItem })
 
 const isModificable = computed({
   get() {
-    return JSON.parse(SessionStorage.getItem('current_user')).canModify
+    return SessionStorage.getItem('current_user').canModify
   }
 })
 /**
@@ -290,7 +290,7 @@ const columns = [
  * onMounted
  */
 onMounted(() => {
-  const user = JSON.parse(SessionStorage.getItem('current_user'))
+  const user = SessionStorage.getItem('current_user')
 })
 
 /**

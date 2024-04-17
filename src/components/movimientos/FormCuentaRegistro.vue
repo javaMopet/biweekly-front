@@ -340,7 +340,7 @@ function onChangeTipoMovimiento(value) {
 
 function saveItem() {
   isSaving.value = true
-  const currentUser = JSON.parse(SessionStorage.getItem('current_user'))
+  const currentUser = SessionStorage.getItem('current_user')
   const userId = currentUser.id
   const categoria = editedFormItem.value.categoria
   const importe = parseFloat(editedFormItem.value.importe)

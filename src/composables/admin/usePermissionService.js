@@ -19,7 +19,7 @@ export function usePermissionService() {
   }
 
   const getCurrentUser = () => {
-    const current_user = JSON.parse(SessionStorage.getItem('current_user'))
+    const current_user = SessionStorage.getItem('current_user')
     // console.log('current_user:', current_user)
     return current_user
   }

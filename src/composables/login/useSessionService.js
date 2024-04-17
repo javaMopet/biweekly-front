@@ -40,10 +40,13 @@ export function useSessionService() {
     // api.defaults.headers.common["Authorization"] = auth_token.value;
     // }
     if (!!userLogin) {
-      SessionStorage.set('credentials', JSON.stringify(userLogin.credentials))
+      SessionStorage.set(
+        'credentials',
+        JSON.parse(JSON.stringify(userLogin.credentials))
+      )
       SessionStorage.set(
         'current_user',
-        JSON.stringify(userLogin.authenticatable)
+        JSON.parse(JSON.stringify(userLogin.authenticatable))
       )
     }
   }

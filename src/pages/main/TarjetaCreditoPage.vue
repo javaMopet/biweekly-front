@@ -278,7 +278,7 @@
               <div class="">
                 <div class="row q-gutter-x-md">
                   <q-btn
-                  v-if="isModificable"
+                    v-if="isModificable"
                     color="primary"
                     icon="add_circle"
                     @click="addItem"
@@ -674,7 +674,7 @@ onErrorListaRegistros((error) => {
  */
 const isModificable = computed({
   get() {
-    return JSON.parse(SessionStorage.getItem('current_user')).canModify
+    return SessionStorage.getItem('current_user').canModify
   }
 })
 

@@ -30,6 +30,8 @@
           :filter="filter"
           :rows-per-page-options="[0]"
           hide-pagination
+          :loading="usuarioStore.loadingListaUsuarios"
+          loading-label="Cargando lista de usuarios..."
         >
           <template #top-left>
             <div class="page-title">
@@ -76,6 +78,10 @@
                     class="col items-center q-pl-sm"
                     style="max-width: 220px; width: 220px"
                   >
+                    <div class="text-bold" v-if="props.row.isSuperuser">
+                      Superusuario
+                    </div>
+                    <div class="" v-else>&nbsp;</div>
                     <div class="text-bold" v-if="props.row.isAdmin">
                       Administrador
                     </div>
@@ -96,7 +102,7 @@
                     >
                   </div>
                 </div>
-                <div class="row text-blue-grey-5 justify-center q-pt-lg">
+                <div class="row text-blue-8 text-bold justify-center q-pt-lg">
                   {{ props.row.email }}
                 </div>
                 <q-separator spaced inset horizontal />
@@ -155,11 +161,9 @@
 import { ref, onMounted, computed } from 'vue'
 import { SessionStorage, useQuasar } from 'quasar'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
-import { useFormato } from 'src/composables/utils/useFormato'
-import { useRouter, RouterLink } from 'vue-router'
+import { RouterLink } from 'vue-router'
 import { useUserService } from 'src/composables/admin/useUserService'
 import UserRegistrationForm from 'src/components/admin/usuarios/UserRegistrationForm.vue'
-import { useSessionService } from 'src/composables/login/useSessionService'
 import { useUsuarioStore } from 'src/stores/admin/useUsuarioStore'
 
 /**
@@ -168,12 +172,9 @@ import { useUsuarioStore } from 'src/stores/admin/useUsuarioStore'
 const $q = useQuasar()
 const { mostrarNotificacionPositiva, mostrarNotificacionNegativa } =
   useNotificacion()
-const formato = useFormato()
-const router = useRouter()
+
 const userService = useUserService()
 const usuarioStore = useUsuarioStore()
-// const usuariosCrud = useUsuariosCrud()
-const sessionService = useSessionService()
 /**
  * GRAPHQL
  */
@@ -206,7 +207,7 @@ const loadingAccount = ref([])
  */
 const isModificable = computed({
   get() {
-    return JSON.parse(SessionStorage.getItem('current_user')).canModify
+    return SessionStorage.getItem('current_user').canModify
   }
 })
 /**

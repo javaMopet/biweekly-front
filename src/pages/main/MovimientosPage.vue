@@ -703,7 +703,7 @@ onErrorDeleteMovimiento((error) => {
 
 const isModificable = computed({
   get() {
-    return JSON.parse(SessionStorage.getItem('current_user')).canModify
+    return SessionStorage.getItem('current_user').canModify
   }
 })
 </script>

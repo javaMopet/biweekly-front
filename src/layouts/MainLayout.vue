@@ -143,14 +143,13 @@ const router = useRouter()
  * onMounted
  */
 onMounted(() => {
-  const credentials =
-    JSON.parse(SessionStorage.getItem('credentials')) || undefined
+  const credentials = SessionStorage.getItem('credentials') || undefined
   // console.log('credentials:', credentials)
   // if (!email) router.push('/home')
 
   email.value = credentials.uid
 
-  user.value = JSON.parse(SessionStorage.getItem('current_user'))
+  user.value = SessionStorage.getItem('current_user')
 
   if (!user.value) router.push('login')
 

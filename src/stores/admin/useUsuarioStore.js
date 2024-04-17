@@ -21,11 +21,11 @@ export const useUsuarioStore = defineStore('usuarioStore', () => {
     fetchPolicy: 'no-cache'
   })
 
-  const { onResult: onResultUsersList, onError: onErrorUsersList } = useQuery(
-    USERS_LIST,
-    null,
-    graphql_options
-  )
+  const {
+    onResult: onResultUsersList,
+    onError: onErrorUsersList,
+    loading: loadingListaUsuarios
+  } = useQuery(USERS_LIST, null, graphql_options)
 
   onResultUsersList(({ data }) => {
     if (!!data) {
@@ -41,6 +41,7 @@ export const useUsuarioStore = defineStore('usuarioStore', () => {
   return {
     listaUsuarios,
     onResultUsersList,
-    onErrorUsersList
+    onErrorUsersList,
+    loadingListaUsuarios
   }
 })

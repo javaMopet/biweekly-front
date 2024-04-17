@@ -12,6 +12,7 @@ export const USERS_LIST = gql`
         logoImage
       }
       isAdmin
+      isSuperuser
       roles
       menus {
         id

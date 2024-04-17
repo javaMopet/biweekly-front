@@ -39,8 +39,8 @@ export default route(function (/* { store, ssrContext } */) {
   const permissionService = usePermissionService()
 
   Router.beforeEach((to, from) => {
-    // console.log('to an from ', to, from)
-    const publicPages = ['/login', '/403', '/']
+    console.log('to an from ', to, from)
+    const publicPages = ['/login', '/403', '/', '/resetPassword']
     const authRequired = !publicPages.includes(to.path)
 
     if (authRequired) {
@@ -48,6 +48,7 @@ export default route(function (/* { store, ssrContext } */) {
         !SessionStorage.getItem('credentials') ||
         !SessionStorage.getItem('current_user')
       ) {
+        console.log('no credentials, no current_user')
         return '/login'
       }
       // Validará las rutas que asi se definan si no tenemos un problema con las rutas que no se

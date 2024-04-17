@@ -22,7 +22,7 @@ const email = ref('')
 const username = ref('')
 
 onMounted(() => {
-  const current_user = JSON.parse(SessionStorage.getItem('current_user'))
+  const current_user = SessionStorage.getItem('current_user')
   email.value = current_user.email
   username.value = current_user.name
 })

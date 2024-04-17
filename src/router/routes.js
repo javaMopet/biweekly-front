@@ -14,6 +14,10 @@ const routes = [
     component: LoginPage
   },
   {
+    path: '/resetPassword',
+    component: () => import('src/pages/ResetPassword.vue')
+  },
+  {
     path: '/home',
     component: () => import('layouts/MainLayout.vue'),
     children: [

@@ -66,6 +66,13 @@
             />
           </template>
         </q-input>
+        <q-select
+          v-if="isSuperuser"
+          v-model="authenticable.instance"
+          :options="instanceStore.instanceList"
+          label="Instancia"
+          option-label="name"
+        />
 
         <div class="col row justify-end q-pt-lg q-gutter-lg">
           <q-btn
@@ -109,6 +116,8 @@ import IconPicker from '/src/components/IconPicker.vue'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import DialogTitle from 'src/components/formComponents/modal/DialogTitle.vue'
 import { useUserService } from 'src/composables/admin/useUserService'
+import { useInstanceStore } from 'src/stores/admin/useInstanceStore'
+import { SessionStorage } from 'quasar'
 
 /**
  * composables
@@ -117,6 +126,7 @@ const { mostrarNotificacionPositiva, mostrarNotificacionNegativa } =
   useNotificacion()
 
 const userService = useUserService()
+const instanceStore = useInstanceStore()
 
 /**
  * state
@@ -152,6 +162,12 @@ const emit = defineEmits(['userRegistered', 'updatedUser'])
 /**
  * computed
  */
+const isSuperuser = computed({
+  get() {
+    return SessionStorage.getItem('current_user').isSuperuser
+  }
+})
+
 const authenticable = computed({
   get() {
     return !!props.userToEdit ? props.userToEdit : formItem.value
@@ -193,7 +209,8 @@ function registerUser() {
     userService.userUpdate({
       id: authenticable.value.id,
       userInput: {
-        name: authenticable.value.name
+        name: authenticable.value.name,
+        instanceId: authenticable.value.instance.id
       }
     })
   }
