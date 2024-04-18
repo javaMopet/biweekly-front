@@ -12,15 +12,18 @@
               : { width: '25%' }
           " -->
         <q-card
-          class="card-login"
-          :style="$q.screen.lt.sm ? { width: '300px' } : { width: '400px' }"
+          class="card-login q-pa-lg"
+          :style="$q.screen.lt.sm ? { width: '400px' } : { width: '500px' }"
         >
-          <q-card-section>
+          <q-card-section class="" style="border: 0px solid red">
             <div
               class="column full-width items-center text-h6 q-pt-sm login_image"
             >
-              <q-icon name="account_circle" size="130px" />
+              <q-icon name="account_circle" size="180px" />
             </div>
+            <!-- account_circle -->
+            <!-- fa-solid fa-circle-user -->
+            <!-- fa-regular fa-circle-user -->
             <div class="row justify-center">
               <span>Ingresa con tu cuenta de correo y contraseña</span>
             </div>
@@ -76,7 +79,7 @@
                 </q-input>
                 <div>
                   <div
-                    class="text-red-3"
+                    class="text-dark bg-negative-pastel"
                     style="border: 0px solid green"
                     v-if="invalidCredentials"
                   >
@@ -97,7 +100,7 @@
                   class="column fit justify-center items-center q-gutter-y-md"
                 >
                   <q-btn
-                    label="Entrar"
+                    label="Login"
                     type="submit"
                     :loading="submitting"
                     push
@@ -240,10 +243,10 @@ function resetUserInfo() {
 .link_forgot-password {
   color: rgb(192, 248, 229);
 }
-.login_image {
-  color: lighten($color: $dark, $amount: 20);
-  opacity: 0.95;
-  transform: translateY(-95px);
-  height: 45px !important;
-}
+// .login_image {
+//   color: darken($color: $dark, $amount: 2);
+//   opacity: 0.95;
+//   transform: translateY(-120px);
+//   height: 100px !important;
+// }
 </style>
