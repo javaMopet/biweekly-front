@@ -61,14 +61,7 @@ export function useSessionService() {
   })
 
   function setUserInfo(userLogin) {
-    // if (response.data.status.code === 200) {
-    // console.log('data', response.data.status.data)
-    // user.value = response.data.status.data
-    // SessionStorage.set('user', user.value)
-    // auth_token.value = response.headers.authorization
-    // SessionStorage.set('user', user.value)
     // api.defaults.headers.common["Authorization"] = auth_token.value;
-    // }
     if (!!userLogin) {
       SessionStorage.set(
         'credentials',

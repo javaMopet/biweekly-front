@@ -19,12 +19,21 @@
             :rules="[(val) => !!val || 'Ingresa la cuenta de Email']"
             outlined
           />
+          <div class="text-negative" v-if="noEmailFound">
+            La dirección de correo no existe. Verifica que la ingresaste
+            corectamente
+          </div>
           <div class="reset-card-message">
             Enviaremos un mensaje a la cuenta de correo para reestablecer tu
             contraseña.
           </div>
           <div class="column">
-            <q-btn label="CONTINUAR" type="submit" color="primary-button" />
+            <q-btn
+              label="CONTINUAR"
+              type="submit"
+              color="primary-button"
+              :loading="loadingSendPasswordReset"
+            />
           </div>
           <div class="column items-center">
             <div class="row">
@@ -42,6 +51,7 @@
 import { useRoute, useRouter } from 'vue-router'
 import { onMounted, ref } from 'vue'
 import { useSessionService } from 'src/composables/login/useSessionService'
+import { useNotificacion } from 'src/composables/utils/useNotificacion'
 
 /**
  * composables
@@ -50,6 +60,7 @@ const route = useRoute()
 
 const sessionService = useSessionService()
 const router = useRouter()
+const { mostrarNotificacionNegativa } = useNotificacion()
 
 onMounted(() => {
   console.log('route.params.reset_password_token:', route.query)
@@ -59,10 +70,15 @@ onMounted(() => {
  * state
  */
 const email = ref('')
+const noEmailFound = ref(false)
+const loadingSendPasswordReset = ref(false)
+
 /**
  * methods
  */
 function sendPasswordReset() {
+  noEmailFound.value = false
+  loadingSendPasswordReset.value = true
   console.log('sendig request reset password')
   sessionService.userSendPasswordReset({
     email: email.value,
@@ -75,6 +91,15 @@ sessionService.onDoneUserSendPasswordReset(({ data }) => {
 })
 sessionService.onErrorUserSendPasswordReset((error) => {
   console.log('error:', error)
+  loadingSendPasswordReset.value = false
+  if (error.toString().includes('User was not found')) {
+    noEmailFound.value = true
+  } else {
+    mostrarNotificacionNegativa(
+      'Ocurrió un error al intentar enviar la solicitud.',
+      1900
+    )
+  }
 })
 </script>
 

@@ -1,15 +1,24 @@
 <template>
   <div class="container full-with column items-center q-pt-xl">
-    <q-card class="reset-card">
+    <q-card class="reset-card" style="min-width: 600px">
       <q-card-section>
-        <div class="text-h5">Correo enviado.</div>
+        <div class="text-h5">Link de recuperación de contraseña enviado.</div>
       </q-card-section>
       <q-card-section>
         <div class="text-subtitle1">
-          Enviamos un correo con el link de recuperación de su cuenta
+          <span class="text-bold text-subtitle2"
+            >Revisa tu cuenta de correo y sigue las instrucciones.</span
+          >
+          <br /><br />
+          <span class="text-subtitle1"
+            >Si no visualizas el correo verifica en tu carpeta de Spam.</span
+          >
         </div>
       </q-card-section>
-      <q-card-section> </q-card-section>
+      <q-card-section>
+        Regresar a
+        <router-link to="/login">iniciar sesión</router-link>
+      </q-card-section>
     </q-card>
   </div>
 </template>

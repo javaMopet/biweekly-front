@@ -18,33 +18,54 @@
         /> -->
         <span>{{ instanceName }}</span>
         <q-toolbar-title class="font-title"> </q-toolbar-title>
-        <span class="q-pr-sm text-bold" v-if="user">{{ user.name }}</span>
+        <!-- <span class="q-pr-sm text-bold" v-if="user">{{ user.name }}</span> -->
         <!-- {{ user.id }} -->
         <q-btn
-          icon="account_circle"
+          icon-right="account_circle"
           @click="onClickAccount"
+          size="1rem"
+          :label="user.name"
+          no-caps
           flat
-          round
           dense
-          size="1.2rem"
         >
-          <q-menu>
-            <q-list style="min-width: 150px">
+          <q-menu class="text-caption" fit>
+            <q-list style="min-width: 170px">
               <q-item>
                 <q-item-section top avatar>
-                  <q-avatar color="secondary" text-color="white" icon="email" />
+                  <q-avatar
+                    color="secondary"
+                    text-color="white"
+                    icon="las la-user-tie"
+                    size="xl"
+                    font-size="40px"
+                  />
                 </q-item-section>
                 <q-item-section>
-                  <q-item-label>{{ email }}</q-item-label>
+                  <q-item-label class="text-bold">{{ user.name }}</q-item-label>
+                  <q-item-label>{{ user.email }}</q-item-label>
+                  <q-item-label class="text-bold" v-if="user.isAdmin">{{
+                    'Administrador'
+                  }}</q-item-label>
                 </q-item-section>
               </q-item>
+              <q-separator spaced horizontal />
               <q-item clickable v-close-popup @click="logout">
-                <q-item-section>Cerrar Sesion</q-item-section>
+                <q-item-section top avatar>
+                  <q-avatar
+                    text-color="primary"
+                    icon="logout"
+                    font-size="25px"
+                  />
+                </q-item-section>
+                <q-item-section class="text-subtitle2 text-primary"
+                  >Cerrar Sesión</q-item-section
+                >
               </q-item>
-              <q-separator />
+              <!-- <q-separator />
               <q-item clickable v-close-popup>
                 <q-item-section>Acerca de...</q-item-section>
-              </q-item>
+              </q-item> -->
             </q-list>
           </q-menu>
         </q-btn>
@@ -58,39 +79,51 @@
       elevated
       class="bg-menu shadow-10"
     >
-      <div class="" style="border: 0px solid red">
-        <div class="application-title q-pa-lg" align="center">
-          <q-img
-            src="/icons/tree.png"
-            spinner-color="primary"
-            spinner-size="72px"
-            width="120px"
-          />
-          <!-- <q-img
+      <div
+        class="column justify-baseline full-height"
+        style="border: 0px solid green"
+      >
+        <div class="col-auto row justify-center" style="border: 0px solid red">
+          <div class="application-title q-pa-lg">
+            <q-img
+              src="/icons/tree.png"
+              spinner-color="primary"
+              spinner-size="72px"
+              width="120px"
+            />
+            <!-- <q-img
             src="/icons/logo.png"
             spinner-color="primary"
             spinner-size="72px"
             width="220px"
           /> -->
-          <!-- <span class="font-title-letter text-secondary">B</span>iweekly
+            <!-- <span class="font-title-letter text-secondary">B</span>iweekly
           Application -->
+          </div>
         </div>
+        <div class="col-7" style="border: 0px solid aquamarine">
+          <q-list class="no-shadow q-mt-lg">
+            <EssentialLink
+              v-for="link in menuStore.arbolMenus"
+              :key="link.nombre"
+              v-bind="link"
+            >
+            </EssentialLink>
+          </q-list>
+        </div>
+        <!-- <div class="col-2 row items-end" style="border: 1px solid pink">
+          <router-link to="/logout">logout</router-link>
+        </div> -->
       </div>
-      <q-separator spaced inset horizontal color="blue-grey-5" />
-
-      <q-list class="no-shadow q-mt-lg">
-        <EssentialLink
-          v-for="link in menuStore.arbolMenus"
-          :key="link.nombre"
-          v-bind="link"
-        >
-        </EssentialLink>
-      </q-list>
     </q-drawer>
 
+    <!-- <q-footer v-model="footer" reveal elevated bordered>
+      <div class="" style="border: 1px solid red; height: 100%">
+        <div class="">Footer</div>
+      </div>
+    </q-footer> -->
+
     <q-page-container>
-      <!-- <p>Idle: {{ idleFirst }}</p>
-      <p>IdleLast: {{ idleLast }}</p> -->
       <router-view />
     </q-page-container>
   </q-layout>
@@ -128,10 +161,9 @@ const menuStore = useMenuStore()
  * state
  */
 const leftDrawerOpen = ref(false)
-const user = ref(null)
+const user = ref({})
 // const essentialLinks = ref([])
 const instanceName = ref('')
-const email = ref('')
 
 /**
  * stores
@@ -147,7 +179,7 @@ onMounted(() => {
   // console.log('credentials:', credentials)
   // if (!email) router.push('/home')
 
-  email.value = credentials.uid
+  // email.value = credentials.uid
 
   user.value = SessionStorage.getItem('current_user')
 

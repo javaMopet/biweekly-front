@@ -12,98 +12,107 @@
               : { width: '25%' }
           " -->
         <q-card
-          class="card-login q-py-md"
+          class="card-login"
           :style="$q.screen.lt.sm ? { width: '300px' } : { width: '400px' }"
         >
-          <div class="">
-            <div class="column full-width items-center text-h6 q-pt-lg">
-              <!-- <span class="text-weight-bold q-py-sm text-blue-grey-3"
-                >Bienvenido
-              </span> -->
-              <!-- <span class="text-caption">Identifiquese antes de continuar</span> -->
-              <q-icon name="account_circle" size="100px" />
+          <q-card-section>
+            <div
+              class="column full-width items-center text-h6 q-pt-sm login_image"
+            >
+              <q-icon name="account_circle" size="130px" />
             </div>
             <div class="row justify-center">
               <span>Ingresa con tu cuenta de correo y contraseña</span>
             </div>
-          </div>
-          <!-- <q-separator spaced inset horizontal color="accent-light" /> -->
+          </q-card-section>
           <q-card-section align="center">
-            <q-form
-              @submit.prevent="login"
-              class="q-gutter-lg q-pa-lg"
-              style="max-width: 95%; border: 0px solid yellow"
-              fit
-            >
-              <!-- Estilo solo de la parte donde se digita el valor  -->
-              <!-- input-style="border: 1px solid green" -->
-
-              <q-input
-                v-model="form.email"
-                type="email"
-                label="Usuario o Email"
-                label-color="input-label"
-                bg-color="blue-1"
-                color="blue-gray-10"
-                lazy-rules
-                outlined
-                :rules="[(val) => !!val || 'Correo es requerido']"
-                class="fit"
+            <div class="q-px-md" style="max-width: 320px">
+              <q-form
+                @submit.prevent="login"
+                style="border: 0px solid yellow"
+                class="q-gutter-md"
               >
-                <template v-slot:prepend>
-                  <q-icon name="mail" class="text-blue-grey-5" />
-                </template>
-              </q-input>
+                <!-- Estilo solo de la parte donde se digita el valor  -->
+                <!-- input-style="border: 1px solid green" -->
 
-              <q-input
-                v-model="form.password"
-                :type="isPwd ? 'password' : 'text'"
-                label="Contraseña"
-                label-color="input-label"
-                color="blue-10"
-                lazy-rules
-                bg-color="blue-1"
-                outlined
-                :rules="[(val) => !!val || 'Correo es requerido']"
-                class="fit"
-              >
-                <!-- standout="bg-form-input-standout-dark" -->
-                <template v-slot:prepend>
-                  <q-icon name="lock" class="text-blue-grey-5" />
-                </template>
-                <template v-slot:append>
-                  <q-icon
-                    :name="isPwd ? 'visibility_off' : 'visibility'"
-                    class="cursor-pointer"
-                    @click="isPwd = !isPwd"
-                  />
-                </template>
-              </q-input>
-
-              <div class="text-red-3" v-if="invalidCredentials">
-                El usuario y/o contraseña son incorrectos
-              </div>
-
-              <div class="column fit justify-center items-center q-gutter-y-md">
-                <q-btn
-                  label="Entrar"
-                  type="submit"
-                  :loading="submitting"
-                  push
-                  color="toggle-button"
-                  text-color="toggle-text-button"
-                  class="text-bold fit"
+                <q-input
+                  v-model="form.email"
+                  type="email"
+                  label="Usuario o Email"
+                  label-color="input-label"
+                  bg-color="blue-1"
+                  color="blue-gray-10"
+                  lazy-rules
+                  outlined
+                  :rules="[(val) => !!val || 'Correo es requerido']"
                 >
-                  <template v-slot:loading>
-                    <q-spinner-pie />
+                  <template v-slot:prepend>
+                    <q-icon name="mail" class="text-blue-grey-5" />
                   </template>
-                </q-btn>
-                <q-separator spaced inset horizontal color="white" />
-                <router-link to="/forgotPassword" class="link_forgot-password"
-                  >¿Olvidaste tu contraseña?</router-link
+                </q-input>
+
+                <q-input
+                  v-model="form.password"
+                  :type="isPwd ? 'password' : 'text'"
+                  label="Contraseña"
+                  label-color="input-label"
+                  color="blue-10"
+                  lazy-rules
+                  bg-color="blue-1"
+                  outlined
+                  :rules="[(val) => !!val || 'Correo es requerido']"
                 >
-              </div>
-            </q-form>
+                  <!-- standout="bg-form-input-standout-dark" -->
+                  <template v-slot:prepend>
+                    <q-icon name="lock" class="text-blue-grey-5" />
+                  </template>
+                  <template v-slot:append>
+                    <q-icon
+                      :name="isPwd ? 'visibility_off' : 'visibility'"
+                      class="cursor-pointer"
+                      @click="isPwd = !isPwd"
+                    />
+                  </template>
+                </q-input>
+                <div>
+                  <div
+                    class="text-red-3"
+                    style="border: 0px solid green"
+                    v-if="invalidCredentials"
+                  >
+                    El usuario y/o contraseña son incorrectos
+                  </div>
+                  <div
+                    class="row full-width justify-end"
+                    style="padding: 0px; border-spacing: 0px"
+                  >
+                    <router-link
+                      to="/forgotPassword"
+                      class="link_forgot-password"
+                      >¿Olvidaste tu contraseña?</router-link
+                    >
+                  </div>
+                </div>
+                <div
+                  class="column fit justify-center items-center q-gutter-y-md"
+                >
+                  <q-btn
+                    label="Entrar"
+                    type="submit"
+                    :loading="submitting"
+                    push
+                    color="toggle-button"
+                    text-color="toggle-text-button"
+                    class="text-bold fit"
+                  >
+                    <template v-slot:loading>
+                      <q-spinner-pie />
+                    </template>
+                  </q-btn>
+                  <q-separator spaced inset horizontal color="white" />
+                </div>
+              </q-form>
+            </div>
           </q-card-section>
         </q-card>
       </q-page>
@@ -162,7 +171,7 @@ function login() {
 }
 
 sessionService.onDoneUserLogin(({ data }) => {
-  submitting.value = false
+  // submitting.value = false
   router.push('/home')
 })
 
@@ -217,6 +226,7 @@ function resetUserInfo() {
   // background-color: $accent-light;
   z-index: 2 !important;
 }
+
 .card-login {
   box-shadow: 0 5px 70px -25px #643a29;
   background-color: lighten($color: $dark, $amount: 5);
@@ -226,7 +236,14 @@ function resetUserInfo() {
   // -webkit-filter: none !important; /* Safari 6.0 - 9.0 */
   // filter: none !important;
 }
+
 .link_forgot-password {
   color: rgb(192, 248, 229);
+}
+.login_image {
+  color: lighten($color: $dark, $amount: 20);
+  opacity: 0.95;
+  transform: translateY(-95px);
+  height: 45px !important;
 }
 </style>
