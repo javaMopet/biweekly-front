@@ -13,13 +13,13 @@
           " -->
         <q-card
           class="card-login q-pa-lg"
-          :style="$q.screen.lt.sm ? { width: '400px' } : { width: '500px' }"
+          :style="$q.screen.lt.sm ? { width: '350px' } : { width: '380px' }"
         >
-          <q-card-section class="" style="border: 0px solid red">
+          <q-card-section>
             <div
               class="column full-width items-center text-h6 q-pt-sm login_image"
             >
-              <q-icon name="account_circle" size="180px" />
+              <q-icon name="account_circle" size="130px" />
             </div>
             <!-- account_circle -->
             <!-- fa-solid fa-circle-user -->
@@ -29,7 +29,7 @@
             </div>
           </q-card-section>
           <q-card-section align="center">
-            <div class="q-px-md" style="max-width: 320px">
+            <div class="q-px-md">
               <q-form
                 @submit.prevent="login"
                 style="border: 0px solid yellow"
