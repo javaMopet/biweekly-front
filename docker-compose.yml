@@ -1,5 +1,6 @@
 # for local development
-version: '3.7'
+# no se esta utilizando por ahora
+version: '3.8'
 services:
   quasar:
     build:
@@ -10,3 +11,9 @@ services:
     volumes:
       - '.:/app'
     command: /bin/sh -c "yarn && quasar dev"
+    networks:
+      - biweekly_network
+
+networks:
+  biweekly_network:
+    external: true
