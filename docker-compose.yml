@@ -1,18 +1,19 @@
-# for local development
-# no se esta utilizando por ahora
 version: '3.8'
 services:
-  quasar:
+  web:
+    env_file:
+      - ~/Projects/.environment/front-end/.env
     build:
       context: .
-      target: 'develop-stage'
+      target: 'build-stage'
     ports:
-      - '8080:8080'
-    volumes:
-      - '.:/app'
-    command: /bin/sh -c "yarn && quasar dev"
+      - '80:80'
     networks:
       - biweekly_network
+    # restart: always
+    image: biweekly-front-end:latest
+    volumes:
+      - ".:/app"
 
 networks:
   biweekly_network:
