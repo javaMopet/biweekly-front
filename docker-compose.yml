@@ -1,20 +1,18 @@
 version: '3.8'
+
 services:
-  web:
-    env_file:
-      - ~/Projects/.environment/front-end/.env
+  frontend:
     build:
       context: .
-      target: 'build-stage'
+      dockerfile: Dockerfile
     ports:
-      - '80:80'
+      - '8080:80'
     networks:
-      - biweekly_network
-    # restart: always
+      - quasar-network
+    # - biweekly_network
+    restart: always
     image: biweekly-front-end:latest
-    volumes:
-      - ".:/app"
 
 networks:
-  biweekly_network:
-    external: true
+  quasar-network:
+    driver: bridge
