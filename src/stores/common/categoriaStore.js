@@ -23,8 +23,11 @@ export const useCategoriaStore = defineStore('categoriaStore', () => {
     fetchPolicy: 'no-cache'
   })
 
-  const { onResult: onResultListaCategorias, onError: onErrorListaCategorias } =
-    useQuery(LISTA_CATEGORIAS, null, graphql_options)
+  const {
+    onResult: onResultListaCategorias,
+    onError: onErrorListaCategorias,
+    loading: loadingListaCategorias
+  } = useQuery(LISTA_CATEGORIAS, null, graphql_options)
 
   onResultListaCategorias(({ data }) => {
     if (!!data) {
@@ -80,6 +83,7 @@ export const useCategoriaStore = defineStore('categoriaStore', () => {
 
   return {
     listaCategorias,
+    loadingListaCategorias,
     onErrorListaCategorias,
     // onErrorCategoriaDelete,
     listaCategoriasIngresos,

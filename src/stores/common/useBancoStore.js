@@ -19,7 +19,8 @@ export const useBancoStore = defineStore('bancoStore', () => {
 
   const {
     onResult: onResultListaBancos,
-    onError: onErrorListaBancos
+    onError: onErrorListaBancos,
+    loading: loadingListaBancos
     // refetch: refetchListaBancos
   } = useQuery(LISTA_BANCOS, { id: 0 }, options)
 
@@ -83,6 +84,7 @@ export const useBancoStore = defineStore('bancoStore', () => {
 
   return {
     listaBancos,
+    loadingListaBancos,
     bancoCreated,
     bancoUpdated,
     bancoDeleted

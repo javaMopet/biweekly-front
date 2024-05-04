@@ -29,6 +29,7 @@
           :filter="filter"
           :rows-per-page-options="[0]"
           hide-pagination
+          :loading="cuentaStore.loadingListaCuentas"
           loading-label="Cargando lista de Cuentas"
         >
           <!-- :loading="loadingListaCuentas" -->

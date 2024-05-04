@@ -21,8 +21,8 @@ export const useCuentaStore = defineStore('cuentaStore', () => {
   const {
     onResult: onResultListaCuentas,
     onError: onErrorListaCuentas,
-
-    refetch: refetchListaCuentas
+    refetch: refetchListaCuentas,
+    loading: loadingListaCuentas
   } = useQuery(LISTA_CUENTAS, null, graphql_options)
 
   const {
@@ -88,6 +88,7 @@ export const useCuentaStore = defineStore('cuentaStore', () => {
   return {
     listaCuentas,
     refetchListaCuentas,
+    loadingListaCuentas,
     cuentaDelete,
     onDoneCuentaDelete,
     onErrorCuentaDelete,

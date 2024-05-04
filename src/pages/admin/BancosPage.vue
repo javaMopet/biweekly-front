@@ -27,6 +27,8 @@
         :filter="filter"
         :rows-per-page-options="[0]"
         hide-pagination
+        :loading="bancoStore.loadingListaBancos"
+        loading-label="Cargando lista de bancos..."
       >
         <template #top-left>
           <div class="page-title">Bancos</div>

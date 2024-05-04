@@ -19,7 +19,13 @@
       </div>
       <q-toolbar-title> </q-toolbar-title>
     </q-toolbar>
-    <div class="q-pl-sm">
+    <div
+      class="text-subtitle1 text-loading"
+      v-if="cuentaContableStore.loadingArbolCuentas"
+    >
+      Cargando árbol de cuentas contables...
+    </div>
+    <div class="q-pl-sm" v-else>
       <div class="row justify-between full-width">
         <div class="page-title">Cuentas Contables</div>
         <div class="q-pl-md">
@@ -40,8 +46,7 @@
           </q-input>
         </div>
       </div>
-
-      <div class="row fit" style="border: 0px solid red">
+      <div class="row fit q-pt-sm" style="border: 0px solid red">
         <q-tree
           v-if="arbolLleno"
           :nodes="cuentaContableStore.arbolCuentasContables"
@@ -57,8 +62,8 @@
           no-connectors
           :filter="filter"
           class="font-tree"
+          default-expand-all
         >
-          <!-- default-expand-all -->
           <template v-slot:default-header="props">
             <div
               :class="{
@@ -173,11 +178,10 @@ import { useCuentasContablesCrud } from 'src/composables/useCuentasContablesCrud
  */
 const notificacion = useNotificacion()
 const $q = useQuasar()
-const $router = useRouter()
+// const $router = useRouter()
 const cuentaContableStore = useCuentaContableStore()
 const cuentasContablesCrud = useCuentasContablesCrud()
 
-const { loadingArbolCuentas, onDoneDeleteCuentaContable } = cuentaContableStore
 /**
  * state
  */
@@ -371,5 +375,9 @@ cuentasContablesCrud.onErrorCuentaContableDelete((error) => {
   font-weight: 500 !important;
   font-size: 0.9rem;
   letter-spacing: 0.025rem;
+}
+.text-loading {
+  font-weight: bold;
+  color: $bg-editing-input-form !important;
 }
 </style>

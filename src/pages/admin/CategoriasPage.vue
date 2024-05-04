@@ -27,7 +27,12 @@
         hide-header
         class="bg-primary-light"
         hide-pagination
+        :loading="categoriaStore.loadingListaCategorias"
+        loading-label="Cargando Categorias..."
       >
+        <template v-slot:loading>
+          <q-inner-loading showing color="primary" />
+        </template>
         <template #top-left>
           <div class="row items-center">
             <div class="page-title q-pr-md">Ingresos</div>
@@ -121,7 +126,12 @@
         hide-header
         hide-pagination
         dense
+        :loading="categoriaStore.loadingListaCategorias"
+        loading-label="Cargando Categorias..."
       >
+        <template v-slot:loading>
+          <q-inner-loading showing color="primary" />
+        </template>
         <template #top-left>
           <div class="row items-center">
             <div class="page-title q-pr-md">Gastos</div>
