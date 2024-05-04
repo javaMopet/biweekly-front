@@ -1,12 +1,18 @@
-# for local development
-version: '3.7'
+version: '3.8'
+
 services:
-  quasar:
+  frontend:
     build:
       context: .
-      target: 'develop-stage'
+      dockerfile: Dockerfile
     ports:
-      - '8080:8080'
-    volumes:
-      - '.:/app'
-    command: /bin/sh -c "yarn && quasar dev"
+      - '8080:80'
+    networks:
+      - quasar-network
+    # - biweekly_network
+    restart: always
+    image: biweekly-front-end:latest
+
+networks:
+  quasar-network:
+    driver: bridge
