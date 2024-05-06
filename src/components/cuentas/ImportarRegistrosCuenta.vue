@@ -257,6 +257,7 @@ import TipoMovimientoSelect from '../formComponents/TipoMovimientoSelect.vue'
 import { SessionStorage } from 'quasar'
 import { useRegistrosCrud } from 'src/composables/useRegistrosCrud'
 import DialogTitle from '../formComponents/modal/DialogTitle.vue'
+import { toast } from 'vue3-toastify'
 
 /**
  * Composables
@@ -274,7 +275,7 @@ const errorsList = ref([])
 const fecha_inicio = ref('01/01/1900')
 const fecha_fin = ref('01/01/1900')
 const isLoading = ref(false)
-const loadingRows = ref(true)
+const loadingRows = ref(false)
 /**
  * composables
  */
@@ -617,12 +618,21 @@ function saveItems() {
   console.table(listaRegistrosFiltrados.value)
   const containsErrors = validarMovimientos()
   if (containsErrors) {
-    setTimeout(() => {
-      errorsList.value.length = 0
-      listaRegistrosFiltrados.value.forEach((item) => {
-        item.isValid = true
-      })
-    }, 4000)
+    // setTimeout(() => {
+    //   errorsList.value.length = 0
+    //   listaRegistrosFiltrados.value.forEach((item) => {
+    //     item.isValid = true
+    //   })
+    // }, 4000)
+    const erroresString = errorsList.value.map(
+      (error) =>
+        `Error en la línea: ${error.numero_linea} - ${error.message} \n`
+    )
+    toast.error(erroresString.toString(), {
+      position: toast.POSITION.TOP_RIGHT,
+      autoClose: 7000,
+      theme: 'dark'
+    })
   } else {
     var registrosInput = obtenerRegistros()
     var traspasosInput = obtenerTraspasos()
@@ -661,7 +671,7 @@ registrosCrud.onErrorImportarRegistros((error) => {
 })
 
 function validarMovimientos() {
-  // setTimeout(() => {
+  errorsList.value.length = 0
   if (listaRegistrosFiltrados.value.length <= 0) {
     addError(0, null, 'No hay datos para guardar')
   }
