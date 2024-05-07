@@ -13,6 +13,8 @@ dotenvExpand.expand(myEnv)
 
 const { configure } = require('quasar/wrappers')
 
+console.log(process.env)
+
 module.exports = configure(function (/* ctx */) {
   return {
     eslint: {
@@ -51,6 +53,7 @@ module.exports = configure(function (/* ctx */) {
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#build
     build: {
+      env: require('dotenv').config().parsed,
       extendViteConf(viteConf) {
         viteConf.define.__VUE_PROD_HYDRATION_MISMATCH_DETAILS__ = false
         //   viteConf.define = {

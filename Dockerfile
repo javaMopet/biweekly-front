@@ -4,6 +4,10 @@ FROM node:lts-alpine as build-stage
 # Aqui es donde se colocará nuestra aplicacion en el contenedor.
 WORKDIR /app
 
+# Instalando librerias de alpine
+RUN apk update && apk add bash git build-base \
+    neovim openssl
+
 # copiamos los archivos de configuracion  para la compilacion.
 COPY package*.json ./
 
