@@ -1,18 +1,28 @@
 version: '3.8'
 
 services:
-  frontend:
+  app:
     build:
       context: .
       dockerfile: Dockerfile
+    container_name: biweekly-app
     ports:
       - '8080:80'
     networks:
-      - quasar-network
-    # - biweekly_network
-    restart: always
-    image: biweekly-front-end:latest
+      - biweekly_network
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx-app
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - 80:80
+    networks:
+      - biweekly_network
+    depends_on:
+      - app
 
 networks:
-  quasar-network:
-    driver: bridge
+  biweekly_network:
+    external: true

@@ -1,7 +1,7 @@
 <template>
   <q-layout>
     <q-page-container class="">
-      <q-page class="flex flex-center bg-color">
+      <q-page class="flex flex-center bg-color column">
         <!-- v-bind:style="
             $q.screen.lt.sm
               ? { width: '85%' }
@@ -25,7 +25,9 @@
             <!-- fa-solid fa-circle-user -->
             <!-- fa-regular fa-circle-user -->
             <div class="row justify-center">
-              <span>Ingresa con tu cuenta de correo y contraseña</span>
+              <span class="text-accent-light"
+                >Ingresa con tu cuenta de correo y contraseña</span
+              >
             </div>
           </q-card-section>
           <q-card-section align="center">
@@ -78,13 +80,6 @@
                   </template>
                 </q-input>
                 <div>
-                  <div
-                    class="text-dark bg-negative-pastel"
-                    style="border: 0px solid green"
-                    v-if="invalidCredentials"
-                  >
-                    El usuario y/o contraseña son incorrectos
-                  </div>
                   <div
                     class="row full-width justify-end"
                     style="padding: 0px; border-spacing: 0px"
@@ -149,7 +144,6 @@ const form = reactive({
   password: ''
 })
 
-const invalidCredentials = ref(false)
 const submitting = ref(false)
 const isPwd = ref(true)
 
@@ -166,7 +160,6 @@ onMounted(() => {
 
 function login() {
   submitting.value = true
-  invalidCredentials.value = false
   sessionService.userLogin({
     email: form.email.toString(),
     password: form.password.toString()
@@ -186,8 +179,8 @@ sessionService.onErrorUserLogin((response) => {
   // )
   let message = ''
   let error = false
-
-  if (response.toString().includes('Failed to fetch')) {
+  // console.log(response)
+  if (response.toString().includes('NetworkError when')) {
     message = 'Error de comunicación con servidor de datos'
     error = true
   } else if (response.toString().includes('Received status code 500')) {
@@ -199,10 +192,26 @@ sessionService.onErrorUserLogin((response) => {
     toast.error(message, {
       position: toast.POSITION.TOP_RIGHT,
       autoClose: 10000,
-      theme: 'dark'
+      theme: 'dark',
+      pauseOnFocusLoss: false
     })
   } else {
-    invalidCredentials.value = true
+    // toast.error('El usuario o la contraseña son incorrectos', {
+    //   position: toast.POSITION.TOP_CENTER,
+    //   autoClose: 5000,
+    //   theme: 'dark',
+    //   pauseOnFocusLoss: false,
+    //   style: 'width: 450px',
+    //   autoClose: false,
+    //   transition: 'slide'
+    // })
+    $q.notify({
+      message:
+        'El usuario o la contraseña son incorrectos. Favor de verificar.',
+      position: 'center',
+      type: 'negative',
+      timeout: 1300
+    })
   }
   submitting.value = false
 })

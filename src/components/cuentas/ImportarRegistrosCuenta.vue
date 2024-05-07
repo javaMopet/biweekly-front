@@ -473,7 +473,7 @@ function obtenerMovimientosBancomer(wb) {
       addItemToSave(row, index, fecha, importe, tipo_afectacion)
     }
   })
-  console.table(listaRegistros.value)
+  // console.table(listaRegistros.value)
 }
 
 function obtenerMovimientosEfectivo(wb) {
@@ -534,7 +534,7 @@ function obtenerMovimientosEfectivo(wb) {
  * @param {*} tipo_afectacion
  */
 function addItemToSave(row, index, fecha, importe, tipo_afectacion) {
-  console.log('fecha', fecha)
+  // console.log('fecha', fecha)
   const item = {
     id: index,
     consecutivo: row.consecutivo,
@@ -615,7 +615,7 @@ function obtenerTraspasos() {
 }
 
 function saveItems() {
-  console.table(listaRegistrosFiltrados.value)
+  // console.table(listaRegistrosFiltrados.value)
   const containsErrors = validarMovimientos()
   if (containsErrors) {
     // setTimeout(() => {
@@ -625,13 +625,15 @@ function saveItems() {
     //   })
     // }, 4000)
     const erroresString = errorsList.value.map(
-      (error) =>
-        `Error en la línea: ${error.numero_linea} - ${error.message} \n`
+      (error) => `Error: línea ${error.numero_linea} - ${error.message} \n`
     )
-    toast.error(erroresString.toString(), {
-      position: toast.POSITION.TOP_RIGHT,
+    toast.error(erroresString, {
+      position: toast.POSITION.TOP_CENTER,
       autoClose: 7000,
-      theme: 'dark'
+      theme: 'dark',
+      transition: 'bounce',
+      pauseOnFocusLoss: false,
+      style: 'width: 450px; min-width: 450px'
     })
   } else {
     var registrosInput = obtenerRegistros()
@@ -673,23 +675,19 @@ registrosCrud.onErrorImportarRegistros((error) => {
 function validarMovimientos() {
   errorsList.value.length = 0
   if (listaRegistrosFiltrados.value.length <= 0) {
-    addError(0, null, 'No hay datos para guardar')
+    addError(0, 0, 'No hay registros por guardar')
   }
   listaRegistrosFiltrados.value.forEach((item) => {
     if (!!item.tipoMovimiento) {
       const tipoMovimiento = item.tipoMovimiento
       if (!tipoMovimiento.value) {
-        addError(
-          1,
-          item.consecutivo,
-          'Favor de ingresar los valores requeridos'
-        )
+        addError(1, item.consecutivo, 'Seleccionar cuenta destino.')
         item.isValid = false
       } else {
         item.isValid = true
       }
     } else {
-      addError(1, item.consecutivo, 'Favor de agregar categoria')
+      addError(1, item.consecutivo, 'Seleccionar una categoria.')
       item.isValid = false
     }
   })
