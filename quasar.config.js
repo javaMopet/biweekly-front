@@ -81,11 +81,11 @@ module.exports = configure(function (/* ctx */) {
         API_URL:
           process.env.API_URL ||
           // Default API endpoint.
-          'http://89.116.49.98:3001',
+          'http://89.116.49.98:3000',
         GRAPHQL_URL:
           process.env.GRAPHQL_URL ||
           // Default graphql endpoint.
-          'http://89.116.49.98:3001/graphql'
+          'http://89.116.49.98:3000/graphql'
       }
       // rawDefine: {}
       // ignorePublicFolder: true,
