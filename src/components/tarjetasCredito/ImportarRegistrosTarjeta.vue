@@ -396,7 +396,7 @@ function cargarMovimientosBancomer(wb) {
     skipHeader: true,
     raw: false
   })
-  console.log('data.map', data)
+  // console.log('data.map', data)
   todos.value = data.map((row, index) => ({
     fecha: row.FECHA,
     consecutivo: index,
@@ -406,6 +406,12 @@ function cargarMovimientosBancomer(wb) {
     saldo: row.SALDO?.replace(',', '') ?? 0
   }))
   console.log('todos.value', todos.value)
+  todos.value = todos.value.map((row, index) => ({
+    fecha: row.fecha,
+    consecutivo: row.consecutivo,
+    concepto: row.concepto,
+    importe: parseFloat(row.cargo) + parseFloat(row.abono)
+  }))
   crearListaRegistrosTarjeta(todos.value)
 }
 /**
