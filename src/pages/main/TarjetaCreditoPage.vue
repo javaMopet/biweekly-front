@@ -530,8 +530,9 @@
       ></PagosTarjeta>
     </q-dialog>
   </Teleport>
+  <!-- <pre>{{ Math.round(sumaMovimientos) }}</pre>-->
   <!-- <pre>{{ Math.round(sumaMovimientos) }}</pre>
-  <pre>{{ Math.round(sumaMovimientos) != 0 }}</pre> -->
+  <pre>{{ listaRegistros.filter((registro) => !registro.isPago) }}</pre> -->
 </template>
 
 <script setup>
@@ -661,7 +662,9 @@ onResultListaRegistrosTarjeta(({ data }) => {
     listaRegistrosMsi.value = data?.listaRegistrosTarjeta.filter(
       (registro) => registro.isMsi
     )
-    // console.table(listaRegistros)
+    listaRegistros.value.forEach((registro) => {
+      console.log('registro.importe:', registro.importe)
+    })
   }
 })
 
@@ -681,9 +684,11 @@ const isModificable = computed({
 const sumaMovimientos = computed({
   get() {
     return Math.abs(
-      listaRegistros.value.reduce((accumulator, registro) => {
-        return accumulator + parseFloat(registro.importe) * -1
-      }, 0)
+      listaRegistros.value
+        .filter((registro) => !registro.isPago)
+        .reduce((accumulator, registro) => {
+          return accumulator + parseFloat(registro.importe) * -1
+        }, 0)
     )
   }
 })
@@ -1104,8 +1109,6 @@ function addItem() {
 }
 
 function pagosTarjeta() {
-  console.log('registrando el pago')
-
   showPagosTarjeta.value = true
 }
 function registroCreated(registro) {

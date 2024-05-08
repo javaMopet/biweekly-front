@@ -353,7 +353,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { DateTime } from 'luxon'
 import { api } from 'src/boot/axios'
 import { LISTA_REGISTROS } from 'src/graphql/registros'
-import { useQuery } from '@vue/apollo-composable'
+import { useLazyQuery, useQuery } from '@vue/apollo-composable'
 import { useFormato } from 'src/composables/utils/useFormato'
 import { useRegistrosCrud } from 'src/composables/useRegistrosCrud'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
@@ -459,18 +459,29 @@ const graphqlOptions = reactive({
 })
 
 const {
+  load: loadListaRegistros,
   onError: onErrorListaRegistros,
   onResult: onResultListaRegistros,
   refetch: refetchListaRegistros,
   loading: loadingRegistros
-} = useQuery(LISTA_REGISTROS, detalleVariables, graphqlOptions)
+} = useLazyQuery(LISTA_REGISTROS, detalleVariables, graphqlOptions)
+
+function fetchOrRefetchListaRegistros() {
+  loadListaRegistros() || refetchListaRegistros()
+}
 
 onResultListaRegistros(({ data }) => {
   // console.log('[ data ] >', data)
   if (!!data) {
     listaRegistros.value =
-      JSON.parse(JSON.stringify(data?.obtenerRegistros)) ?? []
-    // console.log('[ listaRegistros.value ] >', listaRegistros.value)
+      JSON.parse(JSON.stringify(data?.obtenerRegistros)) ?? 0
+
+    let saldoAnterior = saldo_periodo_anterior.value || 0
+
+    listaRegistros.value.forEach((registro) => {
+      registro.saldo = saldoAnterior + registro.importe
+      saldoAnterior = registro.saldo
+    })
   }
 })
 
@@ -492,6 +503,8 @@ const {
 onResultObtenerSaldoAFecha(({ data }) => {
   if (!!data) {
     saldo_periodo_anterior.value = data.obtenerSaldoAFecha
+    console.log('saldo_periodo_anterior.value:', saldo_periodo_anterior.value)
+    fetchOrRefetchListaRegistros(null, detalleVariables, graphqlOptions)
   }
 })
 
@@ -555,7 +568,6 @@ const periodoFinStr = computed({
  * functions
  */
 function refetchDatos() {
-  refetchListaRegistros()
   refetchSaldoAFecha()
   actualizarSaldoFinal()
 }
@@ -636,10 +648,6 @@ function confirmarEliminarItems(toDelete) {
 
 registrosCrud.onDoneRegistrosDelete(({ data }) => {
   console.log('Terminó de eliminar registros', data.registrosDelete.cuentasIds)
-  cuentaStore.actualizarSaldoCuenta(
-    cuenta.value.id.toString(),
-    data.registrosDelete.saldo
-  )
   // cuenta.value.saldo = data.registrosDelete.saldo
   refetchDatos()
   mostrarNotificacionPositiva(
@@ -869,6 +877,15 @@ const columns = [
     name: 'abono',
     label: 'Abono',
     field: 'abono',
+    sortable: true,
+    align: 'right',
+    format: (val, row) => formato.toCurrency(val),
+    headerStyle: 'width: 100px; min-width:100px'
+  },
+  {
+    name: 'saldo',
+    label: 'Saldo',
+    field: 'saldo',
     sortable: true,
     align: 'right',
     format: (val, row) => formato.toCurrency(val),
