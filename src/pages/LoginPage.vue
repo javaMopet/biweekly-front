@@ -112,6 +112,12 @@
               </q-form>
             </div>
           </q-card-section>
+          <div
+            class="text-blue-grey-4"
+            style="border: 0px solid red; text-align: right"
+          >
+            v 1 . 1
+          </div>
         </q-card>
       </q-page>
     </q-page-container>

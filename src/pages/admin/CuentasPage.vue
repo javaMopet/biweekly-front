@@ -37,7 +37,7 @@
             <q-inner-loading showing color="primary" />
           </template>
           <template #top-left>
-            <div class="page-title">Cuentas TEst</div>
+            <div class="page-title">Cuentas</div>
           </template>
           <template #top-right>
             <div class="row inline items-center q-gutter-x-md">
