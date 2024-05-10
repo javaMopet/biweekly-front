@@ -33,9 +33,28 @@ export const useInstanceStore = defineStore('instanceStore', () => {
     console.error(error)
   })
 
+  function instanceCreated(itemCreated) {
+    instanceList.value.push(itemCreated)
+  }
+  function instanceUpdated(itemUpdated) {
+    const index = instanceList.value.findIndex(
+      (item) => item.id === itemUpdated.id
+    )
+    instanceList.value[index] = itemUpdated
+  }
+  function instanceDeleted(itemDeleted) {
+    const index = instanceList.value.findIndex(
+      (item) => item.id === itemDeleted.id
+    )
+    instanceList.value.splice(index, 1)
+  }
+
   return {
     instanceList,
     onResultInstanceList,
-    onErrorInstanceList
+    onErrorInstanceList,
+    instanceCreated,
+    instanceUpdated,
+    instanceDeleted
   }
 })

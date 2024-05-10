@@ -193,7 +193,8 @@ const defaultItem = {
   tipoUsuario: {
     id: null
   },
-  usuario: null
+  usuario: null,
+  isAdmin: false
 }
 
 const userToEdit = ref({})
@@ -250,7 +251,6 @@ const columns = [
 onMounted(() => {})
 
 function addRow(tipoUsuarioId) {
-  console.log('tipo de cuenta', tipoUsuarioId)
   userToEdit.value = { ...defaultItem }
   userToEdit.value.tipoUsuario.id = tipoUsuarioId.toString()
   showFormItem.value = true
@@ -300,12 +300,12 @@ userService.onDoneUserDelete(({ data }) => {
     `El usuario ${itemDeleted.name} se eliminó correctamente`,
     2100
   )
-  userService.loadOrRefetchUsers()
+  usuarioStore.loadOrRefetchUsers()
 })
 
 function userRegistered(itemSaved) {
   showFormItem.value = false
-  userService.loadOrRefetchUsers()
+  usuarioStore.loadOrRefetchUsers()
 }
 function userUpdated(itemUpdated) {
   showFormItem.value = false

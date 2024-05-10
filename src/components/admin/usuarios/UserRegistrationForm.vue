@@ -73,6 +73,12 @@
           label="Instancia"
           option-label="name"
         />
+        <q-checkbox
+          v-if="isSuperuser"
+          left-label
+          v-model="authenticable.isAdmin"
+          label="Is Admin: "
+        />
 
         <div class="col row justify-end q-pt-lg q-gutter-lg">
           <q-btn
@@ -136,10 +142,12 @@ const defaultItem = {
   name: '',
   email: '',
   password: '',
-  passwordConfirmation: ''
+  passwordConfirmation: '',
+  isAdmin: false
 }
 const isPwd = ref(true)
 const formItem = ref({ ...defaultItem })
+const isAdminInitial = ref(false)
 
 /**
  * props
@@ -202,9 +210,8 @@ const lblSubmit = computed({
  */
 function registerUser() {
   if (!isEditing.value) {
-    // if (isFormValid()) {
+    console.log('autheticable.value:', authenticable.value)
     userService.userRegister(authenticable.value)
-    // }
   } else {
     userService.userUpdate({
       id: authenticable.value.id,
@@ -213,6 +220,26 @@ function registerUser() {
         instanceId: authenticable.value.instance.id
       }
     })
+    console.log(
+      'revisando si cambia el is admin',
+      isAdminInitial.value,
+      authenticable.value.isAdmin
+    )
+    if (isAdminInitial.value != authenticable.value.isAdmin) {
+      if (authenticable.value.isAdmin) {
+        console.log('actualizando admin role .......')
+        userService.userAddRole({
+          userId: authenticable.value.id,
+          role: 'admin'
+        })
+      } else {
+        console.log('removing admin role .......')
+        userService.userRemoveRole({
+          userId: authenticable.value.id,
+          role: 'admin'
+        })
+      }
+    }
   }
 }
 // function isFormValid() {
@@ -230,8 +257,18 @@ userService.onDoneUserRegister(({ data }) => {
 
   userService.userUpdate({
     id: newUser.id,
-    userInput: { name: authenticable.value.name }
+    userInput: {
+      name: authenticable.value.name,
+      instanceId: authenticable.value.instance.id
+    }
   })
+  if (authenticable.value.isAdmin) {
+    console.log('actualizando admin role .......')
+    userService.userAddRole({
+      userId: newUser.id,
+      role: 'admin'
+    })
+  }
 })
 
 userService.onDoneUserUpdate(({ data }) => {
@@ -243,6 +280,9 @@ userService.onDoneUserUpdate(({ data }) => {
 userService.onErrorUserRegister((error) => {
   mostrarNotificacionNegativa('El usuario no puede ser registrado', 2500)
 })
+userService.onErrorUserAddRole((error) => {
+  console.log('no se pudo cambiar el role del usuario')
+})
 
 /**
  * onMounted
@@ -252,6 +292,7 @@ onMounted(() => {
     authenticable.value.email = ''
     authenticable.value.password = ''
   }
+  isAdminInitial.value = authenticable.value.isAdmin
 })
 
 /**

@@ -35,6 +35,7 @@
           hide-pagination
           :loading="cuentaStore.loadingListaCuentas"
           loading-label="Cargando lista de Tarjetas..."
+          no-data-label="No hay tarjetas registradas"
         >
           <template v-slot:loading>
             <q-inner-loading showing color="primary" />

@@ -91,3 +91,24 @@ export const USER_MENU_UPDATE = gql`
     }
   }
 `
+export const USER_ADD_ROLE = gql`
+  mutation userAddRole($userId: ID!, $role: String!) {
+    userAddRole(userId: $userId, role: $role) {
+      user {
+        id
+        isAdmin
+      }
+    }
+  }
+`
+
+export const USER_REMOVE_ROLE = gql`
+  mutation userRemoveRole($userId: ID!, $role: String!) {
+    userRemoveRole(userId: $userId, role: $role) {
+      user {
+        id
+        isAdmin
+      }
+    }
+  }
+`

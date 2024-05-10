@@ -62,7 +62,6 @@ export default route(function (/* { store, ssrContext } */) {
       // Validará las rutas que asi se definan si no tenemos un problema con las rutas que no se
       // ponen como menú del usuario
       if (to.meta && to.meta.permission) {
-        // console.log('to.meta.permission:', to.meta.permission)
         const tienePermiso = permissionService.can(to.meta.permission)
         if (!tienePermiso) {
           return '/403'

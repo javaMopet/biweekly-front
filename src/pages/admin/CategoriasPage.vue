@@ -29,6 +29,7 @@
         hide-pagination
         :loading="categoriaStore.loadingListaCategorias"
         loading-label="Cargando Categorias..."
+        no-data-label="No hay categorias de ingreso registradas"
       >
         <template v-slot:loading>
           <q-inner-loading showing color="primary" />
@@ -128,6 +129,7 @@
         dense
         :loading="categoriaStore.loadingListaCategorias"
         loading-label="Cargando Categorias..."
+        no-data-label="No hay categorias de egreso registradas"
       >
         <template v-slot:loading>
           <q-inner-loading showing color="primary" />

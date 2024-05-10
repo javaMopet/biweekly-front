@@ -86,7 +86,7 @@
         <div class="col-auto row justify-center" style="border: 0px solid red">
           <div class="application-title q-pa-lg">
             <q-img
-              src="/icons/tree.png"
+              :src="logoPath"
               spinner-color="primary"
               spinner-size="72px"
               width="120px"
@@ -164,7 +164,7 @@ const leftDrawerOpen = ref(false)
 const user = ref({})
 // const essentialLinks = ref([])
 const instanceName = ref('')
-
+const logoPath = ref('/icons/tree.png')
 /**
  * stores
  */
@@ -176,13 +176,10 @@ const router = useRouter()
  */
 onMounted(() => {
   const credentials = SessionStorage.getItem('credentials') || undefined
-  // console.log('credentials:', credentials)
-  // if (!email) router.push('/home')
-
-  // email.value = credentials.uid
-
   user.value = SessionStorage.getItem('current_user')
-
+  console.log('user.value:', user.value.instance.logoImage)
+  logoPath.value = '/icons/' + user.value.instance.logoImage
+  // /icons/tree.png
   if (!user.value) router.push('login')
 
   instanceName.value = user.value.instance.name

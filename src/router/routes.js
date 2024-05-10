@@ -129,6 +129,13 @@ const routes = [
         ]
       },
       {
+        path: 'instances',
+        component: () => import('src/pages/admin/InstancesPage.vue'),
+        meta: {
+          permission: 'instances'
+        }
+      },
+      {
         path: 'carousel_cards',
         component: () => import('src/pages/admin/CarouselPage.vue')
       }

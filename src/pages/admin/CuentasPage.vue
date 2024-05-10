@@ -31,6 +31,7 @@
           hide-pagination
           :loading="cuentaStore.loadingListaCuentas"
           loading-label="Cargando lista de Cuentas"
+          no-data-label="No hay cuentas registradas"
         >
           <!-- :loading="loadingListaCuentas" -->
           <template v-slot:loading>

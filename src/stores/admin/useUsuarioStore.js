@@ -24,7 +24,8 @@ export const useUsuarioStore = defineStore('usuarioStore', () => {
   const {
     onResult: onResultUsersList,
     onError: onErrorUsersList,
-    loading: loadingListaUsuarios
+    loading: loadingListaUsuarios,
+    refetch: refetchUsersList
   } = useQuery(USERS_LIST, null, graphql_options)
 
   onResultUsersList(({ data }) => {
@@ -38,10 +39,21 @@ export const useUsuarioStore = defineStore('usuarioStore', () => {
     console.error(error)
   })
 
+  function loadOrRefetchUsers() {
+    refetchUsersList()
+  }
+  function changeUserIsAdmin(userId, isAdmin) {
+    const index = listaUsuarios.value.findIndex((user) => user.id === userId)
+    const user = listaUsuarios.value[index]
+    user.isAdmin = isAdmin
+  }
+
   return {
     listaUsuarios,
     onResultUsersList,
     onErrorUsersList,
-    loadingListaUsuarios
+    loadingListaUsuarios,
+    loadOrRefetchUsers,
+    changeUserIsAdmin
   }
 })
