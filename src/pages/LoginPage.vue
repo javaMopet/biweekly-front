@@ -116,7 +116,7 @@
             class="text-blue-grey-4"
             style="border: 0px solid red; text-align: right"
           >
-            v 1 . 1 . 1
+            v 1 . 1 . 2
           </div>
         </q-card>
       </q-page>

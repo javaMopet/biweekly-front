@@ -662,9 +662,6 @@ onResultListaRegistrosTarjeta(({ data }) => {
     listaRegistrosMsi.value = data?.listaRegistrosTarjeta.filter(
       (registro) => registro.isMsi
     )
-    listaRegistros.value.forEach((registro) => {
-      console.log('registro.importe:', registro.importe)
-    })
   }
 })
 
