@@ -47,13 +47,6 @@ const email = ref('')
 /**
  * methods
  */
-function sendPasswordReset() {
-  console.log('sendig request reset password')
-  sessionService.userSendPasswordReset({
-    email: email.value,
-    redirectUrl: 'http://localhost:9001/resetPassword'
-  })
-}
 sessionService.onDoneUserSendPasswordReset(({ data }) => {
   console.log('data:', data)
   router.push('/forgotPasswordSended')

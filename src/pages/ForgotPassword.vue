@@ -52,12 +52,13 @@ import { useRoute, useRouter } from 'vue-router'
 import { onMounted, ref } from 'vue'
 import { useSessionService } from 'src/composables/login/useSessionService'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
+import { useQuasar } from 'quasar'
 
 /**
  * composables
  */
 const route = useRoute()
-
+const $q = useQuasar()
 const sessionService = useSessionService()
 const router = useRouter()
 const { mostrarNotificacionNegativa } = useNotificacion()
@@ -80,9 +81,12 @@ function sendPasswordReset() {
   noEmailFound.value = false
   loadingSendPasswordReset.value = true
   console.log('sendig request reset password')
+  // const serverPath = $q.platform.baseUrl
+  const serverPath = window.location.origin
+  console.log('serverPath:', serverPath)
   sessionService.userSendPasswordReset({
     email: email.value,
-    redirectUrl: 'http://localhost:9001/resetPassword'
+    redirectUrl: `${serverPath}/resetPassword`
   })
 }
 sessionService.onDoneUserSendPasswordReset(({ data }) => {
