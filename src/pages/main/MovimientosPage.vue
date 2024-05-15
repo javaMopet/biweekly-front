@@ -22,6 +22,13 @@
           @onChangePeriodo="onChangePeriodo"
         ></PeriodoSelect>
         <!-- :disable="loadingRegistros" -->
+        <q-btn
+          color="primary-button"
+          icon="fa-regular fa-file-excel"
+          label="Export"
+          @click="exportToExcel"
+        />
+        <!-- icon="las la-file-excel" -->
       </div>
     </template>
     <template #top-right>
@@ -320,7 +327,7 @@ import ListaMovimientos from 'src/components/movimientos/ListaMovimientos.vue'
 import FormCuentaRegistro from 'src/components/movimientos/FormCuentaRegistro.vue'
 import FormRegistroCategoria from 'src/components/categorias/FormRegistroCategoria.vue'
 import PeriodoSelect from 'src/components/formComponents/PeriodoSelect.vue'
-import { SessionStorage } from 'quasar'
+import { SessionStorage, exportFile } from 'quasar'
 
 /**
  * composables
@@ -706,6 +713,41 @@ const isModificable = computed({
     return SessionStorage.getItem('current_user').canModify
   }
 })
+
+function exportToExcel() {
+  console.log('Exportando a excel....')
+  const params = obtenerParametros()
+  api
+    .get(`/movimientos_to_excel.xlsx`, {
+      params,
+      responseType: 'blob' // had to add this one here
+    })
+    .then((response) => {
+      console.log('response:', response)
+      let nombreArchivo = 'test50.xlsx' //getNombreArchivo()
+      console.log(
+        "response.headers('conteny-type'):",
+        response.headers['content-type']
+      )
+      const status = exportFile(nombreArchivo, response.data, {
+        mimeType: response.headers['content-type']
+      })
+      // generandoReporte.value = false
+      // // const content = response.headers['content-type'];
+      // // download(response.data, 'mipdfprueba.pdf', content);
+      console.log('status cfdi', status)
+    })
+    .catch((error) => {
+      console.log('error', error)
+    })
+}
+
+function obtenerParametros() {
+  return {
+    ejercicioFiscalId: ejercicio_fiscal.value,
+    mesId: mes.value.id
+  }
+}
 </script>
 
 <style lang="scss" scoped>

@@ -125,7 +125,7 @@
 </template>
 
 <script setup>
-import { useQuasar, SessionStorage } from 'quasar'
+import { useQuasar, SessionStorage, exportFile } from 'quasar'
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { api } from 'src/boot/axios'
