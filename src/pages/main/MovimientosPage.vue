@@ -25,8 +25,9 @@
         <q-btn
           color="primary-button"
           icon="fa-regular fa-file-excel"
-          label="Export"
+          label="Exportar"
           @click="exportToExcel"
+          no-caps
         />
         <!-- icon="las la-file-excel" -->
       </div>
