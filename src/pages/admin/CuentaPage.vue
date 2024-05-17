@@ -446,9 +446,9 @@ onMounted(() => {
  * @param {Number} cuenta_id - Id de la cuenta.
  */
 function cargarDatosCuenta(cuenta_id) {
-  api.get(`/cuentas/${cuenta_id}`).then((response) => {
-    cuenta.value = response?.data.data ?? {}
-  })
+  cuenta.value = cuentaStore.listaCuentas.find(
+    (cuenta) => cuenta.id === cuenta_id
+  )
 }
 
 /**
@@ -503,7 +503,6 @@ const {
 onResultObtenerSaldoAFecha(({ data }) => {
   if (!!data) {
     saldo_periodo_anterior.value = data.obtenerSaldoAFecha
-    console.log('saldo_periodo_anterior.value:', saldo_periodo_anterior.value)
     fetchOrRefetchListaRegistros(null, detalleVariables, graphqlOptions)
   }
 })

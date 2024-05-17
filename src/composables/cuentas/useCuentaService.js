@@ -1,12 +1,6 @@
-import { useQuery, useMutation, useLazyQuery } from '@vue/apollo-composable'
-import FormCuentaRegistro from 'src/components/movimientos/FormCuentaRegistro.vue'
-import {
-  CUENTA_CREATE,
-  CUENTA_UPDATE,
-  LISTA_CUENTAS
-} from 'src/graphql/cuentas'
+import { useMutation } from '@vue/apollo-composable'
+import { CUENTA_CREATE, CUENTA_UPDATE } from 'src/graphql/cuentas'
 import { useCuentaStore } from 'src/stores/common/useCuentaStore'
-import { ref } from 'vue'
 
 export function useCuentaService() {
   const cuentaStore = useCuentaStore()

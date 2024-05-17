@@ -555,6 +555,7 @@ import {
   SALDO_PAGAR_TARJETA_CREDITO
 } from 'src/graphql/cuentas'
 import PeriodoSelect from 'src/components/formComponents/PeriodoSelect.vue'
+import { useCuentaStore } from 'src/stores/common/useCuentaStore'
 
 /**
  * composables
@@ -566,6 +567,7 @@ const notificacion = useNotificacion()
 const $q = useQuasar()
 const cuentaCrud = useCuentasCrud()
 const registrosTarjetaCrud = useRegistrosTarjetaCrud()
+const cuentaStore = useCuentaStore()
 
 const { mostrarNotificacionPositiva, mostrarNotificacionNegativa } =
   useNotificacion()
@@ -622,14 +624,17 @@ onMounted(() => {
     (mesOption) => mesOption.id === mes_id
   )
   mes.value = mes_value
+  const cuenta_id = route.params.id.toString()
+  console.log('cuenta_id:', cuenta_id)
 
-  api.get(`/cuentas/${route.params.id}`).then((response) => {
-    cuenta.value = response?.data.data ?? {}
+  cuenta.value = cuentaStore.listaCuentas.find(
+    (cuenta) => cuenta.id === route.params.id
+  )
+  console.log('cuenta.value:', cuenta.value)
 
-    obtenerFechasInicialFinal()
-    loadOrRefetchListaRegistrosTarjeta()
-    loadOrRefetchSaldoAnteriorTC()
-  })
+  obtenerFechasInicialFinal()
+  loadOrRefetchListaRegistrosTarjeta()
+  loadOrRefetchSaldoAnteriorTC()
 })
 /**
  * graphql
@@ -764,12 +769,12 @@ const ejercicio_final_id = computed({
 })
 const dia_corte_inicial = computed({
   get() {
-    return !!cuenta.value.dia_corte ? cuenta.value.dia_corte + 1 : 28
+    return !!cuenta.value.diaCorte ? cuenta.value.diaCorte + 1 : 28
   }
 })
 const dia_corte_final = computed({
   get() {
-    return !!cuenta.value.dia_corte ? cuenta.value.dia_corte : 28
+    return !!cuenta.value.diaCorte ? cuenta.value.diaCorte : 28
   }
 })
 const mes_final_id = computed({
@@ -791,14 +796,14 @@ const fechaInicioPeriodo = computed({
       anioInicio = ejercicio_fiscal.value
     }
 
-    const dia_inicio = ('0' + (cuenta.value.dia_corte + 1)).slice(-2)
+    const dia_inicio = ('0' + (cuenta.value.diaCorte + 1)).slice(-2)
     return `${anioInicio}-${('0' + mesInicio).slice(-2)}-${dia_inicio}`
   }
 })
 
 const fechaFinPeriodo = computed({
   get() {
-    const dia_fin = ('0' + cuenta.value.dia_corte).slice(-2)
+    const dia_fin = ('0' + cuenta.value.diaCorte).slice(-2)
     return `${ejercicio_fiscal.value}-${('0' + mes.value.id).slice(
       -2
     )}-${dia_fin}`
@@ -1070,14 +1075,22 @@ function obtenerFechasInicialFinal() {
     mesInicio = 12
     ejercicioFiscal = ejercicio_fiscal.value - 1
   }
-  const dia_inicio = ('0' + (cuenta.value.dia_corte + 1)).slice(-2)
-  const dia_fin = ('0' + cuenta.value.dia_corte).slice(-2)
+  const dia_inicio = ('0' + (cuenta.value.diaCorte + 1)).slice(-2)
+  const dia_fin = ('0' + cuenta.value.diaCorte).slice(-2)
   listaRegistrosVariables.fechaInicio = `${ejercicioFiscal}-${(
     '0' + mesInicio
   ).slice(-2)}-${dia_inicio}`
   listaRegistrosVariables.fechaFin = `${ejercicio_fiscal.value}-${(
     '0' + mes.value.id
   ).slice(-2)}-${dia_fin}`
+  console.log(
+    'listaRegistrosVariables.fechaInicio:',
+    listaRegistrosVariables.fechaInicio
+  )
+  console.log(
+    'listaRegistrosVariables.fechaFin:',
+    listaRegistrosVariables.fechaFin
+  )
 }
 
 function onChangePeriodo() {

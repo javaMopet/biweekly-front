@@ -231,22 +231,6 @@ const variables = reactive({
   instanceId: undefined
 })
 
-// const {
-//   onResult: onResultListaCuentas,
-//   onError: onErrorListaCuentas,
-//   // load: loadListaCuentas,
-//   refetch: refetchListaCuentas,
-//   // result: resultListaCuentas,
-//   loading: loadingListaCuentas
-// } = useQuery(LISTA_CUENTAS, variables, graphql_options)
-
-// onResultListaCuentas(({ data }) => {
-//   if (!!data) {
-//     // console.log('recupeando datos desde el store', 'color: #007acc;', data)
-//     listaCuentas.value = JSON.parse(JSON.stringify(data.listaCuentas ?? []))
-//   }
-// })
-
 cuentaStore.onErrorCuentaDelete((error) => {
   notificacion.mostrarNotificacionNegativa(
     'No es posible eliminar esta cuenta, favor de verificar que no contenga movimientos',
