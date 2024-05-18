@@ -220,6 +220,7 @@ import { DateTime } from 'luxon'
 import DateInput from '../formComponents/DateInput.vue'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import DialogTitle from '../formComponents/modal/DialogTitle.vue'
+import { useRegistrosTarjetaCrud } from 'src/composables/useRegistrosTarjetaCrud'
 
 /**
  * state
@@ -239,6 +240,7 @@ const loadingRows = ref(false)
 const formato = useFormato()
 const notificacion = useNotificacion()
 const { toCurrency } = useFormato()
+const registrosTarjetaCrud = useRegistrosTarjetaCrud()
 
 /**
  * defProperties
@@ -519,10 +521,10 @@ function saveItems() {
 
     listaRegistroFiltrados.value.forEach((item) => {
       const registro = {
-        estado_registro_tarjeta_id: 1, //pendiente
-        tipo_afectacion: item.tipoAfectacion,
-        cuenta_id: props.cuenta.id,
-        categoria_id: item.categoria.id,
+        estadoRegistroTarjetaId: 1, //pendiente
+        tipoAfectacion: item.tipoAfectacion,
+        cuentaId: props.cuenta.id,
+        categoriaId: item.categoria.id,
         importe: item.importe * -1,
         fecha: item.fecha,
         concepto: item.concepto
@@ -531,30 +533,42 @@ function saveItems() {
     })
 
     isLoading.value = true
+    console.log('lista_registros_tarjeta:', lista_registros_tarjeta)
+    registrosTarjetaCrud.registroTarjetaMultipleCreate({
+      input: lista_registros_tarjeta
+    })
 
-    api
-      .post('/create_multiple_registros_tarjeta', {
-        lista_registros_tarjeta
-      })
-      .then((response) => {
-        // console.log('guardado correctamente')
-        // console.log('response', response)
-        const cuenta_id = response.data.retorno[0].cuenta_id
-        // console.log('cuenta', cuenta_id)
-        isLoading.value = false
-        emit('itemsSaved', cuenta_id)
-      })
-      .catch((error) => {
-        isLoading.value = false
-        // console.error(error.response.data.exception)
-        notificacion.mostrarNotificacionNegativa(
-          'No fue posible posible guardar los registro, revisar consola',
-          900
-        )
-      })
+    // api
+    //   .post('/create_multiple_registros_tarjeta', {
+    //     lista_registros_tarjeta
+    //   })
+    //   .then((response) => {
+    //     // console.log('guardado correctamente')
+    //     // console.log('response', response)
+    //     const cuenta_id = response.data.retorno[0].cuenta_id
+    //     // console.log('cuenta', cuenta_id)
+    //     isLoading.value = false
+    //     emit('itemsSaved', cuenta_id)
+    //   })
+    //   .catch((error) => {
+    //     isLoading.value = false
+    //     // console.error(error.response.data.exception)
+    //     notificacion.mostrarNotificacionNegativa(
+    //       'No fue posible posible guardar los registro, revisar consola',
+    //       900
+    //     )
+    //   })
     // console.log('items guardados')
   }
 }
+registrosTarjetaCrud.onDoneRegistroTarjetaMultipleCreate(({ data }) => {
+  console.log('data:', data)
+  isLoading.value = false
+})
+registrosTarjetaCrud.onErrorRegistroTarjetaMultipleCreate((error) => {
+  console.error(error)
+  isLoading.value = false
+})
 
 /**
  * Funcion utilizada para validar los movimiento al momento de guardar

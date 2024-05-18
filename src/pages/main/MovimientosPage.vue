@@ -719,7 +719,7 @@ function exportToExcel() {
   console.log('Exportando a excel....')
   const params = obtenerParametros()
   api
-    .get(`/movimientos_to_excel.xlsx`, {
+    .get(`/movimientos/to_excel.xlsx`, {
       params,
       responseType: 'blob' // had to add this one here
     })

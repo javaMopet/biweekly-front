@@ -351,7 +351,6 @@
 import { ref, reactive, computed, onBeforeMount, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { DateTime } from 'luxon'
-import { api } from 'src/boot/axios'
 import { LISTA_REGISTROS } from 'src/graphql/registros'
 import { useLazyQuery, useQuery } from '@vue/apollo-composable'
 import { useFormato } from 'src/composables/utils/useFormato'

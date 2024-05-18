@@ -1,13 +1,20 @@
 <template>
   <q-card class="my-card">
     <q-card-section>
-      <q-toolbar class="bg-secondary text-white">
+      <q-toolbar class="bg-secondary text-white q-gutter-xs">
         <q-btn
           color="accent"
           dense
           label="Clear Pinia stores"
           @click="clearPinia"
           no-caps
+        />
+        <q-btn
+          color="primary"
+          icon="check"
+          label="Axios test"
+          @click="apiAxiosTest"
+          dense
         />
         <q-toolbar-title> Opciones </q-toolbar-title>
         <q-btn color="primary" label="Reload (F5)" @click="reload()" />
@@ -47,6 +54,7 @@
 <script setup>
 import { getActivePinia } from 'pinia'
 import { SessionStorage } from 'quasar'
+import { api } from 'src/boot/axios'
 import { useCuentaStore } from 'src/stores/common/useCuentaStore'
 
 /**state */
@@ -61,6 +69,17 @@ function clearPinia() {
 
 function reload() {
   window.location.href = window.location.href
+}
+
+function apiAxiosTest() {
+  api
+    .post('/totales_por_categoria')
+    .then((response) => {
+      console.log('response:', response)
+    })
+    .catch((e) => {
+      console.error(e)
+    })
 }
 </script>
 

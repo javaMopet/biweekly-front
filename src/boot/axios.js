@@ -12,11 +12,13 @@ const api = axios.create({ baseURL: process.env.API_URL })
 
 api.interceptors.request.use(
   async (config) => {
-    if (SessionStorage.getItem('auth_token')) {
-      const token = SessionStorage.getItem('auth_token')
-      console.log('token:', token)
+    if (SessionStorage.getItem('credentials')) {
+      const credentials = SessionStorage.getItem('credentials')
+      // console.log('credentials:', credentials)
       config.headers = {
-        Authorization: `${token}`
+        access_token: credentials.accessToken,
+        client: credentials.client,
+        uid: credentials.uid
       }
     }
     return config

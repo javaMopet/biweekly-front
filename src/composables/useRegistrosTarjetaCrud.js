@@ -4,7 +4,8 @@ import {
   REGISTRO_TARJETA_UPDATE,
   REGISTRO_TARJETA_DELETE,
   REGISTROS_TARJETA_DELETE,
-  REGISTRO_TARJETA_PAGO_DELETE
+  REGISTRO_TARJETA_PAGO_DELETE,
+  REGISTRO_TARJETA_MULTIPLE_CREATE
   // IMPORTAR_REGISTROS_TARJETA
 } from 'src/graphql/registrosTarjeta'
 
@@ -27,6 +28,12 @@ export function useRegistrosTarjetaCrud() {
     onDone: onDoneRegistroTarjetaCreate,
     onError: onErrorRegistroTarjetaCreate
   } = useMutation(REGISTRO_TARJETA_CREATE)
+
+  const {
+    mutate: registroTarjetaMultipleCreate,
+    onDone: onDoneRegistroTarjetaMultipleCreate,
+    onError: onErrorRegistroTarjetaMultipleCreate
+  } = useMutation(REGISTRO_TARJETA_MULTIPLE_CREATE)
 
   const {
     mutate: registroTarjetaUpdate,
@@ -81,6 +88,13 @@ export function useRegistrosTarjetaCrud() {
     console.log('[ response ] >', response)
   })
 
+  onDoneRegistroTarjetaMultipleCreate(({ data }) => {
+    console.log('data:', data)
+  })
+  onErrorRegistroTarjetaMultipleCreate((error) => {
+    console.error(error)
+  })
+
   return {
     createRegistroTarjeta,
     onDoneRegistroTarjetaCreate,
@@ -99,6 +113,9 @@ export function useRegistrosTarjetaCrud() {
     onErrorRegistrosTarjetaDelete,
     registroTarjetaPagoDelete,
     onDoneRegistroTarjetaPagoDelete,
-    onErrorRegistroTarjetaPagoDelete
+    onErrorRegistroTarjetaPagoDelete,
+    registroTarjetaMultipleCreate,
+    onDoneRegistroTarjetaMultipleCreate,
+    onErrorRegistroTarjetaMultipleCreate
   }
 }

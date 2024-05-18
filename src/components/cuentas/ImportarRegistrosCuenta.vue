@@ -819,21 +819,12 @@ const columns = [
     style: 'width:5%'
   }
 ]
-function closeErrors() {
-  errorsList.value.length = 0
-}
+// function closeErrors() {
+//   errorsList.value.length = 0
+// }
 function categoriaSaved() {
   console.log('La categoria fue guardada correctamente')
 }
-// deprecated
-// api
-//   .post('/registros/create_multiple', { lista_registros
-//   })
-//   .then((response) => { console.log('guardado correctamente')
-//   })
-//   .catch((error) => { console.error(error)
-//     console.error('esto es un error')
-//   })
 </script>
 
 <style lang="scss">

@@ -139,30 +139,30 @@ export const useSessionStore = defineStore('session', () => {
   /**
    * mutations
    */
-  function setUserInfoOnLogin(response) {
-    // console.log('response data', response.data)
-    if (response.data.message === 'You are logged in.') {
-      // console.log('data', response.data)
-      user.value = response.data.user
-      auth_token.value = response.headers.authorization
-      SessionStorage.set('auth_token', auth_token.value)
-      SessionStorage.set('user', user.value)
-      // console.log('headers', response.data.headers)
-    }
-  }
+  // function setUserInfoOnLogin(response) {
+  //   // console.log('response data', response.data)
+  //   if (response.data.message === 'You are logged in.') {
+  //     // console.log('data', response.data)
+  //     user.value = response.data.user
+  //     auth_token.value = response.headers.authorization
+  //     SessionStorage.set('auth_token', auth_token.value)
+  //     SessionStorage.set('user', user.value)
+  //     // console.log('headers', response.data.headers)
+  //   }
+  // }
 
-  function setUserInfo(response) {
-    // console.log('set user Infor', response)
-    // console.log('response data', response.data.status)
-    if (response.data.status.code === 200) {
-      // console.log('data', response.data.status.data)
-      user.value = response.data.status.data
-      SessionStorage.set('user', user.value)
-      auth_token.value = response.headers.authorization
-      SessionStorage.set('user', user.value)
-      // api.defaults.headers.common["Authorization"] = auth_token.value;
-    }
-  }
+  // function setUserInfo(response) {
+  //   // console.log('set user Infor', response)
+  //   // console.log('response data', response.data.status)
+  //   if (response.data.status.code === 200) {
+  //     // console.log('data', response.data.status.data)
+  //     user.value = response.data.status.data
+  //     SessionStorage.set('user', user.value)
+  //     auth_token.value = response.headers.authorization
+  //     SessionStorage.set('user', user.value)
+  //     // api.defaults.headers.common["Authorization"] = auth_token.value;
+  //   }
+  // }
 
   // function setUserInforFromToken(data) {
   //   user.value = data.data.user;

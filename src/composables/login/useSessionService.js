@@ -61,8 +61,8 @@ export function useSessionService() {
   })
 
   function setUserInfo(userLogin) {
-    // api.defaults.headers.common["Authorization"] = auth_token.value;
     if (!!userLogin) {
+      // const credentials = JSON.parse(JSON.stringify(userLogin.credentials))
       SessionStorage.set(
         'credentials',
         JSON.parse(JSON.stringify(userLogin.credentials))
@@ -71,6 +71,10 @@ export function useSessionService() {
         'current_user',
         JSON.parse(JSON.stringify(userLogin.authenticatable))
       )
+      // console.log('credentials:', credentials)
+      // api.defaults.headers.common['access_token'] = credentials.accessToken
+      // api.defaults.headers.common['client'] = credentials.client
+      // api.defaults.headers.common['uid'] = credentials.uid
     }
   }
 
@@ -87,6 +91,9 @@ export function useSessionService() {
     SessionStorage.remove('credentials')
     SessionStorage.remove('current_user')
     api.defaults.headers.common['Authorization'] = null
+    api.defaults.headers.common['access_token'] = null
+    api.defaults.headers.common['client'] = null
+    api.defaults.headers.common['uid'] = null
   }
 
   return {
