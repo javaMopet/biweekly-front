@@ -612,20 +612,6 @@ function obtenerSaldosCuentas() {
     .catch((error) => {
       console.log('error', error)
     })
-  // api
-  //   .get('/saldos_cuentas', {
-  //     params: {
-  //       ejercicio_fiscal_id: 2023,
-  //       isSaldos: 1
-  //     }
-  //   })
-  //   .then(({ data }) => {
-  //     console.log('response data', data.data)
-  //     saldosCuentas.value = JSON.parse(JSON.stringify(data.data))
-  //   })
-  //   .catch((error) => {
-  //     console.log('error', error)
-  //   })
 }
 
 function obtenerSaldosFinales() {
