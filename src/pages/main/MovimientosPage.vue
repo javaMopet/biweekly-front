@@ -471,7 +471,7 @@ function addCategoria(tipoMovimientoId) {
 
 function obtenerColumnas(ejercicio_fiscal, mes) {
   api
-    .get('/columnas', {
+    .get('/movimientos/columnas', {
       params: {
         ejercicio_fiscal,
         mes,
@@ -491,7 +491,7 @@ function obtenerColumnas(ejercicio_fiscal, mes) {
       // console.log('error', error)
     })
   api
-    .get('/columnas', {
+    .get('/movimientos/columnas', {
       params: {
         ejercicio_fiscal,
         mes,
@@ -517,7 +517,7 @@ function obtenerColumnas(ejercicio_fiscal, mes) {
  */
 function obtenerMovimientos() {
   api
-    .get('/movimientos', {
+    .get('/movimientos/ingresos_egresos', {
       params: {
         ejercicioFiscalId: ejercicio_fiscal.value,
         tipoMovimientoId: 2,
@@ -532,7 +532,7 @@ function obtenerMovimientos() {
     })
 
   api
-    .get('/movimientos', {
+    .get('/movimientos/ingresos_egresos', {
       params: {
         tipoMovimientoId: 1,
         isSaldos: 0,
@@ -549,7 +549,7 @@ function obtenerMovimientos() {
 }
 function obtenerIngresosEgresosSaldos() {
   api
-    .get('/movimientos', {
+    .get('/movimientos/ingresos_egresos', {
       params: {
         tipoMovimientoId: 1,
         isSaldos: 1,
@@ -558,14 +558,12 @@ function obtenerIngresosEgresosSaldos() {
     })
     .then(({ data }) => {
       saldosIngreso.value = JSON.parse(JSON.stringify(data.data))
-      // console.log('saldos de ingresos obtenidos', saldosIngreso.value)
-      // console.table(saldosIngreso.value)
     })
     .catch((error) => {
       console.log('error', error)
     })
   api
-    .get('/movimientos', {
+    .get('/movimientos/ingresos_egresos', {
       params: {
         tipoMovimientoId: 2,
         isSaldos: 1,
@@ -582,7 +580,7 @@ function obtenerIngresosEgresosSaldos() {
 
 function obtenerSaldosMovimientos() {
   api
-    .get('/saldos_movimientos', {
+    .get('/movimientos/saldos_ingresos_egresos', {
       params: {
         ejercicioFiscalId: ejercicio_fiscal.value,
         mesId: mes.value.id,
@@ -599,7 +597,7 @@ function obtenerSaldosMovimientos() {
 
 function obtenerSaldosCuentas() {
   api
-    .get('/saldos_cuentas', {
+    .get('/movimientos/saldos_cuentas', {
       params: {
         ejercicioFiscalId: ejercicio_fiscal.value,
         mesId: mes.value.id,
@@ -616,7 +614,7 @@ function obtenerSaldosCuentas() {
 
 function obtenerSaldosFinales() {
   api
-    .get('/saldos_finales', {
+    .get('/movimientos/saldos_finales', {
       params: {
         ejercicioFiscalId: ejercicio_fiscal.value,
         mesId: mes.value.id,
