@@ -6,10 +6,13 @@ import materialIcons from '@quasar/quasar-ui-qiconpicker/dist/icon-set/material-
 import fontawesomeV5 from '@quasar/quasar-ui-qiconpicker/dist/icon-set/fontawesome-v5.umd.js'
 
 export default boot(({ app }) => {
-  app.use(QIconPicker, {
-    iconSets: {
-      'material-icons': materialIcons,
-      'fontawesome-v5': fontawesomeV5
-    }
-  })
+  // app.use(QIconPicker, {
+  //   iconSets: {
+  //     'material-icons': materialIcons,
+  //     'fontawesome-v5': fontawesomeV5
+  //   }
+  // })
+  QIconPicker.addIconSet(materialIcons)
+  QIconPicker.addIconSet(fontawesomeV5)
+  app.use(QIconPicker)
 })
