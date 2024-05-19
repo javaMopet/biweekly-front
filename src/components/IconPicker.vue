@@ -45,7 +45,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import '@quasar/quasar-ui-qiconpicker/dist/icon-set/material-icons.umd.js'
+// import '@quasar/quasar-ui-qiconpicker/dist/icon-set/material-icons.umd.js'
 const data = ref({
   value: '',
   paginationColor: 'secondary',

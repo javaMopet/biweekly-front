@@ -5,14 +5,14 @@
 <script>
 import { defineComponent } from 'vue'
 
-if (process.env.NODE_ENV === 'development') {
-  import(
-    '../node_modules/@quasar/quasar-ui-qiconpicker/dist/icon-set/material-icons.umd.js'
-  )
-  import(
-    '../node_modules/@quasar/quasar-ui-qiconpicker/dist/icon-set/fontawesome-v5.umd.js'
-  )
-}
+// if (process.env.NODE_ENV === 'development') {
+//   import(
+//     '../node_modules/@quasar/quasar-ui-qiconpicker/dist/icon-set/material-icons.umd.js'
+//   )
+//   import(
+//     '../node_modules/@quasar/quasar-ui-qiconpicker/dist/icon-set/fontawesome-v5.umd.js'
+//   )
+// }
 
 export default defineComponent({
   name: 'App'
