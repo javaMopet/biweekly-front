@@ -32,7 +32,7 @@ module.exports = configure(function (/* ctx */) {
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
     // https://v2.quasar.dev/quasar-cli/boot-files
-    boot: ['axios', 'apollo' /*, "quasar-icon-set"*/],
+    boot: ['axios', 'apollo', 'icon-picker'],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#css
     css: ['app.scss'],
@@ -113,10 +113,13 @@ module.exports = configure(function (/* ctx */) {
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#framework
     framework: {
-      // iconSet: 'fontawesome-v6',
-      iconSet: 'material-icons',
       config: {},
-
+      // Import Quasar components and directives
+      iconSet: 'material-icons',
+      extras: [
+        'material-icons', // Material Icons
+        'fontawesome-v5' // Font Awesome 5
+      ],
       // iconSet: 'material-icons', // Quasar icon set
       // lang: 'en-US', // Quasar language pack
 

@@ -11,7 +11,7 @@ export default boot(async (/* { app, router, ... } */) => {
   try {
     iconSetList[`../../node_modules/quasar/icon-set/${iconSetName}.mjs`]().then(
       (lang) => {
-        Quasar.iconSet.set(setDefinition.default)
+        Quasar.iconSet.set(lang)
       }
     )
   } catch (err) {
