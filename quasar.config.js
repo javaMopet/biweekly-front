@@ -70,7 +70,17 @@ module.exports = configure(function (/* ctx */) {
       //   // browser: ['es2019', 'edge88', 'firefox78', 'chrome87', 'safari13.1'],
       //   node: 'node18'
       // },
-      // vueRouterMode: 'history', // available values: 'hash', 'history'
+      vueRouterMode: 'history', // available values: 'hash', 'history'
+      // Ensure CSS is bundled correctly
+      extractCSS: true,
+      extendWebpack(cfg) {
+        cfg.module.rules.push({
+          enforce: 'pre',
+          test: /\.(js|vue)$/,
+          loader: 'eslint-loader',
+          exclude: /node_modules/
+        })
+      },
       // vueRouterBase,
       // vueDevtools,
       // vueOptionsAPI: false,
