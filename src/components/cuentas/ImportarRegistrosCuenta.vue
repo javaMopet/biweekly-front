@@ -345,13 +345,13 @@ async function updateFile(v) {
     //     console.log('data cell', row[key])
     //   }
     // }
-    // console.log(props.cuenta)
+
     if (!!props.cuenta.banco) {
       switch (props.cuenta.banco.id) {
-        case 1:
+        case '1':
           obtenerMovimientosSantander(wb)
           break
-        case 2:
+        case '2':
           obtenerMovimientosBancomer(wb)
           break
         default:
@@ -384,7 +384,8 @@ function obtenerMovimientosSantander(wb) {
     raw: false
   })
 
-  // console.log('data', data)
+  console.log('data', data)
+
   const monthsMap = new Map()
   monthsMap.set('Ene', '01')
   monthsMap.set('Feb', '02')
