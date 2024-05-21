@@ -8,12 +8,12 @@
         <div class="">
           Hemos recibido una solicitud para reestablecer tu contraseña.
         </div>
-        <q-separator spaced horizontal />
+        <!-- <q-separator spaced horizontal /> -->
         <div class="text-subtitle2">Ingresa la nueva contraseña y guarda.</div>
       </q-card-section>
       <q-card-section>
         <div class="">
-          <q-form @submit="savePassword" class="q-gutter-md">
+          <q-form @submit="savePassword" class="q-gutter-md" @reset="irALogin">
             <q-input
               v-model="password"
               type="password"
@@ -30,7 +30,9 @@
             />
             <div class="column justify-center q-gutter-md">
               <q-btn label="Guardar" type="submit" color="primary-button" />
-              <q-btn label="Cancelar" type="reset" color="negative" outline />
+            </div>
+            <div class="column justify-center q-gutter-md">
+              <q-btn label="CANCELAR" type="reset" color="pink-4" />
             </div>
           </q-form>
         </div>
@@ -85,6 +87,9 @@ sessionService.onErrorUserUpdatePassword((error) => {
     1900
   )
 })
+function irALogin() {
+  router.push('/login')
+}
 </script>
 
 <style lang="scss" scoped>

@@ -80,6 +80,13 @@ const routes = [
         }
       },
       {
+        path: '/estadisticas',
+        component: () => import('src/pages/estadisticas/EstadisticasMain.vue'),
+        meta: {
+          permission: 'estadisticas'
+        }
+      },
+      {
         path: 'catalogos',
         component: () => import('pages/CatalogosPage.vue')
       }

@@ -1,46 +1,23 @@
 <template>
   <q-card class="my-card" flat>
-    <div class="column justify-center items-center">DASHBOARD</div>
+    <div class="column justify-center items-center">ESTADISTICAS</div>
+    <q-toolbar>
+      <PeriodoSelect></PeriodoSelect>
+      <q-toolbar-title> Toolbar </q-toolbar-title>
+      <q-btn flat round dense icon="apps" class="q-mr-xs" />
+      <q-btn flat round dense icon="more_vert" />
+    </q-toolbar>
     <q-card-section>
       <div class="row q-gutter-x-lg">
-        <div class="col">
-          <Bar :data="dataBar" :options="options" aria-label="mititulo" />
-        </div>
-        <div class="col">
+        <!-- <div class="col"> -->
+        <Bar :data="dataBar" :options="options" aria-label="mititulo" />
+        <!-- </div> -->
+        <!-- <div class="col">
           <Doughnut :data="dataDoughnut" :options="options" />
-        </div>
+        </div> -->
       </div>
     </q-card-section>
-    <q-card-section>
-      <div class="row full-width">
-        <q-list borderless>
-          <q-item clickable v-ripple to="/admin/categorias">
-            <q-item-section avatar>
-              <q-icon color="primary" name="category" />
-            </q-item-section>
-            <q-item-section>Categorias</q-item-section>
-          </q-item>
-          <q-item clickable v-ripple to="/admin/cuentas">
-            <q-item-section avatar>
-              <q-icon color="primary" name="wallet" />
-            </q-item-section>
-            <q-item-section>Cuentas</q-item-section>
-          </q-item>
-          <q-item clickable v-ripple to="/admin/cuentas_contables">
-            <q-item-section avatar>
-              <q-icon color="primary" name="list_alt" />
-            </q-item-section>
-            <q-item-section>Cuentas Contables</q-item-section>
-          </q-item>
-          <!-- <q-item clickable v-ripple>
-      <q-item-section avatar>
-        <q-icon color="primary" name="bluetooth" />
-      </q-item-section>
-      <q-item-section>Categorias</q-item-section>
-    </q-item> -->
-        </q-list>
-      </div>
-    </q-card-section>
+    <q-card-section> </q-card-section>
   </q-card>
 </template>
 
@@ -60,6 +37,7 @@ import {
   LinearScale
 } from 'chart.js'
 import { Bar, Doughnut } from 'vue-chartjs'
+import PeriodoSelect from 'src/components/formComponents/PeriodoSelect.vue'
 
 ChartJS.register(
   CategoryScale,
@@ -78,34 +56,36 @@ const file = ref([])
 const mititulo = ref('asdfjalskdj aksdjf asd')
 
 const dataBar = ref({
-  labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio'],
+  labels: [
+    'Enero',
+    'Febrero',
+    'Marzo',
+    'Abril',
+    'Mayo',
+    'Junio',
+    'Julio',
+    'Agosto',
+    'Septiembre',
+    'Octubre',
+    'Noviembre',
+    'Diciembre'
+  ],
   datasets: [
     {
       label: 'Ingresos',
-      backgroundColor: [
-        '#f87979'
-        // '#f85079',
-        // '#AA5079',
-        // '#11aabb',
-        // '#acbdaa',
-        // '#ba1991'
-      ],
-      data: [40, 20, 12, 50, 15, 35]
+      backgroundColor: ['#acbdaa'],
+      data: [40000, 20000, 12000, 50000, 15000]
     },
     {
       label: 'Egresos',
-      backgroundColor: [
-        // '#f87979',
-        // '#f85079',
-        // '#AA5079',
-        // '#11aabb',
-        '#acbdaa'
-        // '#ba1991'
-      ],
-      data: [100, 60, 40, 20, 30, 24]
+      backgroundColor: ['#f87979'],
+      data: [
+        50000, 60000, 40000, 20000, 30, 24, 20, 60, 40000, 20000, 30000, 24
+      ]
     }
   ]
 })
+
 const dataDoughnut = ref({
   labels: ['Netflix', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio'],
   datasets: [

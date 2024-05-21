@@ -2,12 +2,12 @@
   <div class="container column items-center q-pa-xl">
     <q-card class="reset-container">
       <q-card-section>
-        <div class="text-h5">Contraseña actualizada</div>
+        <div class="text-h5">Contraseña actualizada.</div>
       </q-card-section>
       <q-card-section>
         <div class="">Puede ingresar con su nueva contraseña</div>
         <q-separator spaced horizontal />
-        <div class="text-subtitle2">Ingresa la nueva contraseña y guarda.</div>
+        <router-link to="/login">Ir ahora</router-link>
       </q-card-section>
       <q-card-section> </q-card-section>
     </q-card>
