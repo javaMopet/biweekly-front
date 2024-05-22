@@ -1,6 +1,6 @@
 <template>
   <q-card class="my-card" flat>
-    <div class="column justify-center items-center">ESTADISTICAS</div>
+    <!-- <div class="column justify-center items-center">ESTADISTICAS</div> -->
     <!-- <q-toolbar>
       <PeriodoSelect></PeriodoSelect>
       <q-toolbar-title> Toolbar </q-toolbar-title>
@@ -16,6 +16,7 @@
               vertical
               class="text-"
               @update:model-value="cambioDeTab"
+              active-color="secondary"
             >
               <q-tab name="both" icon="analytics" label="Ingresos - Egresos" />
               <q-tab name="ingresos" icon="trending_up" label="INGRESOS" />
@@ -33,8 +34,8 @@
               transition-next="jump-up"
             >
               <q-tab-panel name="both">
-                <div class="row q-gutter-x-lg">
-                  <!-- <div class="col"> -->
+                <div class="column q-gutter-x-lg">
+                  <div class="text-h6">Ingresos - Egresos</div>
                   <Bar
                     :data="dataBar"
                     :options="options"
@@ -46,24 +47,48 @@
               </q-tab-panel>
 
               <q-tab-panel name="ingresos">
-                <div class="col">
-                  <Doughnut
-                    :data="dataDoughnutIngresos"
-                    :options="doughnutOptions"
-                    :style="doughnutStyle"
-                    v-if="ingresoDataLoaded"
-                  />
+                <div class="column">
+                  <div class="text-h6">Ingresos</div>
+                  <div
+                    class="column"
+                    style="border: 0px solid red; height: 600px"
+                  >
+                    <Doughnut
+                      :data="dataDoughnutIngresos"
+                      :options="doughnutOptions"
+                      :style="doughnutStyle"
+                      v-if="ingresoDataLoaded"
+                    />
+                    <div class="row">
+                      Top
+                      <ul>
+                        <li>1 - Sueldo Mensual $50,000</li>
+                        <li>2 - Sueldo Quincenal $40,000</li>
+                      </ul>
+                    </div>
+                  </div>
                 </div>
               </q-tab-panel>
 
               <q-tab-panel name="egresos">
-                <div class="col">
+                <!-- <div class="text-h6">Egresos</div> -->
+                <div
+                  class="column"
+                  style="border: 0px solid red; height: 700px"
+                >
                   <Doughnut
                     :data="dataDoughnutEgresos"
                     :options="doughnutOptions"
                     :style="doughnutStyle"
                     v-if="egresoDataLoaded"
                   />
+                  <div class="row">
+                    Top
+                    <ul>
+                      <li>1 - Crédito Hipotecario $50,000</li>
+                      <li>2 - Taos $40,000</li>
+                    </ul>
+                  </div>
                 </div>
               </q-tab-panel>
             </q-tab-panels>
@@ -93,7 +118,6 @@ import {
   LinearScale
 } from 'chart.js'
 import { Bar, Doughnut } from 'vue-chartjs'
-import PeriodoSelect from 'src/components/formComponents/PeriodoSelect.vue'
 
 ChartJS.register(
   CategoryScale,
@@ -108,8 +132,6 @@ ChartJS.register(
 const $router = useRouter()
 
 const file = ref([])
-
-const mititulo = ref('asdfjalskdj aksdjf asd')
 
 const loaded = ref(false)
 const ingresoDataLoaded = ref(false)
@@ -184,40 +206,83 @@ const dataDoughnutIngresos = ref({
     }
   ]
 })
-const dataDoughnutEgresos = ref({
-  labels: [],
-  datasets: [
-    {
-      backgroundColor: [],
-      data: []
-    }
-  ]
-})
-const options = ref({
-  responsive: true,
-  plugins: {
-    title: {
-      position: 'top',
-      text: 'Algun titulo'
-    },
-    subtitle: {
-      display: true,
-      text: 'Custom Chart Subtitle'
+const dataDoughnutEgresos = ref(
+  {
+    labels: [],
+    datasets: [
+      {
+        backgroundColor: [],
+        data: []
+      }
+    ]
+  },
+  {
+    pieceLabel: {
+      mode: 'percentage',
+      precision: 1
     }
   }
+)
+const options = ref({
+  responsive: true
 })
 const doughnutOptions = ref({
   responsive: true,
-  Legend: 'algo',
+  layout: {
+    padding: {
+      left: 10,
+      right: 40
+    }
+  },
   plugins: {
-    title: {
+    legend: {
       position: 'left',
-      text: 'Algun titulo'
+      labels: {
+        font: {
+          size: 12,
+          family: 'DM Sans',
+          style: 'bold'
+        }
+      }
+      // subtitle: {
+      //   display: true,
+      //   text: 'Custom Chart Subtitle',
+      //   padding: {
+      //     top: 10,
+      //     bottom: 30
+      //   }
+      // },
+      // title: {
+      //   display: true,
+      //   text: 'Custom Chart Title',
+      //   padding: {
+      //     top: 10,
+      //     bottom: 30
+      //   }
+      // }
     },
-    subtitle: {
-      display: true,
-      position: screenLeft,
-      text: 'Custom Chart Subtitle'
+    tooltip: {
+      bodyAlign: 'right'
+      //   callbacks: {
+      //     label: function (context) {
+      //       let label = context.dataset.label || ''
+
+      //       if (label) {
+      //         label += ': '
+      //       }
+      //       if (context.parsed.y !== null) {
+      //         label += new Intl.NumberFormat('en-US', {
+      //           style: 'currency',
+      //           currency: 'USD'
+      //         }).format(context.parsed.y)
+      //       }
+      //       return label
+      //     }
+      //   }
+      // },
+      // pieceLabel: {
+      //   mode: 'percentage',
+      //   precision: 1
     }
   }
 })
@@ -225,7 +290,8 @@ const doughnutOptions = ref({
 const doughnutStyle = computed({
   get() {
     return {
-      height: `650px`,
+      width: `350px`,
+      height: `350px`,
       position: 'relative'
     }
   }
