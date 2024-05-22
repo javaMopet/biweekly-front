@@ -5,6 +5,7 @@
 <script>
 import { defineComponent } from 'vue'
 
+// Se reemplaza por la importacion en el index.html
 // if (process.env.NODE_ENV === 'development') {
 //   import(
 //     '../node_modules/@quasar/quasar-ui-qiconpicker/dist/icon-set/material-icons.umd.js'

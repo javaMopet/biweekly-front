@@ -12,7 +12,4 @@ export default boot(({ app }) => {
       'fontawesome-v5': fontawesomeV5
     }
   })
-  // QIconPicker.addIconSet(materialIcons)
-  // QIconPicker.addIconSet(fontawesomeV5)
-  // app.use(QIconPicker)
 })
