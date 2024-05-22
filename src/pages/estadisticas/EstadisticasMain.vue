@@ -1,28 +1,84 @@
 <template>
   <q-card class="my-card" flat>
     <div class="column justify-center items-center">ESTADISTICAS</div>
-    <q-toolbar>
+    <!-- <q-toolbar>
       <PeriodoSelect></PeriodoSelect>
       <q-toolbar-title> Toolbar </q-toolbar-title>
       <q-btn flat round dense icon="apps" class="q-mr-xs" />
       <q-btn flat round dense icon="more_vert" />
-    </q-toolbar>
+    </q-toolbar> -->
     <q-card-section>
-      <div class="row q-gutter-x-lg">
-        <!-- <div class="col"> -->
-        <Bar :data="dataBar" :options="options" aria-label="mititulo" />
-        <!-- </div> -->
-        <!-- <div class="col">
-          <Doughnut :data="dataDoughnut" :options="options" />
-        </div> -->
+      <div>
+        <q-splitter v-model="splitterModel" style="height: 750px">
+          <template v-slot:before>
+            <q-tabs
+              v-model="tab"
+              vertical
+              class="text-"
+              @update:model-value="cambioDeTab"
+            >
+              <q-tab name="both" icon="analytics" label="Ingresos - Egresos" />
+              <q-tab name="ingresos" icon="trending_up" label="INGRESOS" />
+              <q-tab name="egresos" icon="trending_down" label="EGRESOS" />
+            </q-tabs>
+          </template>
+
+          <template v-slot:after>
+            <q-tab-panels
+              v-model="tab"
+              animated
+              swipeable
+              vertical
+              transition-prev="jump-up"
+              transition-next="jump-up"
+            >
+              <q-tab-panel name="both">
+                <div class="row q-gutter-x-lg">
+                  <!-- <div class="col"> -->
+                  <Bar
+                    :data="dataBar"
+                    :options="options"
+                    aria-label="mititulo"
+                    v-if="loaded"
+                  />
+                  <!-- </div> -->
+                </div>
+              </q-tab-panel>
+
+              <q-tab-panel name="ingresos">
+                <div class="col">
+                  <Doughnut
+                    :data="dataDoughnutIngresos"
+                    :options="doughnutOptions"
+                    :style="doughnutStyle"
+                    v-if="ingresoDataLoaded"
+                  />
+                </div>
+              </q-tab-panel>
+
+              <q-tab-panel name="egresos">
+                <div class="col">
+                  <Doughnut
+                    :data="dataDoughnutEgresos"
+                    :options="doughnutOptions"
+                    :style="doughnutStyle"
+                    v-if="egresoDataLoaded"
+                  />
+                </div>
+              </q-tab-panel>
+            </q-tab-panels>
+          </template>
+        </q-splitter>
       </div>
     </q-card-section>
-    <q-card-section> </q-card-section>
+    <!-- <q-card-section>
+      <pre>{{ dataDoughnutIngresos }}</pre>
+    </q-card-section> -->
   </q-card>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { api } from 'src/boot/axios'
 import { exportFile } from 'quasar'
 import { useRouter } from 'vue-router'
@@ -55,6 +111,12 @@ const file = ref([])
 
 const mititulo = ref('asdfjalskdj aksdjf asd')
 
+const loaded = ref(false)
+const ingresoDataLoaded = ref(false)
+const egresoDataLoaded = ref(false)
+const tab = ref('mails')
+const splitterModel = ref(20)
+
 const dataBar = ref({
   labels: [
     'Enero',
@@ -74,31 +136,60 @@ const dataBar = ref({
     {
       label: 'Ingresos',
       backgroundColor: ['#acbdaa'],
-      data: [40000, 20000, 12000, 50000, 15000]
+      data: Array(12).fill(0)
     },
     {
       label: 'Egresos',
       backgroundColor: ['#f87979'],
-      data: [
-        50000, 60000, 40000, 20000, 30, 24, 20, 60, 40000, 20000, 30000, 24
-      ]
+      data: Array(12).fill(0)
     }
   ]
 })
 
-const dataDoughnut = ref({
-  labels: ['Netflix', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio'],
+onMounted(() => {})
+
+function obtenerDataSetIngresosEgresos() {
+  api
+    .get('/stats/ingresos_egresos_dataset')
+    .then(({ data }) => {
+      const ingresosData = Array(12).fill(0)
+      const egresosData = Array(12).fill(0)
+
+      data.data.forEach((record) => {
+        const monthIndex = record.mes - 1 // Adjust to 0-based index
+        if (record.tipo_movimiento_id === 1) {
+          // Assuming 1 is for 'Ingresos'
+          ingresosData[monthIndex] = record.importe
+        } else if (record.tipo_movimiento_id === 2) {
+          // Assuming 2 is for 'Egresos'
+          egresosData[monthIndex] = record.importe
+        }
+      })
+
+      dataBar.value.datasets[0].data = ingresosData
+      dataBar.value.datasets[1].data = egresosData
+      loaded.value = true
+    })
+    .catch((error) => {
+      console.error(error)
+    })
+}
+
+const dataDoughnutIngresos = ref({
+  labels: [],
   datasets: [
     {
-      backgroundColor: [
-        '#f87979',
-        '#f85079',
-        '#AA5079',
-        '#11aabb',
-        '#acbdaa',
-        '#ba1991'
-      ],
-      data: [100, 60, 40, 20, 30, 24]
+      backgroundColor: [],
+      data: []
+    }
+  ]
+})
+const dataDoughnutEgresos = ref({
+  labels: [],
+  datasets: [
+    {
+      backgroundColor: [],
+      data: []
     }
   ]
 })
@@ -115,6 +206,92 @@ const options = ref({
     }
   }
 })
+const doughnutOptions = ref({
+  responsive: true,
+  Legend: 'algo',
+  plugins: {
+    title: {
+      position: 'left',
+      text: 'Algun titulo'
+    },
+    subtitle: {
+      display: true,
+      position: screenLeft,
+      text: 'Custom Chart Subtitle'
+    }
+  }
+})
+
+const doughnutStyle = computed({
+  get() {
+    return {
+      height: `650px`,
+      position: 'relative'
+    }
+  }
+})
+
+function cambioDeTab(value) {
+  switch (value) {
+    case 'both':
+      obtenerDataSetIngresosEgresos()
+      break
+    case 'ingresos':
+      obtenerIngresosDataSet()
+      break
+    case 'egresos':
+      obtenerEgresosDataSet()
+      break
+  }
+}
+function obtenerIngresosDataSet() {
+  ingresoDataLoaded.value = false
+  api
+    .get('/stats/ingresos_dataset')
+    .then(({ data }) => {
+      const labels = []
+      const colors = []
+      const importes = []
+      data.retorno.forEach((record, index) => {
+        labels[index] = record.categoria
+        colors[index] = record.color
+        importes[index] = record.importe
+      })
+
+      dataDoughnutIngresos.value.labels = labels
+      dataDoughnutIngresos.value.datasets[0].backgroundColor = colors
+      dataDoughnutIngresos.value.datasets[0].data = importes
+
+      ingresoDataLoaded.value = true
+    })
+    .catch((error) => {
+      console.error(error)
+    })
+}
+function obtenerEgresosDataSet() {
+  egresoDataLoaded.value = false
+  api
+    .get('/stats/egresos_dataset')
+    .then(({ data }) => {
+      const labels = []
+      const colors = []
+      const importes = []
+      data.retorno.forEach((record, index) => {
+        labels[index] = record.categoria
+        colors[index] = record.color
+        importes[index] = record.importe
+      })
+
+      dataDoughnutEgresos.value.labels = labels
+      dataDoughnutEgresos.value.datasets[0].backgroundColor = colors
+      dataDoughnutEgresos.value.datasets[0].data = importes
+
+      egresoDataLoaded.value = true
+    })
+    .catch((error) => {
+      console.error(error)
+    })
+}
 
 const showFile = () => {
   console.log(file.value)
@@ -146,7 +323,7 @@ function obtenerPdf() {
 </script>
 <style lang="scss" scoped>
 div {
-  color: $secondary;
+  color: $dark;
   font-weight: bold;
   font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
   background-color: $primary-light;
