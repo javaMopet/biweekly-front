@@ -177,7 +177,7 @@ const router = useRouter()
 onMounted(() => {
   const credentials = SessionStorage.getItem('credentials') || undefined
   user.value = SessionStorage.getItem('current_user')
-  console.log('user.value:', user.value.instance.logoImage)
+  // console.log('user.value:', user.value.instance.logoImage)
   logoPath.value = '/icons/' + user.value.instance.logoImage
   // /icons/tree.png
   if (!user.value) router.push('login')

@@ -142,7 +142,7 @@ export default {
     }
 
     const validar = () => {
-      console.log('validando la fecha', valor_fecha.value)
+      // console.log('validando la fecha', valor_fecha.value)
       if (!valor_fecha.value) {
         containsError.value = true
         setTimeout(() => {

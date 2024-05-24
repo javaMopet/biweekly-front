@@ -193,7 +193,7 @@ export default {
     }
 
     const validar = () => {
-      console.log('validando la cuenta', cuenta.value)
+      // console.log('validando la cuenta', cuenta.value)
       if (!cuenta.value?.id) {
         containsError.value = true
         setTimeout(() => {

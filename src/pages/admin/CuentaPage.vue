@@ -113,6 +113,7 @@
       <div class="sticky-table-container">
         <q-table
           class="q-mt-lg my-sticky-header-table"
+          ref="tableRef"
           :rows="listaRegistros"
           :columns="columns"
           dense
@@ -121,12 +122,14 @@
           separator="vertical"
           hide-pagination
           selection="multiple"
-          v-model:selected="selectedItems"
+          :selected="selected"
           row-key="id"
           :filter="filter"
           no-data-label="No se han registrado movimientos"
           :loading="loadingRegistros"
+          @selection="onSelection"
         >
+          <!-- v-model:selected="selectedItems" -->
           <template v-slot:header-selection="scope">
             <q-checkbox v-model="scope.selected" dense />
           </template>
@@ -135,7 +138,6 @@
             <q-checkbox
               v-model="scope.selected"
               :disable="scope.row.disable"
-              v-if="!scope.row.disable"
               dense
             />
           </template>
@@ -151,7 +153,7 @@
                   <q-btn
                     class="medium-button"
                     color="negative-pastel"
-                    :disable="selectedItems.length <= 0"
+                    :disable="selected.length <= 0"
                     no-caps
                     label="Eliminar"
                     @click="deleteSelectedItems"
@@ -413,7 +415,7 @@ const ejercicio_fiscal = ref(DateTime.now().year)
 const mes = ref({})
 const registroEditedItem = ref(null)
 const registroToEdit = ref(null)
-const selectedItems = ref([])
+const selected = ref([])
 const saldo_periodo_anterior = ref(0)
 // const saldoFinalPeriodo = ref(0)
 
@@ -607,8 +609,8 @@ function obtenerImporteByTipoMovimiento(editedItem) {
 }
 
 function deleteSelectedItems() {
-  if (selectedItems.value.length > 0) {
-    const message = `Esta a punto de eliminar ${selectedItems.value.length} movimientos. ¿Desea continuar?`
+  if (selected.value.length > 0) {
+    const message = `Esta a punto de eliminar ${selected.value.length} movimientos. ¿Desea continuar?`
     $q.dialog({
       title: 'Confirmar',
       style: 'width:500px',
@@ -627,7 +629,7 @@ function deleteSelectedItems() {
       persistent: true
     })
       .onOk(() => {
-        confirmarEliminarItems(selectedItems.value)
+        confirmarEliminarItems(selected.value)
       })
       .onCancel(() => {})
       .onDismiss(() => {})
@@ -652,7 +654,7 @@ registrosCrud.onDoneRegistrosDelete(({ data }) => {
     'Los movimientos fueron eliminados exitosamente',
     1600
   )
-  selectedItems.value.length = 0
+  selected.value.length = 0
 })
 
 registrosCrud.onErrorRegistrosDelete(() => {
@@ -848,7 +850,7 @@ const columns = [
     name: 'fecha',
     label: 'Fecha',
     field: 'fecha',
-    sortable: true,
+    sortable: false,
     align: 'left',
     format: (val, row) => formato.formatoFechaFromISO(val),
     headerStyle: 'width: 90px'
@@ -866,7 +868,7 @@ const columns = [
     name: 'cargo',
     label: 'Cargo',
     field: 'cargo',
-    sortable: true,
+    sortable: false,
     align: 'right',
     format: (val, row) => formato.toCurrency(val),
     headerStyle: 'width: 100px; min-width:100px'
@@ -875,7 +877,7 @@ const columns = [
     name: 'abono',
     label: 'Abono',
     field: 'abono',
-    sortable: true,
+    sortable: false,
     align: 'right',
     format: (val, row) => formato.toCurrency(val),
     headerStyle: 'width: 100px; min-width:100px'
@@ -884,7 +886,7 @@ const columns = [
     name: 'saldo',
     label: 'Saldo',
     field: 'saldo',
-    sortable: true,
+    sortable: false,
     align: 'right',
     format: (val, row) => formato.toCurrency(val),
     headerStyle: 'width: 100px; min-width:100px'
@@ -893,7 +895,7 @@ const columns = [
     name: 'observaciones',
     label: 'Observaciones',
     field: 'observaciones',
-    sortable: true,
+    sortable: false,
     align: 'left',
     headerStyle: 'width:250px;max-width: 250px',
     style:
@@ -903,7 +905,7 @@ const columns = [
     name: 'tarjetaCredito',
     label: 'Tarjeta de Crédito',
     field: (row) => row.registroTarjeta?.cuenta.nombre,
-    sortable: true,
+    sortable: false,
     align: 'left',
     headerStyle: 'width: 120px;min-width:120px;max-width:120px'
   },
@@ -924,6 +926,22 @@ const columns = [
     headerStyle: 'width: 70px'
   }
 ]
+
+const tableRef = ref(null)
+
+function onSelection({ rows, added, evt }) {
+  if (rows.length === 0 || tableRef.value === void 0) {
+    return
+  }
+
+  if (added) {
+    const filteredRows = rows.filter((row) => !row.disable)
+    selected.value = selected.value.concat(filteredRows)
+  } else {
+    const idsToRemove = new Set(rows.map((obj) => obj.id))
+    selected.value = selected.value.filter((obj) => !idsToRemove.has(obj.id))
+  }
+}
 </script>
 
 <style lang="scss" scoped>

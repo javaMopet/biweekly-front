@@ -383,9 +383,6 @@ function obtenerMovimientosSantander(wb) {
     skipHeader: true,
     raw: false
   })
-
-  console.log('data', data)
-
   const monthsMap = new Map()
   monthsMap.set('Ene', '01')
   monthsMap.set('Feb', '02')
@@ -706,7 +703,6 @@ function addError(code, numero_linea, message) {
 }
 
 function eliminarSeleccionados() {
-  console.log('eliminar seleccionados', registrosSelected.value)
   registrosSelected.value.forEach((item) => {
     var index = listaRegistros.value.indexOf(item)
     if (index !== -1) {

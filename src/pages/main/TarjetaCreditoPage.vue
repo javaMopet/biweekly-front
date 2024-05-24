@@ -332,6 +332,7 @@
           </q-table>
           <q-separator spaced inset vertical dark />
           <q-table
+            ref="tableRef"
             :rows="listaRegistros"
             :columns="columns"
             dense
@@ -340,19 +341,20 @@
             separator="horizontal"
             :pagination-label="obtenerMensajePaginacion"
             selection="multiple"
-            v-model:selected="selectedItems"
+            :selected="selected"
             :loading="loadingListaRegistros"
             row-key="id"
             :filter="filter"
+            @selection="onSelection"
           >
-            <template v-slot:header-selection>
-              <!-- <q-checkbox v-model="scope.selected" dense /> -->
-              <!-- <div class=""></div> -->
-            </template>
+            <!-- <template v-slot:header-selection>
+              <q-checkbox v-model="scope.selected" dense />
+              <div class=""></div>
+            </template> -->
             <template v-slot:body-selection="scope">
               <q-checkbox
                 v-model="scope.selected"
-                v-if="scope.row.estadoRegistroTarjeta?.id === '1'"
+                :disable="scope.row.estadoRegistroTarjeta?.id !== '1'"
                 dense
               />
             </template>
@@ -371,7 +373,7 @@
                 <div class="row q-gutter-x-md">
                   <div class="" v-if="isModificable">
                     <q-btn
-                      :disable="selectedItems.length <= 0"
+                      :disable="selected.length <= 0"
                       class="medium-button"
                       no-caps
                       color="negative-pastel"
@@ -450,8 +452,12 @@
             </template>
             <template #body-cell-acciones="props">
               <q-td :props="props" class="q-gutter-x-sm">
+                <!-- mostramos el boton de edicion solo si no es pago y el estatus es pendiente -->
                 <q-btn
-                  v-if="!props.row.isPago"
+                  v-if="
+                    !props.row.isPago &&
+                    props.row.estadoRegistroTarjeta?.id === '1'
+                  "
                   class="button-edit"
                   icon="las la-edit"
                   @click="editItem(props)"
@@ -608,7 +614,7 @@ const listaRegistrosVariables = reactive({
   estadoRegistroTarjetaId: null
 })
 
-const selectedItems = ref([])
+const selected = ref([])
 const expanded = ref(false)
 const filter = ref('')
 const filterMsi = ref('')
@@ -625,13 +631,9 @@ onMounted(() => {
   )
   mes.value = mes_value
   const cuenta_id = route.params.id.toString()
-  console.log('cuenta_id:', cuenta_id)
-
   cuenta.value = cuentaStore.listaCuentas.find(
     (cuenta) => cuenta.id === route.params.id
   )
-  console.log('cuenta.value:', cuenta.value)
-
   obtenerFechasInicialFinal()
   loadOrRefetchListaRegistrosTarjeta()
   loadOrRefetchSaldoAnteriorTC()
@@ -988,9 +990,8 @@ function editItem(item) {
 }
 
 function deleteSelectedItems() {
-  // console.table(selectedItems.value)
-  if (selectedItems.value.length > 0) {
-    const message = `Esta a punto de eliminar ${selectedItems.value.length} movimientos. ¿Desea continuar?`
+  if (selected.value.length > 0) {
+    const message = `Esta a punto de eliminar ${selected.value.length} movimientos. ¿Desea continuar?`
     $q.dialog({
       title: 'Confirmar',
       style: 'width:500px',
@@ -1009,7 +1010,7 @@ function deleteSelectedItems() {
       persistent: true
     })
       .onOk(() => {
-        onConfirmDeleteItems(selectedItems.value)
+        onConfirmDeleteItems(selected.value)
       })
       .onCancel(() => {})
       .onDismiss(() => {})
@@ -1017,9 +1018,7 @@ function deleteSelectedItems() {
 }
 
 function onConfirmDeleteItems(toDelete) {
-  console.log(toDelete)
   const eliminar = toDelete.map((item) => item.id)
-  console.log('eliminando', eliminar.toString())
   registrosTarjetaCrud.registrosTarjetaDelete({ ids: eliminar.toString() })
 }
 
@@ -1083,14 +1082,6 @@ function obtenerFechasInicialFinal() {
   listaRegistrosVariables.fechaFin = `${ejercicio_fiscal.value}-${(
     '0' + mes.value.id
   ).slice(-2)}-${dia_fin}`
-  console.log(
-    'listaRegistrosVariables.fechaInicio:',
-    listaRegistrosVariables.fechaInicio
-  )
-  console.log(
-    'listaRegistrosVariables.fechaFin:',
-    listaRegistrosVariables.fechaFin
-  )
 }
 
 function onChangePeriodo() {
@@ -1140,6 +1131,7 @@ function registroUpdated() {
   refetchSaldoPagarTarjetaCredito()
   showForm.value = false
 }
+
 function cargaMasivaSaved(cuenta_id) {
   showFormCarga.value = false
   cuentaCrud.cuentaSaldoUpdate({ cuentaId: cuenta_id })
@@ -1307,6 +1299,24 @@ const columnsMsi = [
 
 function actualizarSaldosResumen() {
   console.log('actualizar saldo resumen')
+}
+
+const tableRef = ref(null)
+
+function onSelection({ rows, added, evt }) {
+  if (rows.length === 0 || tableRef.value === void 0) {
+    return
+  }
+
+  if (added) {
+    const filteredRows = rows.filter(
+      (row) => row.estadoRegistroTarjeta.id === '1'
+    )
+    selected.value = selected.value.concat(filteredRows)
+  } else {
+    const idsToRemove = new Set(rows.map((obj) => obj.id))
+    selected.value = selected.value.filter((obj) => !idsToRemove.has(obj.id))
+  }
 }
 </script>
 

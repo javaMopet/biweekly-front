@@ -563,11 +563,18 @@ function saveItems() {
 }
 registrosTarjetaCrud.onDoneRegistroTarjetaMultipleCreate(({ data }) => {
   console.log('data:', data)
+  const registrosTarjeta = data.registroTarjetaMultipleCreate.registrosTarjeta
+  const cuenta_id = registrosTarjeta[0].cuenta.id
   isLoading.value = false
+  emit('itemsSaved', cuenta_id)
 })
 registrosTarjetaCrud.onErrorRegistroTarjetaMultipleCreate((error) => {
   console.error(error)
   isLoading.value = false
+  notificacion.mostrarNotificacionNegativa(
+    'No fue posible posible guardar los registro, revisar consola',
+    900
+  )
 })
 
 /**

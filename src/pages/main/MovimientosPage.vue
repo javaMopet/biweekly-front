@@ -101,10 +101,9 @@
     hide-bottom
     separator="none"
     dense
-    table-class="bg-table-summary"
   >
     <template #body-cell="props">
-      <q-td :props="props">{{ props.value }}</q-td>
+      <q-td class="bg-table-summary" :props="props">{{ props.value }}</q-td>
     </template>
   </q-table>
   <!-- END tabla de totales de ingresos -->
@@ -189,10 +188,9 @@
     hide-bottom
     separator="none"
     dense
-    table-class="bg-table-summary"
   >
     <template #body-cell="props">
-      <q-td :props="props">{{ props.value }}</q-td>
+      <q-td class="bg-table-summary" :props="props">{{ props.value }}</q-td>
     </template>
   </q-table>
   <!-- NET CASH PROCEDS and FINAL CASH BALANCE -->
@@ -506,7 +504,7 @@ function obtenerColumnas(ejercicio_fiscal, mes) {
           column.format = (val) => (!!val ? `${formato.toCurrency(val)}` : '')
         }
       })
-      // console.table(columnasSaldos)
+      // console.log('columnasSaldos.value:', columnasSaldos.value)
     })
     .catch((error) => {
       // console.log('error', error)
@@ -648,7 +646,7 @@ function mostrarNotificacion(action, cuenta) {
   )
 }
 function onRegistroCreated(itemCreated) {
-  console.log('El registro fue creado', itemCreated)
+  // console.log('El registro fue creado', itemCreated)
   // show_movimientos.value = false
   cargarDatos()
 }
@@ -829,13 +827,19 @@ body {
   // border: 1px solid red;
 }
 /* **************************************************** */
+.bg-table-summary {
+  font-size: 0.68 rem !important;
+  background-color: #b0d1f0cb !important;
+  font-weight: 500 !important;
+}
 /**
 * CSS para los totales net cash proceds
 */
 .table__body-totals {
   font-family: 'Roboto Slab', 'Open Sans', sans-serif;
   font-weight: 500;
-  background-color: #9cc5ebcb !important;
+  // background-color: #9cc5ebcb !important;
+  background-color: #e3e8eccb !important;
   font-size: 0.85rem !important;
   font-style: normal;
 }

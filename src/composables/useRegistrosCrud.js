@@ -53,34 +53,25 @@ export function useRegistrosCrud() {
   } = useMutation(IMPORTAR_REGISTROS)
 
   onDoneRegistroCreate(({ data }) => {
-    console.log('registro creado', data)
+    // console.log('registro creado', data)
     const itemCreated = data.registroCreate.registro
     cuentaCrud.cuentaSaldoUpdate({ cuentaId: itemCreated.cuenta.id })
   })
   onDoneRegistroUpdate(({ data }) => {
-    console.log('registro actualizado', data)
     const itemUpdated = data.registroUpdate.registro
     cuentaCrud.cuentaSaldoUpdate({ cuentaId: itemUpdated.cuenta.id })
   })
   onDoneRegistroDelete(({ data }) => {
-    console.log('registro actualizado', data)
     const itemDeleted = data.registroDelete.registro
     cuentaCrud.cuentaSaldoUpdate({ cuentaId: itemDeleted.cuenta.id })
   })
   onDoneImportarRegistros(({ data }) => {
-    console.log('Registros importados', data)
-    console.log(data.importarRegistros.registros[0].cuenta.id)
     const cuenta_id = data.importarRegistros.registros[0].cuenta.id
     cuentaCrud.cuentaSaldoUpdate({ cuentaId: cuenta_id })
   })
 
   onDoneRegistrosDelete(({ data }) => {
-    console.log(
-      'useRegistroCrud registros eliminados',
-      data.registrosDelete.cuentasIds
-    )
     data.registrosDelete.cuentasIds.forEach((element) => {
-      console.log('cuenta element', element)
       cuentaCrud.cuentaSaldoUpdate({ cuentaId: element })
     })
   })

@@ -90,7 +90,7 @@ export default {
   },
   emits: ['update:modelValue', 'blur'],
   mounted() {
-    console.log('mounted', this.modelValue)
+    // console.log('mounted', this.modelValue)
     this.inputValue = this.modelValue
   },
   watch: {
@@ -191,7 +191,7 @@ export default {
     }
 
     const validar = () => {
-      console.log('validando el precio', inputValue.value)
+      // console.log('validando el precio', inputValue.value)
       if (inputValue.value === '$0.00') {
         containsError.value = true
         setTimeout(() => {

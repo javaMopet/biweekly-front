@@ -347,7 +347,6 @@ function editItem(props) {
     row
   }
 
-  console.log(row.categoria.tipoMovimientoId)
   const importe =
     row.categoria.tipoMovimientoId === '2'
       ? parseFloat(row.importe) * -1
@@ -361,7 +360,6 @@ function editItem(props) {
     cuenta: row.cuenta,
     observaciones: row.observaciones
   }
-  console.log('estableciendo formItem', formItem.value)
 }
 
 function entradaNoValida() {
@@ -497,7 +495,6 @@ function saveItem() {
       }
       if (!!editingItem.value) {
         const id = editingItem.value.row.id
-        console.dir(id)
         registrosCrud.registroUpdate({ id, input })
       } else {
         registrosCrud.createRegistro({ input })
@@ -509,11 +506,11 @@ function saveItem() {
 }
 const validarEntrada = () => {
   const validarDate = inputDate.value.validar()
-  console.log('despues de validar date', validarDate)
+  // console.log('despues de validar date', validarDate)
   const validar = inputPrecio.value.validar()
-  console.log('despues de validar', validar)
+  // console.log('despues de validar', validar)
   const validarCuenta = selectCuenta.value.validar()
-  console.log('despues de validar Cuenta', validarCuenta)
+  // console.log('despues de validar Cuenta', validarCuenta)
   let validarEntrada = validarDate && validar && validarCuenta
   return validarEntrada
 }
@@ -540,19 +537,19 @@ function addError(code, message) {
 }
 
 registrosCrud.onDoneRegistroCreate(({ data }) => {
-  console.log('data', data)
+  // console.log('data', data)
   const itemSaved = data.registroCreate.registro
   afterSaveItem('Ingreso', itemSaved)
 })
 
 registrosCrud.onDoneRegistroUpdate(({ data }) => {
-  console.log('data', data)
+  // console.log('data', data)
   const itemUpdated = data.registroUpdate.registro
   afterUpdateItem('Ingreso', itemUpdated)
 })
 
 function afterSaveItem(tipoRegistro, itemSaved) {
-  console.log('item saved')
+  // console.log('item saved')
   // row_to_insert.value.saved = true
   listaRegistros.value.push(itemSaved)
   mostrarNotificacionPositiva(`El registro se guardado correctamente.`, 1500)

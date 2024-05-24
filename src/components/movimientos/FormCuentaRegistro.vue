@@ -219,7 +219,7 @@ registrosCrud.onErrorRegistroCreate((error) => {
 
 traspasosCrud.onDoneTraspasoCreate(({ data }) => {
   isSaving.value = false
-  console.log('traspaso creado', data)
+  // console.log('traspaso creado', data)
   mostrarNotificacionPositiva('El traspaso se creó correctamente.', 2100)
   emit('itemSaved')
 })
@@ -234,7 +234,7 @@ traspasosCrud.onErrorTraspasoCreate((error) => {
 
 registrosCrud.onDoneRegistroUpdate(({ data }) => {
   isSaving.value = false
-  console.log('Registro update', data)
+  // console.log('Registro update', data)
   const item = data.registroUpdate.registro
   emit('itemUpdated', item)
 })
@@ -335,7 +335,7 @@ const lblCuentaOrigen = computed({
 function onChangeTipoMovimiento(value) {
   editedFormItem.value.tipoAfectacion = value === '2' ? 'C' : 'A'
   editedFormItem.value.categoria = null
-  console.dir(value)
+  // console.dir(value)
 }
 
 function saveItem() {
@@ -416,7 +416,7 @@ function saveItem() {
       default:
         break
     }
-    console.log('importe_real', importe_real)
+    // console.log('importe_real', importe_real)
     const input = {
       id: editedFormItem.value.id,
       tipoAfectacion,
@@ -428,7 +428,7 @@ function saveItem() {
       observaciones: editedFormItem.value.observaciones,
       userId
     }
-    console.log('saveItem input:', input)
+    // console.log('saveItem input:', input)
     if (!!editedFormItem.value.id) {
       registrosCrud.registroUpdate({
         id: editedFormItem.value.id,
@@ -456,7 +456,7 @@ traspasosCrud.onErrorTraspasoUpdate((error) => {
 function onSelectCategoria(value) {
   if (!isEditing.value && !!value) {
     const importeDefault = value.importeDefault ?? 0
-    console.log('Nuevo registro categoria:', importeDefault)
+    // console.log('Nuevo registro categoria:', importeDefault)
     editedFormItem.value.importe =
       parseFloat(importeDefault) === 0 ? '' : importeDefault.toString()
     editedFormItem.value.concepto = value.descripcion

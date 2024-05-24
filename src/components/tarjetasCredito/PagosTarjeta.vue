@@ -218,8 +218,6 @@ onResultListaRegistros(({ data }) => {
         cuenta_id: props.cuenta.id
       })
       .then((response) => {
-        console.log('guardado correctamente')
-        console.log('response', response)
         notificacion.mostrarNotificacionPositiva(
           'Los registros han sido guardados correctamente.',
           1200
