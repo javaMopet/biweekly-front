@@ -87,7 +87,6 @@ export function useSessionService() {
   })
 
   function removeCredentials() {
-    console.log('removiento credenciales...')
     SessionStorage.remove('credentials')
     SessionStorage.remove('current_user')
     api.defaults.headers.common['Authorization'] = null

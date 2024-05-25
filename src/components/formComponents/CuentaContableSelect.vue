@@ -178,7 +178,6 @@ function filterFn(val, update) {
 }
 
 function addNew() {
-  console.log('registrar una cuenta contable')
   const tipoAfectacion = !!props.tipoAfectacion
     ? props.tipoAfectacion
     : { A: 'Abono' }
@@ -188,7 +187,6 @@ function addNew() {
     subnivel: 0,
     action: 'add'
   }
-  console.log(formEditedItem.value)
   form_cuentaContable_show.value = true
 }
 

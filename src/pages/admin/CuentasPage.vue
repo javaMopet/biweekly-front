@@ -340,7 +340,6 @@ onMounted(() => {
 })
 
 function addRow(tipoCuentaId) {
-  console.log('tipo de cuenta', tipoCuentaId)
   editedItem.value = { ...defaultItem }
   editedItem.value.tipoCuenta.id = tipoCuentaId.toString()
   showFormItem.value = true
@@ -390,7 +389,6 @@ function deleteRow(item) {
 
 cuentaStore.onDoneCuentaDelete(({ data }) => {
   const itemDeleted = data.cuentaDelete.cuenta
-  console.log('CuentasPage.vue itemDeleted', itemDeleted)
   notificacion.mostrarNotificacionPositiva(
     `La cuenta "${itemDeleted.nombre}" se eliminó correctamente`,
     1400

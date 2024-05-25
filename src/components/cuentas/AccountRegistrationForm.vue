@@ -107,7 +107,7 @@
                   :subnivel="cuentaContableProps.subnivel"
                   :clasificacion="cuentaContableProps.clasificacion"
                   :tipo-afectacion="cuentaContableProps.tipoAfectacion"
-                  :is-alta="false"
+                  :is-alta="true"
                   input-label="Seleccione una Cuenta Contable"
                   :rules="[(val) => !!val || 'Requerido']"
                 ></CuentaContableSelect>
