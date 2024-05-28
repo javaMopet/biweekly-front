@@ -317,7 +317,6 @@
 <script setup>
 import { useMutation } from '@vue/apollo-composable'
 import { ref, computed, onMounted } from 'vue'
-import { MOVIMIENTO_DELETE } from '/src/graphql/movimientos'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { DateTime } from 'luxon'
 import { useFormato } from 'src/composables/utils/useFormato'
@@ -664,28 +663,6 @@ function onChangePeriodo() {
 
 function categoriaSaved() {}
 function categoriaUpdated() {}
-/**
- * GRAPHQL
- */
-const {
-  mutate: deleteMovimiento,
-  onDone: onDoneDeleteMovimiento,
-  onError: onErrorDeleteMovimiento
-} = useMutation(MOVIMIENTO_DELETE)
-
-onDoneDeleteMovimiento(({ data }) => {
-  if (!!data) {
-    console.log('item deleted ', data)
-    const deletedItem = data.movimientoDelete.movimiento
-    listaMovimientos.value.splice(rowIndexDelete.value, 1)
-    rowIndexDelete.value = null
-    mostrarNotificacion('elminó', deletedItem)
-  }
-})
-
-onErrorDeleteMovimiento((error) => {
-  console.error(error)
-})
 
 /**
  * computed
