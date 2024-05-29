@@ -315,7 +315,6 @@
 </template>
 
 <script setup>
-import { useMutation } from '@vue/apollo-composable'
 import { ref, computed, onMounted } from 'vue'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { DateTime } from 'luxon'
@@ -379,7 +378,6 @@ const mesOptions = ref([
   { id: 11, nombre: 'Noviembre' },
   { id: 12, nombre: 'Diciembre' }
 ])
-const ejercicioFiscalOptions = ref([2021, 2022, 2023])
 
 const mes = ref(mesOptions.value[0])
 const ejercicio_fiscal = ref(2023)
@@ -393,7 +391,6 @@ const listaSaldosMovimientos = ref([])
 const filter = ref()
 const editedItem = ref({ ...defaultItem })
 const editedIndex = ref(null)
-const rowIndexDelete = ref(null)
 const showFormItem = ref(false)
 const show_movimientos = ref(false)
 const cellData = ref({})
