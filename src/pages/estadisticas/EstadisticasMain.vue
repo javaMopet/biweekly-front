@@ -224,7 +224,13 @@ const dataDoughnutEgresos = ref(
   }
 )
 const options = ref({
-  responsive: true
+  responsive: true,
+  animation: {
+    onComplete: function () {
+      console.log('test')
+    }
+  },
+  indexAxis: 'y'
 })
 const doughnutOptions = ref({
   responsive: true,
