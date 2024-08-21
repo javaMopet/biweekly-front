@@ -287,6 +287,22 @@ const emit = defineEmits(['itemsSaved'])
 const monthsMap = new Map()
 const monthsEnglishMap = new Map()
 // assuming `todos` is a standard VueJS `ref`
+
+const meses = {
+  Ene: '01',
+  Feb: '02',
+  Mar: '03',
+  Abr: '04',
+  May: '05',
+  Jun: '06',
+  Jul: '07',
+  Ago: '08',
+  Sep: '09',
+  Oct: '10',
+  Nov: '11',
+  Dic: '12'
+}
+
 async function updateFile(v) {
   loadingRows.value = true
   try {
@@ -326,6 +342,7 @@ async function updateFile(v) {
     monthsEnglishMap.set('Oct', '10')
     monthsEnglishMap.set('Nov', '11')
     monthsEnglishMap.set('Dic', '12')
+
     // for (const row of rows) {
     //   for (const key in row) {
     //     console.log('data cell', row[key])
@@ -374,10 +391,7 @@ function cargarMovimientosSantander(wb) {
       return !!row.FECHA
     })
     .map((row) => ({
-      fecha: row.FECHA.replace(
-        row.FECHA.substring(3, 6),
-        monthsMap.get(row.FECHA.substring(3, 6))
-      ),
+      fecha: convertidorFecha(row.FECHA),
       consecutivo: row.CONSECUTIVO,
       concepto: row.CONCEPTO,
       importe: parseFloat(row.IMPORTE)
@@ -386,6 +400,24 @@ function cargarMovimientosSantander(wb) {
   // console.table(todos.value)
   // console.log('datda', todos.value[5])
   crearListaRegistrosTarjeta(todos.value)
+}
+function convertidorFecha(fecha) {
+  if (fecha.includes('/')) {
+    const partes = fecha.split('/')
+    if (isNaN(partes[1])) {
+      // Verifica si el mes es texto
+      const [dia, mes, anio] = partes
+      const mesNumerico = meses[mes]
+      return `${dia}/${mesNumerico}/${anio}`
+    } else {
+      // asume que el formato esta en MM/dd/yy
+      const [mes, dia, anio] = partes
+      const anioCompleto = anio.length === 2 ? `20${anio}` : anio // cambiar para 2100
+      return `${dia.toString().padStart(2, '0')}/${mes
+        .toString()
+        .padStart(2, '0')}/${anioCompleto}`
+    }
+  }
 }
 /**
  * Cargar movimientos de Santander
@@ -465,19 +497,24 @@ function cargarMovimientosAmericanExpress(wb) {
 function crearListaRegistrosTarjeta(excelData) {
   // console.table(excelData)
   excelData.forEach((row, index) => {
-    const fechaObject = DateTime.fromFormat(row.fecha.toString(), 'dd/MM/yyyy')
-    if (fechaObject.isValid) {
-      const item = {
-        id: index,
-        fecha: fechaObject.toISODate(),
-        consecutivo: row.consecutivo,
-        importe: row.importe,
-        concepto: row.concepto,
-        tipoAfectacion: 'C',
-        clase: row.importe < 0 ? 'registro-abono' : '',
-        saved: false
+    if (!!row.fecha) {
+      const fechaObject = DateTime.fromFormat(
+        row.fecha.toString(),
+        'dd/MM/yyyy'
+      )
+      if (fechaObject.isValid) {
+        const item = {
+          id: index,
+          fecha: fechaObject.toISODate(),
+          consecutivo: row.consecutivo,
+          importe: row.importe,
+          concepto: row.concepto,
+          tipoAfectacion: 'C',
+          clase: row.importe < 0 ? 'registro-abono' : '',
+          saved: false
+        }
+        listaRegistrosTarjeta.value.push(item)
       }
-      listaRegistrosTarjeta.value.push(item)
     }
   })
   // console.table(listaRegistrosTarjeta.value)
