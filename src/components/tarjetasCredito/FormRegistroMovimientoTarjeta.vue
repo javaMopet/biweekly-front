@@ -180,7 +180,7 @@ const props = defineProps({
     }
   },
   cuentaId: {
-    type: Number,
+    type: String,
     required: true
   },
   fecha: {
