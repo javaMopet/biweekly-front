@@ -31,6 +31,37 @@ export const LISTA_CUENTAS = gql`
     }
   }
 `
+export const CUENTA_BY_ID = gql`
+  query cuentaById($id: ID!) {
+    cuentaById(id: $id) {
+      id
+      nombre
+      identificador
+      diaCorte
+      cuentaContableId
+      cuentaContable {
+        id
+        nombre
+        nombreCompleto
+      }
+      tipoCuenta {
+        id
+        nombre
+        label
+        value
+        icon
+      }
+      banco {
+        id
+        nombre
+        icono
+      }
+      saldo
+      propietario
+      diasGracia
+    }
+  }
+`
 export const LISTA_CUENTAS_REDUCED = gql`
   query listaCuentas {
     listaCuentas {

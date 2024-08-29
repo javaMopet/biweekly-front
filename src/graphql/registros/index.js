@@ -114,6 +114,30 @@ export const REGISTRO_UPDATE = gql`
     }
   }
 `
+export const REGISTRO_PARCIAL_UPDATE = gql`
+  mutation registroParcialUpdate($id: ID!, $observaciones: String!) {
+    registroParcialUpdate(id: $id, observaciones: $observaciones) {
+      registro {
+        id
+        estadoRegistroId
+        tipoAfectacion
+        fecha
+        importe
+        observaciones
+        importe
+        cuenta {
+          id
+          nombre
+        }
+        categoria {
+          id
+          nombre
+          tipoMovimientoId
+        }
+      }
+    }
+  }
+`
 
 export const REGISTRO_DELETE = gql`
   mutation registroDelete($id: ID!) {

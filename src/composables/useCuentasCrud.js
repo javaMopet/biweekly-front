@@ -1,10 +1,28 @@
-import { useMutation } from '@vue/apollo-composable'
-import { CUENTA_SALDO_UPDATE } from 'src/graphql/cuentas'
+import { useMutation, useLazyQuery } from '@vue/apollo-composable'
+import { CUENTA_SALDO_UPDATE, CUENTA_BY_ID } from 'src/graphql/cuentas'
+import { reactive } from 'vue'
 
 export function useCuentasCrud() {
   /**
    * composables
    */
+  const graphql_options = reactive({
+    fetchPolicy: 'no-cache'
+  })
+
+  const {
+    // onResult: onResultCuentaById,
+    load: loadCuentaById,
+    onError: onErrorCuentaById,
+    onResult: onResultCuentaById,
+    refetch: refetchCuentaById
+    // loading: loadingCuentaById
+  } = useLazyQuery(CUENTA_BY_ID, null, graphql_options)
+
+  function fetchOrRefetchCuentaById(id) {
+    loadCuentaById(CUENTA_BY_ID, { id: id }, graphql_options) ||
+      refetchCuentaById(CUENTA_BY_ID, { id: id }, graphql_options)
+  }
 
   const {
     mutate: cuentaSaldoUpdate,
@@ -37,7 +55,11 @@ export function useCuentasCrud() {
   return {
     cuentaSaldoUpdate,
 
-    onDoneCuentaSaldoUpdate
+    onDoneCuentaSaldoUpdate,
+    fetchOrRefetchCuentaById,
+    onErrorCuentaById,
+    onResultCuentaById
+    // loadingCuentaById
 
     // loadSaldoTarjetaCredito,
     // onResultSaldoTarjetaCredito,

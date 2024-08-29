@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import {
   REGISTRO_CREATE,
   REGISTRO_UPDATE,
+  REGISTRO_PARCIAL_UPDATE,
   REGISTRO_DELETE,
   REGISTROS_DELETE,
   IMPORTAR_REGISTROS,
@@ -33,6 +34,12 @@ export function useRegistrosCrud() {
     onDone: onDoneRegistroUpdate,
     onError: onErrorRegistroUpdate
   } = useMutation(REGISTRO_UPDATE)
+
+  const {
+    mutate: registroParcialUpdate,
+    onDone: onDoneRegistroParcialUpdate,
+    onError: onErrorRegistroParcialUpdate
+  } = useMutation(REGISTRO_PARCIAL_UPDATE)
 
   const {
     mutate: deleteRegistro,
@@ -93,6 +100,10 @@ export function useRegistrosCrud() {
     console.error(error)
   })
 
+  onErrorRegistroParcialUpdate((error) => {
+    console.error(error)
+  })
+
   return {
     createRegistro,
     importarRegistros,
@@ -111,6 +122,9 @@ export function useRegistrosCrud() {
     onErrorRegistrosDelete,
     registroDateUpdate,
     onDoneRegistroDateUpdate,
-    onErrorRegistroDateUpdate
+    onErrorRegistroDateUpdate,
+    registroParcialUpdate,
+    onDoneRegistroParcialUpdate,
+    onErrorRegistroParcialUpdate
   }
 }

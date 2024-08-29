@@ -16,6 +16,7 @@
               to="/cuentas"
             />
             <q-breadcrumbs-el
+              v-if="!!cuenta"
               :label="cuenta.nombre"
               icon="account_balance_wallet"
             />
@@ -38,11 +39,12 @@
     <div class="row inline fit items-center justify-between q-px-xl q-pt-md">
       <div class="row items-center q-gutter-md">
         <q-img
+          v-if="!!cuenta"
           :src="`/icons/${cuenta.banco?.icono ?? 'cash.png'}`"
           width="50px"
           height="50px"
         />
-        <span class="cuenta__title">{{ cuenta.nombre }}</span>
+        <span v-if="!!cuenta" class="cuenta__title">{{ cuenta.nombre }}</span>
       </div>
       <span class="cuenta__title text-accent">Cuenta</span>
     </div>
@@ -96,7 +98,11 @@
           <div class="col column items-center">
             <span class="resumen__etiqueta"> Saldo al día</span>
             <div class="q-gutter-x-sm">
-              <span class="resumen__valor" style="font-weight: bold !important">
+              <span
+                v-if="!!cuenta"
+                class="resumen__valor"
+                style="font-weight: bold !important"
+              >
                 {{ formato.toCurrency(cuenta.saldo) }}
               </span>
               <q-btn
@@ -428,17 +434,24 @@ const showFormCarga = ref(false)
  * on before mount
  */
 onBeforeMount(() => {
-  // console.log('On before mount ..............')
+  console.log('On before mount ..............', route.params.id)
+  mes.value = generalStore.meses.find(
+    (mesOption) => mesOption.id === DateTime.now().month
+  )
+  cargarDatosCuenta(route.params.id, true)
+  console.log('cuenta', cuenta.value)
 })
 /**
  * onMounted
  */
 onMounted(() => {
   // console.log('On mounted ................')
+  /*
   mes.value = generalStore.meses.find(
     (mesOption) => mesOption.id === DateTime.now().month
   )
   cargarDatosCuenta(route.params.id, true)
+ */
 })
 
 /**
@@ -447,11 +460,22 @@ onMounted(() => {
  * @param {Number} cuenta_id - Id de la cuenta.
  */
 function cargarDatosCuenta(cuenta_id) {
-  cuenta.value = cuentaStore.listaCuentas.find(
-    (cuenta) => cuenta.id === cuenta_id
-  )
+  if (cuentaStore.listaCuentas.length > 0) {
+    cuenta.value = cuentaStore.listaCuentas.find(
+      (cuenta) => cuenta.id === cuenta_id
+    )
+    console.log(cuentaStore.listaCuentas)
+  } else {
+    console.log('cargando cuenta...')
+    cuentasCrud.fetchOrRefetchCuentaById(cuenta_id)
+    // router.push('/home')
+  }
 }
 
+cuentasCrud.onResultCuentaById(({ data }) => {
+  console.log('response', data)
+  cuenta.value = data.cuentaById
+})
 /**
  * GRAPHQL
  */
@@ -767,31 +791,45 @@ function addItem() {
 
 function saveObs(id, row, observaciones) {
   // console.log('observaciones', observaciones)
-  const input = {
-    ...row,
-    observaciones: observaciones,
-    cuentaId: row.cuenta.id,
-    categoriaId: row.categoria.id,
-    cuenta: undefined,
-    categoria: undefined,
-    __typename: undefined,
-    registroTarjeta: undefined,
-    traspasoDetalle: undefined
-  }
+  // const input = {
+  //   ...row,
+  //   observaciones: observaciones,
+  //   cuentaId: row.cuenta.id,
+  //   categoriaId: row.categoria.id,
+  //   cuenta: undefined,
+  //   categoria: undefined,
+  //   __typename: undefined,
+  //   registroTarjeta: undefined,
+  //   traspasoDetalle: undefined
+  // }
 
-  // console.log('input', input)
-  registrosCrud.registroUpdate({
+  console.log('observaciones', observaciones)
+  registrosCrud.registroParcialUpdate({
     id,
-    input
+    observaciones
   })
 }
 
-registrosCrud.onDoneRegistroUpdate((response) => {
-  mostrarNotificacionPositiva('Campo observación actualizado.', 700)
-})
+registrosCrud.onDoneRegistroUpdate((response) => {})
 
 registrosCrud.onErrorRegistroUpdate((response) => {
   console.trace(response)
+  mostrarNotificacionNegativa(
+    'No fué posible actualizar el registro, favor de verificar.',
+    1500
+  )
+})
+
+registrosCrud.onDoneRegistroParcialUpdate((response) => {
+  mostrarNotificacionPositiva('Campo observación actualizado.', 700)
+})
+
+registrosCrud.onErrorRegistroParcialUpdate((error) => {
+  console.trace(response)
+  mostrarNotificacionNegativa(
+    'No fué posible actualizar el registro, favor de verificar.',
+    1500
+  )
 })
 
 function itemSaved(registro) {
