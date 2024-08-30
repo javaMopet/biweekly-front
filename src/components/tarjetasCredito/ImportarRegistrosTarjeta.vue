@@ -141,6 +141,7 @@
         dense
         selection="multiple"
         v-model:selected="registrosSelected"
+        :selected-rows-label="getSelectedString"
         table-header-class="text-condensed bg-primary-light text-accent"
         no-data-label="No existen datos disponibles"
         hide-pagination
@@ -736,6 +737,25 @@ const columns = [
 ]
 function closeErrors() {
   errorItems.value = []
+}
+
+const importe_seleccionado = computed({
+  get() {
+    return registrosSelected.value.reduce((accumulator, registro) => {
+      return accumulator + parseFloat(registro.importe)
+    }, 0)
+  }
+})
+
+function getSelectedString() {
+  return registrosSelected.value.length === 0
+    ? ''
+    : `${registrosSelected.value.length} registro${
+        registrosSelected.value.length > 1 ? 's' : ''
+      } seleccionados - Importe: ${formato.toCurrency(
+        importe_seleccionado.value
+      )} `
+  //de ${listaRegistrosFiltrados.value.length}
 }
 </script>
 

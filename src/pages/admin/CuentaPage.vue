@@ -129,6 +129,7 @@
           hide-pagination
           selection="multiple"
           :selected="selected"
+          :selected-rows-label="getSelectedString"
           row-key="id"
           :filter="filter"
           no-data-label="No se han registrado movimientos"
@@ -434,12 +435,10 @@ const showFormCarga = ref(false)
  * on before mount
  */
 onBeforeMount(() => {
-  console.log('On before mount ..............', route.params.id)
   mes.value = generalStore.meses.find(
     (mesOption) => mesOption.id === DateTime.now().month
   )
   cargarDatosCuenta(route.params.id, true)
-  console.log('cuenta', cuenta.value)
 })
 /**
  * onMounted
@@ -464,16 +463,13 @@ function cargarDatosCuenta(cuenta_id) {
     cuenta.value = cuentaStore.listaCuentas.find(
       (cuenta) => cuenta.id === cuenta_id
     )
-    console.log(cuentaStore.listaCuentas)
   } else {
-    console.log('cargando cuenta...')
     cuentasCrud.fetchOrRefetchCuentaById(cuenta_id)
     // router.push('/home')
   }
 }
 
 cuentasCrud.onResultCuentaById(({ data }) => {
-  console.log('response', data)
   cuenta.value = data.cuentaById
 })
 /**
@@ -979,6 +975,24 @@ function onSelection({ rows, added, evt }) {
     const idsToRemove = new Set(rows.map((obj) => obj.id))
     selected.value = selected.value.filter((obj) => !idsToRemove.has(obj.id))
   }
+}
+const importe_seleccionado = computed({
+  get() {
+    return selected.value.reduce((accumulator, registro) => {
+      return accumulator + parseFloat(registro.importe)
+    }, 0)
+  }
+})
+
+function getSelectedString() {
+  return selected.value.length === 0
+    ? ''
+    : `${selected.value.length} registro${
+        selected.value.length > 1 ? 's' : ''
+      } seleccionados - Importe: ${formato.toCurrency(
+        importe_seleccionado.value
+      )} `
+  //de ${listaRegistrosFiltrados.value.length}
 }
 </script>
 

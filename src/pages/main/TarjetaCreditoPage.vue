@@ -342,6 +342,7 @@
             :pagination-label="obtenerMensajePaginacion"
             selection="multiple"
             :selected="selected"
+            :selected-rows-label="getSelectedString"
             :loading="loadingListaRegistros"
             row-key="id"
             :filter="filter"
@@ -1317,6 +1318,25 @@ function onSelection({ rows, added, evt }) {
     const idsToRemove = new Set(rows.map((obj) => obj.id))
     selected.value = selected.value.filter((obj) => !idsToRemove.has(obj.id))
   }
+}
+
+const importe_seleccionado = computed({
+  get() {
+    return selected.value.reduce((accumulator, registro) => {
+      return accumulator + parseFloat(registro.importe)
+    }, 0)
+  }
+})
+
+function getSelectedString() {
+  return selected.value.length === 0
+    ? ''
+    : `${selected.value.length} registro${
+        selected.value.length > 1 ? 's' : ''
+      } seleccionados - Importe: ${formato.toCurrency(
+        importe_seleccionado.value
+      )} `
+  //de ${listaRegistrosFiltrados.value.length}
 }
 </script>
 
