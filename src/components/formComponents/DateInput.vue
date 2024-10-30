@@ -26,6 +26,7 @@
             @update:model-value="dateSelected"
             :options="optionsFn"
             :readonly="readonly"
+            :tabindex="tabindex"
           >
             <div class="row items-center justify-end">
               <q-btn v-close-popup label="Hecho" color="primary" flat />
@@ -101,6 +102,11 @@ const props = defineProps({
     default: () => {
       return []
     }
+  },
+  tabindex: {
+    type: Number,
+    required: false,
+    default: -1
   }
 })
 /**

@@ -21,6 +21,7 @@
       :readonly="readonly"
       :autofocus="autofocus"
       clearable
+      @update:model-value="onSelectCategoria"
     >
       <template #after>
         <q-btn
@@ -32,6 +33,7 @@
           class="small-button"
           glossy
           push
+          tabindex="100"
         >
           <q-tooltip> Nueva Categoría </q-tooltip>
         </q-btn>
@@ -233,6 +235,9 @@ function categoriaSaved(value) {
   categoria.value = value
   showRegistroCategoria.value = false
 }
+function onSelectCategoria(value) {
+  console.log(value)
+}
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="css" scoped></style>

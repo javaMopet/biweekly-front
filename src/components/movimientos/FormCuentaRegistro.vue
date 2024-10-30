@@ -18,43 +18,6 @@
             push
           />
         </div>
-        <div>
-          <CategoriaSelect
-            v-if="!isTraspaso"
-            v-model="editedFormItem.categoria"
-            :tipo-afectacion="editedFormItem.tipoAfectacion"
-            :is-cambiable="false"
-            @update:model-value="onSelectCategoria"
-            :rules="[(val) => !!val || 'Favor de ingresar la categoria']"
-            :agregar="true"
-          ></CategoriaSelect>
-        </div>
-        <div class="row">
-          <div class="col q-mr-xs">
-            <DateInput
-              v-model="editedFormItem.fecha"
-              lbl_field="Fecha"
-              :opcional="false"
-              :rules="[(val) => !!val || 'Favor de ingresar la fecha']"
-            ></DateInput>
-          </div>
-          <div class="col q-ml-xs">
-            <PriceInput
-              currency-code="MNX"
-              v-model="editedFormItem.importe"
-              :opcional="false"
-              label="Importe traspaso:"
-              :rules="[
-                (val) =>
-                  (!!val &&
-                    val !== '0' &&
-                    val !== '$0.00' &&
-                    val !== '$NaN.undefined') ||
-                  'Favor de ingresar un valor mayor a cero'
-              ]"
-            ></PriceInput>
-          </div>
-        </div>
         <div class="" style="min-height: 60px">
           <SelectCuenta
             v-model="editedFormItem.cuenta"
@@ -71,7 +34,46 @@
             :filter-array="['1', '2']"
             :filter-id-array="filterIdArray"
             :rules="[(val) => !!val || 'Favor de ingresar la cuenta destino']"
+            :autofocus="!autofocusCategoria"
           ></SelectCuenta>
+        </div>
+        <div>
+          <CategoriaSelect
+            v-if="!isTraspaso"
+            v-model="editedFormItem.categoria"
+            :tipo-afectacion="editedFormItem.tipoAfectacion"
+            :is-cambiable="false"
+            @update:model-value="onSelectCategoria"
+            :rules="[(val) => !!val || 'Favor de ingresar la categoria']"
+            :agregar="true"
+            :autofocus="autofocusCategoria"
+          ></CategoriaSelect>
+        </div>
+        <div class="row vertical-bottom" style="border: 0px solid red">
+          <div class="col q-mr-sm">
+            <PriceInput
+              currency-code="MNX"
+              v-model="editedFormItem.importe"
+              :opcional="false"
+              label="Importe traspaso:"
+              :rules="[
+                (val) =>
+                  (!!val &&
+                    val !== '0' &&
+                    val !== '$0.00' &&
+                    val !== '$NaN.undefined') ||
+                  'Favor de ingresar un valor mayor a cero'
+              ]"
+            ></PriceInput>
+          </div>
+          <div class="col q-ml-sm">
+            <DateInput
+              v-model="editedFormItem.fecha"
+              lbl_field="Fecha"
+              :opcional="false"
+              :rules="[(val) => !!val || 'Favor de ingresar la fecha']"
+            ></DateInput>
+          </div>
         </div>
         <div>
           <q-input
@@ -85,14 +87,14 @@
           />
         </div>
         <div class="col row justify-end q-gutter-x-md">
-          <q-btn
+          <!-- <q-btn
             label="Cancelar"
             flat
             v-close-popup
             color="negative-pastel"
             push
             no-caps
-          />
+          /> -->
           <q-btn
             :label="lblSubmit"
             type="submit"
@@ -325,6 +327,12 @@ const lblCuentaOrigen = computed({
       default:
         return 'Cuenta Bancaria'
     }
+  }
+})
+
+const autofocusCategoria = computed({
+  get() {
+    return editedFormItem.value.tipoMovimientoId !== '3'
   }
 })
 

@@ -168,7 +168,7 @@
                     rounded
                     push
                   />
-                  <q-btn
+                  <!-- <q-btn
                     class="medium-button"
                     color="primary-button"
                     no-caps
@@ -177,7 +177,58 @@
                     icon="add_circle"
                     rounded
                     push
-                  />
+                  /> -->
+
+                  <q-btn-dropdown
+                    v-if="isModificable"
+                    color="primary-button"
+                    push
+                    glossy
+                    no-caps
+                    label="Nuevo"
+                    icon="add_circle"
+                    class="medium-button"
+                  >
+                    <!-- @click="addItem(1)" -->
+                    <q-list class="bg-primary-light">
+                      <q-item clickable v-close-popup @click="addItem('1')">
+                        <q-item-section avatar>
+                          <q-avatar
+                            icon="price_check"
+                            color="positive"
+                            text-color="white"
+                          />
+                        </q-item-section>
+                        <q-item-section>
+                          <q-item-label>Ingreso</q-item-label>
+                        </q-item-section>
+                      </q-item>
+                      <q-item clickable v-close-popup @click="addItem('2')">
+                        <q-item-section avatar>
+                          <q-avatar
+                            icon="payments"
+                            color="negative"
+                            text-color="white"
+                          />
+                        </q-item-section>
+                        <q-item-section>
+                          <q-item-label>Egreso</q-item-label>
+                        </q-item-section>
+                      </q-item>
+                      <q-item clickable v-close-popup @click="addItem('3')">
+                        <q-item-section avatar>
+                          <q-avatar
+                            icon="sync_alt"
+                            color="info"
+                            text-color="white"
+                          />
+                        </q-item-section>
+                        <q-item-section>
+                          <q-item-label>Traspaso</q-item-label>
+                        </q-item-section>
+                      </q-item>
+                    </q-list>
+                  </q-btn-dropdown>
                   <q-btn
                     color="primary-button"
                     @click="importarMovimientos"
@@ -771,9 +822,9 @@ function onChangePeriodo() {
 /**
  * Muestra el formulario para agregar un registro, ingreso, gasto o traspaso.
  */
-function addItem() {
+function addItem(tipoMovimientoId) {
   registroEditedItem.value = {
-    tipoMovimientoId: '2',
+    tipoMovimientoId,
     tipoAfectacion: 'C',
     categoria: null,
     estadoRegistroId: 2,

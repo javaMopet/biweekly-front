@@ -20,6 +20,7 @@
       :rules="rules"
       :readonly="props.readonly"
       :disable="props.disable"
+      :autofocus="autofocus"
     >
       <template #after>
         <div class="" v-if="isAlta" style="border: 0px solid red">
@@ -112,6 +113,11 @@ export default {
       }
     },
     disable: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    autofocus: {
       type: Boolean,
       required: false,
       default: false

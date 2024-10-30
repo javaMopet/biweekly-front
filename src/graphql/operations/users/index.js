@@ -30,11 +30,15 @@ export const USER_REGISTER = gql`
     $email: String!
     $password: String!
     $passwordConfirmation: String!
+    $name: String!
+    $instanceId: ID!
   ) {
     userRegister(
       email: $email
       password: $password
       passwordConfirmation: $passwordConfirmation
+      name: $name
+      instanceId: $instanceId
     ) {
       authenticatable {
         id

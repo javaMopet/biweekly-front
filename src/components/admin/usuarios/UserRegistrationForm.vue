@@ -210,8 +210,13 @@ const lblSubmit = computed({
  */
 function registerUser() {
   if (!isEditing.value) {
-    console.log('autheticable.value:', authenticable.value)
-    userService.userRegister(authenticable.value)
+    const input = {
+      ...authenticable.value,
+      instanceId: authenticable.value.instance.id,
+      instance: undefined
+    }
+    console.log('autheticable.value:', input)
+    userService.userRegister(input)
   } else {
     userService.userUpdate({
       id: authenticable.value.id,

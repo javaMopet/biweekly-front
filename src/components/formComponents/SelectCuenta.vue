@@ -22,6 +22,7 @@
       :disable="disable"
       :bg-color="bgColor"
       filled
+      :autofocus="autofocus"
     >
     </q-select>
     <transition name="fade">
@@ -127,6 +128,11 @@ export default {
       type: String,
       required: false,
       default: 'bg-input-form'
+    },
+    autofocus: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   emits: ['update:modelValue'],

@@ -1,41 +1,36 @@
 <template>
-  <div
-    style="z-index: 5"
-    :class="[errorActive ? 'input-error' : 'input-no-error']"
+  <q-input
+    v-model="inputValue"
+    type="text"
+    v-on:blur="onBlur"
+    @focus="onFocus"
+    input-class="text-right"
+    placeholder="0.00"
+    ref="inputEditing"
+    outlined
+    color="secondary"
+    dense
+    :label="label"
+    :readonly="readonly"
+    :autofocus="autofocus"
+    lazy-rules
+    :rules="rules"
   >
-    <q-input
-      v-model="inputValue"
-      type="text"
-      v-on:blur="onBlur"
-      @focus="onFocus"
-      input-class="text-right"
-      placeholder="0.00"
-      ref="inputEditing"
-      outlined
-      color="secondary"
-      dense
-      :label="label"
-      :readonly="readonly"
-      :autofocus="autofocus"
-      lazy-rules
-      :rules="rules"
-    >
-      <!-- @blur="onBlurInput" -->
-      <template #append>
-        <div class="text-subtitle1">{{ editingLabel }}</div>
-      </template>
-      <!-- <template #after>
+    <!-- @blur="onBlurInput" -->
+    <template #append>
+      <div class="text-subtitle1">{{ editingLabel }}</div>
+    </template>
+    <!-- <template #after>
         <pre> {{ errorActive }}</pre>
       </template> -->
-    </q-input>
-    <transition name="fade">
-      <div class="level2" v-if="errorActive">
-        <div class="level1">
-          <div class="price-error">Ingresar un precio distinto de 0</div>
-        </div>
+  </q-input>
+  <!-- <transition name="fade">
+    <div class="level2" v-if="errorActive">
+      <div class="level1">
+        <div class="price-error">Ingresar un precio distinto de 0</div>
       </div>
-    </transition>
-  </div>
+    </div>
+  </transition> -->
 </template>
 
 <script setup>
@@ -114,34 +109,34 @@ const props = defineProps({
 })
 
 // const { isError } = toRefs(props)
-const isErrors = toRef(props.isError)
+// const isErrors = toRef(props.isError)
 // watch(
 //   () => props.isError,
 //   (newValue, oldValue) => {
 //     console.log('CAMBIANDO IS ERROR', oldValue, newValue)
 //   }
 // )
-watchEffect(() => {
-  errorActive.value = props.isError
-  // setTimeout(() => {
-  //   errorActive.value = false
-  //   isErrors.value = false
-  //   emit('update:isError', false)
-  // }, 3000)
-})
+// watchEffect(() => {
+//   errorActive.value = props.isError
+// setTimeout(() => {
+//   errorActive.value = false
+//   isErrors.value = false
+//   emit('update:isError', false)
+// }, 3000)
+// })
 /**
  * computed
  */
 
-const isErrores = computed({
-  get() {
-    return props.isError
-  },
-  set(val) {
-    // isErrores.value = val
-    emit('update:isError', val)
-  }
-})
+// const isErrores = computed({
+//   get() {
+//     return props.isError
+//   },
+//   set(val) {
+//     // isErrores.value = val
+//     emit('update:isError', val)
+//   }
+// })
 
 const editingLabel = computed({
   get() {
@@ -180,7 +175,7 @@ onMounted(() => {
 function onBlur(e) {
   editing.value = false
   emit('blur')
-  isErrores.value = false
+  // isErrores.value = false
   validar()
 }
 function onFocus() {
