@@ -276,6 +276,19 @@
               <span v-else>{{ props.row.fecha }}</span>
             </q-td>
           </template>
+          <template #body-cell-tipoMovimiento="props">
+            <q-td key="tipoMovimiento" :props="props">
+              <q-avatar
+                size="22px"
+                font-size=".9rem"
+                :color="props.row.tipoMovimientoColor"
+                text-color="white"
+                style="font-weight: bold"
+              >
+                {{ props.row.tipoMovimiento }}
+              </q-avatar>
+            </q-td>
+          </template>
           <template #body-cell-categoria="props">
             <q-td key="categoria" :props="props">
               {{ props.row.categoria?.nombre }}
@@ -553,6 +566,19 @@ onResultListaRegistros(({ data }) => {
     listaRegistros.value.forEach((registro) => {
       registro.saldo = saldoAnterior + registro.importe
       saldoAnterior = registro.saldo
+      // console.log('registro:', registro)
+      if (!!registro.traspaso) {
+        registro.tipoMovimiento = 'T'
+        registro.tipoMovimientoColor = 'blue'
+      } else {
+        if (registro.categoria.tipoMovimientoId === '2') {
+          registro.tipoMovimiento = 'E'
+          registro.tipoMovimientoColor = 'negative'
+        } else {
+          registro.tipoMovimiento = 'I'
+          registro.tipoMovimientoColor = 'positive'
+        }
+      }
     })
   }
 })
@@ -939,6 +965,15 @@ const columns = [
     align: 'left',
     format: (val, row) => formato.formatoFechaFromISO(val),
     headerStyle: 'width: 90px'
+  },
+  {
+    name: 'tipoMovimiento',
+    label: 'Tipo',
+    field: (row) => row.tipoMovimiento,
+    sortable: false,
+    filter: false,
+    align: 'center',
+    style: 'width:40px'
   },
   {
     name: 'categoria',

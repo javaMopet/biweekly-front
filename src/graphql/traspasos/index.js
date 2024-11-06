@@ -16,6 +16,17 @@ export const TRASPASO_CREATE = gql`
           cuentaId
           tipoCuentaTraspasoId
         }
+        traspasoDetalles {
+          id
+          tipoCuentaTraspasoId
+          importe
+          cuentaId
+          cuenta {
+            id
+            nombre
+            identificador
+          }
+        }
       }
     }
   }
