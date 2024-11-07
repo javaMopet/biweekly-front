@@ -849,9 +849,10 @@ function onChangePeriodo() {
  * Muestra el formulario para agregar un registro, ingreso, gasto o traspaso.
  */
 function addItem(tipoMovimientoId) {
+  const tipoAfectacion = tipoMovimientoId === '1' ? 'A' : 'C'
   registroEditedItem.value = {
     tipoMovimientoId,
-    tipoAfectacion: 'C',
+    tipoAfectacion,
     categoria: null,
     estadoRegistroId: 2,
     importe: '',
@@ -1009,7 +1010,8 @@ const columns = [
     sortable: false,
     align: 'right',
     format: (val, row) => formato.toCurrency(val),
-    headerStyle: 'width: 100px; min-width:100px'
+    headerStyle: 'width: 100px; min-width:100px',
+    style: 'background-color: #f0f2f5, font-weight: bold'
   },
   {
     name: 'observaciones',

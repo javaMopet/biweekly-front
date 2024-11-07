@@ -85,8 +85,11 @@ const categoriaStore = useCategoriaStore()
  * onMounted
  */
 onMounted(() => {
-  // console.log('inicializando', props.tipoAfectacion)
-  tipoMovimientoId.value = props.tipoAfectacion === 'A' ? '1' : '2'
+  console.log('inicializando', props.tipoAfectacion)
+  // 1 - Ingreso
+  // 2 - Gasto
+  // 3 - Traspaso
+  tipoMovimientoId.value = props.tipoAfectacion === 'C' ? '2' : '1'
   // if (filteredOptions.value.length <= 0) {
   //   console.log('recargando ')
   //   reloadResultadoLista()
