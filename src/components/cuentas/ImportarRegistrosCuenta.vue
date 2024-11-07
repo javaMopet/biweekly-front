@@ -361,6 +361,7 @@ async function updateFile(v) {
     //   }
     // }
 
+    console.log('props.cuenta.banco.id:', props.cuenta.banco.id)
     if (!!props.cuenta.banco) {
       switch (props.cuenta.banco.id) {
         case '1':

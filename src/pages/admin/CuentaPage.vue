@@ -1011,7 +1011,7 @@ const columns = [
     align: 'right',
     format: (val, row) => formato.toCurrency(val),
     headerStyle: 'width: 100px; min-width:100px',
-    style: 'background-color: #f0f2f5, font-weight: bold'
+    style: 'background-color: #f0f2f5; font-weight: bold'
   },
   {
     name: 'observaciones',

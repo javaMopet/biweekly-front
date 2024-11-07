@@ -85,7 +85,7 @@ const categoriaStore = useCategoriaStore()
  * onMounted
  */
 onMounted(() => {
-  console.log('inicializando', props.tipoAfectacion)
+  // console.log('inicializando', props.tipoAfectacion)
   // 1 - Ingreso
   // 2 - Gasto
   // 3 - Traspaso

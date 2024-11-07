@@ -2,7 +2,7 @@
   <q-card class="my-card" dense style="width: 85%; min-width: 85%">
     <q-inner-loading
       :showing="isLoading"
-      label="Saving... Please wait..."
+      label="Guardando... Por favor espere..."
       label-class="text-teal"
       label-style="font-size: 1.1em"
       style="z-index: 500"
@@ -157,7 +157,7 @@
           <q-td :props="props">
             <CategoriaSelect
               v-model="props.row.categoria"
-              :tipo-afectacion="props.row.tipo_afectacion"
+              :tipo-afectacion="props.row.tipoAfectacion"
               :agregar="true"
             ></CategoriaSelect>
           </q-td>
@@ -398,7 +398,7 @@ function cargarMovimientosSantander(wb) {
       importe: parseFloat(row.IMPORTE)
     }))
 
-  // console.table(todos.value)
+  // console.log(todos.value)
   // console.log('datda', todos.value[5])
   crearListaRegistrosTarjeta(todos.value)
 }
@@ -518,7 +518,7 @@ function crearListaRegistrosTarjeta(excelData) {
       }
     }
   })
-  // console.table(listaRegistrosTarjeta.value)
+  // console.log(listaRegistrosTarjeta.value)
 }
 /**
  * computed
