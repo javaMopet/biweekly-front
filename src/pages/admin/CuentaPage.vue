@@ -103,7 +103,7 @@
                 class="resumen__valor"
                 style="font-weight: bold !important"
               >
-                {{ formato.toCurrency(cuenta.saldo) }}
+                {{ formato.toCurrency(saldoCuenta) }}
               </span>
               <q-btn
                 class="small-button"
@@ -369,8 +369,9 @@
         Importe total de movimientos:
         <span> {{ toCurrency(sumaMovimientos) }}</span>
       </div>
-      <!-- <pre>{{ listaRegistros }}</pre> -->
+      <!-- <pre>{{ cuentaStore.listaCuentas }}</pre> -->
     </div>
+    <!-- <pre>{{ cuenta }}</pre> -->
   </div>
 
   <Teleport to="#modal">
@@ -507,15 +508,7 @@ onBeforeMount(() => {
 /**
  * onMounted
  */
-onMounted(() => {
-  // console.log('On mounted ................')
-  /*
-  mes.value = generalStore.meses.find(
-    (mesOption) => mesOption.id === DateTime.now().month
-  )
-  cargarDatosCuenta(route.params.id, true)
- */
-})
+onMounted(() => {})
 
 /**
  * Cargar datos de la cuenta desde la api.
@@ -524,9 +517,7 @@ onMounted(() => {
  */
 function cargarDatosCuenta(cuenta_id) {
   if (cuentaStore.listaCuentas.length > 0) {
-    cuenta.value = cuentaStore.listaCuentas.find(
-      (cuenta) => cuenta.id === cuenta_id
-    )
+    obtenerCuentaDeListado(cuenta_id)
   } else {
     cuentasCrud.fetchOrRefetchCuentaById(cuenta_id)
     // router.push('/home')
@@ -534,8 +525,15 @@ function cargarDatosCuenta(cuenta_id) {
 }
 
 cuentasCrud.onResultCuentaById(({ data }) => {
-  cuenta.value = data.cuentaById
+  // console.log('data.cuentaById:', data.cuentaById)
+  obtenerCuentaDeListado(data.cuentaById.id)
 })
+
+function obtenerCuentaDeListado(cuentaId) {
+  cuenta.value = cuentaStore.listaCuentas.find(
+    (cuenta) => cuenta.id === cuentaId
+  )
+}
 /**
  * GRAPHQL
  */
@@ -659,6 +657,11 @@ const periodoFinStr = computed({
     return `${diaFinal}/${mes.value?.nombre?.substring(0, 3)}/${
       ejercicio_fiscal.value
     }`
+  }
+})
+const saldoCuenta = computed({
+  get() {
+    return cuenta.value.saldo
   }
 })
 /**
@@ -931,7 +934,7 @@ function actualizarSaldoFinal() {
 
 cuentasCrud.onDoneCuentaSaldoUpdate(({ data }) => {
   // console.log('cuentasCrud.onDoneCuentaSaldoUpdate ......')
-  cuenta.value.saldo = data.cuentaSaldoUpdate.cuenta.saldo
+  // cuenta.value.saldo = data.cuentaSaldoUpdate.cuenta.saldo
 })
 
 /**

@@ -239,7 +239,7 @@ function categoriaSaved(value) {
   showRegistroCategoria.value = false
 }
 function onSelectCategoria(value) {
-  console.log(value)
+  // console.log(value)
 }
 </script>
 

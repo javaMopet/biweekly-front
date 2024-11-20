@@ -141,14 +141,14 @@ import { useMenuStore } from 'src/stores/common/useMenuStore'
 // const { idle, lastActive, reset } = useIdle(5 * 60 * 1000) // 5 min
 const {
   idle: idleFirst,
-  lastActive: lastAciveFirst,
+  lastActive: lastActiveFirst,
   reset: resetFirst
-} = useIdle(30 * 60 * 1000) // 2 min
+} = useIdle(15 * 60 * 1000) // 2 min
 const {
   idle: idleLast,
   lastActive: lastActiveLast,
   reset: resetLast
-} = useIdle(31 * 60 * 1000) // 3 min
+} = useIdle(16 * 60 * 1000) // 3 min
 
 /**
  * composable
@@ -197,8 +197,9 @@ function logout() {
 const dialogCloseSession = ref()
 
 watch(idleFirst, (idlevalue) => {
-  if (idlevalue) {
-    if (!!dialogCloseSession.value) {
+  if (!!idlevalue) {
+    console.log('dialogCloseSession.value:', dialogCloseSession.value)
+    if (!!dialogCloseSession.value || idleLast.value) {
       console.log(
         '%csrc/layouts/MainLayout.vue:192 dialogcloesSession.value',
         'color: #007acc;',
@@ -206,6 +207,9 @@ watch(idleFirst, (idlevalue) => {
       )
       // dialogCloseSession.value.show()
     } else {
+      console.log('idlevalue:', idlevalue)
+      console.log('idlelast.value:', idleLast.value)
+      console.log('Entrando a crear un dialog.')
       dialogCloseSession.value = $q
         .dialog({
           title: 'Confirmar',
@@ -225,15 +229,18 @@ watch(idleFirst, (idlevalue) => {
           persistent: true
         })
         .onOk(() => {
+          console.log('se dio click en ok...')
           // usuariosCrud.cuentaDelete({ id: item.row.id })
           // dialogCloseSession.value.hide()
           // dialogCloseSession.value = null
         })
         .onCancel(() => {
+          console.log('se dio click en cancel...')
           // dialogCloseSession.value.hide()
           // dialogCloseSession.value = null
         })
         .onDismiss(() => {
+          console.log('El dialogo se cerró.....')
           // dialogCloseSession.value.hide()
           // console.log('%csrc/layouts/MainLayout.vue:22', 'color: #007acc;')
           dialogCloseSession.value = null

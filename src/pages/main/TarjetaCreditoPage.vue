@@ -11,7 +11,7 @@
               to="/tarjetas_credito"
             />
             <q-breadcrumbs-el
-              :label="cuenta.nombre"
+              :label="cuenta?.nombre"
               icon="account_balance_wallet"
             />
           </q-breadcrumbs>
@@ -33,11 +33,11 @@
       <div class="row items-center q-gutter-md">
         <q-img
           class="shadow-icon"
-          :src="`/icons/${cuenta.banco?.icono ?? 'cash.png'}`"
+          :src="`/icons/${cuenta?.banco?.icono ?? 'cash.png'}`"
           width="50px"
           height="50px"
         />
-        <span class="cuenta__title">{{ cuenta.nombre }}</span>
+        <span class="cuenta__title">{{ cuenta?.nombre }}</span>
       </div>
       <span class="cuenta__title text-accent">Tarjeta de crédito </span>
     </div>
@@ -82,7 +82,7 @@
           <div class="row text-condensed" v-if="!expanded">
             <div class="column items-center justify-center">
               <span class="tarjeta__resumen-etiqueta">Día de corte:</span
-              ><span class="resumen__valor"> {{ cuenta.dia_corte }}</span>
+              ><span class="resumen__valor"> {{ cuenta.diaCorte }}</span>
             </div>
             <q-separator spaced vertical />
             <div class="column items-center justify-center">
@@ -540,14 +540,15 @@
   <!-- <pre>{{ Math.round(sumaMovimientos) }}</pre>-->
   <!-- <pre>{{ Math.round(sumaMovimientos) }}</pre>
   <pre>{{ listaRegistros.filter((registro) => !registro.isPago) }}</pre> -->
+  <!-- <pre>{{ cuenta }}</pre> -->
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, onBeforeMount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { DateTime } from 'luxon'
 import FormRegistroMovimientoTarjeta from 'src/components/tarjetasCredito/FormRegistroMovimientoTarjeta.vue'
-import { api } from 'src/boot/axios'
+// import { api } from 'src/boot/axios'
 import { LISTA_REGISTROS_TARJETA } from 'src/graphql/registrosTarjeta'
 import { useLazyQuery, useQuery } from '@vue/apollo-composable'
 import { useFormato } from 'src/composables/utils/useFormato'
@@ -575,6 +576,7 @@ const $q = useQuasar()
 const cuentaCrud = useCuentasCrud()
 const registrosTarjetaCrud = useRegistrosTarjetaCrud()
 const cuentaStore = useCuentaStore()
+const cuentasCrud = useCuentasCrud()
 
 const { mostrarNotificacionPositiva, mostrarNotificacionNegativa } =
   useNotificacion()
@@ -591,7 +593,8 @@ const registroEditedItem = ref([
   {
     concepto: 'mi concepto',
     fecha: '10/05/2013',
-    importe: '500.20'
+    importe: '500.20',
+    tipoAfectacion: 'C'
   }
 ])
 
@@ -619,11 +622,45 @@ const selected = ref([])
 const expanded = ref(false)
 const filter = ref('')
 const filterMsi = ref('')
+/**
+ *
+ */
+onBeforeMount(() => {
+  // console.log('route.params.id:', route.params.id)
+  // console.log('cuentaStore.listaCuentas:', cuentaStore.listaCuentas)
+  cargarDatosCuenta(route.params.id)
+})
 
 /**
- * onMounted
+ * Cargar datos de la cuenta desde la api.
+ * @author Horacio Peña Mendoza <hpena.dtic@gmail.com>
+ * @param {Number} cuenta_id - Id de la cuenta.
  */
-onMounted(() => {
+function cargarDatosCuenta(cuenta_id) {
+  console.log(
+    'cuentaStore.listaCuentas.length:',
+    cuentaStore.listaCuentas.length
+  )
+  if (cuentaStore.listaCuentas.length > 0) {
+    obtenerCuentaDeListado(cuenta_id)
+  } else {
+    console.log('cargando cuentas nuevamente...')
+    console.log('cuenta_id:', cuenta_id)
+    cuentasCrud.fetchOrRefetchCuentaById(cuenta_id)
+    // router.push('/home')
+  }
+}
+cuentasCrud.onResultCuentaById(({ data }) => {
+  console.log('data.cuentaById:', data.cuentaById)
+  obtenerCuentaDeListado(data.cuentaById.id)
+})
+cuentaCrud.onErrorCuentaById((error) => {
+  console.log('error:', error)
+})
+function obtenerCuentaDeListado(cuentaId) {
+  cuenta.value = cuentaStore.listaCuentas.find(
+    (cuenta) => cuenta.id === cuentaId
+  )
   const dateNow = DateTime.now()
   ejercicio_fiscal.value = dateNow.year
   const mes_id = dateNow.month
@@ -631,13 +668,35 @@ onMounted(() => {
     (mesOption) => mesOption.id === mes_id
   )
   mes.value = mes_value
-  const cuenta_id = route.params.id.toString()
+
   cuenta.value = cuentaStore.listaCuentas.find(
     (cuenta) => cuenta.id === route.params.id
   )
   obtenerFechasInicialFinal()
   loadOrRefetchListaRegistrosTarjeta()
   loadOrRefetchSaldoAnteriorTC()
+}
+/**
+ * onMounted
+ */
+onMounted(() => {
+  /*
+  console.log('corriendo en onMounted...')
+  const dateNow = DateTime.now()
+  ejercicio_fiscal.value = dateNow.year
+  const mes_id = dateNow.month
+  const mes_value = mesOptions.value.find(
+    (mesOption) => mesOption.id === mes_id
+  )
+  mes.value = mes_value
+  // const cuenta_id = route.params.id.toString()
+  cuenta.value = cuentaStore.listaCuentas.find(
+    (cuenta) => cuenta.id === route.params.id
+  )
+  obtenerFechasInicialFinal()
+  loadOrRefetchListaRegistrosTarjeta()
+  loadOrRefetchSaldoAnteriorTC()
+  */
 })
 /**
  * graphql
@@ -772,12 +831,12 @@ const ejercicio_final_id = computed({
 })
 const dia_corte_inicial = computed({
   get() {
-    return !!cuenta.value.diaCorte ? cuenta.value.diaCorte + 1 : 28
+    return !!cuenta.value?.diaCorte ? cuenta.value.diaCorte + 1 : 28
   }
 })
 const dia_corte_final = computed({
   get() {
-    return !!cuenta.value.diaCorte ? cuenta.value.diaCorte : 28
+    return !!cuenta.value?.diaCorte ? cuenta.value.diaCorte : 28
   }
 })
 const mes_final_id = computed({
@@ -1069,12 +1128,14 @@ registrosTarjetaCrud.onDoneRegistroTarjetaPagoDelete(({ data }) => {
 })
 
 function obtenerFechasInicialFinal() {
+  // if (!!cuenta.value) {
   let mesInicio = mes.value.id - 1
   let ejercicioFiscal = ejercicio_fiscal.value
   if (!mesInicio) {
     mesInicio = 12
     ejercicioFiscal = ejercicio_fiscal.value - 1
   }
+  console.log('cuenta.value.diaCorte:', cuenta.value.diaCorte)
   const dia_inicio = ('0' + (cuenta.value.diaCorte + 1)).slice(-2)
   const dia_fin = ('0' + cuenta.value.diaCorte).slice(-2)
   listaRegistrosVariables.fechaInicio = `${ejercicioFiscal}-${(
@@ -1083,6 +1144,7 @@ function obtenerFechasInicialFinal() {
   listaRegistrosVariables.fechaFin = `${ejercicio_fiscal.value}-${(
     '0' + mes.value.id
   ).slice(-2)}-${dia_fin}`
+  // }
 }
 
 function onChangePeriodo() {

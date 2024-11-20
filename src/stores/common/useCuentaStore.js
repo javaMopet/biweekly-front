@@ -75,6 +75,11 @@ export const useCuentaStore = defineStore('cuentaStore', () => {
   function addItem(cuenta) {
     listaCuentas.value.push(cuenta)
   }
+  function actualizarSaldoCuenta(cuentaId, saldo) {
+    const cuentaIndex = listaCuentas.value.findIndex((c) => c.id === cuentaId)
+    const cuentaModificar = listaCuentas.value[cuentaIndex]
+    cuentaModificar.saldo = saldo
+  }
   // function actualizarSaldoCuenta(cuenta_id, saldo) {
   //   const cuentaIndex = listaCuentas.value.findIndex((c) => c.id === cuenta_id)
   //   const cuentaModificar = listaCuentas.value[cuentaIndex]
@@ -94,6 +99,7 @@ export const useCuentaStore = defineStore('cuentaStore', () => {
     onErrorCuentaDelete,
     listaCuentasAhorro,
     listaCuentasTarjeta,
-    addItem
+    addItem,
+    actualizarSaldoCuenta
   }
 })

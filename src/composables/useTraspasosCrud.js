@@ -46,7 +46,6 @@ export function useTraspasosCrud() {
     const cuentaDestinoId = detalles.find(
       (detalle) => detalle.tipoCuentaTraspasoId === '2'
     ).cuentaId
-    console.log('cuentaDestinoId:', cuentaDestinoId)
     actualizarInterfazCuentas(traspaso.detalleOrigen.cuentaId, cuentaDestinoId)
   })
 

@@ -23,7 +23,7 @@ export function useCuentaService() {
   })
   onDoneCuentaUpdate(({ data }) => {
     if (!!data) {
-      // console.log('ejecutando onDonecuentaUpdate useCuentaCrud', data)
+      console.log('ejecutando onDonecuentaUpdate useCuentaCrud', data)
       const itemUpdated = data.cuentaUpdate.cuenta
       // console.log('itemUpdated... ', itemUpdated)
       const index = cuentaStore.listaCuentas.findIndex(

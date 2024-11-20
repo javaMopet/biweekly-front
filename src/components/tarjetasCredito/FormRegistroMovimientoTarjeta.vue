@@ -12,6 +12,7 @@
             :rules="[(val) => !!val || 'Selecciona una categoría']"
             autofocus
             @update:model-value="onSelectCategoria"
+            tipo-afectacion="C"
           ></CategoriaSelect>
 
           <div class="row inline q-gutter-x-xs">
