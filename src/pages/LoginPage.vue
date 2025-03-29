@@ -245,7 +245,8 @@ function resetUserInfo() {
 
 .card-login {
   box-shadow: 0 5px 70px -25px #643a29;
-  background-color: lighten($color: $dark, $amount: 5);
+  // background-color: lighten($color: $dark, $amount: 5);
+  background-color: scale-color($dark, $lightness: 5%);
   opacity: 0.9;
   z-index: 1 !important;
   // background-color: white;

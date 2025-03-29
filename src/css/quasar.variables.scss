@@ -35,23 +35,27 @@ $warning: #ecd13b;
 
 // $primary-text: darken ($primary, 50%);
 //$primary-text: lighten ($primary, 10%);
-$primary-text: lighten(
-  $color: $primary,
-  $amount: 30
-);
-$primary-icon: darken ($primary, 90%);
+// $primary-text: lighten(
+//   $color: $primary,
+//   $amount: 30
+// );
+$primary-text: scale-color($primary, $lightness: 30%);
+// $primary-icon: darken ($primary, 90%);
+$primany-icon: scale-color($primary, $lightness: -90%);
 $primary-light: #f2f2f2;
-$secondary-light: lighten(
-  $color: $secondary,
-  $amount: 42
-);
+// $secondary-light: lighten(
+//   $color: $secondary,
+//   $amount: 42
+// );
+$secondary-light: scale-color($secondary, $lightness: 42%);
 $contrast: #c4943a;
 $contrast-light: #e7b962;
 
-$accent-light: darken(
-  $color: #e9e8f0,
-  $amount: 5
-);
+// $accent-light: darken(
+//   $color: #e9e8f0,
+//   $amount: 5
+// );
+$accent-light: scale-color(#e9e8f0, $lightness: -5%);
 $accent-contrast: #e4f599;
 $positive-pastel: #34b47a;
 $negative-pastel: #c05151;
@@ -69,10 +73,11 @@ $categoria-title-light: #aebbc7;
 
 $primary-grey: #a3a3a8;
 
-$primary-button: darken(
-  $color: #00838f,
-  $amount: 5
-); //Utilizado en itop
+// $primary-button: darken(
+//   $color: #00838f,
+//   $amount: 5
+// ); //Utilizado en itop
+$primary-button: scale-color(#00838f, $lightness: -5%);
 
 $secondary-button: #d1deeb;
 /*$primary-button: #00AAC1;*/

@@ -42,7 +42,8 @@
   &:hover {
     opacity: 1;
     color: white !important;
-    background: lighten($color: $primary-button, $amount: 3) !important;
+    // background: lighten($color: $primary-button, $amount: 3) !important;
+    background: scale-color($color: $primary-button, $lightness: 3%) !important;
     transition: all 0.05 ease;
   }
 }

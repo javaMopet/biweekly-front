@@ -7,6 +7,7 @@
 
 // Configuration for your app
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js
+/*
 var dotenvExpand = require('dotenv-expand')
 var myEnv = require('dotenv').config()
 dotenvExpand.expand(myEnv)
@@ -14,8 +15,14 @@ dotenvExpand.expand(myEnv)
 const { configure } = require('quasar/wrappers')
 
 console.log(process.env)
+*/
+import { defineConfig } from '#q-app/wrappers'
+import dotenv from 'dotenv'
+import dotenvExpand from 'dotenv-expand'
 
-module.exports = configure(function (/* ctx */) {
+const myEnv = dotenv.config()
+dotenvExpand.expand(myEnv)
+export default defineConfig(function (/* ctx */) {
   return {
     eslint: {
       // fix: true,
@@ -53,7 +60,7 @@ module.exports = configure(function (/* ctx */) {
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#build
     build: {
-      env: require('dotenv').config().parsed,
+      //env: require('dotenv').config().parsed,
       extendViteConf(viteConf) {
         viteConf.define.__VUE_PROD_HYDRATION_MISMATCH_DETAILS__ = false
         //   viteConf.define = {

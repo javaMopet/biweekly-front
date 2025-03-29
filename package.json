@@ -1,5 +1,6 @@
 {
   "name": "biweekly-front",
+  "type": "module",
   "version": "0.0.1",
   "description": "Aplicación front-end para el proyecto biweekly",
   "productName": "Applicacion front-end para el proyecto biweekly",
@@ -7,10 +8,11 @@
   "private": true,
   "scripts": {
     "start": "GENERATE_SOURCEMAP=false && react-scripts start",
-    "lint": "eslint --ext .js,.vue ./",
+    "lint": "eslint -c ./eslint.config.js \"./src*/**/*.{js,cjs,mjs,vue}\"",
     "format": "prettier --write \"**/*.{js,vue,scss,html,md,json}\" --ignore-path .gitignore",
     "test": "echo \"No test specified\" && exit 0",
-    "build": "GENERATE_SOURCEMAP=false vite build"
+    "build": "GENERATE_SOURCEMAP=false vite build",
+    "postinstall": "quasar prepare"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.4.2",
@@ -23,7 +25,7 @@
     "accounting-js": "^1.1.1",
     "axios": "^1.6.2",
     "chart.js": "^4.4.1",
-    "dotenv": "^16.0.3",
+    "dotenv": "^16.4.7",
     "dotenv-expand": "^9.0.0",
     "font-awesome": "^4.7.0",
     "graphql": "^16.8.1",
@@ -39,7 +41,7 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
-    "@quasar/app-vite": "^1.0.0",
+    "@quasar/app-vite": "^2.2.0",
     "@quasar/quasar-app-extension-apollo": "^2.0.0-beta.5",
     "@quasar/quasar-app-extension-qiconpicker": "^2.0.7",
     "@types/luxon": "^3.2.0",

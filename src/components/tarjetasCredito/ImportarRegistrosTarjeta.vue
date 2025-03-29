@@ -189,12 +189,14 @@
       <div class="row justify-between items-center full-width text-accent">
         <div class="col-9 q-pl-xl">
           <table style="border: 0px solid red">
-            <tr>
-              <td>Importe Total:</td>
-              <td class="summary__value">
-                {{ toCurrency(sumatoriaImporte) }}
-              </td>
-            </tr>
+            <tbody>
+              <tr>
+                <td>Importe Total:</td>
+                <td class="summary__value">
+                  {{ toCurrency(sumatoriaImporte) }}
+                </td>
+              </tr>
+            </tbody>
           </table>
         </div>
         <div class="col-3 q-py-md">
