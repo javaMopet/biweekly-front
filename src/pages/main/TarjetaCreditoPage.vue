@@ -1434,10 +1434,10 @@ function getSelectedString() {
   background: white;
   // background-color: rgb(248, 248, 247);
   border-top: 1px solid #d3d6d1;
-  &__left {
-  }
-  &__right {
-  }
+  // &__left {
+  // }
+  // &__right {
+  // }
 
   &__etiqueta {
     letter-spacing: -0.025rem;

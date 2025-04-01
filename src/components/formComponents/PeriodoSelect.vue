@@ -63,7 +63,7 @@
 
 <script setup>
 import { useGeneralStore } from 'src/stores/common/useGeneralStore'
-import { onMounted, defineModel } from 'vue'
+import { onMounted } from 'vue'
 
 /**
  * composables
