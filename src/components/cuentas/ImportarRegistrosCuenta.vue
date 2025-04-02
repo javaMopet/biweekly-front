@@ -258,6 +258,8 @@ import { SessionStorage } from 'quasar'
 import { useRegistrosCrud } from 'src/composables/useRegistrosCrud'
 import DialogTitle from '../formComponents/modal/DialogTitle.vue'
 import { toast } from 'vue3-toastify'
+import { parse, format } from 'date-fns'
+import es from 'date-fns/locale/es'
 
 /**
  * Composables
@@ -277,20 +279,6 @@ const fecha_fin = ref('01/01/1900')
 const isLoading = ref(false)
 const loadingRows = ref(false)
 
-const meses = {
-  Ene: '01',
-  Feb: '02',
-  Mar: '03',
-  Abr: '04',
-  May: '05',
-  Jun: '06',
-  Jul: '07',
-  Ago: '08',
-  Sep: '09',
-  Oct: '10',
-  Nov: '11',
-  Dic: '12'
-}
 /**
  * composables
  */
@@ -361,11 +349,12 @@ async function updateFile(v) {
     //   }
     // }
 
-    console.log('props.cuenta.banco.id:', props.cuenta.banco.id)
+    console.log('props.cuenta.banco.id:', props.cuenta.banco)
     if (!!props.cuenta.banco) {
       switch (props.cuenta.banco.id) {
         case '1':
-          obtenerMovimientosSantander(wb)
+          // obtenerMovimientosSantander(wb)
+          obtenerMovimientosSantanderNuevo(wb)
           break
         case '2':
           obtenerMovimientosBancomer(wb)
@@ -399,19 +388,6 @@ function obtenerMovimientosSantander(wb) {
     skipHeader: true,
     raw: false
   })
-  // const monthsMap = new Map()
-  // monthsMap.set('Ene', '01')
-  // monthsMap.set('Feb', '02')
-  // monthsMap.set('Mar', '03')
-  // monthsMap.set('Abr', '04')
-  // monthsMap.set('May', '05')
-  // monthsMap.set('Jun', '06')
-  // monthsMap.set('Jul', '07')
-  // monthsMap.set('Ago', '08')
-  // monthsMap.set('Sep', '09')
-  // monthsMap.set('Oct', '10')
-  // monthsMap.set('Nov', '11')
-  // monthsMap.set('Dic', '12')
 
   todos.value = data.map((row) => ({
     fecha: row.A,
@@ -421,16 +397,11 @@ function obtenerMovimientosSantander(wb) {
     saldo: row.G,
     referencia: row.H
   }))
-  // console.log('datda', todos.value)
-  // console.log('datda', todos.value[5])
+
+  console.log('datda', todos.value)
+
   todos.value.forEach((row, index) => {
     let fecha = convertidorFecha(row.fecha.toString())
-    // let fecha = row.fecha.toString()
-    // for (const [key, value] of monthsMap) {
-    //   // console.log(`${key}: ${value}`)
-    //   fecha = fecha.replace(key.toString(), value.toString())
-    // }
-    // console.log('fecha', fecha)
     if (!!fecha) {
       const validDate = DateTime.fromFormat(fecha, 'dd/MM/yyyy')
       if (validDate.isValid) {
@@ -452,21 +423,77 @@ function obtenerMovimientosSantander(wb) {
           saldo: row.saldo,
           referencia: row.referencia,
           tipoMovimiento: {}
-          // saved: false
         }
         listaRegistros.value.push(item)
       }
     }
   })
 }
+function obtenerMovimientosSantanderNuevo(wb) {
+  // get data of first worksheet as an array of objects
+  const data = utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {
+    header: ['A', 'B', 'C', 'D', 'E', 'F'],
+    skipHeader: true,
+    raw: false
+  })
+
+  todos.value = data.map((row) => ({
+    fecha: row.A,
+    hora: row.B,
+    concepto: row.C,
+    retiro: row.D,
+    deposito: row.E,
+    referencia: row.F
+  }))
+
+  console.table(todos.value)
+
+  todos.value.forEach((row, index) => {
+    let fecha = convertidorFecha(row.fecha.toString())
+    if (!!fecha) {
+      const validDate = DateTime.fromFormat(fecha, 'dd/MM/yyyy')
+      if (validDate.isValid) {
+        const retiro = convertirImporte(row.retiro)
+        const deposito = convertirImporte(row.deposito)
+        const tipo_afectacion = retiro != 0 ? 'C' : deposito != 0 ? 'A' : 'N/A'
+        const importe =
+          retiro != 0
+            ? parseFloat(retiro)
+            : deposito != 0
+            ? parseFloat(deposito)
+            : 0
+        // console.log('tipo_afectacion:', tipo_afectacion)
+        // console.log('importe:', importe)
+        const item = {
+          id: index,
+          consecutivo: index + 1,
+          tipo_afectacion,
+          fecha: fecha,
+          concepto: row.concepto,
+          importe,
+          saldo: row.saldo,
+          referencia: row.referencia,
+          tipoMovimiento: {}
+        }
+        listaRegistros.value.push(item)
+      }
+    }
+  })
+}
+
 function convertidorFecha(fecha) {
+  // console.log('fecha:', fecha)
   if (fecha.includes('/')) {
     const partes = fecha.split('/')
+    // console.log('partes:', partes)
     if (isNaN(partes[1])) {
-      // Verifica si el mes es texto
-      const [dia, mes, anio] = partes
-      const mesNumerico = meses[mes]
-      return `${dia}/${mesNumerico}/${anio}`
+      // asume que el formato es 01/ene/2025 pe.
+      const fechaParseada = parse(fecha, 'dd/MMM/yy', new Date(), {
+        locale: es
+      })
+      const fechaP = format(fechaParseada, 'dd/MM/yyyy')
+      // console.log('fechaP:', fechaP)
+      return fechaP
     } else {
       // asume que el formato esta en MM/dd/yy
       const [mes, dia, anio] = partes
@@ -478,6 +505,11 @@ function convertidorFecha(fecha) {
     }
   }
 }
+function convertirImporte(importe) {
+  if (!importe) return 0
+  return parseFloat(importe.replace(/[$,]/g, ''))
+}
+
 function obtenerMovimientosBancomer(wb) {
   const data = utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {
     header: ['A', 'B', 'C', 'D', 'E'],
