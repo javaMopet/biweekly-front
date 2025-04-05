@@ -1,8 +1,8 @@
 import gql from 'graphql-tag'
 
 export const LISTA_CUENTAS = gql`
-  query listaCuentas {
-    listaCuentas {
+  query listaCuentas($instanceId: ID!) {
+    listaCuentas(instanceId: $instanceId) {
       id
       nombre
       identificador
@@ -92,8 +92,8 @@ export const OBTENER_SALDO_A_FECHA = gql`
 `
 
 export const CUENTA_CREATE = gql`
-  mutation cuentaCreate($input: CuentaInput!) {
-    cuentaCreate(cuentaInput: $input) {
+  mutation cuentaCreate($input: CuentaInput!, $instanceId: ID!) {
+    cuentaCreate(cuentaInput: $input, instanceId: $instanceId) {
       cuenta {
         id
         nombre

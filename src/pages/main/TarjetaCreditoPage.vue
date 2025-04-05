@@ -395,6 +395,16 @@
                       rounded
                     />
                     <q-btn
+                      no-caps
+                      class="medium-button"
+                      color="primary-button"
+                      label="Agregar Masivo"
+                      @click="addMasiveItems"
+                      push
+                      icon="add_circle"
+                      rounded
+                    />
+                    <q-btn
                       color="primary-button"
                       flat
                       @click="cargarMovimientos"
@@ -522,6 +532,19 @@
       ></ImportarRegistrosTarjeta>
     </q-dialog>
     <q-dialog
+      v-model="showFormCargaMasiva"
+      persistent
+      transition-show="jump-up"
+      transition-hide="jump-down"
+    >
+      <FormInsercionMasivaTarjeta
+        :cuenta="cuenta"
+        @items-saved="cargaMasivaSaved"
+        :fecha_desde="fechaInicioPeriodo"
+        :fecha_hasta="fechaFinPeriodo"
+      ></FormInsercionMasivaTarjeta>
+    </q-dialog>
+    <q-dialog
       v-model="showPagosTarjeta"
       persistent
       transition-show="jump-up"
@@ -556,6 +579,7 @@ import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { SessionStorage, useQuasar } from 'quasar'
 import PagosTarjeta from 'src/components/tarjetasCredito/PagosTarjeta.vue'
 import ImportarRegistrosTarjeta from 'src/components/tarjetasCredito/ImportarRegistrosTarjeta.vue'
+import FormInsercionMasivaTarjeta from 'src/components/tarjetasCredito/FormInsercionMasivaTarjeta.vue'
 import { useRegistrosTarjetaCrud } from 'src/composables/useRegistrosTarjetaCrud'
 import { useCuentasCrud } from 'src/composables/useCuentasCrud'
 import {
@@ -599,6 +623,7 @@ const registroEditedItem = ref([
 ])
 
 const showForm = ref(false)
+const showFormCargaMasiva = ref(false)
 const showFormMSI = ref(false)
 const showFormCarga = ref(false)
 const showPagosTarjeta = ref(false)
@@ -637,10 +662,6 @@ onBeforeMount(() => {
  * @param {Number} cuenta_id - Id de la cuenta.
  */
 function cargarDatosCuenta(cuenta_id) {
-  console.log(
-    'cuentaStore.listaCuentas.length:',
-    cuentaStore.listaCuentas.length
-  )
   if (cuentaStore.listaCuentas.length > 0) {
     obtenerCuentaDeListado(cuenta_id)
   } else {
@@ -1135,7 +1156,7 @@ function obtenerFechasInicialFinal() {
     mesInicio = 12
     ejercicioFiscal = ejercicio_fiscal.value - 1
   }
-  console.log('cuenta.value.diaCorte:', cuenta.value.diaCorte)
+
   const dia_inicio = ('0' + (cuenta.value.diaCorte + 1)).slice(-2)
   const dia_fin = ('0' + cuenta.value.diaCorte).slice(-2)
   listaRegistrosVariables.fechaInicio = `${ejercicioFiscal}-${(
@@ -1171,6 +1192,9 @@ function addItem() {
   registroEditedItem.value = null
   showForm.value = true
 }
+function addMasiveItems() {
+  showFormCargaMasiva.value = true
+}
 
 function pagosTarjeta() {
   showPagosTarjeta.value = true
@@ -1196,6 +1220,7 @@ function registroUpdated() {
 }
 
 function cargaMasivaSaved(cuenta_id) {
+  showFormCargaMasiva.value = false
   showFormCarga.value = false
   cuentaCrud.cuentaSaldoUpdate({ cuentaId: cuenta_id })
   notificacion.mostrarNotificacionPositiva(

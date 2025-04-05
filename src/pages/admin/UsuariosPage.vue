@@ -89,7 +89,7 @@
                     <div class="text-primary">
                       {{ props.row.name }}
                     </div>
-                    <div class="">{{ props.row.instance.name }}</div>
+                    <!-- <div class="">{{ props.row.instance.name }}</div> -->
                     <div class="">
                       Roles: [{{ props.row.roles.toString() }}]
                     </div>

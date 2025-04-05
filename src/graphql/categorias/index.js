@@ -1,8 +1,8 @@
 import gql from 'graphql-tag'
 
 export const LISTA_CATEGORIAS = gql`
-  query listaCategorias {
-    listaCategorias {
+  query listaCategorias($instanceId: ID!) {
+    listaCategorias(instanceId: $instanceId) {
       id
       nombre
       descripcion
@@ -54,8 +54,8 @@ export const CATEGORIA_BY_ID = gql`
 `
 
 export const CATEGORIA_CREATE = gql`
-  mutation categoriaCreate($input: CategoriaInput!) {
-    categoriaCreate(categoriaInput: $input) {
+  mutation categoriaCreate($input: CategoriaInput!, $instanceId: ID!) {
+    categoriaCreate(categoriaInput: $input, instanceId: $instanceId) {
       categoria {
         id
         nombre

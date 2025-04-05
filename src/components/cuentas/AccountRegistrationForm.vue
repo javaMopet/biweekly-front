@@ -345,8 +345,9 @@ function saveItem() {
   }
   if (!editedFormItem.value.id) {
     // console.log('guardando cuenta nueva', input)
+    let instanceId = SessionStorage.getItem('current_instance').id
     input.saldo = parseFloat(0)
-    cuentaService.cuentaCreate({ input })
+    cuentaService.cuentaCreate({ input, instanceId })
   } else {
     if (tipo_cuenta_id === '2') {
       console.log('se cambio el tipo de cuenta', tipo_cuenta_id)

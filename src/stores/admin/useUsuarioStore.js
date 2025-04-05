@@ -1,8 +1,9 @@
 import { useQuery } from '@vue/apollo-composable'
 import { defineStore } from 'pinia'
+import { SessionStorage } from 'quasar'
 import { useUserService } from 'src/composables/admin/useUserService'
 import { USERS_LIST } from 'src/graphql/operations/users'
-import { ref } from 'vue'
+import { ref, reactive } from 'vue'
 
 export const useUsuarioStore = defineStore('usuarioStore', () => {
   /**
@@ -21,17 +22,20 @@ export const useUsuarioStore = defineStore('usuarioStore', () => {
     fetchPolicy: 'no-cache'
   })
 
+  const variablesListados = reactive({
+    instanceId: SessionStorage.getItem('current_instance').id ?? '-1'
+  })
+
   const {
     onResult: onResultUsersList,
     onError: onErrorUsersList,
     loading: loadingListaUsuarios,
     refetch: refetchUsersList
-  } = useQuery(USERS_LIST, null, graphql_options)
+  } = useQuery(USERS_LIST, variablesListados, graphql_options)
 
   onResultUsersList(({ data }) => {
     if (!!data) {
       listaUsuarios.value = JSON.parse(JSON.stringify(data.usersList ?? []))
-      console.log('listaUsuarios.value:', listaUsuarios.value)
     }
   })
 

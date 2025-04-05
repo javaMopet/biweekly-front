@@ -510,12 +510,14 @@ function obtenerColumnas(ejercicio_fiscal, mes) {
  *
  */
 function obtenerMovimientos() {
+  const instanceId = SessionStorage.getItem('current_instance').id
   api
     .get('/movimientos/ingresos_egresos', {
       params: {
         ejercicioFiscalId: ejercicio_fiscal.value,
         tipoMovimientoId: 2,
-        isSaldos: 0
+        isSaldos: 0,
+        instanceId
       }
     })
     .then(({ data }) => {
@@ -530,7 +532,8 @@ function obtenerMovimientos() {
       params: {
         tipoMovimientoId: 1,
         isSaldos: 0,
-        ejercicioFiscalId: ejercicio_fiscal.value
+        ejercicioFiscalId: ejercicio_fiscal.value,
+        instanceId
       }
     })
     .then(({ data }) => {
@@ -542,12 +545,14 @@ function obtenerMovimientos() {
     })
 }
 function obtenerIngresosEgresosSaldos() {
+  const instanceId = SessionStorage.getItem('current_instance').id
   api
     .get('/movimientos/ingresos_egresos', {
       params: {
         tipoMovimientoId: 1,
         isSaldos: 1,
-        ejercicioFiscalId: ejercicio_fiscal.value
+        ejercicioFiscalId: ejercicio_fiscal.value,
+        instanceId
       }
     })
     .then(({ data }) => {
@@ -561,7 +566,8 @@ function obtenerIngresosEgresosSaldos() {
       params: {
         tipoMovimientoId: 2,
         isSaldos: 1,
-        ejercicioFiscalId: ejercicio_fiscal.value
+        ejercicioFiscalId: ejercicio_fiscal.value,
+        instanceId
       }
     })
     .then(({ data }) => {
@@ -573,12 +579,14 @@ function obtenerIngresosEgresosSaldos() {
 }
 
 function obtenerSaldosMovimientos() {
+  const instanceId = SessionStorage.getItem('current_instance').id
   api
     .get('/movimientos/saldos_ingresos_egresos', {
       params: {
         ejercicioFiscalId: ejercicio_fiscal.value,
         mesId: mes.value.id,
-        isSaldos: 0
+        isSaldos: 0,
+        instanceId
       }
     })
     .then(({ data }) => {
@@ -590,12 +598,14 @@ function obtenerSaldosMovimientos() {
 }
 
 function obtenerSaldosCuentas() {
+  const instanceId = SessionStorage.getItem('current_instance').id
   api
     .get('/movimientos/saldos_cuentas', {
       params: {
         ejercicioFiscalId: ejercicio_fiscal.value,
         mesId: mes.value.id,
-        isSaldos: 0
+        isSaldos: 0,
+        instanceId
       }
     })
     .then(({ data }) => {
@@ -607,12 +617,14 @@ function obtenerSaldosCuentas() {
 }
 
 function obtenerSaldosFinales() {
+  const instanceId = SessionStorage.getItem('current_instance').id
   api
     .get('/movimientos/saldos_finales', {
       params: {
         ejercicioFiscalId: ejercicio_fiscal.value,
         mesId: mes.value.id,
-        isSaldos: 0
+        isSaldos: 0,
+        instanceId
       }
     })
     .then(({ data }) => {

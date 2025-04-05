@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { api } from 'src/boot/axios'
 import { ref } from 'vue'
-import { Platform, SessionStorage } from 'quasar'
+import { SessionStorage } from 'quasar'
 
 // import { useRouter } from 'vue-router'
 
@@ -175,6 +175,7 @@ export const useSessionStore = defineStore('session', () => {
     auth_token.value = null
     SessionStorage.remove('auth_token')
     SessionStorage.remove('user')
+    SessionStorage.remove('current_instance')
     api.defaults.headers.common['Authorization'] = null
   }
 

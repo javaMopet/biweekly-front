@@ -335,7 +335,8 @@ function saveItem() {
   }
   // console.log('guardando item:', input)
   if (!editedFormItem.value.id) {
-    categoriaService.categoriaCreate({ input })
+    const instance = SessionStorage.getItem('current_instance')
+    categoriaService.categoriaCreate({ input, instanceId: instance.id })
   } else {
     const id = editedFormItem.value.id
     categoriaService.categoriaUpdate({ id, input })

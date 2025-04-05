@@ -12,54 +12,7 @@
     >
     <q-card-section>
       <q-toolbar class="q-gutter-x-md">
-        <div class="row q-pr-lg justify-between">
-          <div class="column">
-            <div class="load__file-text text-condensed">
-              Selecciona un archivo en formato Excel:
-            </div>
-            <q-file
-              v-model="archivoExcel"
-              label="Carga archivo Excel"
-              accept=".xlsx,.xls"
-              @input="updateFile"
-              dense
-              style="width: 450px"
-              max-files="1"
-              outlined
-              label-color="accent"
-              clearable
-              @clear="fileClear"
-            >
-              <template #prepend>
-                <q-icon color="primary" name="cloud_upload" />
-              </template>
-              <template #before>
-                <q-img src="/icons/excel2.png" width="24px" />
-              </template>
-            </q-file>
-          </div>
-        </div>
-        <q-separator vertical></q-separator>
-        <div class="row items-center q-gutter-x-md">
-          <div class="column">
-            <span class="form-input__label"> Desde:</span>
-            <DateInput
-              v-model="fecha_inicio"
-              lbl_field="Fecha"
-              :opcional="false"
-              style="width: 140px"
-            ></DateInput>
-          </div>
-          <div class="column">
-            <span class="form-input__label">Hasta:</span>
-            <DateInput
-              v-model="fecha_fin"
-              lbl_field="Fecha"
-              :opcional="false"
-              style="width: 140px"
-            ></DateInput>
-          </div>
-        </div>
+        <!-- <q-separator vertical></q-separator> -->
         <q-toolbar-title></q-toolbar-title>
         <q-btn
           :disable="!isSelected"
@@ -133,7 +86,7 @@
     </q-card-section>
     <q-card-section style="max-height: 70vh; height: 60vh" class="scroll">
       <q-table
-        :rows="listaRegistroFiltrados"
+        :rows="listaRegistrosTarjeta"
         :columns="columns"
         :rows-per-page-options="[0]"
         row-key="consecutivo"
@@ -148,9 +101,73 @@
         class="my-sticky-header-table"
         :loading="loadingRows"
       >
-        <template #body-cell-concepto="props">
+        <template #top>
+          <q-th
+            class="text-left"
+            style="width: 120px; min-width: 120px; max-width: 120px"
+          >
+            <q-btn
+              color="primary-button"
+              icon="add"
+              @click="addItem"
+              dense
+              glossy
+              push
+              class="small-button"
+            >
+              <q-tooltip> Agregar Registro </q-tooltip>
+          </q-btn>
+          </q-th>
+        </template>
+        <template #header-cell-categoria="props">
+          <q-th :props="props" class="text-left">
+            <div class="row justify-start items-center">
+              <span class="q-pl-md q-pr-sm">{{ props.col.label }}</span>
+              <q-btn
+                color="button-new"
+                icon="add"
+                label="Agregar"
+                @click="addItemCategoria(props)"
+                dense
+                class="small-button"
+                glossy
+                push
+                tabindex="100"
+              >
+                <q-tooltip> Nueva Categoría </q-tooltip>
+              </q-btn>
+            </div>
+          </q-th>
+        </template>
+        <!-- <template #body-cell-concepto="props">
           <q-td :props="props" :class="props.row.clase">
             {{ props.row.concepto }}
+          </q-td>
+        </template> -->
+        <template #body-cell-fecha="props">
+          <q-td :props="props">
+            <DateInput
+              v-model="props.row.fecha"
+              :fecha-inicio="fecha_inicio"
+              :fecha-fin="fecha_fin"
+              :agregar="true"
+              @focus="focusDate(props)"
+            ></DateInput>
+          </q-td>
+        </template>
+        <template #body-cell-concepto="props">
+          <q-td :props="props">
+            <q-input
+              v-model="props.row.concepto"
+              :class="props.row.clase"
+              dense
+              lazy-rules
+              outlined
+              color="primary-button"
+              bg-color="blue-1"
+              label-color="input-label"
+              style="width: 100%"
+            ></q-input>
           </q-td>
         </template>
         <template #body-cell-categoria="props">
@@ -158,29 +175,17 @@
             <CategoriaSelect
               v-model="props.row.categoria"
               :tipo-afectacion="props.row.tipoAfectacion"
-              :agregar="true"
+              :agregar="false"
+              :clearable="false"
             ></CategoriaSelect>
           </q-td>
         </template>
         <template #body-cell-importe="props">
           <q-td :props="props">
-            <span :class="props.row.clase">
-              {{ formato.toCurrency(parseFloat(props.row.importe)) }}
-            </span>
-          </q-td>
-        </template>
-        <template #body-cell-acciones="props">
-          <q-td :props="props">
-            <q-btn
-              icon="delete_sweep"
-              size="md"
-              :class="props.row.clase"
-              dense
-              @click="deleteRow(props)"
-              flat
-            />
-            <!-- class="q-ml-sm"
-              color="accent" -->
+            <PriceInput
+              v-model="props.row.importe"
+              label="Importe"
+            ></PriceInput>
           </q-td>
         </template>
       </q-table>
@@ -208,6 +213,20 @@
       </div>
     </q-card-actions>
   </q-card>
+
+  <Teleport to="#modal">
+    <q-dialog
+      v-model="showRegistroCategoria"
+      persistent
+      transition-show="jump-up"
+      transition-hide="jump-down"
+    >
+      <FormRegistroCategoria
+        :edited-item="editedCategoriaParam"
+        @categoriaSaved="categoriaSaved"
+      ></FormRegistroCategoria>
+    </q-dialog>
+  </Teleport>
 </template>
 
 <script setup>
@@ -224,14 +243,16 @@ import DateInput from '../formComponents/DateInput.vue'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import DialogTitle from '../formComponents/modal/DialogTitle.vue'
 import { useRegistrosTarjetaCrud } from 'src/composables/useRegistrosTarjetaCrud'
-import { parse, format } from 'date-fns'
-import es from 'date-fns/locale/es'
+import PriceInput from '../formComponents/PriceInput.vue'
+import FormRegistroCategoria from '../categorias/FormRegistroCategoria.vue'
+import { useQuasar } from 'quasar'
 
 /**
  * state
  */
-const archivoExcel = ref(null)
+
 const registrosSelected = ref([])
+const showRegistroCategoria = ref(false)
 const listaRegistrosTarjeta = ref([])
 const todos = ref()
 const fecha_inicio = ref('01/01/1900')
@@ -239,6 +260,9 @@ const fecha_fin = ref('01/01/1900')
 const errorItems = ref([])
 const isLoading = ref(false)
 const loadingRows = ref(false)
+
+const tipoMovimientoId = ref('2')
+const editedCategoriaParam = ref({ tipoMovimientoId: tipoMovimientoId.value })
 /**
  * composables
  */
@@ -246,6 +270,7 @@ const formato = useFormato()
 const notificacion = useNotificacion()
 const { toCurrency } = useFormato()
 const registrosTarjetaCrud = useRegistrosTarjetaCrud()
+const $q = useQuasar()
 
 /**
  * defProperties
@@ -276,9 +301,29 @@ const props = defineProps({
 onMounted(() => {
   let desde = formato.formatoFechaFromISO(props.fecha_desde)
   let hasta = formato.formatoFechaFromISO(props.fecha_hasta)
-  // console.log('[ desde ] >', desde)
+  console.log('[ desde ] >', desde)
   fecha_inicio.value = desde
   fecha_fin.value = hasta
+  listaRegistrosTarjeta.value
+  for (let i = 0; i < 25; i++) {
+    let fecha = ''
+    if (i == 0) {
+      fecha = desde
+    }
+    listaRegistrosTarjeta.value.push({
+      id: undefined,
+      fecha: fecha,
+      consecutivo: i + 1,
+      concepto: '',
+      importe: '',
+      categoria: {
+        id: 0,
+        nombre: ''
+      },
+      tipoAfectacion: 'C',
+      clase: ''
+    })
+  }
 })
 /**
  * emits
@@ -289,7 +334,7 @@ const emit = defineEmits(['itemsSaved'])
  *
  * @param {*} v
  */
-const monthsMap = new Map()
+
 const monthsEnglishMap = new Map()
 // assuming `todos` is a standard VueJS `ref`
 
@@ -306,73 +351,6 @@ const meses = {
   Oct: '10',
   Nov: '11',
   Dic: '12'
-}
-
-async function updateFile(v) {
-  loadingRows.value = true
-  try {
-    // `v.target.files[0]` is the desired file object
-    const files = v.target.files
-    if (!files || files.length == 0) return
-
-    // read first file
-    const wb = read(await files[0].arrayBuffer())
-    // // get data of first worksheet as an array of objects
-    // const rows = utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {
-    //   raw: false
-    // })
-
-    monthsMap.set('Ene', '01')
-    monthsMap.set('Feb', '02')
-    monthsMap.set('Mar', '03')
-    monthsMap.set('Abr', '04')
-    monthsMap.set('May', '05')
-    monthsMap.set('Jun', '06')
-    monthsMap.set('Jul', '07')
-    monthsMap.set('Ago', '08')
-    monthsMap.set('Sep', '09')
-    monthsMap.set('Oct', '10')
-    monthsMap.set('Nov', '11')
-    monthsMap.set('Dic', '12')
-
-    monthsEnglishMap.set('Jan', '01')
-    monthsEnglishMap.set('Feb', '02')
-    monthsEnglishMap.set('Mar', '03')
-    monthsEnglishMap.set('Apr', '04')
-    monthsEnglishMap.set('May', '05')
-    monthsEnglishMap.set('Jun', '06')
-    monthsEnglishMap.set('Jul', '07')
-    monthsEnglishMap.set('Ago', '08')
-    monthsEnglishMap.set('Sep', '09')
-    monthsEnglishMap.set('Oct', '10')
-    monthsEnglishMap.set('Nov', '11')
-    monthsEnglishMap.set('Dic', '12')
-
-    // for (const row of rows) {
-    //   for (const key in row) {
-    //     console.log('data cell', row[key])
-    //   }
-    // }
-    // console.log('props.cuenta.banco.id:', props.cuenta.banco.id)
-    switch (props.cuenta.banco.id.toString()) {
-      case '1':
-        // cargarMovimientosSantander(wb)
-        cargarMovimientosSantanderNuevo(wb)
-        break
-      case '2':
-        cargarMovimientosBancomer(wb)
-        break
-      case '6':
-        cargarMovimientosAmericanExpress(wb)
-        break
-      default:
-        break
-    }
-  } catch (e) {
-    console.log(e)
-    loadingRows.value = false
-  }
-  loadingRows.value = false
 }
 
 /**
@@ -407,69 +385,23 @@ function cargarMovimientosSantander(wb) {
   // console.log('datda', todos.value[5])
   crearListaRegistrosTarjeta(todos.value)
 }
-
-/**
- * Cargar movimientos de santander.
- * @param {Object} wb - Excel data
- */
-function cargarMovimientosSantanderNuevo(wb) {
-  // get data of first worksheet as an array of objects
-  const data = utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {
-    header: ['A', 'B', 'C', 'D', 'E', 'F'],
-    skipHeader: true,
-    raw: false
-  })
-
-  todos.value = data
-    .filter((row) => {
-      return !!row.A
-    })
-    .map((row, index) => ({
-      fecha: convertidorFecha(row.A),
-      consecutivo: index + 1,
-      concepto: row.C,
-      retiro: convertirImporte(row.D),
-      deposito: convertirImporte(row.E)
-    }))
-
-  console.table(todos.value)
-  todos.value = todos.value.map((row, index) => ({
-    fecha: row.fecha,
-    consecutivo: row.consecutivo,
-    concepto: row.concepto,
-    importe: (parseFloat(row.retiro)*-1) + (parseFloat(row.deposito)*-1)
-  }))
-  console.log(todos.value)
-
-  crearListaRegistrosTarjeta(todos.value)
-}
 function convertidorFecha(fecha) {
-  // console.log('fecha:', fecha)
   if (fecha.includes('/')) {
     const partes = fecha.split('/')
-    // console.log('partes:', partes)
     if (isNaN(partes[1])) {
-      // asume que el formato es 01/ene/2025 pe.
-      const fechaParseada = parse(fecha, 'dd/MMM/yy', new Date(), {
-        locale: es
-      })
-      const fechaP = format(fechaParseada, 'dd/MM/yyyy')
-      // console.log('fechaP:', fechaP)
-      return fechaP
+      // Verifica si el mes es texto
+      const [dia, mes, anio] = partes
+      const mesNumerico = meses[mes]
+      return `${dia}/${mesNumerico}/${anio}`
     } else {
       // asume que el formato esta en MM/dd/yy
       const [mes, dia, anio] = partes
-      let diaInt = parseInt(dia) + 1
       const anioCompleto = anio.length === 2 ? `20${anio}` : anio // cambiar para 2100
-      return `${diaInt.toString().padStart(2, '0')}/${mes
+      return `${dia.toString().padStart(2, '0')}/${mes
         .toString()
         .padStart(2, '0')}/${anioCompleto}`
     }
   }
-}
-function convertirImporte(importe) {
-  if (!importe) return 0
-  return parseFloat(importe.replace(/[$,]/g, ''))
 }
 /**
  * Cargar movimientos de Santander
@@ -574,17 +506,7 @@ function crearListaRegistrosTarjeta(excelData) {
 /**
  * computed
  */
-const listaRegistroFiltrados = computed({
-  get() {
-    const start_date = DateTime.fromFormat(fecha_inicio.value, 'dd/MM/yyyy')
-    const end_date = DateTime.fromFormat(fecha_fin.value, 'dd/MM/yyyy')
 
-    return listaRegistrosTarjeta.value.filter((registro) => {
-      const fecha_registro = DateTime.fromISO(registro.fecha)
-      return fecha_registro >= start_date && fecha_registro <= end_date
-    })
-  }
-})
 const isErrors = computed({
   get() {
     return errorItems.value.length > 0
@@ -593,7 +515,7 @@ const isErrors = computed({
 
 const sumatoriaImporte = computed({
   get() {
-    return listaRegistroFiltrados.value.reduce((accumulator, registro) => {
+    return listaRegistrosTarjeta.value.reduce((accumulator, registro) => {
       return accumulator + parseFloat(registro.importe)
     }, 0)
   }
@@ -606,50 +528,80 @@ function saveItems() {
       errorItems.value = []
     }, 6000)
   } else {
-    var lista_registros_tarjeta = []
-
-    listaRegistroFiltrados.value.forEach((item) => {
-      const registro = {
-        estadoRegistroTarjetaId: 1, //pendiente
-        tipoAfectacion: item.tipoAfectacion,
-        cuentaId: props.cuenta.id,
-        categoriaId: item.categoria.id,
-        importe: item.importe * -1,
-        fecha: item.fecha,
-        concepto: item.concepto
-      }
-      lista_registros_tarjeta.push(registro)
+    console.log('guardando items.....')
+    // var lista_registros_tarjeta = []
+    const listaGuardar = listaRegistrosTarjeta.value.filter((item) => {
+      return (
+        !!item.fecha && !!item.importe && !!item.categoria && item.importe != 0
+      )
     })
 
-    isLoading.value = true
-    console.log('lista_registros_tarjeta:', lista_registros_tarjeta)
-    registrosTarjetaCrud.registroTarjetaMultipleCreate({
-      input: lista_registros_tarjeta
+    console.log('listaGuardar size:', listaGuardar.length)
+    const message = `Se van a guardar ${listaGuardar.length} registros. ¿Desea continuar?`
+    $q.dialog({
+      title: 'Confirmar',
+      style: 'width:500px',
+      message,
+      ok: {
+        push: true,
+        color: 'positive',
+        label: 'Continuar'
+      },
+      cancel: {
+        push: true,
+        color: 'negative',
+        flat: true,
+        label: 'cancelar'
+      },
+      persistent: true
     })
-
-    // api
-    //   .post('/create_multiple_registros_tarjeta', {
-    //     lista_registros_tarjeta
-    //   })
-    //   .then((response) => {
-    //     // console.log('guardado correctamente')
-    //     // console.log('response', response)
-    //     const cuenta_id = response.data.retorno[0].cuenta_id
-    //     // console.log('cuenta', cuenta_id)
-    //     isLoading.value = false
-    //     emit('itemsSaved', cuenta_id)
-    //   })
-    //   .catch((error) => {
-    //     isLoading.value = false
-    //     // console.error(error.response.data.exception)
-    //     notificacion.mostrarNotificacionNegativa(
-    //       'No fue posible posible guardar los registro, revisar consola',
-    //       900
-    //     )
-    //   })
-    // console.log('items guardados')
+      .onOk(() => {
+        onConfirmarGuardar(listaGuardar)
+      })
+      .onCancel(() => {})
+      .onDismiss(() => {})
   }
 }
+function onConfirmarGuardar(listaGuardar) {
+  const lista_registros_tarjeta = []
+  listaGuardar.forEach((item) => {
+    const registro = {
+      estadoRegistroTarjetaId: 1, //pendiente
+      tipoAfectacion: item.tipoAfectacion,
+      cuentaId: props.cuenta.id,
+      categoriaId: item.categoria.id,
+      importe: item.importe * -1,
+      fecha: formato.convertDateFromInputToIso(item.fecha),
+      concepto: item.concepto
+    }
+    lista_registros_tarjeta.push(registro)
+  })
+
+  console.table(listaGuardar)
+  isLoading.value = true
+  console.log('lista_registros_tarjeta:', lista_registros_tarjeta)
+  registrosTarjetaCrud.registroTarjetaMultipleCreate({
+    input: lista_registros_tarjeta
+  })
+}
+
+function addItem(){
+  const item = {
+    id: undefined,
+    fecha: '',
+    consecutivo: listaRegistrosTarjeta.value.length + 1,
+    concepto: '',
+    importe: '',
+    categoria: {
+      id: 0,
+      nombre: ''
+    },
+    tipoAfectacion: 'C',
+    clase: ''
+  }
+  listaRegistrosTarjeta.value.push(item)
+}
+
 registrosTarjetaCrud.onDoneRegistroTarjetaMultipleCreate(({ data }) => {
   console.log('data:', data)
   const registrosTarjeta = data.registroTarjetaMultipleCreate.registrosTarjeta
@@ -670,7 +622,7 @@ registrosTarjetaCrud.onErrorRegistroTarjetaMultipleCreate((error) => {
  * Funcion utilizada para validar los movimiento al momento de guardar
  */
 function validarMovimientos() {
-  errorItems.value = []
+  /*  errorItems.value = []
   if (listaRegistroFiltrados.value.length <= 0) {
     errorItems.value.push({
       id: 1,
@@ -690,6 +642,11 @@ function validarMovimientos() {
     })
   }
   return errorItems.value.length > 0
+  */
+  const listaGuardar = listaRegistrosTarjeta.value.filter((item) => {
+    return !!item.fecha && !!item.categoria
+  })
+  console.log('listaGuardar:', listaGuardar)
 }
 
 /**
@@ -734,7 +691,7 @@ const columns = [
     label: 'No.',
     field: 'consecutivo',
     sortable: true,
-    align: 'left',
+    align: 'center',
     filter: true,
     style: 'width:55px',
     headerStyle: 'width:55px'
@@ -746,12 +703,12 @@ const columns = [
     sortable: true,
     align: 'center',
     filter: false,
-    style: 'width:95px;min-width: 95px;max-width: 95px',
-    headerStyle: 'width: 95px;min-width: 95px;max-width: 95px'
+    style: 'width:150px;min-width: 150px;max-width: 150px',
+    headerStyle: 'width: 150px;min-width: 150px;max-width: 150px'
   },
   {
     name: 'concepto',
-    label: 'Concepto',
+    label: 'Observaciones',
     field: 'concepto',
     sortable: true,
     align: 'left',
@@ -763,8 +720,8 @@ const columns = [
     field: 'importe',
     align: 'right',
     // format: (val, row) => `${formato.toCurrency(parseFloat(val))}`,
-    style: 'width:100px; min-width: 100px; max-width: 100px',
-    headerStyle: 'width:100px; min-width: 100px; max-width: 100px'
+    style: 'width:160px; min-width: 160px; max-width: 160px',
+    headerStyle: 'width:160px; min-width: 160px; max-width: 160px'
   },
   {
     name: 'categoria',
@@ -775,15 +732,6 @@ const columns = [
     align: 'left',
     style: 'width:400px;max-width:400px',
     headerStyle: 'width:400px;max-width:400px'
-  },
-  {
-    name: 'acciones',
-    label: '',
-    field: 'action',
-    sortable: false,
-    align: 'center',
-    style: 'width:70px',
-    headerStyle: 'width:70px'
   }
 ]
 function closeErrors() {
@@ -806,7 +754,29 @@ function getSelectedString() {
       } seleccionados - Importe: ${formato.toCurrency(
         importe_seleccionado.value
       )} `
-  //de ${listaRegistrosFiltrados.value.length}
+}
+function addItemCategoria(props_row) {
+  editedCategoriaParam.value = {
+    tipoMovimientoId: tipoMovimientoId.value,
+    cuentaContable: null,
+    cuentaDefault: null,
+    icono: 'insert_emoticon',
+    color: '#019A9D'
+  }
+  showRegistroCategoria.value = true
+}
+function categoriaSaved(value) {
+  console.log('categoria saved')
+  // categoria.value = value
+  showRegistroCategoria.value = false
+}
+function focusDate(props) {
+  const rowIndex = props.rowIndex
+  const columnIndex = props.colIndex
+  const item = listaRegistrosTarjeta.value[rowIndex - 1]
+  if (!!item && !(props.row.fecha)) {
+    props.row.fecha = item.fecha
+  }
 }
 </script>
 

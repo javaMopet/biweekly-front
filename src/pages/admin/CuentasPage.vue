@@ -335,7 +335,8 @@ const columns = [
 onMounted(() => {
   // console.log('OnMountedCuentasPage')
   const user = SessionStorage.getItem('current_user')
-  variables.instanceId = user.instance.id
+  let instance = SessionStorage.getItem('current_instance')
+  variables.instanceId = instance.id
   // cuentaStore.fetchOrRefetchListaCuentas()
 })
 

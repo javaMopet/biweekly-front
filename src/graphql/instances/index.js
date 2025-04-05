@@ -15,6 +15,7 @@ export const INSTANCE_CREATE = gql`
       instance {
         id
         name
+        dominio
         logoImage
       }
     }
@@ -26,6 +27,7 @@ export const INSTANCE_UPDATE = gql`
       instance {
         id
         name
+        dominio
         logoImage
       }
     }
@@ -37,6 +39,7 @@ export const INSTANCE_DELETE = gql`
       instance {
         id
         name
+        dominio
         logoImage
       }
     }

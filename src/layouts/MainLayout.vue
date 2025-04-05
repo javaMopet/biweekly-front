@@ -178,11 +178,14 @@ onMounted(() => {
   const credentials = SessionStorage.getItem('credentials') || undefined
   user.value = SessionStorage.getItem('current_user')
   // console.log('user.value:', user.value.instance.logoImage)
-  logoPath.value = '/icons/' + user.value.instance.logoImage
+  // console.log('user.value:', user.value)
+  // console.log('user.value.instances:', user.value.instances)
+  let instance = SessionStorage.getItem('current_instance')
+  logoPath.value = '/icons/' + instance.logoImage
   // /icons/tree.png
   if (!user.value) router.push('login')
 
-  instanceName.value = user.value.instance.name
+  instanceName.value = instance.name
 })
 /**
  * methods
@@ -198,7 +201,6 @@ const dialogCloseSession = ref()
 
 watch(idleFirst, (idlevalue) => {
   if (!!idlevalue) {
-    console.log('dialogCloseSession.value:', dialogCloseSession.value)
     if (!!dialogCloseSession.value || idleLast.value) {
       console.log(
         '%csrc/layouts/MainLayout.vue:192 dialogcloesSession.value',

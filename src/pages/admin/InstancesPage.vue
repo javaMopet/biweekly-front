@@ -228,7 +228,13 @@ const columns = [
     sortable: true,
     align: 'left'
   },
-
+  {
+    name: 'dominio',
+    label: 'Dominio',
+    field: 'dominio',
+    sortable: false,
+    align: 'left'
+  },
   {
     name: 'logo',
     label: 'Logo - Imagen',

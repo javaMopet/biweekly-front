@@ -25,7 +25,6 @@ export const useInstanceStore = defineStore('instanceStore', () => {
   onResultInstanceList(({ data }) => {
     if (!!data) {
       instanceList.value = JSON.parse(JSON.stringify(data.instanceList ?? []))
-      console.log('instanceList.value:', instanceList.value)
     }
   })
 

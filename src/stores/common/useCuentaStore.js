@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from '@vue/apollo-composable'
 import { defineStore } from 'pinia'
+import { SessionStorage } from 'quasar'
 
 import { CUENTA_DELETE, LISTA_CUENTAS } from 'src/graphql/cuentas'
 import { ref, reactive, computed } from 'vue'
@@ -18,12 +19,16 @@ export const useCuentaStore = defineStore('cuentaStore', () => {
     fetchPolicy: 'no-cache'
   })
 
+  const variablesCuentas = reactive({
+    instanceId: SessionStorage.getItem('current_instance').id ?? '-1'
+  })
+
   const {
     onResult: onResultListaCuentas,
     onError: onErrorListaCuentas,
     refetch: refetchListaCuentas,
     loading: loadingListaCuentas
-  } = useQuery(LISTA_CUENTAS, null, graphql_options)
+  } = useQuery(LISTA_CUENTAS, variablesCuentas, graphql_options)
 
   const {
     mutate: cuentaDelete,

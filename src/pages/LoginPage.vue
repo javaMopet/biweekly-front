@@ -83,6 +83,21 @@
                 />
               </template>
             </q-input>
+            <q-input
+              v-model="form.dominio"
+              type="text"
+              label="Dominio"
+              label-color="input-label"
+              bg-color="blue-1"
+              color="blue-gray-10"
+              lazy-rules
+              outlined
+              :rules="[(val) => !!val || 'El dominio es requerido']"
+            >
+              <template v-slot:prepend>
+                <q-icon name="app_registration" class="text-blue-grey-5" />
+              </template>
+            </q-input>
             <div>
               <div
                 class="row full-width justify-end"
@@ -123,7 +138,7 @@
 </template>
 
 <script setup>
-import { useQuasar, SessionStorage, exportFile } from 'quasar'
+import { useQuasar, SessionStorage } from 'quasar'
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { api } from 'src/boot/axios'
@@ -171,7 +186,17 @@ function login() {
 }
 
 sessionService.onDoneUserLogin(({ data }) => {
-  // submitting.value = false
+  let instances = data.userLogin.authenticatable.instances
+  let instance = instances.find((instance) => instance.dominio === form.dominio)
+  if (!instance) {
+    mostrarNotificacionNegativa(
+      'El dominio no existe o no está asociado a tu cuenta. Favor de verificar.'
+    )
+    submitting.value = false
+    return
+  }
+
+  sessionService.setUserInfo(data.userLogin, instance)
   router.push('/home')
 })
 
@@ -223,6 +248,7 @@ sessionService.onErrorUserLogin((response) => {
 function resetUserInfo() {
   SessionStorage.remove('credentials')
   SessionStorage.remove('current_user')
+  SessionStorage.remove('current_instance')
   api.defaults.headers.common['Authorization'] = null
   // console.log('Clearing pinia')
   getActivePinia()._s.forEach((store) => store.$reset())

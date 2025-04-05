@@ -28,12 +28,34 @@
               </div>
               <div>
                 <q-input
+                  v-model="editedFormItem.dominio"
+                  type="text"
+                  dense
+                  color="positive"
+                  autofocus
+                  lazy-rules
+                  :rules="[
+                    (val) =>
+                      (val && val.length > 0) ||
+                      'Favor de ingresar el nombre del dominio'
+                  ]"
+                  label="* Nombre del dominio de la instancia"
+                  outlined
+                />
+              </div>
+              <div>
+                <q-input
                   v-model="editedFormItem.logoImage"
                   type="text"
                   label="Imágen del logo "
                   color="positive"
                   dense
                   outlined
+                  :rules="[
+                    (val) =>
+                      (val && val.length > 0) ||
+                      'Favor de ingresar la URL de la imágen del logo'
+                  ]"
                 ></q-input>
               </div>
             </div>

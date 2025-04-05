@@ -20,7 +20,7 @@
       map-options
       :readonly="readonly"
       :autofocus="autofocus"
-      clearable
+      :clearable="clearable"
       @update:model-value="onSelectCategoria"
     >
       <template #after>
@@ -133,6 +133,11 @@ const props = defineProps({
     }
   },
   autofocus: {
+    type: Boolean,
+    required: false,
+    default: false
+  },
+  clearable: {
     type: Boolean,
     required: false,
     default: false

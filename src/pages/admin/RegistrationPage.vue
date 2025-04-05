@@ -259,6 +259,7 @@ function resetUserInfo() {
   // auth_token.value = null
   SessionStorage.remove('auth_token')
   SessionStorage.remove('user')
+  SessionStorage.remove('current_instance')
   api.defaults.headers.common['Authorization'] = null
 }
 </script>

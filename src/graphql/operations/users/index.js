@@ -1,12 +1,12 @@
 import gql from 'graphql-tag'
 
 export const USERS_LIST = gql`
-  query usersList {
-    usersList {
+  query usersList($instanceId: ID!) {
+    usersList(instanceId: $instanceId) {
       id
       name
       email
-      instance {
+      instances {
         id
         name
         logoImage

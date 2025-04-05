@@ -2,7 +2,8 @@ import { useQuery } from '@vue/apollo-composable'
 import { defineStore } from 'pinia'
 import { useCategoriaService } from 'src/composables/useCategoriaService'
 import { LISTA_CATEGORIAS } from 'src/graphql/categorias'
-import { ref, computed } from 'vue'
+import { ref, reactive, computed } from 'vue'
+import { SessionStorage } from 'quasar'
 
 export const useCategoriaStore = defineStore('categoriaStore', () => {
   /**
@@ -23,11 +24,15 @@ export const useCategoriaStore = defineStore('categoriaStore', () => {
     fetchPolicy: 'no-cache'
   })
 
+  const variablesListados = reactive({
+    instanceId: SessionStorage.getItem('current_instance').id ?? '-1'
+  })
+
   const {
     onResult: onResultListaCategorias,
     onError: onErrorListaCategorias,
     loading: loadingListaCategorias
-  } = useQuery(LISTA_CATEGORIAS, null, graphql_options)
+  } = useQuery(LISTA_CATEGORIAS, variablesListados, graphql_options)
 
   onResultListaCategorias(({ data }) => {
     if (!!data) {

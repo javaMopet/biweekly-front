@@ -41,7 +41,7 @@ export function useSessionService() {
   } = useMutation(UPDATE_PASSWORD_WITH_TOKEN)
 
   onDoneUserLogin(({ data }) => {
-    setUserInfo(data.userLogin)
+    console.log('data:', data)
   })
   onErrorUserLogin((error) => {
     // console.log(error)
@@ -60,8 +60,12 @@ export function useSessionService() {
     console.log('error:', error)
   })
 
-  function setUserInfo(userLogin) {
+  function setUserInfo(userLogin, instance) {
     if (!!userLogin) {
+      SessionStorage.set(
+        'current_instance',
+        JSON.parse(JSON.stringify(instance))
+      )
       // const credentials = JSON.parse(JSON.stringify(userLogin.credentials))
       SessionStorage.set(
         'credentials',
@@ -89,6 +93,7 @@ export function useSessionService() {
   function removeCredentials() {
     SessionStorage.remove('credentials')
     SessionStorage.remove('current_user')
+    SessionStorage.remove('current_instance')
     api.defaults.headers.common['Authorization'] = null
     api.defaults.headers.common['access_token'] = null
     api.defaults.headers.common['client'] = null
@@ -108,6 +113,7 @@ export function useSessionService() {
     onErrorUserSendPasswordReset,
     userUpdatePassword,
     onDoneUserUpdatePassword,
-    onErrorUserUpdatePassword
+    onErrorUserUpdatePassword,
+    setUserInfo
   }
 }

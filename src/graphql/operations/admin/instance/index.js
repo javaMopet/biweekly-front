@@ -5,6 +5,7 @@ export const INSTANCE_LIST = gql`
     instanceList {
       id
       name
+      dominio
       logoImage
       createdAt
     }

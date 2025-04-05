@@ -7,9 +7,10 @@ export const LOGIN = gql`
         id
         email
         name
-        instance {
+        instances {
           id
           name
+          dominio
           logoImage
         }
         menus {
