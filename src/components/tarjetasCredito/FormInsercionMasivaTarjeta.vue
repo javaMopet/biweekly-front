@@ -116,7 +116,7 @@
               class="small-button"
             >
               <q-tooltip> Agregar Registro </q-tooltip>
-          </q-btn>
+            </q-btn>
           </q-th>
         </template>
         <template #header-cell-categoria="props">
@@ -585,7 +585,7 @@ function onConfirmarGuardar(listaGuardar) {
   })
 }
 
-function addItem(){
+function addItem() {
   const item = {
     id: undefined,
     fecha: '',
@@ -774,7 +774,7 @@ function focusDate(props) {
   const rowIndex = props.rowIndex
   const columnIndex = props.colIndex
   const item = listaRegistrosTarjeta.value[rowIndex - 1]
-  if (!!item && !(props.row.fecha)) {
+  if (!!item && !props.row.fecha) {
     props.row.fecha = item.fecha
   }
 }

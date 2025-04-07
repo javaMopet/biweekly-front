@@ -230,6 +230,16 @@
                     </q-list>
                   </q-btn-dropdown>
                   <q-btn
+                    no-caps
+                    class="medium-button"
+                    color="primary-button"
+                    label="Agregar Masivo"
+                    @click="addMasiveItems"
+                    push
+                    icon="add_circle"
+                    rounded
+                  />
+                  <q-btn
                     color="primary-button"
                     @click="importarMovimientos"
                     no-caps
@@ -418,6 +428,19 @@
         @date-updated="dateUpdated"
       ></CambioFechaPage>
     </q-dialog>
+    <q-dialog
+      v-model="showFormCargaMasiva"
+      persistent
+      transition-show="jump-up"
+      transition-hide="jump-down"
+    >
+      <FormInsercionMasivaCuenta
+        :cuenta="cuenta"
+        @items-saved="cargaMasivaSaved"
+        :fecha_desde="detalleVariables.fechaInicio"
+        :fecha_hasta="detalleVariables.fechaFin"
+      ></FormInsercionMasivaCuenta>
+    </q-dialog>
   </Teleport>
 </template>
 
@@ -439,6 +462,7 @@ import { useCuentaStore } from 'src/stores/common/useCuentaStore'
 import { useCuentasCrud } from 'src/composables/useCuentasCrud'
 import PeriodoSelect from 'src/components/formComponents/PeriodoSelect.vue'
 import { useGeneralStore } from 'src/stores/common/useGeneralStore'
+import FormInsercionMasivaCuenta from 'src/components/cuentas/FormInsercionMasivaCuenta.vue'
 
 /**
  * composables
@@ -473,6 +497,7 @@ const variablesSaldoAnterior = reactive({
   fechaFin: DateTime.now().startOf('month').plus({ days: -1 }).toISODate()
 })
 const showCambioFecha = ref(false)
+const showFormCargaMasiva = ref(false)
 // const loadingRegistros = ref(false)
 
 // const variablesSaldoAlPeriodo = reactive({
@@ -554,7 +579,6 @@ function fetchOrRefetchListaRegistros() {
 }
 
 onResultListaRegistros(({ data }) => {
-  // console.log('[ data ] >', data)
   if (!!data) {
     listaRegistros.value =
       JSON.parse(JSON.stringify(data?.obtenerRegistros)) ?? 0
@@ -629,7 +653,6 @@ const sumaMovimientos = computed({
 
 const saldoFinalPeriodo = computed({
   get() {
-    // console.log('calculando saldo final periodo')
     return saldo_periodo_anterior.value + sumaMovimientos.value
   }
 })
@@ -740,15 +763,11 @@ function deleteSelectedItems() {
  * @param {Array} toDelete - Items to delete.
  */
 function confirmarEliminarItems(toDelete) {
-  console.log(toDelete)
   const eliminar = toDelete.map((item) => item.id)
-  console.log('eliminando', eliminar.toString())
   registrosCrud.registrosDelete({ ids: eliminar.toString() })
 }
 
 registrosCrud.onDoneRegistrosDelete(({ data }) => {
-  console.log('Terminó de eliminar registros', data.registrosDelete.cuentasIds)
-  // cuenta.value.saldo = data.registrosDelete.saldo
   refetchDatos()
   mostrarNotificacionPositiva(
     'Los movimientos fueron eliminados exitosamente',
@@ -864,6 +883,22 @@ function addItem(tipoMovimientoId) {
     cuenta: cuenta.value
   }
   showForm.value = true
+}
+
+function addMasiveItems() {
+  showFormCargaMasiva.value = true
+}
+function cargaMasivaSaved(cuenta_id) {
+  showFormCargaMasiva.value = false
+  showFormCarga.value = false
+  console.log('cuenta_id:', cuenta_id)
+  cuentasCrud.cuentaSaldoUpdate({ cuentaId: cuenta.value.id })
+  // mostrarNotificacionPositiva(
+  //   'Los movimientos fueron guardados correctamente.',
+  //   900
+  // )
+  refetchListaRegistros()
+  refetchDatos()
 }
 
 function saveObs(id, row, observaciones) {
