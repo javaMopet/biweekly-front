@@ -9,11 +9,20 @@ export const USERS_LIST = gql`
       instances {
         id
         name
+        dominio
         logoImage
+        createdAt
       }
       isAdmin
       isSuperuser
-      roles
+      roles {
+        id
+        name
+        resourceId
+        resourceType
+        updatedAt
+        createdAt
+      }
       menus {
         id
         nombre
@@ -31,19 +40,22 @@ export const USER_REGISTER = gql`
     $password: String!
     $passwordConfirmation: String!
     $name: String!
-    $instanceId: ID!
+    $instances: [ID!]
+    $roles: [ID!]
   ) {
     userRegister(
       email: $email
       password: $password
       passwordConfirmation: $passwordConfirmation
       name: $name
-      instanceId: $instanceId
+      instances: $instances
+      roles: $roles
     ) {
       authenticatable {
         id
         email
         name
+        roles
         createdAt
       }
       credentials {
@@ -56,8 +68,18 @@ export const USER_REGISTER = gql`
 `
 
 export const USER_UPDATE = gql`
-  mutation userUpdate($id: ID!, $userInput: UserInput!) {
-    userUpdate(id: $id, userInput: $userInput) {
+  mutation userUpdate(
+    $id: ID!
+    $userInput: UserInput!
+    $instances: [ID!]
+    $roles: [ID!]
+  ) {
+    userUpdate(
+      id: $id
+      userInput: $userInput
+      instances: $instances
+      roles: $roles
+    ) {
       user {
         id
         email

@@ -714,7 +714,8 @@ function exportToExcel() {
 function obtenerParametros() {
   return {
     ejercicioFiscalId: ejercicio_fiscal.value,
-    mesId: mes.value.id
+    mesId: mes.value.id,
+    instanceId: SessionStorage.getItem('current_instance').id,
   }
 }
 </script>

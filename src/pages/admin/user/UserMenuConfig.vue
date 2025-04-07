@@ -95,7 +95,7 @@ function inicilizar(newValue) {
   user.value = usuarioStore.listaUsuarios[index]
   // console.log('user.value:', user.value)
   selection.value = user.value?.menus.map((menu) => menu.id)
-  console.table(selection.value)
+  // console.table(selection.value)
 }
 /**
  * computed

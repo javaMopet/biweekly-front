@@ -91,7 +91,8 @@
                     </div>
                     <!-- <div class="">{{ props.row.instance.name }}</div> -->
                     <div class="">
-                      Roles: [{{ props.row.roles.toString() }}]
+                      <span class="text-bold">Roles:</span>
+                      {{ props.row.roles.map((rol) => rol.name).join(', ') }}
                     </div>
                     <router-link
                       :to="{
@@ -175,15 +176,7 @@ const { mostrarNotificacionPositiva, mostrarNotificacionNegativa } =
 
 const userService = useUserService()
 const usuarioStore = useUsuarioStore()
-/**
- * GRAPHQL
- */
-// usuariosCrud.onErrorUsuarioDelete((error) => {
-//   notificacion.mostrarNotificacionNegativa(
-//     'No es posible eliminar esta cuenta, favor de verificar que no contenga movimientos',
-//     1600
-//   )
-// })
+
 /**
  * state
  */
@@ -263,8 +256,8 @@ function editItem(item) {
   userToEdit.value = {
     ...item.row
   }
-  console.log('iniciar edicion el item', userToEdit.value)
-  console.log('indice:', item.rowIndex)
+  // console.log('userToEdit instances:', userToEdit.value.instances)
+  // console.log('userToEdit roles:', userToEdit.value.roles)
   showFormItem.value = true
 }
 
@@ -293,6 +286,9 @@ function deleteRow(item) {
     .onDismiss(() => {})
 }
 
+/**
+ * GRAPHQL
+ */
 userService.onDoneUserDelete(({ data }) => {
   const itemDeleted = data.userDelete.user
   console.log('itemDeleted', itemDeleted)
@@ -301,6 +297,20 @@ userService.onDoneUserDelete(({ data }) => {
     2100
   )
   usuarioStore.loadOrRefetchUsers()
+})
+userService.onErrorUserDelete((error) => {
+  console.error('error', error)
+  mostrarNotificacionNegativa(
+    `Surgió un error al intentar eliminar el usuario.`,
+    2100
+  )
+})
+userService.onErrorUserUpdate((error) => {
+  console.error('error', error)
+  mostrarNotificacionNegativa(
+    `Surgió un error al intentar actualizar el usuario.`,
+    2100
+  )
 })
 
 function userRegistered(itemSaved) {

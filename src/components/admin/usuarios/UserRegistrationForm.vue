@@ -3,7 +3,7 @@
     <DialogTitle>{{ actionName }}</DialogTitle>
     <div class="column fit q-pa-lg items-center" style="border: 0px solid red">
       <q-form
-        @submit="registerUser"
+        @submit="guardarUsuario"
         class="column q-gutter-md"
         style="width: 75%"
         autocomplete="off"
@@ -16,6 +16,8 @@
           clearable
           class="fit"
           :rules="[(val) => !!val || 'Nombre requerido.']"
+          color="deep-orange"
+          dense
         />
         <!-- standout="bg-contrast" -->
         <q-input
@@ -28,6 +30,8 @@
           class="fit"
           :rules="[(val) => !!val || 'Email required!']"
           :readonly="isEditing"
+          color="deep-orange"
+          dense
         />
         <q-input
           v-model="authenticable.password"
@@ -36,6 +40,8 @@
           :rules="[(val) => !!val || 'Requerido']"
           v-if="!isEditing"
           clearable
+          color="deep-orange"
+          dense
         >
           <template v-slot:append>
             <q-icon
@@ -57,6 +63,8 @@
           ]"
           v-if="!isEditing"
           clearable
+          color="deep-orange"
+          dense
         >
           <template v-slot:append>
             <q-icon
@@ -68,17 +76,36 @@
         </q-input>
         <q-select
           v-if="isSuperuser"
-          v-model="authenticable.instance"
+          v-model="authenticable.instances"
           :options="instanceStore.instanceList"
-          label="Instancia"
+          label="Instancias"
           option-label="name"
+          multiple
+          use-chips
+          hint="Selecciona una o más instancias"
+          outlined
+          color="primary-button"
+          dense
         />
-        <q-checkbox
+        <q-select
+          v-if="isSuperuser"
+          v-model="authenticable.roles"
+          :options="rolesStore.roleList"
+          label="Roles"
+          option-label="name"
+          multiple
+          use-chips
+          hint="Selecciona uno o más roles"
+          outlined
+          color="primary-button"
+          dense
+        />
+        <!-- <q-checkbox
           v-if="isSuperuser"
           left-label
           v-model="authenticable.isAdmin"
           label="Is Admin: "
-        />
+        /> -->
 
         <div class="col row justify-end q-pt-lg q-gutter-lg">
           <q-btn
@@ -99,6 +126,7 @@
         </div>
       </q-form>
     </div>
+    <!-- <pre>{{ authenticable.roles }}</pre> -->
   </div>
 
   <Teleport to="#modal">
@@ -124,6 +152,9 @@ import DialogTitle from 'src/components/formComponents/modal/DialogTitle.vue'
 import { useUserService } from 'src/composables/admin/useUserService'
 import { useInstanceStore } from 'src/stores/admin/useInstanceStore'
 import { SessionStorage } from 'quasar'
+import { useRoleStore } from 'src/stores/admin/useRoleStore'
+
+import { cleanAndCamelCase } from 'src/utils/cleanAndCamelCase'
 
 /**
  * composables
@@ -133,6 +164,7 @@ const { mostrarNotificacionPositiva, mostrarNotificacionNegativa } =
 
 const userService = useUserService()
 const instanceStore = useInstanceStore()
+const rolesStore = useRoleStore()
 
 /**
  * state
@@ -208,43 +240,53 @@ const lblSubmit = computed({
  * Guardar o actualizar un usuario,
  * mandar a llamar en el servicio de usuarios.
  */
-function registerUser() {
+function guardarUsuario() {
+  console.log('authenticable:', authenticable.value)
+  console.log('isEditing.value:', isEditing.value)
+  const instances = authenticable.value.instances.map((instance) => instance.id)
+  const roles = authenticable.value.roles.map((role) => role.id)
+  console.log('instances:', instances)
   if (!isEditing.value) {
+    const fieldsToRemove = ['__typename', 'logoImage', 'createdAt', 'name']
     const input = {
       ...authenticable.value,
-      instanceId: authenticable.value.instance.id,
-      instance: undefined
+      instances,
+      roles
+      // roles: cleanAndCamelCase(authenticable.value.roles, fieldsToRemove)
     }
-    console.log('autheticable.value:', input)
+    // const input = removeFields(authenticable.value, fieldsToRemove)
+    console.log('autheticable.value input to register:', input)
     userService.userRegister(input)
   } else {
+    const instances = authenticable.value.instances.map(
+      (instance) => instance.id
+    )
+    const roles = authenticable.value.roles.map((role) => role.id)
+    console.log('instances:', instances)
+    console.log('roles:', roles)
     userService.userUpdate({
       id: authenticable.value.id,
       userInput: {
-        name: authenticable.value.name,
-        instanceId: authenticable.value.instance.id
-      }
+        name: authenticable.value.name
+      },
+      instances,
+      roles
     })
-    console.log(
-      'revisando si cambia el is admin',
-      isAdminInitial.value,
-      authenticable.value.isAdmin
-    )
-    if (isAdminInitial.value != authenticable.value.isAdmin) {
-      if (authenticable.value.isAdmin) {
-        console.log('actualizando admin role .......')
-        userService.userAddRole({
-          userId: authenticable.value.id,
-          role: 'admin'
-        })
-      } else {
-        console.log('removing admin role .......')
-        userService.userRemoveRole({
-          userId: authenticable.value.id,
-          role: 'admin'
-        })
-      }
-    }
+    // if (isAdminInitial.value != authenticable.value.isAdmin) {
+    //   if (authenticable.value.isAdmin) {
+    //     console.log('actualizando admin role .......')
+    //     userService.userAddRole({
+    //       userId: authenticable.value.id,
+    //       role: 'admin'
+    //     })
+    //   } else {
+    //     console.log('removing admin role .......')
+    //     userService.userRemoveRole({
+    //       userId: authenticable.value.id,
+    //       role: 'admin'
+    //     })
+    //   }
+    // }
   }
 }
 // function isFormValid() {
@@ -259,21 +301,24 @@ function registerUser() {
 
 userService.onDoneUserRegister(({ data }) => {
   const newUser = data.userRegister.authenticatable
+  mostrarNotificacionPositiva('El usuario se registró correctamente', 2500)
+  emit('userRegistered', newUser)
 
-  userService.userUpdate({
-    id: newUser.id,
-    userInput: {
-      name: authenticable.value.name,
-      instanceId: authenticable.value.instance.id
-    }
-  })
-  if (authenticable.value.isAdmin) {
-    console.log('actualizando admin role .......')
-    userService.userAddRole({
-      userId: newUser.id,
-      role: 'admin'
-    })
-  }
+  // console.log('userUpdate: actualizar usuario nombre .........')
+  // userService.userUpdate({
+  //   id: newUser.id,
+  //   userInput: {
+  //     name: authenticable.value.name,
+  //     instanceId: authenticable.value.instance.id
+  //   }
+  // })
+  // if (authenticable.value.isAdmin) {
+  //   console.log('actualizando admin role .......')
+  //   userService.userAddRole({
+  //     userId: newUser.id,
+  //     role: 'admin'
+  //   })
+  // }
 })
 
 userService.onDoneUserUpdate(({ data }) => {

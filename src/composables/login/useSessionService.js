@@ -40,12 +40,8 @@ export function useSessionService() {
     onError: onErrorUserUpdatePassword
   } = useMutation(UPDATE_PASSWORD_WITH_TOKEN)
 
-  onDoneUserLogin(({ data }) => {
-    console.log('data:', data)
-  })
-  onErrorUserLogin((error) => {
-    // console.log(error)
-  })
+  // onDoneUserLogin(({ data }) => {})
+  // onErrorUserLogin((error) => {})
 
   onDoneUserSendPasswordReset(({ data }) => {
     console.log('data:', data)
