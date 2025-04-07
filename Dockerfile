@@ -14,11 +14,11 @@ COPY package*.json ./
 # instalacion del quasar cli
 RUN npm install -g @quasar/cli
 
-# Instalacion de todas las dependencias
-RUN npm install
-
 # se copia la aplicacion al workdir
 COPY . .
+
+# Instalacion de todas las dependencias
+RUN npm install
 
 # se compila la aplicacion
 RUN quasar build
