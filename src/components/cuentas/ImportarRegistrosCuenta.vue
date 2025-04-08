@@ -148,6 +148,21 @@
             class="my-sticky-header-table"
             :loading="loadingRows"
           >
+            <template #body-cell-concepto="props">
+              <q-td :props="props">
+                <q-input
+                  v-model="props.row.concepto"
+                  :class="props.row.clase"
+                  dense
+                  lazy-rules
+                  outlined
+                  color="primary-button"
+                  bg-color="blue-1"
+                  label-color="input-label"
+                  style="width: 100%"
+                ></q-input>
+              </q-td>
+            </template>
             <template #body-cell-categoria="props">
               <q-td :props="props">
                 <div class="column col">
@@ -241,9 +256,10 @@
       </div>
     </div>
   </div>
-  <!-- <div class="col bg-white">
-    <pre>{{ registrosSelected }}</pre>
-  </div> -->
+  <div class="col bg-white">
+    <pre>{{ listaRegistrosFiltrados }}</pre>
+  </div>
+
 </template>
 
 <script setup>
@@ -260,12 +276,15 @@ import DialogTitle from '../formComponents/modal/DialogTitle.vue'
 import { toast } from 'vue3-toastify'
 import { parse, format } from 'date-fns'
 import es from 'date-fns/locale/es'
+import en from 'date-fns/locale/en-US'
+import { useCategoriaStore } from 'src/stores/common/categoriaStore'
 
 /**
  * Composables
  */
 const notificacion = useNotificacion()
 const registrosCrud = useRegistrosCrud()
+const categoriaStore = useCategoriaStore()
 /**
  * state
  */
@@ -349,7 +368,7 @@ async function updateFile(v) {
     //   }
     // }
 
-    console.log('props.cuenta.banco.id:', props.cuenta.banco)
+    // console.log('props.cuenta.banco.id:', props.cuenta.banco)
     if (!!props.cuenta.banco) {
       switch (props.cuenta.banco.id) {
         case '1':
@@ -397,8 +416,6 @@ function obtenerMovimientosSantander(wb) {
     saldo: row.G,
     referencia: row.H
   }))
-
-  console.log('datda', todos.value)
 
   todos.value.forEach((row, index) => {
     let fecha = convertidorFecha(row.fecha.toString())
@@ -462,8 +479,7 @@ function obtenerMovimientosSantanderNuevo(wb) {
             : deposito != 0
             ? parseFloat(deposito)
             : 0
-        // console.log('tipo_afectacion:', tipo_afectacion)
-        // console.log('importe:', importe)
+
         const item = {
           id: index,
           consecutivo: index + 1,
@@ -482,17 +498,14 @@ function obtenerMovimientosSantanderNuevo(wb) {
 }
 
 function convertidorFecha(fecha) {
-  // console.log('fecha:', fecha)
   if (fecha.includes('/')) {
     const partes = fecha.split('/')
-    // console.log('partes:', partes)
     if (isNaN(partes[1])) {
       // asume que el formato es 01/ene/2025 pe.
       const fechaParseada = parse(fecha, 'dd/MMM/yy', new Date(), {
         locale: es
       })
       const fechaP = format(fechaParseada, 'dd/MM/yyyy')
-      // console.log('fechaP:', fechaP)
       return fechaP
     } else {
       // asume que el formato esta en MM/dd/yy
@@ -503,8 +516,15 @@ function convertidorFecha(fecha) {
         .toString()
         .padStart(2, '0')}/${anioCompleto}`
     }
+  } else if (fecha.includes('-')) {
+    const fechaParseada = parse(fecha, 'dd-MMM', new Date(), {
+      locale: en
+    })
+    const fechaP = format(fechaParseada, 'dd/MM/yyyy')
+    return fechaP
   }
 }
+
 function convertirImporte(importe) {
   if (!importe) return 0
   return parseFloat(importe.replace(/[$,]/g, ''))
@@ -545,52 +565,84 @@ function obtenerMovimientosBancomer(wb) {
 }
 
 function obtenerMovimientosEfectivo(wb) {
-  const data = utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {
-    header: ['A', 'B', 'C', 'D', 'E', 'F'],
+  // console.log('movimientos efectivo')
+  // console.log('wb.SheetNames:', wb.SheetNames)
+  const data = utils.sheet_to_json(wb.Sheets[wb.SheetNames[1]], {
+    header: ['A', 'B', 'C', 'D', 'E', 'F', 'G'],
     skipHeader: true,
     raw: false
   })
 
-  todos.value = data.map((row) => ({
-    consecutivo: row.A,
-    fecha: row.B,
-    concepto: row.C,
-    cargo: row.D,
-    abono: row.E,
-    saldo: row.F
-  }))
+  // console.log('data:', data)
+
+  todos.value = data
+    .filter((row) => !!row.A)
+    .map((row, index) => ({
+      consecutivo: index + 1,
+      fecha: convertidorFecha(row.A),
+      movimiento: row.B,
+      categoria: row.C,
+      concepto: row.D,
+      cargo: convertirImporte(row.E),
+      abono: convertirImporte(row.F),
+      saldo: convertirImporte(row.G)
+    }))
+
   // console.log('todos', todos.value)
   console.table(todos.value)
+  console.log('categoriaStore.listaCategorias:', categoriaStore.listaCategorias)
+  try {
+    todos.value.forEach((row, index) => {
+      let fecha = row.fecha?.toString() || ''
+      // console.log('fecha', fecha)
+      let fechaObject = DateTime.fromFormat(fecha, 'dd/MM/yyyy')
+      if (!fechaObject.isValid) {
+        fechaObject = DateTime.fromFormat(fecha, 'dd-MM-yyyy')
+      }
+      // console.log('fecha valida', fechaObject.isValid)
+      if (fechaObject.isValid) {
+        // console.log('row.cargo:', row.cargo)
+        const cargo = parseFloat(row.cargo ?? 0)
+        const abono = parseFloat(row.abono ?? 0)
+        // console.log('cargo y abono: ', cargo, abono)
+        if (cargo !== 0 && abono !== 0) {
+          console.trace('error en la linea')
+          return
+        }
+        let tipo_afectacion = null
+        let importe = 0
+        if (cargo !== 0) {
+          tipo_afectacion = 'C'
+          importe = cargo * -1
+        } else {
+          tipo_afectacion = 'A'
+          importe = abono
+        }
+        const categoria = buscarCategoriaPorCadena(row.categoria)
+        addItemToSave(row, index, fecha, importe, tipo_afectacion, categoria)
+      }
+    })
+    console.table(listaRegistros.value)
+  } catch (e) {
+    console.log(e)
+    loadingRows.value = false
+  }
+}
 
-  todos.value.forEach((row, index) => {
-    let fecha = row.fecha?.toString() || ''
-    // console.log('fecha', fecha)
-    let fechaObject = DateTime.fromFormat(fecha, 'dd/MM/yyyy')
-    if (!fechaObject.isValid) {
-      fechaObject = DateTime.fromFormat(fecha, 'dd-MM-yyyy')
-    }
-    // console.log('fecha valida', fechaObject.isValid)
-    if (fechaObject.isValid) {
-      const cargo = parseFloat(row.cargo?.replace(',', '') ?? 0)
-      const abono = parseFloat(row.abono?.replace(',', '') ?? 0)
-      console.log('cargo y abono: ', cargo, abono)
-      if (cargo !== 0 && abono !== 0) {
-        console.trace('error en la linea')
-        return
-      }
-      let tipo_afectacion = null
-      let importe = 0
-      if (cargo !== 0) {
-        tipo_afectacion = 'C'
-        importe = cargo * -1
-      } else {
-        tipo_afectacion = 'A'
-        importe = abono
-      }
-      addItemToSave(row, index, fecha, importe, tipo_afectacion)
-    }
-  })
-  console.table(listaRegistros.value)
+function buscarCategoriaPorCadena(cadena) {
+  console.log('categoriaName:', cadena)
+  const tipoChar = cadena.charAt(0) // 'I' o 'G'
+  const nombre = cadena.slice(2) // remueve el tipo y el espacio
+
+  const tipo_movimiento = tipoChar === 'I' ? '1' : '2'
+
+  console.log('tipo_movimiento:', tipo_movimiento)
+  console.log('nombre:', nombre)
+  const cat = categoriaStore.listaCategorias.find(
+    (cat) => cat.tipoMovimientoId === tipo_movimiento && cat.nombre === nombre
+  )
+  console.log('cat:', cat)
+  return cat
 }
 
 /**
@@ -601,7 +653,7 @@ function obtenerMovimientosEfectivo(wb) {
  * @param {*} importe
  * @param {*} tipo_afectacion
  */
-function addItemToSave(row, index, fecha, importe, tipo_afectacion) {
+function addItemToSave(row, index, fecha, importe, tipo_afectacion, categoria) {
   // console.log('fecha', fecha)
   const item = {
     id: index,
@@ -611,6 +663,7 @@ function addItemToSave(row, index, fecha, importe, tipo_afectacion) {
     concepto: row.concepto,
     importe,
     saldo: row.saldo,
+    categoria,
     saved: false,
     isValid: true
   }

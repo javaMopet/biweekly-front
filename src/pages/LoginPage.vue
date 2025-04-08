@@ -131,7 +131,7 @@
         class="text-blue-grey-4"
         style="border: 0px solid red; text-align: right"
       >
-        v 1 . 2 . 1
+        v 1 . 3 . 5
       </div>
     </q-card>
   </div>
