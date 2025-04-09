@@ -613,16 +613,25 @@ function obtenerMovimientosEfectivo(wb) {
           console.trace('error en la linea')
           return
         }
-        let tipo_afectacion = null
+        // let tipo_afectacion = null
         let importe = 0
         if (cargo !== 0) {
-          tipo_afectacion = 'C'
+          // tipo_afectacion = 'C'
           importe = cargo * -1
         } else {
-          tipo_afectacion = 'A'
+          // tipo_afectacion = 'A'
           importe = abono
         }
         const categoria = buscarCategoriaPorCadena(row.categoria, index)
+
+        const tipo_afectacion = !!categoria
+          ? categoria.tipoMovimientoId === '2'
+            ? 'C'
+            : 'A'
+          : cargo !== 0
+          ? 'C'
+          : 'A'
+
         addItemToSave(row, index, fecha, importe, tipo_afectacion, categoria)
       }
     })
@@ -633,20 +642,16 @@ function obtenerMovimientosEfectivo(wb) {
   }
 }
 
-function buscarCategoriaPorCadena(cadena /* , index */) {
-  // console.log('index:', index)
-  // console.log('categoriaName:', cadena)
+function buscarCategoriaPorCadena(cadena, index) {
   const tipoChar = cadena.charAt(0) // 'I' o 'G'
   const nombre = cadena.slice(2) // remueve el tipo y el espacio
 
   const tipo_movimiento = tipoChar === 'I' ? '1' : '2'
 
-  // console.log('tipo_movimiento:', tipo_movimiento)
-  // console.log('nombre:', nombre)
   const cat = categoriaStore.listaCategorias.find(
     (cat) => cat.tipoMovimientoId === tipo_movimiento && cat.nombre === nombre
   )
-  // console.log('cat:', cat)
+
   return cat
 }
 
@@ -729,25 +734,25 @@ function obtenerTraspasos() {
     .forEach((item) => {
       const fecha = DateTime.fromFormat(item.fecha, 'dd/MM/yyyy')
       const user = SessionStorage.getItem('current_user')
-        traspasosInput.push({
-          fecha,
-          observaciones: 'Traspaso entre cuentas',
-          userId: user.id,
-          traspasoDetalles: [
-            {
-              cuentaId: parseInt(item.cuentaDestino.id),
-              tipoCuentaTraspasoId: 1,
-              importe: item.importe * -1
-            },
-            {
-              cuentaId: parseInt(props.cuenta.id),
-              tipoCuentaTraspasoId: 2,
-              importe: item.importe
-            }
-          ]
-        })
+      traspasosInput.push({
+        fecha,
+        observaciones: 'Traspaso entre cuentas',
+        userId: user.id,
+        traspasoDetalles: [
+          {
+            cuentaId: parseInt(item.cuentaDestino.id),
+            tipoCuentaTraspasoId: 1,
+            importe: item.importe * -1
+          },
+          {
+            cuentaId: parseInt(props.cuenta.id),
+            tipoCuentaTraspasoId: 2,
+            importe: item.importe
+          }
+        ]
+      })
     })
-    // console.table(traspasosInput);
+  // console.table(traspasosInput);
   return traspasosInput
 }
 
