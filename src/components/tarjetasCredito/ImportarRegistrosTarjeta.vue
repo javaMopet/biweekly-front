@@ -214,11 +214,11 @@
 /**
  * imports
  */
-import { ref, computed, onMounted, toRef } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { read, utils } from 'xlsx'
 import CategoriaSelect from '../formComponents/CategoriaSelect.vue'
 import { useFormato } from 'src/composables/utils/useFormato'
-import { api } from 'src/boot/axios'
+// import { api } from 'src/boot/axios'
 import { DateTime } from 'luxon'
 import DateInput from '../formComponents/DateInput.vue'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
@@ -293,21 +293,6 @@ const monthsMap = new Map()
 const monthsEnglishMap = new Map()
 // assuming `todos` is a standard VueJS `ref`
 
-const meses = {
-  Ene: '01',
-  Feb: '02',
-  Mar: '03',
-  Abr: '04',
-  May: '05',
-  Jun: '06',
-  Jul: '07',
-  Ago: '08',
-  Sep: '09',
-  Oct: '10',
-  Nov: '11',
-  Dic: '12'
-}
-
 async function updateFile(v) {
   loadingRows.value = true
   try {
@@ -379,6 +364,7 @@ async function updateFile(v) {
  * Cargar movimientos de santander.
  * @param {Object} wb - Excel data
  */
+/*
 function cargarMovimientosSantander(wb) {
   // get data of first worksheet as an array of objects
   const data = utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {
@@ -407,7 +393,7 @@ function cargarMovimientosSantander(wb) {
   // console.log('datda', todos.value[5])
   crearListaRegistrosTarjeta(todos.value)
 }
-
+*/
 /**
  * Cargar movimientos de santander.
  * @param {Object} wb - Excel data
@@ -433,16 +419,17 @@ function cargarMovimientosSantanderNuevo(wb) {
     }))
 
   console.table(todos.value)
-  todos.value = todos.value.map((row, index) => ({
+  todos.value = todos.value.map((row /* , index */) => ({
     fecha: row.fecha,
     consecutivo: row.consecutivo,
     concepto: row.concepto,
-    importe: (parseFloat(row.retiro)*-1) + (parseFloat(row.deposito)*-1)
+    importe: parseFloat(row.retiro) * -1 + parseFloat(row.deposito) * -1
   }))
   console.log(todos.value)
 
   crearListaRegistrosTarjeta(todos.value)
 }
+
 function convertidorFecha(fecha) {
   // console.log('fecha:', fecha)
   if (fecha.includes('/')) {
@@ -487,12 +474,12 @@ function cargarMovimientosBancomer(wb) {
     fecha: row.FECHA,
     consecutivo: index,
     concepto: row.DESCRIPCION,
-    cargo: row.CARGO === '' ? 0 : row.CARGO?.replace(',', '') ?? 0,
-    abono: row.ABONO === '' ? 0 : row.ABONO?.replace(',', '') ?? 0,
+    cargo: row.CARGO === '' ? 0 : (row.CARGO?.replace(',', '') ?? 0),
+    abono: row.ABONO === '' ? 0 : (row.ABONO?.replace(',', '') ?? 0),
     saldo: row.SALDO?.replace(',', '') ?? 0
   }))
   console.log('todos.value', todos.value)
-  todos.value = todos.value.map((row, index) => ({
+  todos.value = todos.value.map((row /* , index */) => ({
     fecha: row.fecha,
     consecutivo: row.consecutivo,
     concepto: row.concepto,
@@ -549,7 +536,7 @@ function cargarMovimientosAmericanExpress(wb) {
 function crearListaRegistrosTarjeta(excelData) {
   // console.table(excelData)
   excelData.forEach((row, index) => {
-    if (!!row.fecha) {
+    if (row.fecha) {
       const fechaObject = DateTime.fromFormat(
         row.fecha.toString(),
         'dd/MM/yyyy'

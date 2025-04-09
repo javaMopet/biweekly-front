@@ -463,7 +463,6 @@ import { useCuentasCrud } from 'src/composables/useCuentasCrud'
 import PeriodoSelect from 'src/components/formComponents/PeriodoSelect.vue'
 import { useGeneralStore } from 'src/stores/common/useGeneralStore'
 import FormInsercionMasivaCuenta from 'src/components/cuentas/FormInsercionMasivaCuenta.vue'
-import { customStorageEventName } from '@vueuse/core'
 
 /**
  * composables
@@ -589,7 +588,7 @@ function fetchOrRefetchListaRegistros() {
 }
 
 onResultListaRegistros(({ data }) => {
-  if (!!data) {
+  if (data) {
     listaRegistros.value =
       JSON.parse(JSON.stringify(data?.obtenerRegistros)) ?? 0
 
@@ -599,7 +598,7 @@ onResultListaRegistros(({ data }) => {
       registro.saldo = saldoAnterior + registro.importe
       saldoAnterior = registro.saldo
       // console.log('registro:', registro)
-      if (!!registro.traspaso) {
+      if (registro.traspaso) {
         registro.tipoMovimiento = 'T'
         registro.tipoMovimientoColor = 'blue'
       } else {
@@ -617,10 +616,11 @@ onResultListaRegistros(({ data }) => {
 
 onErrorListaRegistros((error) => {
   mostrarNotificacionNegativa(
-    'Ocurrió un error, no se pueden obtener los detalles de la cuenta'
+    `Ocurrió un error, no se pueden obtener los detalles de la cuenta. ${error.message}`
   )
   if (process.env.NODE_ENV !== 'production') {
-    logErrorMessages(error)
+    // logErrorMessages(error)
+    console.log('error:', error)
   }
 })
 
@@ -631,16 +631,19 @@ const {
 } = useQuery(OBTENER_SALDO_A_FECHA, variablesSaldoAnterior, graphqlOptions)
 
 onResultObtenerSaldoAFecha(({ data }) => {
-  if (!!data) {
+  if (data) {
     saldo_periodo_anterior.value = data.obtenerSaldoAFecha
     fetchOrRefetchListaRegistros(null, detalleVariables, graphqlOptions)
   }
 })
 
 onErrorObtenerSaldo((error) => {
-  mostrarNotificacionNegativa('Ocurrió un error, no se puede obtener el saldo')
+  mostrarNotificacionNegativa(
+    `Ocurrió un error, no se puede obtener el saldo. ${error.message}`
+  )
   if (process.env.NODE_ENV !== 'production') {
-    logErrorMessages(error)
+    // logErrorMessages(error)
+    console.log('error:', error)
   }
 })
 
@@ -730,11 +733,11 @@ function editItem(item) {
  * @returns {Float} Retornar el importe formateado de acuerdo al tipo de movimiento
  */
 function obtenerImporteByTipoMovimiento(editedItem) {
-  if (!!editedItem.categoria) {
+  if (editedItem.categoria) {
     return editedItem.categoria.tipoMovimientoId === '2'
       ? editedItem.importe * -1
       : editedItem.importe
-  } else if (!!editedItem.traspasoDetalle) {
+  } else if (editedItem.traspasoDetalle) {
     return editedItem.traspasoDetalle.importe
   } else {
     return ''
@@ -778,6 +781,7 @@ function confirmarEliminarItems(toDelete) {
 }
 
 registrosCrud.onDoneRegistrosDelete(({ data }) => {
+  console.log('data:', data)
   refetchDatos()
   mostrarNotificacionPositiva(
     'Los movimientos fueron eliminados exitosamente',
@@ -851,15 +855,19 @@ registrosCrud.onErrorRegistrosDelete(() => {
 /**
  * Al cambiar el mes
  */
+/*
 function onChangeMes() {
   onChangePeriodo()
 }
+ */
 /**
  * Al cambiar el ejericio
  */
+/*
 function onChangeEjercicio() {
   onChangePeriodo()
 }
+ */
 /**
  * Lista de registros de la tarjeta
  */
@@ -935,7 +943,10 @@ function saveObs(id, row, observaciones) {
   })
 }
 
-registrosCrud.onDoneRegistroUpdate((response) => {})
+registrosCrud.onDoneRegistroUpdate((response) => {
+  console.log('response:', response)
+  mostrarNotificacionPositiva('Registro actualizado correctamente.', 1000)
+})
 
 registrosCrud.onErrorRegistroUpdate((response) => {
   console.trace(response)
@@ -946,18 +957,19 @@ registrosCrud.onErrorRegistroUpdate((response) => {
 })
 
 registrosCrud.onDoneRegistroParcialUpdate((response) => {
+  console.log('response:', response)
   mostrarNotificacionPositiva('Campo observación actualizado.', 700)
 })
 
 registrosCrud.onErrorRegistroParcialUpdate((error) => {
-  console.trace(response)
   mostrarNotificacionNegativa(
-    'No fué posible actualizar el registro, favor de verificar.',
+    `No fué posible actualizar el registro, favor de verificar. ${error.message}`,
     1500
   )
 })
 
 function itemSaved(registro) {
+  console.log('registro:', registro)
   refetchDatos()
   // cargarDatosCuenta(route.params.id, false)
   showForm.value = false
@@ -979,12 +991,12 @@ function itemsSaved() {
 function actualizarSaldoFinal() {
   cuentasCrud.cuentaSaldoUpdate({ cuentaId: route.params.id.toString() })
 }
-
-cuentasCrud.onDoneCuentaSaldoUpdate(({ data }) => {
+/*
+ cuentasCrud.onDoneCuentaSaldoUpdate(({ data }) => {
   // console.log('cuentasCrud.onDoneCuentaSaldoUpdate ......')
   // cuenta.value.saldo = data.cuentaSaldoUpdate.cuenta.saldo
-})
-
+ })
+*/
 /**
  * Iniciar el formulario de importación de movimientos.
  */
@@ -1015,7 +1027,7 @@ const columns = [
     field: 'fecha',
     sortable: false,
     align: 'left',
-    format: (val, row) => formato.formatoFechaFromISO(val),
+    format: (val /* , row */) => formato.formatoFechaFromISO(val),
     headerStyle: 'width: 90px'
   },
   {
@@ -1042,7 +1054,7 @@ const columns = [
     field: 'cargo',
     sortable: false,
     align: 'right',
-    format: (val, row) => formato.toCurrency(val),
+    format: (val /* , row */) => formato.toCurrency(val),
     headerStyle: 'width: 100px; min-width:100px'
   },
   {
@@ -1051,7 +1063,7 @@ const columns = [
     field: 'abono',
     sortable: false,
     align: 'right',
-    format: (val, row) => formato.toCurrency(val),
+    format: (val /* , row */) => formato.toCurrency(val),
     headerStyle: 'width: 100px; min-width:100px'
   },
   {
@@ -1060,7 +1072,7 @@ const columns = [
     field: 'saldo',
     sortable: false,
     align: 'right',
-    format: (val, row) => formato.toCurrency(val),
+    format: (val /* , row */) => formato.toCurrency(val),
     headerStyle: 'width: 100px; min-width:100px',
     style: 'background-color: #f0f2f5; font-weight: bold'
   },
@@ -1102,7 +1114,7 @@ const columns = [
 
 const tableRef = ref(null)
 
-function onSelection({ rows, added, evt }) {
+function onSelection({ rows, added /* , evt */ }) {
   if (rows.length === 0 || tableRef.value === void 0) {
     return
   }
@@ -1115,6 +1127,7 @@ function onSelection({ rows, added, evt }) {
     selected.value = selected.value.filter((obj) => !idsToRemove.has(obj.id))
   }
 }
+
 const importe_seleccionado = computed({
   get() {
     return selected.value.reduce((accumulator, registro) => {

@@ -72,7 +72,7 @@
 </template>
 
 <script setup>
-import { ref, toRefs, watch, onMounted, computed, Teleport } from 'vue'
+import { ref, toRefs, watch, onMounted, computed } from 'vue'
 import FormRegistroCategoria from '../categorias/FormRegistroCategoria.vue'
 import { useCategoriaStore } from 'src/stores/common/categoriaStore'
 
@@ -157,7 +157,7 @@ const emit = defineEmits(['update:modelValue'])
 /**
  * watch
  */
-watch(tipoAfectacion, (newVal, oldVal) => {
+watch(tipoAfectacion, (newVal, _oldVal_) => {
   // console.log('new - old ', newVal, oldVal)
   tipoMovimientoId.value = newVal === 'A' ? '1' : '2'
 })
@@ -166,11 +166,13 @@ const mostrarCategorias = computed({
     return tipoMovimientoId.value === '1' || tipoMovimientoId.value === '2'
   }
 })
-const lblChangeTipoMovimiento = computed({
-  get() {
-    return tipoMovimientoId.value === '2' ? 'Ingreso' : 'Gasto'
-  }
-})
+
+// const lblChangeTipoMovimiento = computed({
+//   get() {
+//     return tipoMovimientoId.value === '2' ? 'Ingreso' : 'Gasto'
+//   }
+// })
+
 const categoria = computed({
   get() {
     return props.modelValue
@@ -181,16 +183,18 @@ const categoria = computed({
 })
 const optionsList = computed({
   get() {
-    if (!!tipoMovimientoId.value) {
+    if (tipoMovimientoId.value) {
       // return (resultadoLista.value?.listaCategorias ?? []).filter(
       //   (categoria) => categoria.tipoMovimientoId === tipoMovimientoId.value
       // )
       return categoriaStore.listaCategorias.filter(
         (categoria) => categoria.tipoMovimientoId === tipoMovimientoId.value
       )
-    } else {
-      return resultadoLista.value?.listaCategorias ?? []
     }
+    return []
+    // else {
+    //   return resultadoLista.value?.listaCategorias ?? []
+    // }
   }
 })
 const tipoMovimientoLabel = computed({
@@ -198,8 +202,8 @@ const tipoMovimientoLabel = computed({
     return tipoMovimientoId.value === '1'
       ? 'Ingreso'
       : tipoMovimientoId.value === '2'
-      ? 'Gasto'
-      : 'Traspaso'
+        ? 'Gasto'
+        : 'Traspaso'
   }
 })
 // onErrorListaCuentas((error) => {
@@ -224,11 +228,11 @@ function filterFn(val, update) {
   })
 }
 
-function toogleTipoAfectacion(val) {
-  categoria.value = null
-  tipoMovimientoId.value = tipoMovimientoId.value === '1' ? '2' : '1'
-}
-function addItemCategoria(props_row) {
+// function toogleTipoAfectacion(val) {
+//   categoria.value = null
+//   tipoMovimientoId.value = tipoMovimientoId.value === '1' ? '2' : '1'
+// }
+function addItemCategoria(_props_row) {
   editedCategoriaParam.value = {
     tipoMovimientoId: tipoMovimientoId.value,
     cuentaContable: null,
@@ -238,12 +242,14 @@ function addItemCategoria(props_row) {
   }
   showRegistroCategoria.value = true
 }
+
 function categoriaSaved(value) {
   console.log('categoria saved')
   categoria.value = value
   showRegistroCategoria.value = false
 }
-function onSelectCategoria(value) {
+
+function onSelectCategoria(_value) {
   // console.log(value)
 }
 </script>

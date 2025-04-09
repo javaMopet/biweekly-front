@@ -141,13 +141,13 @@ import { useMenuStore } from 'src/stores/common/useMenuStore'
 // const { idle, lastActive, reset } = useIdle(5 * 60 * 1000) // 5 min
 const {
   idle: idleFirst,
-  lastActive: lastActiveFirst,
+  // lastActive: lastActiveFirst,
   reset: resetFirst
 } = useIdle(15 * 60 * 1000) // 2 min
 const {
-  idle: idleLast,
-  lastActive: lastActiveLast,
-  reset: resetLast
+  idle: idleLast
+  // lastActive: lastActiveLast,
+  // reset: resetLast
 } = useIdle(16 * 60 * 1000) // 3 min
 
 /**
@@ -175,7 +175,7 @@ const router = useRouter()
  * onMounted
  */
 onMounted(() => {
-  const credentials = SessionStorage.getItem('credentials') || undefined
+  // const credentials = SessionStorage.getItem('credentials') || undefined
   user.value = SessionStorage.getItem('current_user')
   // console.log('user.value:', user.value.instance.logoImage)
   // console.log('user.value:', user.value)
@@ -200,7 +200,7 @@ function logout() {
 const dialogCloseSession = ref()
 
 watch(idleFirst, (idlevalue) => {
-  if (!!idlevalue) {
+  if (idlevalue) {
     if (!!dialogCloseSession.value || idleLast.value) {
       console.log(
         '%csrc/layouts/MainLayout.vue:192 dialogcloesSession.value',

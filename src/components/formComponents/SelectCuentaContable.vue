@@ -58,9 +58,8 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue'
-import FormRegistroCuentaContable from '../cuentasContables/FormRegistroCuentaContable.vue'
-import { useCuentaContableStore } from 'src/stores/common/useCuentaContableStore'
+import { ref } from 'vue'
+// import { useCuentaContableStore } from 'src/stores/common/useCuentaContableStore'
 export default {
   props: {
     modelValue: {
@@ -124,80 +123,47 @@ export default {
     }
   },
   emits: ['update:modelValue'],
-  setup(props, { emit }) {
+  setup(/* props ,*/
+  /* { emit } */) {
     /**
      * composables
      */
-    const cuentaContableStore = useCuentaContableStore()
+    // const cuentaContableStore = useCuentaContableStore()
     /**
      * state
      */
     const filteredOptions = ref([])
-    const form_cuentaContable_show = ref(false)
-    const formEditedItem = ref(null)
 
     /**
      * computed
      */
-    const cuentaContable = computed({
-      get() {
-        return props.modelValue
-      },
-      set(val) {
-        emit('update:modelValue', val)
-      }
-    })
+    // const cuentaContable = computed({
+    //   get() {
+    //     return props.modelValue
+    //   },
+    //   set(val) {
+    //     emit('update:modelValue', val)
+    //   }
+    // })
 
-    const options = computed({
-      get() {
-        return (cuentaContableStore.listaCuentasContables ?? []).filter(
-          (cc) =>
-            cc.subnivel === props.subnivel &&
-            cc.tipoAfectacion === props.tipoAfectacion &&
-            cc.id.toString().startsWith(props.clasificacion)
-        )
-      }
-    })
+    // const options = computed({
+    //   get() {
+    //     return (cuentaContableStore.listaCuentasContables ?? []).filter(
+    //       (cc) =>
+    //         cc.subnivel === props.subnivel &&
+    //         cc.tipoAfectacion === props.tipoAfectacion &&
+    //         cc.id.toString().startsWith(props.clasificacion)
+    //     )
+    //   }
+    // })
 
     /**
      * methods
      */
-    function filterFn(val, update) {
-      if (val === '') {
-        update(() => {
-          filteredOptions.value = options.value
-        })
-        return
-      }
 
-      update(() => {
-        const needle = val.toLowerCase()
-        filteredOptions.value = options.value.filter(
-          (v) => v.nombreCompleto.toLowerCase().indexOf(needle) > -1
-        )
-      })
-    }
-
-    function addNew() {
-      console.log('registrar una cuenta contable')
-      const tipoAfectacion = !!props.tipoAfectacion
-        ? props.tipoAfectacion
-        : { A: 'Abono' }
-      formEditedItem.value = {
-        padre: null,
-        tipoAfectacion,
-        subnivel: 0,
-        action: 'add'
-      }
-      console.log(formEditedItem.value)
-      form_cuentaContable_show.value = true
-    }
-
-    function cuentaContableSaved(item) {
-      form_cuentaContable_show.value = false
-      cuentaContable.value = item
-    }
-
+    /**
+     * Return
+     */
     return {
       filteredOptions
     }

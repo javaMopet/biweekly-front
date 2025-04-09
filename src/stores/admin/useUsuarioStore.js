@@ -1,7 +1,6 @@
 import { useQuery } from '@vue/apollo-composable'
 import { defineStore } from 'pinia'
 import { SessionStorage } from 'quasar'
-import { useUserService } from 'src/composables/admin/useUserService'
 import { USERS_LIST } from 'src/graphql/operations/users'
 import { ref, reactive } from 'vue'
 
@@ -13,7 +12,6 @@ export const useUsuarioStore = defineStore('usuarioStore', () => {
   /**
    * composables
    */
-  const userService = useUserService()
 
   /**
    * graphql
@@ -34,7 +32,7 @@ export const useUsuarioStore = defineStore('usuarioStore', () => {
   } = useQuery(USERS_LIST, variablesListados, graphql_options)
 
   onResultUsersList(({ data }) => {
-    if (!!data) {
+    if (data) {
       listaUsuarios.value = JSON.parse(JSON.stringify(data.usersList ?? []))
     }
   })

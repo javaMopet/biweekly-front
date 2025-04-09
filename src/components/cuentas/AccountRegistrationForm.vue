@@ -42,7 +42,7 @@
                   <BancoSelect
                     v-model="editedFormItem.banco"
                     label="Banco"
-                    :rules="[(val) => !!val || 'Favor de ingresar el banco']"
+                    :rules="[(val) => val || 'Favor de ingresar el banco']"
                   ></BancoSelect>
                 </div>
                 <q-input
@@ -109,7 +109,7 @@
                   :tipo-afectacion="cuentaContableProps.tipoAfectacion"
                   :is-alta="true"
                   input-label="Seleccione una Cuenta Contable"
-                  :rules="[(val) => !!val || 'Requerido']"
+                  :rules="[(val) => val || 'Requerido']"
                 ></CuentaContableSelect>
               </div>
               <div class="column">
@@ -145,7 +145,6 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import CuentaContableSelect from 'src/components/formComponents/CuentaContableSelect.vue'
 import BancoSelect from '../formComponents/BancoSelect.vue'
 import { useTipoCuentaStore } from 'src/stores/common/useTipoCuentaStore'
-import { useCuentasCrud } from 'src/composables/useCuentasCrud'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import DialogTitle from '../formComponents/modal/DialogTitle.vue'
 import { useCuentaService } from 'src/composables/cuentas/useCuentaService'
@@ -156,13 +155,12 @@ import { SessionStorage } from 'quasar'
  */
 // const tipoMovimientoStore = useTipoMovimientoStore()
 const tipoCuentaStore = useTipoCuentaStore()
-const cuentasCrud = useCuentasCrud()
 const cuentaService = useCuentaService()
 
 const {
   mostrarNotificacionPositiva,
-  mostrarNotificacionNegativa,
-  mostrarNotificacionInformativa
+  mostrarNotificacionNegativa
+  // mostrarNotificacionInformativa
 } = useNotificacion()
 
 /**
@@ -185,14 +183,14 @@ const cuentaContableProps = reactive({
 
 cuentaService.onDoneCuentaCreate(({ data }) => {
   // console.log('saved data...', data)
-  if (!!data) {
+  if (data) {
     const itemSaved = data.cuentaCreate.cuenta
     mostrarNotificacion('guardó', itemSaved)
     emit('cuentaSaved', itemSaved)
   }
 })
 cuentaService.onDoneCuentaUpdate(({ data }) => {
-  if (!!data) {
+  if (data) {
     const itemUpdated = data.cuentaUpdate.cuenta
     mostrarNotificacion('actualizó', itemUpdated)
     emit('cuentaUpdated', itemUpdated)
@@ -241,17 +239,17 @@ const emit = defineEmits(['cuentaSaved', 'cuentaUpdated'])
 const tiposCuentaOptions = computed({
   get() {
     return editedFormItem.value.tipoCuenta.id === '3'
-      ? tipoCuentaStore.listaTiposCuenta.filter(
+      ? (tipoCuentaStore.listaTiposCuenta.filter(
           (tipoCuenta) => tipoCuenta.id === editedFormItem.value.tipoCuenta.id
-        ) ?? []
-      : tipoCuentaStore.listaTiposCuenta.filter(
+        ) ?? [])
+      : (tipoCuentaStore.listaTiposCuenta.filter(
           (tipoCuenta) => tipoCuenta.id != '3'
-        ) ?? []
+        ) ?? [])
   }
 })
 const editedFormItem = computed({
   get() {
-    return !!props.editedItem ? props.editedItem : formItem.value
+    return props.editedItem || formItem.value
   },
   set(val) {
     formItem.value = val
@@ -259,16 +257,16 @@ const editedFormItem = computed({
 })
 const actionName = computed({
   get() {
-    return !!editedFormItem.value.id
+    return editedFormItem.value.id
       ? 'Actualizar la Cuenta'
       : editedFormItem.value.tipoCuenta.id === '3'
-      ? 'Nueva tarjeta de crédito'
-      : 'Nueva Cuenta'
+        ? 'Nueva tarjeta de crédito'
+        : 'Nueva Cuenta'
   }
 })
-const lbl_nombre = computed({
+const _lbl_nombre = computed({
   get() {
-    return !!editedFormItem.value.tipoCuenta.id
+    return editedFormItem.value.tipoCuenta.id
       ? editedFormItem.value.tipoCuenta.id === '3'
         ? 'Nombre de la tarjeta:'
         : 'Nombre de la cuenta:'
@@ -277,7 +275,7 @@ const lbl_nombre = computed({
 })
 const lblSubmit = computed({
   get() {
-    return !!editedFormItem.value.id ? 'Actualizar' : 'Guardar'
+    return editedFormItem.value.id ? 'Actualizar' : 'Guardar'
   }
 })
 
@@ -294,7 +292,7 @@ const isBancoRequerido = computed({
 
 const isEditing = computed({
   get() {
-    return !!editedFormItem.value.id
+    return editedFormItem.value.id ? true : false
   }
 })
 // const isCuentaBancariaRequerida = computed({
@@ -315,21 +313,23 @@ onMounted(() => {
 function saveItem() {
   // console.log('save item', editedFormItem.value)
   const tipo_cuenta_id = editedFormItem.value.tipoCuenta.id
-  const bancoId = !!editedFormItem.value.banco
+  const bancoId = editedFormItem.value.banco
     ? editedFormItem.value.banco.id
     : undefined
-  const identificador = !!editedFormItem.value.identificador
+  const identificador = editedFormItem.value.identificador
     ? editedFormItem.value.identificador
     : ''
-  const diasGracia = !!editedFormItem.value.diasGracia
+  const diasGracia = editedFormItem.value.diasGracia
     ? parseInt(editedFormItem.value.diasGracia)
     : 0
 
   let cuenta_contable_id = null
-  const current_user = SessionStorage.getItem('current_user')
-  if (!!editedFormItem.value.cuentaContable) {
+  // const current_user = SessionStorage.getItem('current_user')
+
+  if (editedFormItem.value.cuentaContable) {
     cuenta_contable_id = parseInt(editedFormItem.value.cuentaContable.id)
   }
+
   const input = {
     ...editedFormItem.value,
     identificador,
@@ -364,7 +364,7 @@ function saveItem() {
 cuentaService.onErrorCuentaCreate((error) => {
   const nombreError = error.graphQLErrors[0]?.extensions?.nombre ?? null
 
-  const errorString = !!nombreError
+  const errorString = nombreError
     ? 'No fue posible guardar la cuenta. Ya existe una cuenta con el nombre que intenta guardar'
     : 'No fue posible guardar la cuenta. Favor de intentar nuevamente'
 
@@ -374,7 +374,7 @@ cuentaService.onErrorCuentaCreate((error) => {
 cuentaService.onErrorCuentaUpdate((error) => {
   const nombreError = error.graphQLErrors[0]?.extensions?.nombre ?? null
 
-  const errorString = !!nombreError
+  const errorString = nombreError
     ? 'No fue posible actualizar la cuenta. Ya existe una cuenta con el nombre que intenta guardar'
     : 'No fue posible actualizar la cuenta. Favor de intentar nuevamente'
 

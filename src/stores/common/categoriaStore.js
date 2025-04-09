@@ -1,6 +1,5 @@
 import { useQuery } from '@vue/apollo-composable'
 import { defineStore } from 'pinia'
-import { useCategoriaService } from 'src/composables/useCategoriaService'
 import { LISTA_CATEGORIAS } from 'src/graphql/categorias'
 import { ref, reactive, computed } from 'vue'
 import { SessionStorage } from 'quasar'
@@ -13,7 +12,6 @@ export const useCategoriaStore = defineStore('categoriaStore', () => {
   /**
    * composables
    */
-  const categoriasCrud = useCategoriaService()
 
   /**
    * graphql
@@ -35,7 +33,7 @@ export const useCategoriaStore = defineStore('categoriaStore', () => {
   } = useQuery(LISTA_CATEGORIAS, variablesListados, graphql_options)
 
   onResultListaCategorias(({ data }) => {
-    if (!!data) {
+    if (data) {
       listaCategorias.value = JSON.parse(
         JSON.stringify(data.listaCategorias ?? [])
       )
@@ -54,7 +52,7 @@ export const useCategoriaStore = defineStore('categoriaStore', () => {
   // } = categoriasCrud
 
   // categoriasCrud.onDoneCategoriaCreate(({ data }) => {
-  //   if (!!data) {
+  //   if (data) {
   //     const itemSaved = data.categoriaCreate.categoria
   //     listaCategorias.value.push(itemSaved)
   //   }

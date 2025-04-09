@@ -81,7 +81,7 @@ usuarioStore.onResultUsersList(() => {
 
 watch(
   () => route.params.id,
-  (newValue, oldValue) => {
+  (newValue /* , oldValue */) => {
     inicilizar(newValue)
   }
 )
@@ -143,11 +143,14 @@ function saveDataMenus() {
 }
 
 userService.onDoneUserMenuUpdate(({ data }) => {
+  const itemUpdated = data.userMenuUpdate.user
+  console.log('itemUpdated', itemUpdated)
   mostrarNotificacionPositiva('Cambios guardados correctamente.', 1900)
 })
+
 userService.onErrorUserMenuUpdate((error) => {
   mostrarNotificacionNegativa(
-    'Ocurrió un error al intentar actualizar el menú para el usuario',
+    `Ocurrió un error al intentar actualizar el menú para el usuario, ${error.message}`,
     1900
   )
 })

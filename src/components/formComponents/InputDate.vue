@@ -46,7 +46,6 @@
 </template>
 
 <script>
-import { useFormato } from 'src/composables/utils/useFormato'
 import { ref, computed } from 'vue'
 
 export default {
@@ -104,7 +103,7 @@ export default {
     /**
      * composables
      */
-    const formato = useFormato()
+
     /**
      * state
      */
@@ -187,7 +186,8 @@ export default {
   border-radius: 5px;
   padding: 3px;
   padding-right: 15px;
-  box-shadow: rgba(124, 113, 113, 0.76) 5px 14px 28px,
+  box-shadow:
+    rgba(124, 113, 113, 0.76) 5px 14px 28px,
     rgba(112, 93, 93, 0.74) 5px 10px 10px;
   font-size: 0.8rem;
   &::before {

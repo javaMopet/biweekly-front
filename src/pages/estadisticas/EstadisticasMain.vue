@@ -105,8 +105,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { api } from 'src/boot/axios'
-import { exportFile } from 'quasar'
-import { useRouter } from 'vue-router'
+
 import {
   Chart as ChartJS,
   ArcElement,
@@ -129,9 +128,7 @@ ChartJS.register(
   Legend
 )
 
-const $router = useRouter()
-
-const file = ref([])
+// const $router = useRouter()
 
 const loaded = ref(false)
 const ingresoDataLoaded = ref(false)
@@ -364,10 +361,11 @@ function obtenerEgresosDataSet() {
       console.error(error)
     })
 }
-
+/*
 const showFile = () => {
   console.log(file.value)
 }
+
 function obtenerPdf() {
   console.log('obteniendo el pdf')
   api
@@ -392,6 +390,7 @@ function obtenerPdf() {
       console.error(error)
     })
 }
+*/
 </script>
 <style lang="scss" scoped>
 div {

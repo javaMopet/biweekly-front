@@ -49,7 +49,7 @@ export function useFormato() {
     return DateTime.fromISO(date).toFormat('yyyy/MM/dd')
   }
   function convertDateFromInputToIso(fecha_string) {
-    return !!fecha_string
+    return fecha_string
       ? DateTime.fromFormat(fecha_string, 'dd/MM/yyyy')?.toISODate()
       : null
   }

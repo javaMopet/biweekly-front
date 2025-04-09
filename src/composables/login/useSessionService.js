@@ -57,7 +57,7 @@ export function useSessionService() {
   })
 
   function setUserInfo(userLogin, instance) {
-    if (!!userLogin) {
+    if (userLogin) {
       SessionStorage.set(
         'current_instance',
         JSON.parse(JSON.stringify(instance))
@@ -79,7 +79,9 @@ export function useSessionService() {
   }
 
   onDoneUserLogout((response) => {
-    removeCredentials()
+    if (response) {
+      removeCredentials()
+    }
   })
 
   onErrorUserLogout((response) => {

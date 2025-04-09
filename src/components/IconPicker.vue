@@ -83,7 +83,7 @@ function setValue(name) {
   data.value.value = name
   emit('onIconSelected', name)
 }
-
+/*
 const categorias = ref([
   'calendar',
   'accessibility',
@@ -113,6 +113,7 @@ const categorias = ref([
   'weather',
   'web'
 ])
+  */
 const categoriesMaterial = ref([
   'accessibility',
   'arrow',

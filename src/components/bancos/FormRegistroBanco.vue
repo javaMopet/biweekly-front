@@ -121,7 +121,7 @@ const emit = defineEmits(['itemSaved', 'itemUpdated'])
 
 const editedFormItem = computed({
   get() {
-    return !!props.editedItem ? props.editedItem : formItem.value
+    return props.editedItem || formItem.value
   },
   set(val) {
     formItem.value = val
@@ -129,12 +129,12 @@ const editedFormItem = computed({
 })
 const actionName = computed({
   get() {
-    return !!editedFormItem.value.id ? 'Actualizar Banco' : 'Nuevo Banco'
+    return editedFormItem.value.id ? 'Actualizar Banco' : 'Nuevo Banco'
   }
 })
 const lblSubmit = computed({
   get() {
-    return !!editedFormItem.value.id ? 'Actualizar' : 'Guardar'
+    return editedFormItem.value.id ? 'Actualizar' : 'Guardar'
   }
 })
 
@@ -172,8 +172,7 @@ function saveItem() {
  */
 
 bancoService.onDoneBancoCreate(({ data }) => {
-  console.log('saved data...', data)
-  if (!!data) {
+  if (data) {
     const itemSaved = data.bancoCreate.banco
     mostrarNotificacion('guardó', itemSaved)
     emit('itemSaved', itemSaved)
@@ -183,13 +182,10 @@ bancoService.onDoneBancoCreate(({ data }) => {
   }
 })
 bancoService.onDoneBancoUpdate(({ data }) => {
-  console.log('data updated', data)
-  if (!!data) {
+  if (data) {
     const itemUpdated = data.bancoUpdate.banco
     emit('itemUpdated', itemUpdated)
-    /**
-     *
-     */
+
     mostrarNotificacion('actualizó', itemUpdated)
   }
 })
@@ -203,15 +199,14 @@ function mostrarNotificacion(action, banco) {
 
 bancoService.onErrorBancoCreate((error) => {
   mostrarNotificacionNegativa(
-    `Surgió un error al intentar crear el banco.`,
+    `Surgió un error al intentar actualizar el banco. ${error.message}`,
     1500
   )
 })
 
 bancoService.onErrorBancoUpdate((error) => {
-  // console.error(error)
   mostrarNotificacionNegativa(
-    'Ocurrió un error al intentar actualizar el banco.',
+    `Surgió un error al intentar actualizar el banco. ${error.message}`,
     1900
   )
 })

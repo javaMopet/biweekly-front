@@ -118,7 +118,7 @@ function onChangeMonth() {
 
 function onClickPrevious() {
   const mesPrevio = month.value.id - 1
-  if (!!mesPrevio) {
+  if (mesPrevio) {
     month.value = generalStore.meses.find((option) => option.id === mesPrevio)
   } else {
     console.log('mes doce ')

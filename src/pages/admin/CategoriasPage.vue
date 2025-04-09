@@ -275,7 +275,7 @@ const showFormItem = ref(false)
  */
 
 categoriasCrud.onDoneCategoriaDelete(({ data }) => {
-  if (!!data) {
+  if (data) {
     const deletedItem = data.categoriaDelete.categoria
     mostrarNotificacion('elminó', deletedItem)
   }
@@ -292,7 +292,7 @@ categoriasCrud.onErrorCategoriaDelete((error) => {
 
 categoriaStore.onErrorListaCategorias((error) => {
   mostrarNotificacionNegativa(
-    'NO es posible obtener el listado de categorias.',
+    `No es posible obtener el listado de categorias. Favor de verificar. ${error.message}`,
     2100
   )
 })
@@ -332,7 +332,7 @@ function addRow(tipoMovimientoId) {
 function editRow(item) {
   editedItem.value = {
     ...item.row,
-    importeDefault: !!item.row.importeDefault
+    importeDefault: item.row.importeDefault
       ? item.row.importeDefault.toString()
       : '',
     tipoMovimientoId: item.row.tipoMovimiento.id
@@ -367,12 +367,12 @@ function deleteRow(item) {
     .onDismiss(() => {})
 }
 
-function categoriaSaved(itemSaved) {
+function categoriaSaved(/* itemSaved */) {
   showFormItem.value = false
   // mostrarNotificacion('guardó', itemSaved)
   // categoriasCrud.refetchListaCategorias()
 }
-function categoriaUpdated(itemUpdated, indice) {
+function categoriaUpdated(/* itemUpdated, indice */) {
   showFormItem.value = false
   editedItem.value = { ...defaultItem }
   editedIndex.value = null

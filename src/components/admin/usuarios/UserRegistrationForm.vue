@@ -153,8 +153,7 @@ import { useUserService } from 'src/composables/admin/useUserService'
 import { useInstanceStore } from 'src/stores/admin/useInstanceStore'
 import { SessionStorage } from 'quasar'
 import { useRoleStore } from 'src/stores/admin/useRoleStore'
-
-import { cleanAndCamelCase } from 'src/utils/cleanAndCamelCase'
+// import { cleanAndCamelCase } from 'src/utils/cleanAndCamelCase'
 
 /**
  * composables
@@ -210,7 +209,7 @@ const isSuperuser = computed({
 
 const authenticable = computed({
   get() {
-    return !!props.userToEdit ? props.userToEdit : formItem.value
+    return props.userToEdit || formItem.value
   },
   set(val) {
     formItem.value = val
@@ -218,17 +217,17 @@ const authenticable = computed({
 })
 const actionName = computed({
   get() {
-    return !!authenticable.value.id ? 'Actualizar Usuario' : 'Nuevo Usuario'
+    return authenticable.value.id ? 'Actualizar Usuario' : 'Nuevo Usuario'
   }
 })
 const isEditing = computed({
   get() {
-    return !!authenticable.value.id
+    return authenticable.value.id ? true : false
   }
 })
 const lblSubmit = computed({
   get() {
-    return !!authenticable.value.id ? 'Actualizar' : 'Registrar'
+    return authenticable.value.id ? 'Actualizar' : 'Registrar'
   }
 })
 
@@ -247,7 +246,7 @@ function guardarUsuario() {
   const roles = authenticable.value.roles.map((role) => role.id)
   console.log('instances:', instances)
   if (!isEditing.value) {
-    const fieldsToRemove = ['__typename', 'logoImage', 'createdAt', 'name']
+    // const fieldsToRemove = ['__typename', 'logoImage', 'createdAt', 'name']
     const input = {
       ...authenticable.value,
       instances,
@@ -328,10 +327,14 @@ userService.onDoneUserUpdate(({ data }) => {
 })
 
 userService.onErrorUserRegister((error) => {
-  mostrarNotificacionNegativa('El usuario no puede ser registrado', 2500)
+  mostrarNotificacionNegativa(
+    `El usuario no puede ser registrado. ${error.message}`,
+    2500
+  )
 })
+
 userService.onErrorUserAddRole((error) => {
-  console.log('no se pudo cambiar el role del usuario')
+  console.log(`no se pudo cambiar el role del usuario. ${error.message}`)
 })
 
 /**
@@ -343,13 +346,6 @@ onMounted(() => {
     authenticable.value.password = ''
   }
   isAdminInitial.value = authenticable.value.isAdmin
-})
-
-/**
- * GRAPHQL
- */
-const options = ref({
-  fetchPolicy: 'network-only'
 })
 
 /**

@@ -1,7 +1,7 @@
 import { useQuery } from '@vue/apollo-composable'
 import { LISTA_TIPOS_MOVIMIENTO } from 'src/graphql/movimientos'
 
-import { ref, reactive, computed } from 'vue'
+import { reactive } from 'vue'
 
 export function useTiposMovimientoDao() {
   /**

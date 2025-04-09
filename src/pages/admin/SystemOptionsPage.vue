@@ -55,10 +55,10 @@
 import { getActivePinia } from 'pinia'
 import { SessionStorage } from 'quasar'
 import { api } from 'src/boot/axios'
-import { useCuentaStore } from 'src/stores/common/useCuentaStore'
+// import { useCuentaStore } from 'src/stores/common/useCuentaStore'
 
 /**state */
-const cuentaStore = useCuentaStore()
+// const cuentaStore = useCuentaStore()
 const user = SessionStorage.getItem('current_user')
 
 function clearPinia() {
@@ -68,7 +68,7 @@ function clearPinia() {
 }
 
 function reload() {
-  window.location.href = window.location.href
+  // window.location.href = window.location.href
 }
 
 function apiAxiosTest() {

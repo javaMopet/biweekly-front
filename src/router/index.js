@@ -1,10 +1,5 @@
 import { route } from 'quasar/wrappers'
-import {
-  createRouter,
-  createMemoryHistory,
-  createWebHistory,
-  createWebHashHistory
-} from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 import routes from './routes'
 import { SessionStorage } from 'quasar'
 import { usePermissionService } from 'src/composables/admin/usePermissionService'
@@ -20,11 +15,11 @@ import { usePermissionService } from 'src/composables/admin/usePermissionService
  */
 
 export default route(function (/* { store, ssrContext } */) {
-  const createHistory = process.env.SERVER
-    ? createMemoryHistory
-    : process.env.VUE_ROUTER_MODE === 'history'
-    ? createWebHistory
-    : createWebHashHistory
+  // const createHistory = process.env.SERVER
+  //   ? createMemoryHistory
+  //   : process.env.VUE_ROUTER_MODE === 'history'
+  //   ? createWebHistory
+  //   : createWebHashHistory
 
   const Router = createRouter({
     scrollBehavior: () => ({ left: 0, top: 0 }),
@@ -38,7 +33,7 @@ export default route(function (/* { store, ssrContext } */) {
 
   const permissionService = usePermissionService()
 
-  Router.beforeEach((to, from) => {
+  Router.beforeEach((to /* , from */) => {
     // console.log('to an from ', to, from)
     const publicPages = [
       '/login',

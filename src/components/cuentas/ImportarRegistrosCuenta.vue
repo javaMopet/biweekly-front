@@ -164,10 +164,7 @@
                 ></q-input>
               </q-td>
             </template>
-            <template
-              #body-cell-categoria="props"
-              :class="{ 'bg-orange': !props.row.isValid }"
-            >
+            <template #body-cell-categoria="props">
               <q-td :props="props">
                 <div class="column col">
                   <div>
@@ -261,17 +258,15 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, toRef } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { read, utils } from 'xlsx'
 import { useFormato } from 'src/composables/utils/useFormato'
 import { DateTime } from 'luxon'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import DateInput from '../formComponents/DateInput.vue'
-import TipoMovimientoSelect from '../formComponents/TipoMovimientoSelect.vue'
 import { SessionStorage } from 'quasar'
 import { useRegistrosCrud } from 'src/composables/useRegistrosCrud'
 import DialogTitle from '../formComponents/modal/DialogTitle.vue'
-import { toast } from 'vue3-toastify'
 import { parse, format } from 'date-fns'
 import es from 'date-fns/locale/es'
 import en from 'date-fns/locale/en-US'
@@ -362,9 +357,9 @@ async function updateFile(v) {
     // read first file
     const wb = read(await files[0].arrayBuffer())
     // get data of first worksheet as an array of objects
-    const rows = utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {
-      raw: false
-    })
+    // const rows = utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {
+    //   raw: false
+    // })
 
     // for (const row of rows) {
     //   for (const key in row) {
@@ -373,7 +368,7 @@ async function updateFile(v) {
     // }
 
     // console.log('props.cuenta.banco.id:', props.cuenta.banco)
-    if (!!props.cuenta.banco) {
+    if (props.cuenta.banco) {
       switch (props.cuenta.banco.id) {
         case '1':
           // obtenerMovimientosSantander(wb)
@@ -404,6 +399,7 @@ function getSelectedString() {
       )} `
   //de ${listaRegistrosFiltrados.value.length}
 }
+/*
 function obtenerMovimientosSantander(wb) {
   // get data of first worksheet as an array of objects
   const data = utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {
@@ -423,7 +419,7 @@ function obtenerMovimientosSantander(wb) {
 
   todos.value.forEach((row, index) => {
     let fecha = convertidorFecha(row.fecha.toString())
-    if (!!fecha) {
+    if (fecha) {
       const validDate = DateTime.fromFormat(fecha, 'dd/MM/yyyy')
       if (validDate.isValid) {
         const tipo_afectacion =
@@ -450,6 +446,7 @@ function obtenerMovimientosSantander(wb) {
     }
   })
 }
+  */
 function obtenerMovimientosSantanderNuevo(wb) {
   // get data of first worksheet as an array of objects
   const data = utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {
@@ -471,7 +468,7 @@ function obtenerMovimientosSantanderNuevo(wb) {
 
   todos.value.forEach((row, index) => {
     let fecha = convertidorFecha(row.fecha.toString())
-    if (!!fecha) {
+    if (fecha) {
       const validDate = DateTime.fromFormat(fecha, 'dd/MM/yyyy')
       if (validDate.isValid) {
         const retiro = convertirImporte(row.retiro)
@@ -555,11 +552,11 @@ function obtenerMovimientosBancomer(wb) {
     if (fechaObject.isValid) {
       const cargo = row.cargo?.replace(',', '')
       const abono = row.abono?.replace(',', '')
-      const tipo_afectacion = !!cargo ? 'C' : !!abono ? 'A' : 'N/A'
+      const tipo_afectacion = cargo ? 'C' : abono ? 'A' : 'N/A'
       row.consecutivo = index
-      const importe = !!cargo
+      const importe = cargo
         ? parseFloat(cargo)
-        : !!abono
+        : abono
         ? parseFloat(abono)
         : 0
       addItemToSave(row, index, fecha, importe, tipo_afectacion)
@@ -624,7 +621,7 @@ function obtenerMovimientosEfectivo(wb) {
         }
         const categoria = buscarCategoriaPorCadena(row.categoria, index)
 
-        const tipo_afectacion = !!categoria
+        const tipo_afectacion = categoria
           ? categoria.tipoMovimientoId === '2'
             ? 'C'
             : 'A'
@@ -642,7 +639,7 @@ function obtenerMovimientosEfectivo(wb) {
   }
 }
 
-function buscarCategoriaPorCadena(cadena, index) {
+function buscarCategoriaPorCadena(cadena, _index) {
   const tipoChar = cadena.charAt(0) // 'I' o 'G'
   const nombre = cadena.slice(2) // remueve el tipo y el espacio
 
@@ -692,7 +689,7 @@ const categoriaAux = {
 
 function obtenerRegistros() {
   var registrosInput = []
-  var opciones = ['1', '2']
+  // var opciones = ['1', '2']
   const user = SessionStorage.getItem('current_user')
   // console.log('listaRegistrosFiltrados.value:', listaRegistrosFiltrados.value)
   listaRegistrosFiltrados.value
@@ -796,7 +793,7 @@ function saveItemsAfterValidate(registrosInput, traspasosInput) {
     traspasosInput
   })
 }
-registrosCrud.onDoneImportarRegistros(({ data }) => {
+registrosCrud.onDoneImportarRegistros(({ _data }) => {
   afterSaveItems()
 })
 

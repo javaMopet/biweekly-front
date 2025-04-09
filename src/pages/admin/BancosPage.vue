@@ -150,7 +150,7 @@ const $q = useQuasar()
 // const bancosCrud = useBancosCrud()
 const bancoStore = useBancoStore()
 const bancoService = useBancoService()
-const { mostrarNotificacionNegativa, mostrarNotificacionPositiva } =
+const { /* mostrarNotificacionNegativa, */ mostrarNotificacionPositiva } =
   useNotificacion()
 
 /**
@@ -158,7 +158,7 @@ const { mostrarNotificacionNegativa, mostrarNotificacionPositiva } =
  */
 
 bancoService.onDoneBancoDelete(({ data }) => {
-  if (!!data) {
+  if (data) {
     const deletedItem = data.bancoDelete.banco
     mostrarNotificacionPositiva(
       `El banco "${deletedItem.nombre}" se elimininó correctamente`,
@@ -298,10 +298,10 @@ function deleteItem(item) {
     .onDismiss(() => {})
 }
 
-function itemSaved(itemSaved) {
+function itemSaved(/* itemSaved */) {
   showFormRegisterItem.value = false
 }
-function itemUpdated(itemUpdated) {
+function itemUpdated(/* itemUpdated */) {
   showFormRegisterItem.value = false
   editedItem.value = { ...defaultItem }
 }

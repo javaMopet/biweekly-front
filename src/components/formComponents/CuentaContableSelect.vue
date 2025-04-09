@@ -178,9 +178,7 @@ function filterFn(val, update) {
 }
 
 function addNew() {
-  const tipoAfectacion = !!props.tipoAfectacion
-    ? props.tipoAfectacion
-    : { A: 'Abono' }
+  const tipoAfectacion = props.tipoAfectacion || { A: 'Abono' }
   formEditedItem.value = {
     padre: null,
     tipoAfectacion,

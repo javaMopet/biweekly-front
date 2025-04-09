@@ -4,14 +4,15 @@ import { setContext } from '@apollo/client/link/context'
 import { SessionStorage } from 'quasar'
 import { useSessionService } from 'src/composables/login/useSessionService'
 
-export /* async */ function getClientOptions(/* {app, router, ...} */ options) {
+export /* async */ function getClientOptions /* {app, router, ...} */() {
+/* options */
   const { userLogout, removeCredentials } = useSessionService()
 
   const errorLink = onError(({ operation, graphQLErrors, networkError }) => {
     // console.log(
     //   `[operation]: ${operation.operationName}, Variables: ${operation.variables}`
     // )
-    if (!!operation?.variables) {
+    if (operation?.variables) {
       console.log(
         '%c[Error]: Operation -> name',
         'color: #03fc0f;',
@@ -29,12 +30,12 @@ export /* async */ function getClientOptions(/* {app, router, ...} */ options) {
     // console.log('%csrc/apollo/index.js:15 graphQLErrors', 'color: #007acc;', {
     //   graphQLErrors
     // })
-    if (!!graphQLErrors) {
+    if (graphQLErrors) {
       graphQLErrors.forEach((element) => {
         console.log(element.message)
       })
     }
-    if (!!networkError) {
+    if (networkError) {
       console.log(
         '%csrc/apollo/index.js:20 networkError',
         'color: #22FF55;',
@@ -49,7 +50,7 @@ export /* async */ function getClientOptions(/* {app, router, ...} */ options) {
           `%c[GraphQL error location]: ${location}`,
           'color: #63fffc;'
         )
-        if (!!extensions) {
+        if (extensions) {
           console.debug('extensions', JSON.stringify(extensions, null, 2))
         }
         if (message.includes('requires authentication')) {
@@ -73,7 +74,7 @@ export /* async */ function getClientOptions(/* {app, router, ...} */ options) {
   const authLink = setContext((_, { headers }) => {
     // return the headers to the context so httpLink can read them
     let credentials = ''
-    if (!!SessionStorage.getItem('credentials')) {
+    if (SessionStorage.getItem('credentials')) {
       credentials = SessionStorage.getItem('credentials')
     }
 

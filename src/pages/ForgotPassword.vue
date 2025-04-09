@@ -52,13 +52,11 @@ import { useRoute, useRouter } from 'vue-router'
 import { onMounted, ref } from 'vue'
 import { useSessionService } from 'src/composables/login/useSessionService'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
-import { useQuasar } from 'quasar'
 
 /**
  * composables
  */
 const route = useRoute()
-const $q = useQuasar()
 const sessionService = useSessionService()
 const router = useRouter()
 const { mostrarNotificacionNegativa } = useNotificacion()

@@ -221,7 +221,7 @@ import { useFormato } from 'src/composables/utils/useFormato'
 import { useRegistrosCrud } from 'src/composables/useRegistrosCrud'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { SessionStorage, useQuasar } from 'quasar'
-import { toast } from 'vue3-toastify'
+// import { toast } from 'vue3-toastify'
 import InputPrice from '../formComponents/InputPrice.vue'
 import DialogTitle from '../formComponents/modal/DialogTitle.vue'
 import SelectCuenta from '../formComponents/SelectCuenta.vue'
@@ -233,24 +233,21 @@ import InputDate from '../formComponents/InputDate.vue'
 const formato = useFormato()
 const registrosCrud = useRegistrosCrud()
 const {
-  mostrarNotificacionPositiva,
-  mostrarNotificacionNegativa,
-  mostrarNotificacionInformativa
+  mostrarNotificacionPositiva
+  // mostrarNotificacionNegativa,
+  // mostrarNotificacionInformativa
 } = useNotificacion()
 const $q = useQuasar()
 
 /**
  * state
  */
-const hijoRef = ref(null)
-
 const categoria = ref({})
 const inputDate = ref(null)
 const inputPrecio = ref(null)
 const selectCuenta = ref(null)
-const errorItems = ref([])
 const listaRegistros = ref([])
-const errorsList = ref([])
+
 const defaultFormItem = {
   fecha: '',
   importe: '',
@@ -259,10 +256,6 @@ const defaultFormItem = {
 }
 
 const formItem = ref({ ...defaultFormItem })
-
-const errors = ref({
-  isPriceError: false
-})
 
 const selectedItems = ref([])
 const editingItem = ref(null)
@@ -305,7 +298,7 @@ const columns = [
     name: 'importe',
     label: 'Importe',
     field: (row) => row.importe,
-    format: (val, row) => `${obtenerFormatoImporte(val)}`,
+    format: (val /* , row */) => `${obtenerFormatoImporte(val)}`,
     sortable: false,
     align: 'right',
     headerStyle: 'width:15%;max-width:15%;min-width:15%'
@@ -325,8 +318,7 @@ const columns = [
     sortable: false,
     align: 'left',
     style: 'text-wrap: wrap; min-width:40%;max-width:40%',
-    headerStyle: 'width:32%',
-    style: 'text-wrap: wrap'
+    headerStyle: 'width:32%'
   },
   {
     name: 'acciones',
@@ -361,7 +353,7 @@ function editItem(props) {
     observaciones: row.observaciones
   }
 }
-
+/*
 function entradaNoValida() {
   // errors.value.isPriceError = false
   const importe = parseFloat(formItem.value.importe)
@@ -396,7 +388,7 @@ function entradaNoValida() {
   // }) // ToastOptions
   // }
   return errors.value.isPriceError || errors.value.isCuentaError
-}
+}*/
 
 function cancelEditItem() {
   editingItem.value = null
@@ -493,7 +485,7 @@ function saveItem() {
         observaciones: formItem.value.observaciones,
         userId: user.id
       }
-      if (!!editingItem.value) {
+      if (editingItem.value) {
         const id = editingItem.value.row.id
         registrosCrud.registroUpdate({ id, input })
       } else {
@@ -514,7 +506,7 @@ const validarEntrada = () => {
   let validarEntrada = validarDate && validar && validarCuenta
   return validarEntrada
 }
-
+/*
 function isInputItemValid(row) {
   console.log('row', row)
   errorsList.value.length = 0
@@ -528,13 +520,13 @@ function isInputItemValid(row) {
     addError(3, 'Favor de seleccionar una cuenta de gasto')
   }
   return errorsList.value.length <= 0
-}
+}*/ /*
 function addError(code, message) {
   errorsList.value.push({
     code,
     message
   })
-}
+}*/
 
 registrosCrud.onDoneRegistroCreate(({ data }) => {
   // console.log('data', data)
@@ -548,7 +540,7 @@ registrosCrud.onDoneRegistroUpdate(({ data }) => {
   afterUpdateItem('Ingreso', itemUpdated)
 })
 
-function afterSaveItem(tipoRegistro, itemSaved) {
+function afterSaveItem(/* tipoRegistro, */ itemSaved) {
   // console.log('item saved')
   // row_to_insert.value.saved = true
   listaRegistros.value.push(itemSaved)
@@ -571,32 +563,32 @@ registrosCrud.onErrorRegistroCreate((error) => {
   console.log('error', error.graphQLErrors[0])
   console.log('error', error.graphQLErrors[0]?.extensions)
   console.table('error', error.graphQLErrors[0]?.extensions.problems)
-})
+}) /*
 function obtenerFechaISO(fecha_formato) {
   const date = !!fecha_formato
     ? DateTime.fromFormat(fecha_formato, 'dd/MM/yyyy')
     : null
   return date?.toISODate()
-}
-
+}*/
+/*
 function deleteItem(item) {
   console.log('item', item.row)
   console.log('item index', item.rowIndex)
 
-  if (!!item.row.saved) {
+  if (item.row.saved) {
     console.log('el registro esta guardado')
     confirmarEliminacion(item)
   } else {
     listaRegistros.value.splice(item.rowIndex, 1)
   }
-}
+}*/ /*
 function confirmarEliminacion(item) {
   item.row
-}
-
+}*/
+/*
 function validarPrecio(value) {
   // console.log('validar precio', value)
-}
+}*/
 function obtenerFormatoImporte(val) {
   return formato.toCurrency(
     parseFloat(categoria.value.tipoMovimiento.id === '2' ? val * -1 : val)
@@ -681,20 +673,21 @@ const periodoFormato = computed({
     )} Al: ${formato.convertDateFromIsoToInput(props.cellData.fecha_fin)}`
   }
 })
-
+/*
 const isErrors = computed({
   get() {
     return errorItems.value.length > 0
   }
-})
+})*/
 // const importeValido = ref(true)
-
+/*
 const isImporteValido = (importeValido) => {
   return importeValido
-}
+}*/ /*
 const isCuentaValida = (cuentaValida) => {
   return cuentaValida
 }
+  */
 
 const isEditing = computed({
   get() {

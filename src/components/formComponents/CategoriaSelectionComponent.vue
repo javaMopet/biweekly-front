@@ -88,7 +88,7 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted, toRef } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import CategoriaSelect from './CategoriaSelect.vue'
 import FormRegistroCategoria from '../categorias/FormRegistroCategoria.vue'
 import SelectCuenta from './SelectCuenta.vue'
@@ -122,11 +122,10 @@ const props = defineProps({
     default: true
   }
 })
+
 /**
  * state
  */
-
-const cuenta = ref()
 const tipoAfectacion = ref(props.tipoAfectacion)
 const showRegistroCategoria = ref(false)
 const editedCategoriaParam = ref()
@@ -190,6 +189,7 @@ function onChangeTipoMovimiento(val) {
       break
     case '2':
       tipoAfectacion.value = 'C'
+      break
     default:
       break
   }
@@ -221,7 +221,7 @@ function agregarCategoria() {
 function onCategoriaSaved(categoriaSaved) {
   showRegistroCategoria.value = false
   categoria.value = categoriaSaved
-  emit('update:modelValue', val)
+  emit('update:modelValue', categoriaSaved)
   emit('categoriaSaved', categoriaSaved)
 }
 </script>

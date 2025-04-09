@@ -139,7 +139,7 @@ const emit = defineEmits(['itemSaved', 'itemUpdated'])
 
 const editedFormItem = computed({
   get() {
-    return !!props.editedItem ? props.editedItem : formItem.value
+    return props.editedItem ? props.editedItem : formItem.value
   },
   set(val) {
     formItem.value = val
@@ -147,14 +147,12 @@ const editedFormItem = computed({
 })
 const actionName = computed({
   get() {
-    return !!editedFormItem.value.id
-      ? 'Actualizar Instancia'
-      : 'Nueva Instancia'
+    return editedFormItem.value.id ? 'Actualizar Instancia' : 'Nueva Instancia'
   }
 })
 const lblSubmit = computed({
   get() {
-    return !!editedFormItem.value.id ? 'Actualizar' : 'Guardar'
+    return editedFormItem.value.id ? 'Actualizar' : 'Guardar'
   }
 })
 
@@ -191,7 +189,7 @@ function saveItem() {
 
 instanceService.onDoneInstanceCreate(({ data }) => {
   console.log('saved data...', data)
-  if (!!data) {
+  if (data) {
     const itemSaved = data.instanceCreate.instance
     mostrarNotificacion('guardó', itemSaved)
     emit('itemSaved', itemSaved)
@@ -202,7 +200,7 @@ instanceService.onDoneInstanceCreate(({ data }) => {
 })
 instanceService.onDoneInstanceUpdate(({ data }) => {
   console.log('data updated', data)
-  if (!!data) {
+  if (data) {
     const itemUpdated = data.instanceUpdate.instance
     emit('itemUpdated', itemUpdated)
     /**
@@ -221,7 +219,7 @@ function mostrarNotificacion(action, instance) {
 
 instanceService.onErrorInstanceCreate((error) => {
   mostrarNotificacionNegativa(
-    `Surgió un error al intentar crear el instance.`,
+    `Surgió un error al intentar crear el instance. ${error.message}`,
     1500
   )
 })
@@ -229,7 +227,7 @@ instanceService.onErrorInstanceCreate((error) => {
 instanceService.onErrorInstanceUpdate((error) => {
   // console.error(error)
   mostrarNotificacionNegativa(
-    'Ocurrió un error al intentar actualizar el instance.',
+    `Ocurrió un error al intentar actualizar el instance. ${error.message}`,
     1900
   )
 })

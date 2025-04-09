@@ -6,14 +6,12 @@ import {
   TRASPASO_UPDATE
 } from 'src/graphql/traspasos'
 import { useCuentasCrud } from './useCuentasCrud'
-import { useCuentaStore } from 'src/stores/common/useCuentaStore'
 
 export function useTraspasosCrud() {
   /**
    * composition api
    */
   const cuentasCrud = useCuentasCrud()
-  const cuentaStore = useCuentaStore()
 
   /**
    * graphql
@@ -50,7 +48,7 @@ export function useTraspasosCrud() {
   })
 
   onDoneTraspasoUpdate(({ data }) => {
-    // console.log('onDonetraspasoUpdate', data)
+    console.log('onDonetraspasoUpdate', data)
     // const traspaso = data.traspasoUpdate.traspaso
     // const cuentasIds = data.traspasoUpdate.cuentasIds
     // const cuentas = data.traspasoUpdate.cuentas

@@ -166,7 +166,7 @@ const $q = useQuasar()
 // const instancesCrud = useInstancesCrud()
 const instanceStore = useInstanceStore()
 const instanceService = useInstanceService()
-const { mostrarNotificacionNegativa, mostrarNotificacionPositiva } =
+const { /* mostrarNotificacionNegativa,  */ mostrarNotificacionPositiva } =
   useNotificacion()
 
 /**
@@ -174,7 +174,7 @@ const { mostrarNotificacionNegativa, mostrarNotificacionPositiva } =
  */
 
 instanceService.onDoneInstanceDelete(({ data }) => {
-  if (!!data) {
+  if (data) {
     const deletedItem = data.instanceDelete.instance
     console.log('deletedItem:', deletedItem)
     mostrarNotificacionPositiva(
@@ -183,6 +183,7 @@ instanceService.onDoneInstanceDelete(({ data }) => {
     )
   }
 })
+
 instanceService.onErrorInstanceDelete((error) => {
   const errorString = error?.toString() ?? ''
   const mensaje = errorString.includes('REFERENCE constraint')
@@ -313,10 +314,10 @@ function deleteItem(item) {
     .onDismiss(() => {})
 }
 
-function itemSaved(itemSaved) {
+function itemSaved(/* itemSaved */) {
   showFormRegisterItem.value = false
 }
-function itemUpdated(itemUpdated) {
+function itemUpdated(/* itemUpdated */) {
   showFormRegisterItem.value = false
   editedItem.value = { ...defaultItem }
 }

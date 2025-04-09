@@ -110,7 +110,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, reactive } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import DateInput from '../formComponents/DateInput.vue'
 import CategoriaSelect from '../formComponents/CategoriaSelect.vue'
 import { useFormato } from 'src/composables/utils/useFormato'
@@ -160,7 +160,7 @@ const isSaving = ref(false)
  */
 onMounted(() => {
   if (!isEditing.value) {
-    editedFormItem.value.fecha = !!props.fecha
+    editedFormItem.value.fecha = props.fecha
       ? formato.convertDateFromIsoToInput(props.fecha)
       : formato.formatoFecha(new Date())
   } else {
@@ -214,14 +214,14 @@ registrosCrud.onDoneRegistroCreate(({ data }) => {
 registrosCrud.onErrorRegistroCreate((error) => {
   isSaving.value = false
   mostrarNotificacionNegativa(
-    'Surgió un error al intentar guardar el movimiento.',
+    `Surgió un error al intentar guardar el movimiento. ${error.message}`,
     2100
   )
 })
 
 traspasosCrud.onDoneTraspasoCreate(({ data }) => {
   isSaving.value = false
-  // console.log('traspaso creado', data)
+  console.log('traspaso creado', data)
   mostrarNotificacionPositiva('El traspaso se creó correctamente.', 2100)
   emit('itemSaved')
 })
@@ -229,7 +229,7 @@ traspasosCrud.onDoneTraspasoCreate(({ data }) => {
 traspasosCrud.onErrorTraspasoCreate((error) => {
   isSaving.value = false
   mostrarNotificacionNegativa(
-    'No fue posible generar el traspaso. Revisar log.',
+    `No fue posible generar el traspaso. Favor de verificar. ${error.message}`,
     2100
   )
 })
@@ -243,20 +243,21 @@ registrosCrud.onDoneRegistroUpdate(({ data }) => {
 registrosCrud.onErrorRegistroUpdate((error) => {
   isSaving.value = false
   mostrarNotificacionNegativa(
-    'No es posible actualizar el movimiento con la información ingresada. Favor de verificar.',
+    `No es posible actualizar el movimiento con la información ingresada. Favor de verificar. ${error.message}`,
     2100
   )
 })
 
 traspasosCrud.onResultListaTraspasos(({ data }) => {
-  const tipoCuentaTraspasoId =
-    editedFormItem.value.traspasoDetalle.tipoCuentaTraspasoId
-  traspaso.value = data.listaTraspasos[0]
-  const detalleContrario = traspaso.value.traspasoDetalles.find((detalle) => {
-    return detalle.tipoCuentaTraspasoId !== tipoCuentaTraspasoId
-  })
+  console.log('data:', data)
+  // const tipoCuentaTraspasoId =
+  //   editedFormItem.value.traspasoDetalle.tipoCuentaTraspasoId
+  // traspaso.value = data.listaTraspasos[0]
+  // const detalleContrario = traspaso.value.traspasoDetalles.find((detalle) => {
+  //   return detalle.tipoCuentaTraspasoId !== tipoCuentaTraspasoId
+  // })
   // editedFormItem.value.cuentaDestino = detalleContrario.cuenta
-  editedFormItem.value.observaciones = traspaso.value.observaciones
+  // editedFormItem.value.observaciones = traspaso.value.observaciones
 })
 
 /**
@@ -264,19 +265,21 @@ traspasosCrud.onResultListaTraspasos(({ data }) => {
  */
 const editedFormItem = computed({
   get() {
-    return !!props.editedItem.cuenta ? props.editedItem : formItem.value
+    return props.editedItem || formItem.value
   },
   set(val) {
     formItem.value = val
   }
 })
+
 const actionName = computed({
   get() {
-    return !!editedFormItem.value.id
+    return editedFormItem.value.id
       ? 'Actualizar Movimiento'
       : `Nuevo ${tipoMovimientoNombre.value}`
   }
 })
+
 const tipoMovimientoNombre = computed({
   get() {
     switch (editedFormItem.value.tipoMovimientoId) {
@@ -291,9 +294,10 @@ const tipoMovimientoNombre = computed({
     }
   }
 })
+
 const lblSubmit = computed({
   get() {
-    return !!editedFormItem.value.id ? 'Actualizar' : 'Guardar'
+    return editedFormItem.value.id ? 'Actualizar' : 'Guardar'
   }
 })
 const isTraspaso = computed({
@@ -303,7 +307,7 @@ const isTraspaso = computed({
 })
 const isEditing = computed({
   get() {
-    return !!editedFormItem.value.id
+    return editedFormItem.value.id ? true : false
   }
 })
 
@@ -437,7 +441,7 @@ function saveItem() {
       userId
     }
     // console.log('saveItem input:', input)
-    if (!!editedFormItem.value.id) {
+    if (editedFormItem.value.id) {
       registrosCrud.registroUpdate({
         id: editedFormItem.value.id,
         input
@@ -449,6 +453,7 @@ function saveItem() {
 }
 
 traspasosCrud.onDoneTraspasoUpdate(({ data }) => {
+  console.log('data:', data)
   mostrarNotificacionPositiva('Traspaso actualizado', 2100)
   emit('itemUpdated')
 })
@@ -456,7 +461,7 @@ traspasosCrud.onDoneTraspasoUpdate(({ data }) => {
 traspasosCrud.onErrorTraspasoUpdate((error) => {
   // console.trace(error)
   mostrarNotificacionNegativa(
-    'Ocurrió un error al intentar actualizar el movimiento. Favor de verificar.',
+    `Ocurrió un error al intentar actualizar el movimiento. Favor de verificar. ${error.message}`,
     2100
   )
 })
@@ -475,14 +480,11 @@ function onSelectCategoria(value) {
 //   console.log('data', data)
 //   emit('itemUpdated')
 // })
-const graphqlOptions = reactive({
-  fetchPolicy: 'no-cache'
-})
 
 function obtenerDatosTraspasoSiAplica() {
   // console.log('[ editedFormItem.value ] >', editedFormItem.value)
 
-  if (!!editedFormItem.value.traspaso) {
+  if (editedFormItem.value.traspaso) {
     // const id = editedFormItem.value.traspasoDetalle.traspasoId
     // traspasosCrud.loadListaTraspasos(null, { id }, graphqlOptions)
     const cuentaOrigen = editedFormItem.value.traspaso.traspasoDetalles.find(

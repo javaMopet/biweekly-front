@@ -33,13 +33,13 @@ export const useMenuStore = defineStore('menuStore', () => {
   )
 
   onResultListaMenus(({ data }) => {
-    if (!!data) {
+    if (data) {
       arbolMenus.value = JSON.parse(JSON.stringify(data.menuLevels))
     }
   })
 
   onResultMenusList(({ data }) => {
-    if (!!data) {
+    if (data) {
       // console.log('data:', data.menusList)
       listaMenus.value = JSON.parse(JSON.stringify(data.menusList))
     }

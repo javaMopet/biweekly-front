@@ -13,11 +13,11 @@ export const useSessionStore = defineStore('session', () => {
   /**
    * constants
    */
-  const defaultUser = {
-    id: null,
-    username: null,
-    email: null
-  }
+  // const defaultUser = {
+  //   id: null,
+  //   username: null,
+  //   email: null
+  // }
 
   /**
    * state
@@ -67,7 +67,7 @@ export const useSessionStore = defineStore('session', () => {
         .post(`users`, payload)
         .then((response) => {
           console.log('register response', response)
-          setUserInfo(response)
+          // setUserInfo(response)
           resolve(response)
         })
         .catch((error) => {
@@ -76,8 +76,9 @@ export const useSessionStore = defineStore('session', () => {
         })
     })
   }
-  const login = (payload) => {
-    userLogin(payload)
+
+  const login = (_payload) => {
+    // userLogin(payload)
   }
 
   // const loginUser = (payload) => {

@@ -1,7 +1,6 @@
 import { useQuery } from '@vue/apollo-composable'
 import { logErrorMessages } from '@vue/apollo-util'
 import { defineStore } from 'pinia'
-import { useCuentasContablesCrud } from 'src/composables/useCuentasContablesCrud'
 import {
   ARBOL_CUENTAS_CONTABLES,
   LISTA_CUENTAS_CONTABLES
@@ -18,15 +17,14 @@ export const useCuentaContableStore = defineStore('cuentaContableStore', () => {
   /**
    * composables
    */
-  const cuentasContablesCrud = useCuentasContablesCrud()
 
   const options = reactive({
     fetchPolicy: 'cache-first'
   })
   const {
     onResult: onResultArbolCuentas,
-    loading: loadingArbolCuentas,
-    onError: onErrorArbolCuentasContables
+    loading: loadingArbolCuentas
+    // onError: onErrorArbolCuentasContables
   } = useQuery(ARBOL_CUENTAS_CONTABLES, null, options)
   /**
    * graphql
@@ -41,8 +39,8 @@ export const useCuentaContableStore = defineStore('cuentaContableStore', () => {
   })
   const {
     onResult: onResultListaCuentasContables,
-    onError: onErrorListaCuentasContables,
-    loading: loadingListaCuentasContables
+    onError: onErrorListaCuentasContables
+    // loading: loadingListaCuentasContables
   } = useQuery(LISTA_CUENTAS_CONTABLES, variablesLista, graphql_options)
 
   /**
@@ -71,7 +69,7 @@ export const useCuentaContableStore = defineStore('cuentaContableStore', () => {
    */
 
   onResultArbolCuentas(({ data }) => {
-    if (!!data) {
+    if (data) {
       arbolCuentasContables.value = JSON.parse(
         JSON.stringify(data.arbolCuentasContables)
       )
@@ -79,7 +77,7 @@ export const useCuentaContableStore = defineStore('cuentaContableStore', () => {
   })
 
   onResultListaCuentasContables(({ data }) => {
-    if (!!data) {
+    if (data) {
       // console.log('loading lista de cuentas contables...', data)
       listaCuentasContables.value = JSON.parse(
         JSON.stringify(data.listaCuentasContables ?? [])

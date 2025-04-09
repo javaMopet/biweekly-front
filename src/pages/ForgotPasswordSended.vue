@@ -25,7 +25,7 @@
 
 <script setup>
 import { useRoute, useRouter } from 'vue-router'
-import { onMounted, ref } from 'vue'
+import { onMounted } from 'vue'
 import { useSessionService } from 'src/composables/login/useSessionService'
 
 /**
@@ -43,7 +43,8 @@ onMounted(() => {
 /**
  * state
  */
-const email = ref('')
+// const email = ref('')
+
 /**
  * methods
  */
@@ -51,6 +52,7 @@ sessionService.onDoneUserSendPasswordReset(({ data }) => {
   console.log('data:', data)
   router.push('/forgotPasswordSended')
 })
+
 sessionService.onErrorUserSendPasswordReset((error) => {
   console.log('error:', error)
 })

@@ -233,12 +233,9 @@
 /**
  * imports
  */
-import { ref, computed, onMounted, toRef } from 'vue'
-import { read, utils } from 'xlsx'
+import { ref, computed, onMounted } from 'vue'
 import CategoriaSelect from '../formComponents/CategoriaSelect.vue'
 import { useFormato } from 'src/composables/utils/useFormato'
-import { api } from 'src/boot/axios'
-import { DateTime } from 'luxon'
 import DateInput from '../formComponents/DateInput.vue'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import DialogTitle from '../formComponents/modal/DialogTitle.vue'
@@ -254,7 +251,6 @@ import { useQuasar } from 'quasar'
 const registrosSelected = ref([])
 const showRegistroCategoria = ref(false)
 const listaRegistrosTarjeta = ref([])
-const todos = ref()
 const fecha_inicio = ref('01/01/1900')
 const fecha_fin = ref('01/01/1900')
 const errorItems = ref([])
@@ -329,179 +325,6 @@ onMounted(() => {
  */
 const emit = defineEmits(['itemsSaved'])
 
-/**
- *
- * @param {*} v
- */
-
-const monthsEnglishMap = new Map()
-// assuming `todos` is a standard VueJS `ref`
-
-const meses = {
-  Ene: '01',
-  Feb: '02',
-  Mar: '03',
-  Abr: '04',
-  May: '05',
-  Jun: '06',
-  Jul: '07',
-  Ago: '08',
-  Sep: '09',
-  Oct: '10',
-  Nov: '11',
-  Dic: '12'
-}
-
-/**
- * Cargar movimientos de santander.
- * @param {Object} wb - Excel data
- */
-function cargarMovimientosSantander(wb) {
-  // get data of first worksheet as an array of objects
-  const data = utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {
-    header: ['FECHA', 'CONSECUTIVO', 'CONCEPTO', 'IMPORTE'],
-    skipHeader: true,
-    raw: false
-  })
-
-  // console.table(data)
-  // data.forEach((d) => {
-  //   console.log(d.IMPORTE)
-  // })
-
-  todos.value = data
-    .filter((row) => {
-      return !!row.FECHA
-    })
-    .map((row) => ({
-      fecha: convertidorFecha(row.FECHA),
-      consecutivo: row.CONSECUTIVO,
-      concepto: row.CONCEPTO,
-      importe: parseFloat(row.IMPORTE)
-    }))
-
-  // console.log(todos.value)
-  // console.log('datda', todos.value[5])
-  crearListaRegistrosTarjeta(todos.value)
-}
-function convertidorFecha(fecha) {
-  if (fecha.includes('/')) {
-    const partes = fecha.split('/')
-    if (isNaN(partes[1])) {
-      // Verifica si el mes es texto
-      const [dia, mes, anio] = partes
-      const mesNumerico = meses[mes]
-      return `${dia}/${mesNumerico}/${anio}`
-    } else {
-      // asume que el formato esta en MM/dd/yy
-      const [mes, dia, anio] = partes
-      const anioCompleto = anio.length === 2 ? `20${anio}` : anio // cambiar para 2100
-      return `${dia.toString().padStart(2, '0')}/${mes
-        .toString()
-        .padStart(2, '0')}/${anioCompleto}`
-    }
-  }
-}
-/**
- * Cargar movimientos de Santander
- * @param {Object} wb - Excel data
- */
-function cargarMovimientosBancomer(wb) {
-  // get data of first worksheet as an array of objects
-  const data = utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {
-    header: ['FECHA', 'DESCRIPCION', 'CARGO', 'ABONO', 'SALDO'],
-    skipHeader: true,
-    raw: false
-  })
-  // console.log('data.map', data)
-  todos.value = data.map((row, index) => ({
-    fecha: row.FECHA,
-    consecutivo: index,
-    concepto: row.DESCRIPCION,
-    cargo: row.CARGO === '' ? 0 : row.CARGO?.replace(',', '') ?? 0,
-    abono: row.ABONO === '' ? 0 : row.ABONO?.replace(',', '') ?? 0,
-    saldo: row.SALDO?.replace(',', '') ?? 0
-  }))
-  console.log('todos.value', todos.value)
-  todos.value = todos.value.map((row, index) => ({
-    fecha: row.fecha,
-    consecutivo: row.consecutivo,
-    concepto: row.concepto,
-    importe: parseFloat(row.cargo) + parseFloat(row.abono)
-  }))
-  crearListaRegistrosTarjeta(todos.value)
-}
-/**
- * Cargar movimientos de American Express
- * @param {Object} wb - Excel data
- */
-function cargarMovimientosAmericanExpress(wb) {
-  // get data of first worksheet as an array of objects
-  const data = utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {
-    header: [
-      'FECHA',
-      'FECHA_COMPRA',
-      'DESCRIPCION',
-      'TITULAR',
-      'CUENTA',
-      'IMPORTE'
-    ],
-    skipHeader: true,
-    raw: false
-  })
-  // console.log('data.map', data)
-  todos.value = data
-    .filter((row) => {
-      return !!row.FECHA
-    })
-    .map((row, index) => ({
-      fecha: row.FECHA.replace(
-        row.FECHA.substring(3, 6),
-        monthsEnglishMap.get(row.FECHA.substring(3, 6))
-      ).replace(' ', '/'),
-      consecutivo: index,
-      concepto: row.DESCRIPCION,
-      importe: parseFloat(row.IMPORTE)
-    }))
-
-  todos.value = todos.value.map((row, index) => ({
-    fecha: row.fecha.replace(' ', '/'),
-    consecutivo: index,
-    concepto: row.concepto,
-    importe: row.importe
-  }))
-  // console.log('todos.value', todos.value)
-  crearListaRegistrosTarjeta(todos.value)
-}
-/**
- * Convertir un arreglo de datos de excel a registros para visualizar en la tabla.
- * @param {Array} excelData - Datos obtenidos del archivo excel
- */
-function crearListaRegistrosTarjeta(excelData) {
-  // console.table(excelData)
-  excelData.forEach((row, index) => {
-    if (!!row.fecha) {
-      const fechaObject = DateTime.fromFormat(
-        row.fecha.toString(),
-        'dd/MM/yyyy'
-      )
-      if (fechaObject.isValid) {
-        const item = {
-          id: index,
-          fecha: fechaObject.toISODate(),
-          consecutivo: row.consecutivo,
-          importe: row.importe,
-          concepto: row.concepto,
-          tipoAfectacion: 'C',
-          clase: row.importe < 0 ? 'registro-abono' : '',
-          saved: false
-        }
-        listaRegistrosTarjeta.value.push(item)
-      }
-    }
-  })
-  // console.log(listaRegistrosTarjeta.value)
-}
 /**
  * computed
  */
@@ -662,18 +485,6 @@ function eliminarSeleccionados() {
   registrosSelected.value.length = 0
 }
 
-function deleteRow(props) {
-  // const rowIndex = props.rowIndex
-  const id = props.row.id
-  // console.log(id)
-  const index = listaRegistrosTarjeta.value.findIndex((r) => r.id == id)
-  // listaRegistrosTarjeta.find
-
-  listaRegistrosTarjeta.value.splice(index, 1)
-}
-function fileClear() {
-  listaRegistrosTarjeta.value.length = 0
-}
 /**
  * computed
  */
@@ -754,7 +565,7 @@ function getSelectedString() {
         importe_seleccionado.value
       )} `
 }
-function addItemCategoria(props_row) {
+function addItemCategoria(_props_row) {
   editedCategoriaParam.value = {
     tipoMovimientoId: tipoMovimientoId.value,
     cuentaContable: null,
@@ -764,14 +575,15 @@ function addItemCategoria(props_row) {
   }
   showRegistroCategoria.value = true
 }
-function categoriaSaved(value) {
+
+function categoriaSaved(_value) {
   console.log('categoria saved')
   // categoria.value = value
   showRegistroCategoria.value = false
 }
 function focusDate(props) {
   const rowIndex = props.rowIndex
-  const columnIndex = props.colIndex
+  // const columnIndex = props.colIndex
   const item = listaRegistrosTarjeta.value[rowIndex - 1]
   if (!!item && !props.row.fecha) {
     props.row.fecha = item.fecha

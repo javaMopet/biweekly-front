@@ -85,8 +85,8 @@
                     props.node.tipoAfectacion == 'C'
                       ? ' (Cargo)'
                       : props.node.tipoAfectacion == 'A'
-                      ? ' (Abono)'
-                      : props.node.tipoAfectacion
+                        ? ' (Abono)'
+                        : props.node.tipoAfectacion
                   }}</span>
                 </span>
               </div>
@@ -169,7 +169,6 @@ import { ref, computed } from 'vue'
 import FormRegistroCuentaContable from 'src/components/cuentasContables/FormRegistroCuentaContable.vue'
 import { useNotificacion } from 'src/composables/utils/useNotificacion.js'
 import { useQuasar } from 'quasar'
-import { useRouter } from 'vue-router'
 import { useCuentaContableStore } from 'src/stores/common/useCuentaContableStore'
 import { useCuentasContablesCrud } from 'src/composables/useCuentasContablesCrud'
 
@@ -178,7 +177,6 @@ import { useCuentasContablesCrud } from 'src/composables/useCuentasContablesCrud
  */
 const notificacion = useNotificacion()
 const $q = useQuasar()
-// const $router = useRouter()
 const cuentaContableStore = useCuentaContableStore()
 const cuentasContablesCrud = useCuentasContablesCrud()
 
@@ -222,7 +220,7 @@ function addRow(item_padre) {
     .toString()
     .substring(0, 5 - subnivel_padre)
 
-  const numero_hijos = !!item_padre.node.children
+  const numero_hijos = item_padre.node.children
     ? item_padre.node.children.length
     : 0
 
@@ -324,7 +322,7 @@ function cuentaContableUpdated() {
  */
 
 cuentasContablesCrud.onDoneCuentaContableDelete(({ data }) => {
-  if (!!data) {
+  if (data) {
     console.log('deleted')
     const itemDeleted = data.cuentaContableDelete.cuentaContable
     notificacion.mostrarNotificacionPositiva(

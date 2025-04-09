@@ -243,16 +243,9 @@ const emit = defineEmits(['categoriaSaved', 'categoriaUpdated'])
 /**
  * computed
  */
-const tiposMovimientoOptions = computed({
-  get() {
-    return (tiposMovimientoDao.listaTiposMovimiento.value ?? []).filter(
-      (tipoMovimiento) => tipoMovimiento.id != '3'
-    )
-  }
-})
 const editedFormItem = computed({
   get() {
-    return !!props.editedItem ? props.editedItem : formItem.value
+    return props.editedItem || formItem.value
   },
   set(val) {
     formItem.value = val
@@ -260,19 +253,17 @@ const editedFormItem = computed({
 })
 const actionName = computed({
   get() {
-    return !!editedFormItem.value.id
-      ? 'Actualizar Categoria'
-      : 'Nueva Categoria'
+    return editedFormItem.value.id ? 'Actualizar Categoria' : 'Nueva Categoria'
   }
 })
 const isEditing = computed({
   get() {
-    return !!editedFormItem.value.id
+    return editedFormItem.value.id ? true : false
   }
 })
 const lblSubmit = computed({
   get() {
-    return !!editedFormItem.value.id ? 'Actualizar' : 'Guardar'
+    return editedFormItem.value.id ? 'Actualizar' : 'Guardar'
   }
 })
 const color = new Map([
@@ -320,7 +311,7 @@ function saveItem() {
   // console.log('save item')
   const cuenta_contable_id = editedFormItem.value.cuentaContable?.id
   const cuentaDefaultId = editedFormItem.value.cuentaDefault?.id
-  const user = SessionStorage.getItem('current_user')
+  // const user = SessionStorage.getItem('current_user')
   const input = {
     ...editedFormItem.value,
     cuentaContableId: parseInt(cuenta_contable_id),
@@ -347,7 +338,7 @@ function saveItem() {
  *
  */
 categoriaService.onDoneCategoriaCreate(({ data }) => {
-  if (!!data) {
+  if (data) {
     const itemSaved = data.categoriaCreate.categoria
     mostrarNotificacionPositiva(
       `Categoría "${itemSaved.nombre}" creada correctamente.`,
@@ -358,7 +349,7 @@ categoriaService.onDoneCategoriaCreate(({ data }) => {
 })
 
 categoriaService.onDoneCategoriaUpdate(({ data }) => {
-  if (!!data) {
+  if (data) {
     const itemUpdated = data.categoriaUpdate.categoria
     mostrarNotificacionPositiva(
       `Categoría "${itemUpdated.nombre}" actualizada correctamente.`,
@@ -371,7 +362,7 @@ categoriaService.onDoneCategoriaUpdate(({ data }) => {
 categoriaService.onErrorCategoriaCreate((error) => {
   const nombreError = error.graphQLErrors[0]?.extensions?.nombre ?? null
 
-  const errorString = !!nombreError
+  const errorString = nombreError
     ? 'No fue posible guardar la categoria. Ya existe una categoria con el nombre que intenta guardar'
     : 'No fue posible guardar la categoria. Favor de intentar nuevamente'
 
@@ -386,7 +377,7 @@ categoriaService.onErrorCategoriaCreate((error) => {
 categoriaService.onErrorCategoriaUpdate((error) => {
   const nombreError = error.graphQLErrors[0]?.extensions?.nombre ?? null
 
-  const errorString = !!nombreError
+  const errorString = nombreError
     ? 'No fue posible guardar la categoria. Ya existe una categoria con el nombre que intenta guardar'
     : 'No fue posible guardar la categoria. Favor de intentar nuevamente'
 
@@ -398,13 +389,6 @@ categoriaService.onErrorCategoriaUpdate((error) => {
  */
 onMounted(() => {
   obtenerCuentasContables(editedFormItem.value.tipoMovimientoId)
-})
-
-/**
- * GRAPHQL
- */
-const options = ref({
-  fetchPolicy: 'network-only'
 })
 
 /**
@@ -422,7 +406,7 @@ function onIconSelected(value) {
   editedFormItem.value.icono = value
   show_icon_picker.value = false
 }
-function colorSelecionado(value) {
+function colorSelecionado(/* value */) {
   ppproxy.value.hide()
 }
 </script>

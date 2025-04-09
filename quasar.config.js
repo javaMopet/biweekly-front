@@ -106,7 +106,7 @@ export default defineConfig(function (/* ctx */) {
           process.env.GRAPHQL_URL ||
           // Default graphql endpoint.
           'http://89.116.49.98:3000/graphql'
-      }
+      },
       // rawDefine: {}
       // ignorePublicFolder: true,
       // minify: false,
@@ -116,9 +116,19 @@ export default defineConfig(function (/* ctx */) {
       // extendViteConf (viteConf) {},
       // viteVuePluginOptions: {},
 
-      // vitePlugins: [
-      //   [ 'package-name', { ..options.. } ]
-      // ]
+      vitePlugins: [
+        [
+          'vite-plugin-checker',
+          {
+            eslint: {
+              lintCommand:
+                'eslint -c ./eslint.config.js "./src*/**/*.{js,mjs,cjs,vue}"',
+              useFlatConfig: true
+            }
+          },
+          { server: false }
+        ]
+      ]
     },
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#devServer

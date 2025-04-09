@@ -132,22 +132,20 @@ import DialogTitle from '../formComponents/modal/DialogTitle.vue'
  * composables
  */
 const formato = useFormato()
-const notificacion = useNotificacion()
 const registrosTarjetaCrud = useRegistrosTarjetaCrud()
 
-const { mostrarNotificacionPositiva, mostrarNotificacionNegativa } =
+const { /* mostrarNotificacionPositiva, */ mostrarNotificacionNegativa } =
   useNotificacion()
 /**
  * state
  */
-const tipoMovimientoId = ref('2')
 const formItem = ref({ fecha: '10/05/2023' })
 const loadingSubmit = ref(false)
 /**
  * onMounted
  */
 onMounted(() => {
-  if (!!editedFormItem.value.id) {
+  if (editedFormItem.value.id) {
     // console.log('is edicion')
   } else {
     const now = DateTime.now()
@@ -161,7 +159,7 @@ onMounted(() => {
       isMsi: false,
       numero_msi: 3
     }
-    editedFormItem.value.fecha = !!props.fecha
+    editedFormItem.value.fecha = props.fecha
       ? formato.convertDateFromIsoToInput(props.fecha)
       : formato.formatoFecha(new Date())
   }
@@ -305,7 +303,7 @@ registrosTarjetaCrud.onErrorRegistroTarjetaCreate((error) => {
   loadingSubmit.value = false
   // console.trace(error)
   mostrarNotificacionNegativa(
-    'Ocurrió un error al intengar guardar el registro',
+    `Ocurrió un error al intengar guardar el registro. ${error.message}`,
     1900
   )
 })
@@ -336,7 +334,7 @@ const lblSubmit = computed({
 })
 const editedFormItem = computed({
   get() {
-    return !!props.registroEditedItem?.id
+    return props.registroEditedItem?.id
       ? props.registroEditedItem
       : formItem.value
   },
@@ -346,7 +344,7 @@ const editedFormItem = computed({
 })
 const isEditionAction = computed({
   get() {
-    return !!props.registroEditedItem?.id
+    return props.registroEditedItem?.id ? true : false
   }
 })
 const isRegisterOpen = computed({

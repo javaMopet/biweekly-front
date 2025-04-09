@@ -107,12 +107,13 @@ import { useQuasar } from 'quasar'
 import { ref, reactive, computed } from 'vue'
 import { useSessionStore } from 'src/stores/sessionStore'
 import { useRouter } from 'vue-router'
+/*
 import { route } from 'quasar/wrappers'
 
 const username = ref(null)
 const password = ref(null)
 const returnUrl = ref(null)
-
+*/
 const $q = useQuasar()
 
 const router = useRouter()
@@ -128,6 +129,7 @@ const form = reactive({
   password: '123456',
   password_confirmation: '1234856'
 })
+
 const loginAction = ref('one')
 // const btnLabel = ref("Entrar");
 
@@ -189,13 +191,14 @@ function submitForm() {
     )
   }
 }
-
+/*
 function showNotification(error) {
   $q.notify({
     type: 'negative',
     message: error
   })
 }
+*/
 </script>
 
 <style lang="scss" scoped>

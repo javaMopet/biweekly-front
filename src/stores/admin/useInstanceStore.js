@@ -23,7 +23,7 @@ export const useInstanceStore = defineStore('instanceStore', () => {
     useQuery(INSTANCE_LIST, null, graphql_options)
 
   onResultInstanceList(({ data }) => {
-    if (!!data) {
+    if (data) {
       instanceList.value = JSON.parse(JSON.stringify(data.instanceList ?? []))
     }
   })

@@ -443,7 +443,7 @@ function addItem(props) {
       periodo_id: col.periodo_id,
       label: col.label
     }
-    if (!!cellData.value.periodo_id) {
+    if (cellData.value.periodo_id) {
       show_movimientos.value = true
     }
   } else {
@@ -477,12 +477,12 @@ function obtenerColumnas(ejercicio_fiscal, mes) {
 
       columnsT.value.forEach((column) => {
         if (column.name != 'nombre_categoria') {
-          column.format = (val) => (!!val ? `${formato.toCurrency(val)}` : '')
+          column.format = (val) => (val ? `${formato.toCurrency(val)}` : '')
         }
       })
     })
     .catch((error) => {
-      // console.log('error', error)
+      console.log('error', error)
     })
   api
     .get('/movimientos/columnas', {
@@ -497,13 +497,13 @@ function obtenerColumnas(ejercicio_fiscal, mes) {
 
       columnasSaldos.value.forEach((column) => {
         if (column.name != 'nombre_categoria') {
-          column.format = (val) => (!!val ? `${formato.toCurrency(val)}` : '')
+          column.format = (val) => (val ? `${formato.toCurrency(val)}` : '')
         }
       })
       // console.log('columnasSaldos.value:', columnasSaldos.value)
     })
     .catch((error) => {
-      // console.log('error', error)
+      console.log('error', error)
     })
 }
 /**
@@ -653,15 +653,15 @@ function mostrarNotificacion(action, cuenta) {
     2500
   )
 }
-function onRegistroCreated(itemCreated) {
+function onRegistroCreated(/* itemCreated */) {
   // console.log('El registro fue creado', itemCreated)
   // show_movimientos.value = false
   cargarDatos()
 }
-function onRegistroUpdated(itemUpdated) {
+function onRegistroUpdated(/* itemUpdated */) {
   cargarDatos()
 }
-function onRegistroDeleted(cuentasIds) {
+function onRegistroDeleted(/* cuentasIds */) {
   cargarDatos()
 }
 
@@ -715,7 +715,7 @@ function obtenerParametros() {
   return {
     ejercicioFiscalId: ejercicio_fiscal.value,
     mesId: mes.value.id,
-    instanceId: SessionStorage.getItem('current_instance').id,
+    instanceId: SessionStorage.getItem('current_instance').id
   }
 }
 </script>

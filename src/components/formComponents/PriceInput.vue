@@ -34,7 +34,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, toRef, watchEffect } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { formatMoney } from 'accounting-js'
 /**
  * state
@@ -43,7 +43,6 @@ const selectedCurrency = ref({})
 const editing = ref(false)
 const localValue = ref(0)
 const inputEditing = ref()
-const errorActive = ref(false)
 
 const inputValue = computed({
   get() {
@@ -174,7 +173,7 @@ onMounted(() => {
 })
 function onBlur(e) {
   editing.value = false
-  emit('blur')
+  emit('blur', e)
   // isErrores.value = false
   validar()
 }
@@ -255,7 +254,8 @@ function setCurrency(code) {
   border-radius: 5px;
   padding: 3px;
   padding-right: 15px;
-  box-shadow: rgba(124, 113, 113, 0.76) 5px 14px 28px,
+  box-shadow:
+    rgba(124, 113, 113, 0.76) 5px 14px 28px,
     rgba(112, 93, 93, 0.74) 5px 10px 10px;
   font-size: 0.8rem;
   &::before {

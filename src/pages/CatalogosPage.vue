@@ -101,13 +101,13 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+// import { ref } from 'vue'
 
-const leftDrawerOpen = ref(true)
+// const leftDrawerOpen = ref(true)
 
-function toggleLeftDrawer() {
-  leftDrawerOpen.value = !leftDrawerOpen.value
-}
+// function toggleLeftDrawer() {
+//   leftDrawerOpen.value = !leftDrawerOpen.value
+// }
 </script>
 
 <style lang="sass">

@@ -114,8 +114,8 @@ const graphqlOptions = reactive({
 const {
   onError: onErrorListaRegistros,
   onResult: onResultListaRegistros,
-  load: cargaListaRegistrosTarjeta,
-  refetch: refetchListaRegistros
+  load: cargaListaRegistrosTarjeta
+  // refetch: refetchListaRegistros
 } = useLazyQuery(LISTA_REGISTROS_TARJETA)
 
 /**
@@ -218,6 +218,7 @@ onResultListaRegistros(({ data }) => {
         cuenta_id: props.cuenta.id
       })
       .then((response) => {
+        console.log('response:', response)
         notificacion.mostrarNotificacionPositiva(
           'Los registros han sido guardados correctamente.',
           1200

@@ -42,7 +42,7 @@ const formato = useFormato()
 const $q = useQuasar()
 const registrosCrud = useRegistrosCrud()
 const {
-  mostrarNotificacionInformativa,
+  // mostrarNotificacionInformativa,
   mostrarNotificacionNegativa,
   mostrarNotificacionPositiva
 } = useNotificacion()
@@ -107,9 +107,10 @@ registrosCrud.onDoneRegistroDateUpdate(({ data }) => {
   mostrarNotificacionPositiva('Se actualizó la fecha correctamente', 1800)
   emit('dateUpdated')
 })
+
 registrosCrud.onErrorRegistroDateUpdate((error) => {
   mostrarNotificacionNegativa(
-    'Imposible actualizar la fecha de los registros',
+    `Imposible actualizar la fecha de los registros. ${error.message}`,
     2100
   )
 })

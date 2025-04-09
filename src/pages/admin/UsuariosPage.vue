@@ -194,7 +194,7 @@ const userToEdit = ref({})
 const filter = ref()
 const showFormItem = ref(false)
 // const userToEdit = ref({ ...defaultItem })
-const loadingAccount = ref([])
+// const loadingAccount = ref([])
 
 /**
  * computed
@@ -313,11 +313,12 @@ userService.onErrorUserUpdate((error) => {
   )
 })
 
-function userRegistered(itemSaved) {
+function userRegistered(/* itemSaved */) {
   showFormItem.value = false
   usuarioStore.loadOrRefetchUsers()
 }
-function userUpdated(itemUpdated) {
+
+function userUpdated(/* itemUpdated */) {
   showFormItem.value = false
   userToEdit.value = { ...defaultItem }
 }

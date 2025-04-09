@@ -39,13 +39,12 @@
 </template>
 
 <script setup>
-import { useFormato } from 'src/composables/utils/useFormato'
 import { ref, computed } from 'vue'
 
 /**
  * composables
  */
-const formato = useFormato()
+
 /**
  * state
  */
@@ -120,9 +119,9 @@ const valor_fecha = computed({
     emit('update:modelValue', val)
   }
 })
-function dateSelected(value, reason, details) {
+function dateSelected(value /* , reason, details */) {
   // console.log('seleccionado', value, reason, details)
-  if (!!value) {
+  if (value) {
     popUpDate.value.hide()
   }
 }

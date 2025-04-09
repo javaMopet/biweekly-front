@@ -1,12 +1,10 @@
 import { useMutation } from '@vue/apollo-composable'
-import { logErrorMessages } from '@vue/apollo-util'
 import {
   CUENTA_CONTABLE_CREATE,
   CUENTA_CONTABLE_UPDATE,
   CUENTA_CONTABLE_DELETE
 } from 'src/graphql/cuentasContables'
 import { useCuentaContableStore } from 'src/stores/common/useCuentaContableStore'
-import { watch } from 'vue'
 
 export function useCuentasContablesCrud() {
   /**
@@ -32,12 +30,12 @@ export function useCuentasContablesCrud() {
   const {
     mutate: cuentaContableDelete,
     onDone: onDoneCuentaContableDelete,
-    onError: onErrorCuentaContableDelete,
-    error
+    onError: onErrorCuentaContableDelete
+    // error
   } = useMutation(CUENTA_CONTABLE_DELETE)
 
   onDoneCuentaContableCreate(({ data }) => {
-    if (!!data) {
+    if (data) {
       const itemCreated = JSON.parse(
         JSON.stringify(data.cuentaContableCreate.cuentaContable)
       )
@@ -55,7 +53,7 @@ export function useCuentasContablesCrud() {
 
   onDoneCuentaContableUpdate(({ data }) => {
     console.log('refrescando cuentasContables en el crud')
-    if (!!data) {
+    if (data) {
       const itemUpdated = data.cuentaContableUpdate.cuentaContable
       itemUpdated.label = `${itemUpdated.id} - ${itemUpdated.nombre}`
       itemUpdated.selectable = itemUpdated.subnivel === 0

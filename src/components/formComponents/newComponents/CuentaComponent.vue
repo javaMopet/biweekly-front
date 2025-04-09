@@ -187,7 +187,7 @@ function filterFn(val, update) {
 function registrarCuenta() {
   form_cuenta_show.value = true
 }
-function cuentaSaved(itemSaved) {
+function cuentaSaved(/* itemSaved */) {
   form_cuenta_show.value = false
 }
 </script>

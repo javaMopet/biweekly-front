@@ -36,7 +36,7 @@
 </template>
 
 <script>
-import { ref, computed, toRef, watch, watchEffect } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { formatMoney } from 'accounting-js'
 
 export default {
@@ -105,7 +105,6 @@ export default {
     const selectedCurrency = ref({})
     const editing = ref(false)
     const localValue = ref(0)
-    const inputEditing = ref()
     const containsError = ref(false)
 
     const inputValue = computed({
@@ -180,7 +179,7 @@ export default {
      */
     function onBlur(e) {
       editing.value = false
-      emit('blur')
+      emit('blur', e)
       if (props.manualValidation) {
         validar()
       }
@@ -241,7 +240,8 @@ export default {
   border-radius: 5px;
   padding: 3px;
   padding-right: 15px;
-  box-shadow: rgba(124, 113, 113, 0.76) 5px 14px 28px,
+  box-shadow:
+    rgba(124, 113, 113, 0.76) 5px 14px 28px,
     rgba(112, 93, 93, 0.74) 5px 10px 10px;
   font-size: 0.8rem;
   &::before {

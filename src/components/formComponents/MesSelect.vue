@@ -73,7 +73,7 @@ function onChangeMes(value) {
 function prevMonth() {
   // console.log(mes.value)
   const mesPrevio = mes.value.id - 1
-  if (!!mesPrevio) {
+  if (mesPrevio) {
     // console.log(mesPrevio)
     mes.value = mesOptions.value.find((option) => option.id === mesPrevio)
   }

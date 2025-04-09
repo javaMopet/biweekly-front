@@ -26,7 +26,7 @@ export const useRoleStore = defineStore('roleStore', () => {
   )
 
   onResultRoleList(({ data }) => {
-    if (!!data) {
+    if (data) {
       roleList.value = JSON.parse(JSON.stringify(data.roleList ?? []))
     }
   })

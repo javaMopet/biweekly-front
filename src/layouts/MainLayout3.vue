@@ -127,7 +127,7 @@
 </template>
 
 <script setup>
-import { defineComponent, ref, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useSessionStore } from 'src/stores/sessionStore.js'
 import { useRouter } from 'vue-router'
 import { SessionStorage } from 'quasar'
@@ -136,18 +136,6 @@ import { SessionStorage } from 'quasar'
  * state
  */
 const user = ref(null)
-const filter = ref('')
-const iconSet = ref('fontawesome-v5')
-const name = ref('nombre')
-const tags = ref([])
-const value = ref()
-
-const pagination = ref({
-  itemsPerPage: 60,
-  page: 0
-})
-
-const leftDrawerOpen = ref(false)
 
 /**
  * stores
@@ -168,9 +156,12 @@ function logout() {
   if (promise) {
     promise.then(
       (result) => {
+        console.log('result:', result)
         router.push('/login')
       },
-      (error) => {}
+      (error) => {
+        console.error(error)
+      }
     )
   }
 }
@@ -313,7 +304,9 @@ nav.main-menu li.active > a,
   font-family: 'Titillium Web';
   font-style: normal;
   font-weight: 300;
-  src: local('Titillium WebLight'), local('TitilliumWeb-Light'),
+  src:
+    local('Titillium WebLight'),
+    local('TitilliumWeb-Light'),
     url(http://themes.googleusercontent.com/static/fonts/titilliumweb/v2/anMUvcNT0H1YN4FII8wpr24bNCNEoFTpS2BTjF6FB5E.woff)
       format('woff');
 }

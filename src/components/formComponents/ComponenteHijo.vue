@@ -8,7 +8,7 @@
 <script>
 export default {
   setup() {
-    const mensaje = 'Hola desde el componente hijo'
+    // const mensaje = 'Hola desde el componente hijo'
 
     const metodoEnHijo = () => {
       console.log('Método en el componente hijo llamado')

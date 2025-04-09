@@ -211,8 +211,8 @@ const loadingCard = ref([])
  */
 
 registrosTarjetaCrud.onDoneRegistroTarjetaDelete(({ data }) => {
-  if (!!data) {
-    refetchListaCuentas()
+  if (data) {
+    // refetchListaCuentas()
     const deletedItem = data.cuentaDelete.cuenta
     mostrarNotificacion('elminó', deletedItem)
   }
@@ -220,7 +220,7 @@ registrosTarjetaCrud.onDoneRegistroTarjetaDelete(({ data }) => {
 
 registrosTarjetaCrud.onErrorRegistroTarjetaDelete((error) => {
   notificacion.mostrarNotificacionNegativa(
-    'No es posible eliminar esta tarjeta de crédito debido a que tiene movimientos',
+    `No es posible eliminar esta tarjeta de crédito debido a que tiene movimientos. ${error.message}`,
     1500
   )
 })
@@ -291,7 +291,7 @@ const columns = [
  * onMounted
  */
 onMounted(() => {
-  const user = SessionStorage.getItem('current_user')
+  // const user = SessionStorage.getItem('current_user')
 })
 
 /**
@@ -352,20 +352,23 @@ cuentaStore.onDoneCuentaDelete(({ data }) => {
 })
 
 cuentaStore.onErrorCuentaDelete((error) => {
-  mostrarNotificacionNegativa('No es posible eliminar la tarjeta', 2100)
+  mostrarNotificacionNegativa(
+    `No es posible eliminar la tarjeta. ${error.message}`,
+    2100
+  )
 })
 /**
  * Run after save an item.
  * @param {*} itemSaved
  */
-function cuentaSaved(itemSaved) {
+function cuentaSaved(/* itemSaved */) {
   showFormItem.value = false
 }
 /**
  * Run after update an item.
  * @param {*} itemUpdated
  */
-function cuentaUpdated(itemUpdated) {
+function cuentaUpdated(/* itemUpdated */) {
   showFormItem.value = false
   editedItem.value = { ...defaultItem }
 }

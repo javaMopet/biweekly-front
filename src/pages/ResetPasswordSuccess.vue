@@ -15,8 +15,8 @@
 </template>
 
 <script setup>
-import { useRoute } from 'vue-router'
-import { onMounted, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { onMounted } from 'vue'
 import { useSessionService } from 'src/composables/login/useSessionService'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 
@@ -24,6 +24,7 @@ import { useNotificacion } from 'src/composables/utils/useNotificacion'
  * composables
  */
 const route = useRoute()
+const router = useRouter()
 const sessionService = useSessionService()
 const { mostrarNotificacionNegativa } = useNotificacion()
 
@@ -34,20 +35,19 @@ onMounted(() => {
 /**
  * state
  */
-const password = ref('')
-const passwordConfirmation = ref('')
+// const password = ref('')
 
 /**
  * methods
  */
-function savePassword() {
-  console.log('saving password')
-  sessionService.userUpdatePassword({
-    password: password.value,
-    passwordConfirmation: password.value,
-    resetPasswordToken: route.query.reset_password_token
-  })
-}
+// function savePassword() {
+//   console.log('saving password')
+//   sessionService.userUpdatePassword({
+//     password: password.value,
+//     passwordConfirmation: password.value,
+//     resetPasswordToken: route.query.reset_password_token
+//   })
+// }
 
 sessionService.onDoneUserUpdatePassword(({ data }) => {
   console.log('data:', data)

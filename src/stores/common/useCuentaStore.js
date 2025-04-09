@@ -37,7 +37,7 @@ export const useCuentaStore = defineStore('cuentaStore', () => {
   } = useMutation(CUENTA_DELETE)
 
   onResultListaCuentas(({ data }) => {
-    if (!!data) {
+    if (data) {
       listaCuentas.value = JSON.parse(JSON.stringify(data.listaCuentas ?? []))
     }
   })
@@ -47,7 +47,7 @@ export const useCuentaStore = defineStore('cuentaStore', () => {
   })
 
   onDoneCuentaDelete(({ data }) => {
-    if (!!data) {
+    if (data) {
       const cuentaDeleted = data.cuentaDelete.cuenta
       const index = listaCuentas.value.findIndex(
         (c) => c.id === cuentaDeleted.id

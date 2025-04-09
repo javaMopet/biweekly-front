@@ -230,7 +230,7 @@ function submitForm() {
     const promise = sessionStore.loginUser(payload)
     promise.then(
       (result) => {
-        // console.log('Resultado correcto', result)
+        console.log('Resultado correcto', result)
         router.push('/home')
       },
       (error) => {
@@ -249,12 +249,14 @@ function submitForm() {
   }
 }
 
+/*
 function showNotification(error) {
   $q.notify({
     type: 'negative',
     message: error
   })
 }
+*/
 function resetUserInfo() {
   // auth_token.value = null
   SessionStorage.remove('auth_token')

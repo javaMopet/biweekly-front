@@ -90,7 +90,7 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted, toRef } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import CategoriaSelect from './CategoriaSelect.vue'
 import FormRegistroCategoria from '../categorias/FormRegistroCategoria.vue'
 import SelectCuenta from './SelectCuenta.vue'
@@ -166,6 +166,7 @@ function onChangeTipoMovimiento(val) {
       break
     case '2':
       tipoAfectacion.value = 'C'
+      break
     default:
       break
   }

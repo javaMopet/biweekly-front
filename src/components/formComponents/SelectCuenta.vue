@@ -53,9 +53,7 @@
 </template>
 
 <script>
-import { useQuery } from '@vue/apollo-composable'
-
-import { ref, computed, reactive } from 'vue'
+import { ref, computed } from 'vue'
 // import AccountRegistrationForm from '../cuentas/AccountRegistrationForm.vue'
 import { useCuentaStore } from 'src/stores/common/useCuentaStore'
 
@@ -191,13 +189,14 @@ export default {
         )
       })
     }
+    /*
     function registrarCuenta() {
       form_cuenta_show.value = true
     }
     function cuentaSaved(itemSaved) {
       form_cuenta_show.value = false
     }
-
+ */
     const validar = () => {
       // console.log('validando la cuenta', cuenta.value)
       if (!cuenta.value?.id) {
@@ -244,7 +243,8 @@ export default {
   border-radius: 5px;
   padding: 3px;
   padding-right: 15px;
-  box-shadow: rgba(124, 113, 113, 0.76) 5px 14px 28px,
+  box-shadow:
+    rgba(124, 113, 113, 0.76) 5px 14px 28px,
     rgba(112, 93, 93, 0.74) 5px 10px 10px;
   font-size: 0.8rem;
   &::before {

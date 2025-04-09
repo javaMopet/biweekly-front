@@ -197,7 +197,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, watch, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { SessionStorage, useQuasar } from 'quasar'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { useFormato } from 'src/composables/utils/useFormato'
@@ -219,21 +219,15 @@ const router = useRouter()
 // const cuentasCrud = useCuentasCrud()
 const cuentaStore = useCuentaStore()
 
-const listaCuentas = ref([])
-/**
- * GRAPHQL
- */
-const graphql_options = reactive({
-  fetchPolicy: 'cache-first'
-})
-
 const variables = reactive({
   instanceId: undefined
 })
 
 cuentaStore.onErrorCuentaDelete((error) => {
   notificacion.mostrarNotificacionNegativa(
-    'No es posible eliminar esta cuenta, favor de verificar que no contenga movimientos',
+    `No es posible eliminar esta cuenta, favor de verificar que no contenga movimientos. ${
+      error.message
+    }`,
     1600
   )
 })
@@ -334,7 +328,7 @@ const columns = [
  */
 onMounted(() => {
   // console.log('OnMountedCuentasPage')
-  const user = SessionStorage.getItem('current_user')
+  // const user = SessionStorage.getItem('current_user')
   let instance = SessionStorage.getItem('current_instance')
   variables.instanceId = instance.id
   // cuentaStore.fetchOrRefetchListaCuentas()
@@ -396,11 +390,11 @@ cuentaStore.onDoneCuentaDelete(({ data }) => {
   )
 })
 
-function cuentaSaved(itemSaved) {
+function cuentaSaved(/* itemSaved */) {
   showFormItem.value = false
   // cuentaStore.refetchListaCuentas()
 }
-function cuentaUpdated(itemUpdated) {
+function cuentaUpdated(/* itemUpdated */) {
   showFormItem.value = false
   editedItem.value = { ...defaultItem }
   // cuentaStore.refetchListaCuentas()
@@ -416,7 +410,8 @@ function cuentaUpdated(itemUpdated) {
   cursor: normal;
 
   &:hover {
-    box-shadow: rgba(104, 102, 102, 0.76) 5px 14px 28px,
+    box-shadow:
+      rgba(104, 102, 102, 0.76) 5px 14px 28px,
       rgba(112, 128, 173, 0.74) 5px 10px 10px;
     -webkit-font-smoothing: subpixel-antialiased;
     -webkit-transform: translateZ(0) scale(1, 1);

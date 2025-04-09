@@ -1,5 +1,5 @@
 import { useMutation } from '@vue/apollo-composable'
-import { ref } from 'vue'
+// import { ref } from 'vue'
 import {
   REGISTRO_CREATE,
   REGISTRO_UPDATE,
@@ -19,9 +19,6 @@ export function useRegistrosCrud() {
   /**
    * GRAPHQL
    */
-  const options = ref({
-    fetchPolicy: 'network-only'
-  })
 
   const {
     mutate: createRegistro,

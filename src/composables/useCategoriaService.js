@@ -38,14 +38,14 @@ export function useCategoriaService() {
    * state
    */
   onDoneCategoriaCreate(({ data }) => {
-    if (!!data) {
+    if (data) {
       console.log('refrescando categorias', data)
       categoriaStore.listaCategorias.push(data.categoriaCreate.categoria)
     }
   })
 
   onDoneCategoriaUpdate(({ data }) => {
-    if (!!data) {
+    if (data) {
       // console.log('categoria actualizada', data)
       const index = findItemIndexOnList(data.categoriaUpdate.categoria)
       categoriaStore.listaCategorias[index] = {
@@ -55,7 +55,7 @@ export function useCategoriaService() {
   })
 
   onDoneCategoriaDelete(({ data }) => {
-    if (!!data) {
+    if (data) {
       // console.log('categoria eliminada', data)
       const index = findItemIndexOnList(data.categoriaDelete.categoria)
       categoriaStore.listaCategorias.splice(index, 1)
@@ -68,7 +68,7 @@ export function useCategoriaService() {
     )
     return index
   }
-
+  /*
   onErrorCategoriaCreate((error) => {
     // logErrorMessages(error)
     // console.log('error', error.graphQLErrors[0])
@@ -79,11 +79,11 @@ export function useCategoriaService() {
     // logErrorMessages(error)
     // console.dir(error)
     // const problems = error.graphQLErrors[0].extensions.problems
-    // if (!!problems) {
+    // if (problems) {
     //   console.table(problems)
     // }
   })
-
+*/
   return {
     categoriaCreate,
     categoriaUpdate,

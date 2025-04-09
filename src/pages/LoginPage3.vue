@@ -52,23 +52,24 @@
 </template>
 
 <script setup>
-import { useQuasar, SessionStorage } from 'quasar'
-import { ref, reactive, computed, onMounted } from 'vue'
+import { SessionStorage } from 'quasar'
+import { ref, onMounted } from 'vue'
 // import { useSessionStore } from 'src/stores/sessionStore'
-import { useRouter } from 'vue-router'
+// import { useRouter } from 'vue-router'
 import { api } from 'src/boot/axios'
-import { useNotificacion } from 'src/composables/utils/useNotificacion'
+// import { useNotificacion } from 'src/composables/utils/useNotificacion'
 // import { useMutation } from '@vue/apollo-composable'
-import { useSessionService } from 'src/composables/login/useSessionService'
+// import { useSessionService } from 'src/composables/login/useSessionService'
 
 /**
  * composables
  */
+/*
 const $q = useQuasar()
 const router = useRouter()
-const { mostrarNotificacionNegativa } = useNotificacion()
+// const { mostrarNotificacionNegativa } = useNotificacion()
 const sessionService = useSessionService()
-
+*/
 /**
  * GRAPHQL
  */
@@ -81,15 +82,15 @@ const sessionService = useSessionService()
 /**
  * state
  */
-const form = reactive({
-  name: '',
-  email: 'horaciopenamendoza@gmail.com',
-  password: '',
-  password_confirmation: ''
-})
+// const form = reactive({
+//   name: '',
+//   email: 'horaciopenamendoza@gmail.com',
+//   password: '',
+//   password_confirmation: ''
+// })
 
-const invalidCredentials = ref(false)
-const submitting = ref(false)
+// const invalidCredentials = ref(false)
+// const submitting = ref(false)
 const authenticable = ref({})
 
 /**
@@ -103,26 +104,26 @@ onMounted(() => {
   resetUserInfo()
 })
 
-function login() {
-  submitting.value = true
-  invalidCredentials.value = false
-  const email = authenticable.value.email
-  const password = authenticable.value.password
-  sessionService.userLogin({
-    email,
-    password
-  })
-}
+// function login() {
+//   submitting.value = true
+//   invalidCredentials.value = false
+//   const email = authenticable.value.email
+//   const password = authenticable.value.password
+//   sessionService.userLogin({
+//     email,
+//     password
+//   })
+// }
 
-sessionService.onDoneUserLogin(({ data }) => {
-  console.log('mandando al home')
-  submitting.value = false
-  router.push('/home')
-})
-sessionService.onErrorUserLogin((response) => {
-  submitting.value = false
-  invalidCredentials.value = true
-})
+// sessionService.onDoneUserLogin(({ data }) => {
+//   console.log('mandando al home')
+//   submitting.value = false
+//   router.push('/home')
+// })
+// sessionService.onErrorUserLogin((response) => {
+//   submitting.value = false
+//   invalidCredentials.value = true
+// })
 
 // function login() {
 //     const payload = {
@@ -152,12 +153,12 @@ sessionService.onErrorUserLogin((response) => {
 //     )
 // }
 
-function showNotification(error) {
-  $q.notify({
-    type: 'negative',
-    message: error
-  })
-}
+// function showNotification(error) {
+//   $q.notify({
+//     type: 'negative',
+//     message: error
+//   })
+// }
 function resetUserInfo() {
   // auth_token.value = null
   SessionStorage.remove('auth_token')

@@ -185,7 +185,7 @@ const emit = defineEmits(['cuentaContableSaved', 'cuentaContableUpdated'])
  */
 const editedFormItem = computed({
   get() {
-    return !!props.editedItem ? props.editedItem : formItem.value
+    return props.editedItem || formItem.value
   },
   set(val) {
     formItem.value = val
@@ -229,7 +229,7 @@ onMounted(() => {
 function saveItem() {
   const id = editedFormItem.value.id
   const padreId = parseInt(editedFormItem.value.padre.id)
-  const tipoAfectacion = editedFormItem.value.tipoAfectacion
+
   const input = {
     ...editedFormItem.value,
     tipoAfectacion: editedFormItem.value.tipoAfectacion.id,
@@ -254,14 +254,14 @@ function saveItem() {
  * GRAPHQL
  */
 cuentasContablesCrud.onDoneCuentaContableCreate(({ data }) => {
-  if (!!data) {
+  if (data) {
     notificacion.mostrarNotificacionPositiva('Cuenta Contable creada.', 1200)
     emit('cuentaContableSaved')
   }
 })
 
 cuentasContablesCrud.onDoneCuentaContableUpdate(({ data }) => {
-  if (!!data) {
+  if (data) {
     notificacion.mostrarNotificacionPositiva(
       'Cuenta Contable actualizada correctamente.',
       1200
@@ -272,14 +272,14 @@ cuentasContablesCrud.onDoneCuentaContableUpdate(({ data }) => {
 
 cuentasContablesCrud.onErrorCuentaContableCreate((error) => {
   notificacion.mostrarNotificacionNegativa(
-    'Ocurrió un error al intentar crear la cuenta contable',
+    `Ocurrió un error al intentar crear la cuenta contable, ${error.message}`,
     1200
   )
 })
 
 cuentasContablesCrud.onErrorCuentaContableUpdate((error) => {
   notificacion.mostrarNotificacionNegativa(
-    'Ocurrió un error al intentar actualizar la cuenta contable',
+    `Ocurrió un error al intentar actualizar la cuenta contable, ${error.message}`,
     1200
   )
 })
@@ -294,7 +294,7 @@ function identificadorIngresado(evt) {
       .get(`/cuentas_contable/${value}`)
       .then(({ data }) => {
         console.log('response', data)
-        if (!!data) {
+        if (data) {
           notificacion.mostrarNotificacionNegativa(
             'Ya existe una cuenta con el id ingresado',
             600

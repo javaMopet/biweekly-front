@@ -624,7 +624,7 @@ const registroEditedItem = ref([
 
 const showForm = ref(false)
 const showFormCargaMasiva = ref(false)
-const showFormMSI = ref(false)
+// const showFormMSI = ref(false)
 const showFormCarga = ref(false)
 const showPagosTarjeta = ref(false)
 const cuenta = ref({})
@@ -743,7 +743,7 @@ function loadOrRefetchListaRegistrosTarjeta() {
 }
 
 onResultListaRegistrosTarjeta(({ data }) => {
-  if (!!data) {
+  if (data) {
     listaRegistros.value = data?.listaRegistrosTarjeta.filter(
       (registro) => !registro.isMsi
     )
@@ -852,12 +852,12 @@ const ejercicio_final_id = computed({
 })
 const dia_corte_inicial = computed({
   get() {
-    return !!cuenta.value?.diaCorte ? cuenta.value.diaCorte + 1 : 28
+    return cuenta.value?.diaCorte ? cuenta.value.diaCorte + 1 : 28
   }
 })
 const dia_corte_final = computed({
   get() {
-    return !!cuenta.value?.diaCorte ? cuenta.value.diaCorte : 28
+    return cuenta.value?.diaCorte ? cuenta.value.diaCorte : 28
   }
 })
 const mes_final_id = computed({
@@ -911,7 +911,7 @@ const periodoInicio = computed({
     const mes = mesOptions.value.find(
       (option) => option.id === mes_inicial_id.value
     )
-    if (!!mes) {
+    if (mes) {
       return `${dia_corte_inicial.value}/${mes.nombre.substring(0, 3)}/${
         ejercicio_inicial_id.value
       }`
@@ -924,7 +924,7 @@ const periodoFin = computed({
     const mes = mesOptions.value.find(
       (option) => option.id === mes_final_id.value
     )
-    if (!!mes) {
+    if (mes) {
       return `${dia_corte_final.value}/${mes.nombre.substring(0, 3)}/${
         ejercicio_final_id.value
       }`
@@ -1025,9 +1025,11 @@ onErrorSaldoPagarTarjetaCredito((error) => {
 })
 
 registrosTarjetaCrud.onDoneRegistroTarjetaDelete((response) => {
-  loadOrRefetchListaRegistrosTarjeta()
-  refetchSaldoPagarTarjetaCredito()
-  showSuccessMessage('eliminó')
+  if (response) {
+    loadOrRefetchListaRegistrosTarjeta()
+    refetchSaldoPagarTarjetaCredito()
+    showSuccessMessage('eliminó')
+  }
 })
 
 registrosTarjetaCrud.onDoneRegistrosTarjetaDelete(({ data }) => {
@@ -1041,9 +1043,10 @@ registrosTarjetaCrud.onErrorRegistroTarjetaDelete((error) => {
   console.error(error)
   mostrarNotificacionNegativa('No es posible realizar la eliminacion', 2100)
 })
+
 registrosTarjetaCrud.onErrorRegistrosTarjetaDelete((error) => {
   mostrarNotificacionNegativa(
-    'No es posible realizar la eliminación de los registros seleccionados',
+    `No es posible realizar la eliminación de los registros seleccionados. ${error.message}`,
     2100
   )
 })
@@ -1149,7 +1152,7 @@ registrosTarjetaCrud.onDoneRegistroTarjetaPagoDelete(({ data }) => {
 })
 
 function obtenerFechasInicialFinal() {
-  // if (!!cuenta.value) {
+  // if (cuenta.value) {
   let mesInicio = mes.value.id - 1
   let ejercicioFiscal = ejercicio_fiscal.value
   if (!mesInicio) {
@@ -1199,7 +1202,8 @@ function addMasiveItems() {
 function pagosTarjeta() {
   showPagosTarjeta.value = true
 }
-function registroCreated(registro) {
+
+function registroCreated(/* registro */) {
   notificacion.mostrarNotificacionPositiva(
     'Se ha ingresado un nuevo registro.',
     1200
@@ -1260,7 +1264,7 @@ const mesOptions = ref([
   { id: 11, nombre: 'Noviembre' },
   { id: 12, nombre: 'Diciembre' }
 ])
-const ejercicioFiscalOptions = ref([2021, 2022, 2023])
+
 const columns = [
   // { name: 'id', label: 'Id', field: 'id', sortable: true, align: 'left' },
   {
@@ -1269,7 +1273,7 @@ const columns = [
     field: 'fecha',
     sortable: true,
     align: 'left',
-    format: (val, row) => formato.formatoFechaFromISO(val),
+    format: (val /* , row */) => formato.formatoFechaFromISO(val),
     style: 'width: 10%'
   },
   {
@@ -1286,7 +1290,7 @@ const columns = [
     field: 'cargo',
     sortable: true,
     align: 'right',
-    format: (val, row) => formato.toCurrency(val),
+    format: (val /* , row */) => formato.toCurrency(val),
     style: 'width:15%'
   },
   {
@@ -1295,7 +1299,7 @@ const columns = [
     field: 'abono',
     sortable: true,
     align: 'right',
-    format: (val, row) => formato.toCurrency(val),
+    format: (val /* , row */) => formato.toCurrency(val),
     style: 'width:15%'
   },
   {
@@ -1331,7 +1335,7 @@ const columnsMsi = [
     field: 'fecha',
     sortable: true,
     align: 'left',
-    format: (val, row) => formato.formatoFechaFromISO(val),
+    format: (val /* , row */) => formato.formatoFechaFromISO(val),
     style: 'width: 10%'
   },
   {
@@ -1348,7 +1352,7 @@ const columnsMsi = [
     field: 'importe',
     sortable: true,
     align: 'right',
-    format: (val, row) => formato.toCurrencyAbsoluteFormat(val),
+    format: (val /* , row */) => formato.toCurrencyAbsoluteFormat(val),
     style: 'width:15%'
   },
   {
@@ -1357,7 +1361,7 @@ const columnsMsi = [
     field: 'importeMensual',
     sortable: true,
     align: 'right',
-    format: (val, row) => formato.toCurrency(val),
+    format: (val /* , row */) => formato.toCurrency(val),
     style: 'width:15%'
   },
   {
@@ -1391,7 +1395,7 @@ function actualizarSaldosResumen() {
 
 const tableRef = ref(null)
 
-function onSelection({ rows, added, evt }) {
+function onSelection({ rows, added /* , evt */ }) {
   if (rows.length === 0 || tableRef.value === void 0) {
     return
   }

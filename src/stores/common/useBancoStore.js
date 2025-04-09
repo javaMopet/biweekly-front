@@ -25,7 +25,7 @@ export const useBancoStore = defineStore('bancoStore', () => {
   } = useQuery(LISTA_BANCOS, { id: 0 }, options)
 
   onResultListaBancos(({ data }) => {
-    if (!!data) {
+    if (data) {
       // console.log('cargando lista de bancos al store ....')
       listaBancos.value = JSON.parse(JSON.stringify(data.listaBancos)) ?? []
     }

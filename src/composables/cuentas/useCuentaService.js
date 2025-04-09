@@ -22,7 +22,7 @@ export function useCuentaService() {
     cuentaStore.addItem(itemSaved)
   })
   onDoneCuentaUpdate(({ data }) => {
-    if (!!data) {
+    if (data) {
       console.log('ejecutando onDonecuentaUpdate useCuentaCrud', data)
       const itemUpdated = data.cuentaUpdate.cuenta
       // console.log('itemUpdated... ', itemUpdated)
@@ -32,13 +32,6 @@ export function useCuentaService() {
       // console.log('index updated', index)
       cuentaStore.listaCuentas[index] = itemUpdated
     }
-  })
-
-  onErrorCuentaCreate((error) => {
-    // console.trace(error)
-  })
-  onErrorCuentaUpdate((error) => {
-    // console.log('error', error)
   })
 
   // function loadOrRefetchListaCuentas() {
