@@ -1,5 +1,5 @@
 <template>
-  <div class="my-card" style="width: 90%; min-width: 90%; max-width: 90%">
+  <div class="my-card" style="width: 80%; min-width: 80%; max-width: 80%">
     <q-inner-loading
       :showing="isLoading"
       label="Saving... Please wait..."
@@ -7,7 +7,7 @@
       label-style="font-size: 1.1em"
       style="z-index: 500"
     />
-    <DialogTitle>Cuenta &nbsp;&nbsp;~ {{ cuenta.nombre }} ~</DialogTitle>
+    <DialogTitle>Cuenta &nbsp;&nbsp;~ {{ account?.nombre }} ~</DialogTitle>
     <div class="main-content q-py-lg">
       <div class="q-pa-lg cuenta-content">
         <q-toolbar class="q-gutter-x-md">
@@ -147,6 +147,7 @@
             hide-pagination
             class="my-sticky-header-table"
             :loading="loadingRows"
+            :table-row-class-fn="getRowClass"
           >
             <template #body-cell-concepto="props">
               <q-td :props="props">
@@ -163,27 +164,23 @@
                 ></q-input>
               </q-td>
             </template>
-            <template #body-cell-categoria="props">
+            <template
+              #body-cell-categoria="props"
+              :class="{ 'bg-orange': !props.row.isValid }"
+            >
               <q-td :props="props">
                 <div class="column col">
                   <div>
-                    <TipoMovimientoSelect
-                      v-model="props.row.tipoMovimiento"
+                    <!-- <pre>{{ props.row.categoria.id }}</pre> -->
+                    <!-- <pre>{{ props.row.isValid }}</pre> -->
+                    <CategoriaSelectionComponent
+                      v-model="props.row.categoria"
+                      v-model:tipoMovimientoId="props.row.tipoMovimientoId"
+                      v-model:cuentaDestino="props.row.cuentaDestino"
                       :tipo-afectacion="props.row.tipo_afectacion"
                       @categoriaSaved="categoriaSaved"
-                    ></TipoMovimientoSelect>
+                    ></CategoriaSelectionComponent>
                   </div>
-                  <!-- <transition name="fade">
-                    <div class="requerido" v-if="!props.row.isValid">
-                      <div class="requerido__message">
-                        <q-icon
-                          name="las la-exclamation-triangle"
-                          size="16px"
-                        />
-                        Requerido
-                      </div>
-                    </div>
-                  </transition> -->
                 </div>
               </q-td>
             </template>
@@ -256,14 +253,15 @@
       </div>
     </div>
   </div>
-  <div class="col bg-white">
-    <pre>{{ listaRegistrosFiltrados }}</pre>
-  </div>
-
+  <!-- <div class="col bg-white"> -->
+  <!-- <pre>cta: {{ props.cuenta?.id }} - {{ cuenta?.id }}</pre> -->
+  <!-- <pre>{{ listaRegistrosFiltrados.map((det) => det.categoria) }}</pre> -->
+  <!-- <pre>{{ listaRegistrosFiltrados }}</pre> -->
+  <!-- </div> -->
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, toRef } from 'vue'
 import { read, utils } from 'xlsx'
 import { useFormato } from 'src/composables/utils/useFormato'
 import { DateTime } from 'luxon'
@@ -278,6 +276,8 @@ import { parse, format } from 'date-fns'
 import es from 'date-fns/locale/es'
 import en from 'date-fns/locale/en-US'
 import { useCategoriaStore } from 'src/stores/common/categoriaStore'
+import CategoriaSelectionComponent from '../formComponents/CategoriaSelectionComponent.vue'
+import { useRouter } from 'vue-router'
 
 /**
  * Composables
@@ -285,9 +285,12 @@ import { useCategoriaStore } from 'src/stores/common/categoriaStore'
 const notificacion = useNotificacion()
 const registrosCrud = useRegistrosCrud()
 const categoriaStore = useCategoriaStore()
+const router = useRouter()
+const { mostrarNotificacionNegativa } = useNotificacion()
 /**
  * state
  */
+const account = ref()
 const archivoExcel = ref(null)
 const registrosSelected = ref([])
 const listaRegistros = ref([])
@@ -309,32 +312,33 @@ const formato = useFormato()
 const props = defineProps({
   cuenta: {
     type: Object,
-    required: true,
-    default: () => {
-      return {}
-    }
+    required: true
   },
   fecha_desde: {
     type: String,
-    required: true,
-    default: () => {
-      return null
-    }
+    required: true
   },
   fecha_hasta: {
     type: String,
-    required: true,
-    default: () => {
-      return null
-    }
+    required: true
   }
 })
 /**
  * onMounted
  */
 onMounted(() => {
-  let desde = formato.formatoFechaFromISO(props.fecha_desde)
-  let hasta = formato.formatoFechaFromISO(props.fecha_hasta)
+  const { cuenta, fecha_desde, fecha_hasta } = props
+  account.value = cuenta
+  if (!account.value) {
+    notificacion.mostrarNotificacionNegativa(
+      'No se ha seleccionado una cuenta',
+      1500
+    )
+    router.push('/cuentas')
+    return
+  }
+  let desde = formato.formatoFechaFromISO(fecha_desde)
+  let hasta = formato.formatoFechaFromISO(fecha_hasta)
   // console.log('desde', desde)
   fecha_inicio.value = desde
   fecha_fin.value = hasta
@@ -463,7 +467,7 @@ function obtenerMovimientosSantanderNuevo(wb) {
     referencia: row.F
   }))
 
-  console.table(todos.value)
+  // console.table(todos.value)
 
   todos.value.forEach((row, index) => {
     let fecha = convertidorFecha(row.fecha.toString())
@@ -589,8 +593,8 @@ function obtenerMovimientosEfectivo(wb) {
     }))
 
   // console.log('todos', todos.value)
-  console.table(todos.value)
-  console.log('categoriaStore.listaCategorias:', categoriaStore.listaCategorias)
+  // console.table(todos.value)
+  // console.log('categoriaStore.listaCategorias:', categoriaStore.listaCategorias)
   try {
     todos.value.forEach((row, index) => {
       let fecha = row.fecha?.toString() || ''
@@ -618,30 +622,31 @@ function obtenerMovimientosEfectivo(wb) {
           tipo_afectacion = 'A'
           importe = abono
         }
-        const categoria = buscarCategoriaPorCadena(row.categoria)
+        const categoria = buscarCategoriaPorCadena(row.categoria, index)
         addItemToSave(row, index, fecha, importe, tipo_afectacion, categoria)
       }
     })
-    console.table(listaRegistros.value)
+    // console.table(listaRegistros.value)
   } catch (e) {
     console.log(e)
     loadingRows.value = false
   }
 }
 
-function buscarCategoriaPorCadena(cadena) {
-  console.log('categoriaName:', cadena)
+function buscarCategoriaPorCadena(cadena /* , index */) {
+  // console.log('index:', index)
+  // console.log('categoriaName:', cadena)
   const tipoChar = cadena.charAt(0) // 'I' o 'G'
   const nombre = cadena.slice(2) // remueve el tipo y el espacio
 
   const tipo_movimiento = tipoChar === 'I' ? '1' : '2'
 
-  console.log('tipo_movimiento:', tipo_movimiento)
-  console.log('nombre:', nombre)
+  // console.log('tipo_movimiento:', tipo_movimiento)
+  // console.log('nombre:', nombre)
   const cat = categoriaStore.listaCategorias.find(
     (cat) => cat.tipoMovimientoId === tipo_movimiento && cat.nombre === nombre
   )
-  console.log('cat:', cat)
+  // console.log('cat:', cat)
   return cat
 }
 
@@ -654,7 +659,7 @@ function buscarCategoriaPorCadena(cadena) {
  * @param {*} tipo_afectacion
  */
 function addItemToSave(row, index, fecha, importe, tipo_afectacion, categoria) {
-  // console.log('fecha', fecha)
+  const categoriaInput = !categoria ? { ...categoriaAux } : categoria
   const item = {
     id: index,
     consecutivo: row.consecutivo,
@@ -663,36 +668,47 @@ function addItemToSave(row, index, fecha, importe, tipo_afectacion, categoria) {
     concepto: row.concepto,
     importe,
     saldo: row.saldo,
-    categoria,
+    categoria: categoriaInput,
     saved: false,
     isValid: true
   }
   listaRegistros.value.push(item)
+}
+const categoriaAux = {
+  id: undefined,
+  nombre: '',
+  tipoMovimientoId: '1',
+  instancesId: SessionStorage.getItem('current_instance').id,
+  tipoMovimiento: {
+    id: '1',
+    nombre: 'Ingreso'
+  }
 }
 
 function obtenerRegistros() {
   var registrosInput = []
   var opciones = ['1', '2']
   const user = SessionStorage.getItem('current_user')
-  listaRegistrosFiltrados.value.forEach((item) => {
-    // console.log('recorriendo arreglo')
-    // console.dir(item.tipoMovimiento)
-    if (opciones.indexOf(item.tipoMovimiento.tipoMovimientoId) !== -1) {
+  // console.log('listaRegistrosFiltrados.value:', listaRegistrosFiltrados.value)
+  listaRegistrosFiltrados.value
+    .filter((detalle) => !!detalle.categoria)
+    .forEach((item) => {
+      // console.log('recorriendo arreglo')
+      // console.dir(item)
       const fecha = fechaFromFormat(item.fecha)
+      // console.log('fecha:', fecha)
       registrosInput.push({
         estadoRegistroId: 2, //cerrado
-        tipoAfectacion: obtenerTipoAfectacionCategoria(
-          item.tipoMovimiento.tipoMovimientoId
-        ),
+        tipoAfectacion: obtenerTipoAfectacionCategoria(item.tipoMovimientoId),
         cuentaId: props.cuenta.id,
-        categoriaId: item.tipoMovimiento.value.id,
+        categoriaId: item.categoria.id,
         importe: parseFloat(item.importe),
         fecha: fecha.toISODate(),
         observaciones: item.concepto,
         userId: user.id
       })
-    }
-  })
+    })
+  // console.table(registrosInput)
   return registrosInput
 }
 
@@ -708,59 +724,64 @@ function obtenerTipoAfectacionCategoria(tipoMovimientoId) {
 
 function obtenerTraspasos() {
   var traspasosInput = []
-  listaRegistrosFiltrados.value.forEach((item) => {
-    const fecha = DateTime.fromFormat(item.fecha, 'dd/MM/yyyy')
-    const user = SessionStorage.getItem('current_user')
-
-    if (item.tipoMovimiento.tipoMovimientoId === '3') {
-      traspasosInput.push({
-        fecha,
-        observaciones: 'Traspaso entre cuentas',
-        userId: user.id,
-        traspasoDetalles: [
-          {
-            cuentaId: parseInt(item.tipoMovimiento.value.id),
-            tipoCuentaTraspasoId: 1,
-            importe: item.importe * -1
-          },
-          {
-            cuentaId: parseInt(props.cuenta.id),
-            tipoCuentaTraspasoId: 2,
-            importe: item.importe
-          }
-        ]
-      })
-    }
-  })
+  listaRegistrosFiltrados.value
+    .filter((detalle) => !!detalle.cuentaDestino)
+    .forEach((item) => {
+      const fecha = DateTime.fromFormat(item.fecha, 'dd/MM/yyyy')
+      const user = SessionStorage.getItem('current_user')
+        traspasosInput.push({
+          fecha,
+          observaciones: 'Traspaso entre cuentas',
+          userId: user.id,
+          traspasoDetalles: [
+            {
+              cuentaId: parseInt(item.cuentaDestino.id),
+              tipoCuentaTraspasoId: 1,
+              importe: item.importe * -1
+            },
+            {
+              cuentaId: parseInt(props.cuenta.id),
+              tipoCuentaTraspasoId: 2,
+              importe: item.importe
+            }
+          ]
+        })
+    })
+    // console.table(traspasosInput);
   return traspasosInput
 }
 
 function saveItems() {
-  // console.table(listaRegistrosFiltrados.value)
-  const containsErrors = validarMovimientos()
-  if (containsErrors) {
-    // setTimeout(() => {
-    //   errorsList.value.length = 0
-    //   listaRegistrosFiltrados.value.forEach((item) => {
-    //     item.isValid = true
-    //   })
-    // }, 4000)
-    const erroresString = errorsList.value.map(
-      (error) => `Error: línea ${error.numero_linea} - ${error.message} \n`
-    )
-    toast.error(erroresString, {
-      position: toast.POSITION.TOP_CENTER,
-      autoClose: 7000,
-      theme: 'dark',
-      transition: 'bounce',
-      pauseOnFocusLoss: false,
-      style: 'width: 450px; min-width: 450px'
-    })
-  } else {
-    var registrosInput = obtenerRegistros()
-    var traspasosInput = obtenerTraspasos()
-    saveItemsAfterValidate(registrosInput, traspasosInput)
+  try {
+    const containsErrors = validarMovimientos()
+    // console.log('containsErrors:', containsErrors)
+    if (containsErrors) {
+      // toast.error("El formulario contiene algunos errores o datos faltantes", {
+      //   position: toast.POSITION.TOP_CENTER,
+      //   autoClose: 7000,
+      //   theme: 'dark',
+      //   transition: 'bounce',
+      //   pauseOnFocusLoss: false,
+      //   style: 'width: 450px; min-width: 450px'
+      // })
+
+      errorsList.value.reverse().forEach((error) => {
+        mostrarNotificacionNegativa(
+          `Error en la línea ${error.numero_linea}: ${error.message}`,
+          5000,
+          'top-right'
+        )
+      })
+    } else {
+      var registrosInput = obtenerRegistros()
+      var traspasosInput = obtenerTraspasos()
+      saveItemsAfterValidate(registrosInput, traspasosInput)
+    }
+  } catch (e) {
+    console.log('error', e)
+    mostrarNotificacionNegativa(e.message, 2500, 'top-right')
   }
+  isLoading.value = false
 }
 
 function saveItemsAfterValidate(registrosInput, traspasosInput) {
@@ -795,29 +816,38 @@ registrosCrud.onErrorImportarRegistros((error) => {
 
 function validarMovimientos() {
   errorsList.value.length = 0
+
   if (listaRegistrosFiltrados.value.length <= 0) {
-    addError(0, 0, 'No hay registros por guardar')
+    throw new Error('No hay registros para guardar')
   }
+
   listaRegistrosFiltrados.value.forEach((item) => {
-    if (!!item.tipoMovimiento) {
-      const tipoMovimiento = item.tipoMovimiento
-      if (!tipoMovimiento.value) {
-        addError(1, item.consecutivo, 'Seleccionar cuenta destino.')
-        item.isValid = false
+    // console.log('item:', item)
+    // console.log('item.categoria:', item.categoria)
+    if (!item.categoria || !item.categoria.id) {
+      if (item.tipoMovimientoId === '3') {
+        if (!item.cuentaDestino || !item.cuentaDestino.id) {
+          addError(1, item.consecutivo, 'Seleccionar cuenta destino.')
+          item.isValid = false
+        } else {
+          item.isValid = true
+        }
       } else {
-        item.isValid = true
+        addError(1, item.consecutivo, 'Seleccionar categoria.')
+        item.isValid = false
       }
     } else {
-      addError(1, item.consecutivo, 'Seleccionar una categoria.')
-      item.isValid = false
+      item.isValid = true
     }
   })
+  // console.log('errorsList:', errorsList.value)
   return errorsList.value.length > 0
   // , 4000
   // })
 }
 
 function addError(code, numero_linea, message) {
+  // console.log('Adding error - message:', message)
   errorsList.value.push({
     code,
     numero_linea,
@@ -945,6 +975,10 @@ const columns = [
 function categoriaSaved() {
   console.log('La categoria fue guardada correctamente')
 }
+
+function getRowClass(row) {
+  return !row.isValid ? 'tr-fade bg-red-1' : ''
+}
 </script>
 
 <style lang="scss">
@@ -1017,5 +1051,13 @@ function categoriaSaved() {
     box-shadow: rgba(165, 138, 138, 0.76) 5px 14px 28px,
       rgba(145, 109, 109, 0.74) 5px 10px 10px;
   }
+}
+
+.tr-fade {
+  transition: background-color 0.6s ease;
+}
+
+.error_base {
+  background-color: #63a58a !important;
 }
 </style>

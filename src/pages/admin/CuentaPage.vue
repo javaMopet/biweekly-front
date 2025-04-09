@@ -463,6 +463,7 @@ import { useCuentasCrud } from 'src/composables/useCuentasCrud'
 import PeriodoSelect from 'src/components/formComponents/PeriodoSelect.vue'
 import { useGeneralStore } from 'src/stores/common/useGeneralStore'
 import FormInsercionMasivaCuenta from 'src/components/cuentas/FormInsercionMasivaCuenta.vue'
+import { customStorageEventName } from '@vueuse/core'
 
 /**
  * composables
@@ -533,7 +534,9 @@ onBeforeMount(() => {
 /**
  * onMounted
  */
-onMounted(() => {})
+onMounted(() => {
+  console.log('route.params.id:', route.params.id)
+})
 
 /**
  * Cargar datos de la cuenta desde la api.
@@ -541,22 +544,29 @@ onMounted(() => {})
  * @param {Number} cuenta_id - Id de la cuenta.
  */
 function cargarDatosCuenta(cuenta_id) {
+  // console.log('Cargando datos de la cuenta:')
+  // console.log('cuenta_id:', cuenta_id)
   if (cuentaStore.listaCuentas.length > 0) {
+    // console.log('lista cuentas con mas de 0 elementos')
     obtenerCuentaDeListado(cuenta_id)
   } else {
+    // console.log('lista cuentas con 0 o menos elementos')
     cuentasCrud.fetchOrRefetchCuentaById(cuenta_id)
     // router.push('/home')
   }
 }
 
 cuentasCrud.onResultCuentaById(({ data }) => {
+  // console.log('cuentasCrud.onResultCuentaById')
   // console.log('data.cuentaById:', data.cuentaById)
-  obtenerCuentaDeListado(data.cuentaById.id)
+  cuenta.value = data.cuentaById
 })
 
 function obtenerCuentaDeListado(cuentaId) {
+  // console.log('Obteniendo del listado la cuenta con id:', cuentaId)
+  // console.log('cuentaStore.listaCuentas:', cuentaStore.listaCuentas)
   cuenta.value = cuentaStore.listaCuentas.find(
-    (cuenta) => cuenta.id === cuentaId
+    (cuenta) => cuenta.id === cuentaId.toString()
   )
 }
 /**
@@ -886,8 +896,11 @@ function addItem(tipoMovimientoId) {
 }
 
 function addMasiveItems() {
+  console.log('')
+  console.log('cuenta:', cuenta)
   showFormCargaMasiva.value = true
 }
+
 function cargaMasivaSaved(cuenta_id) {
   showFormCargaMasiva.value = false
   showFormCarga.value = false

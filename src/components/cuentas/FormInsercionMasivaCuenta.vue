@@ -889,7 +889,7 @@ const isSelected = computed({
 
 const sumatoriaMovimientos = computed({
   get() {
-    return listaRegistros.value.reduce((accumulator, registro) => {
+    return listaGuardar.value.reduce((accumulator, registro) => {
       return accumulator + parseFloat(registro.importe)
     }, 0)
   }

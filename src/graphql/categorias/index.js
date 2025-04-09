@@ -9,11 +9,6 @@ export const LISTA_CATEGORIAS = gql`
       color
       icono
       importeDefault
-      cuentaContable {
-        id
-        nombre
-        nombreCompleto
-      }
       tipoMovimientoId
       tipoMovimiento {
         id
@@ -24,10 +19,16 @@ export const LISTA_CATEGORIAS = gql`
         id
         nombre
       }
-      instanceId
     }
   }
 `
+// cuentaContable {
+//   id
+//   nombre
+//   nombreCompleto
+// }
+// instanceId
+
 export const CATEGORIA_BY_ID = gql`
   query categoriaById($id: ID!) {
     categoriaById(id: $id) {
