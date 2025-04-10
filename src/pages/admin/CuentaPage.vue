@@ -281,9 +281,11 @@
                 @click="cambiarFecha(props.row)"
                 v-if="!!props.row.registroTarjeta"
               >
-                {{ props.row.fecha }}
+                {{ formato.convertDateFromIsoToInput(props.row.fecha) }}
               </button>
-              <span v-else>{{ props.row.fecha }}</span>
+              <span v-else>{{
+                formato.convertDateFromIsoToInput(props.row.fecha)
+              }}</span>
             </q-td>
           </template>
           <template #body-cell-tipoMovimiento="props">
@@ -301,7 +303,7 @@
           </template>
           <template #body-cell-categoria="props">
             <q-td key="categoria" :props="props">
-              {{ props.row.categoria?.nombre }}
+              {{ props.row.categoria?.nombre || props.row.conceptoTraspaso }}
             </q-td>
           </template>
           <template #body-cell-importe="props">
@@ -379,7 +381,6 @@
         Importe total de movimientos:
         <span> {{ toCurrency(sumaMovimientos) }}</span>
       </div>
-      <!-- <pre>{{ cuentaStore.listaCuentas }}</pre> -->
     </div>
     <!-- <pre>{{ cuenta }}</pre> -->
   </div>
@@ -484,13 +485,6 @@ const { toCurrency } = useFormato()
 /**
  * state
  */
-const detalleVariables = reactive({
-  categoriaId: null,
-  cuentaId: route.params.id,
-  fechaInicio: DateTime.now().startOf('month').toISODate(),
-  fechaFin: DateTime.now().endOf('month').toISODate(),
-  isMsi: null
-})
 
 const variablesSaldoAnterior = reactive({
   cuentaId: route.params.id,
@@ -575,44 +569,82 @@ const graphqlOptions = reactive({
   fetchPolicy: 'no-cache'
 })
 
+const detalleVariables = reactive({
+  categoriaId: null,
+  cuentaId: route.params.id,
+  fechaInicio: DateTime.now().startOf('month').toISODate(),
+  fechaFin: DateTime.now().endOf('month').toISODate(),
+  isMsi: null
+})
+
 const {
   load: loadListaRegistros,
   onError: onErrorListaRegistros,
-  onResult: onResultListaRegistros,
-  refetch: refetchListaRegistros,
-  loading: loadingRegistros
-} = useLazyQuery(LISTA_REGISTROS, detalleVariables, graphqlOptions)
+  // onResult: onResultListaRegistros,
+  loading: loadingRegistros,
+  refetch: refetchListaRegistros
+  // result
+} = useLazyQuery(LISTA_REGISTROS)
 
 function fetchOrRefetchListaRegistros() {
-  loadListaRegistros() || refetchListaRegistros()
+  console.log('fetchOrRefetchListaRegistros')
+  // loadListaRegistros(null, { ...detalleVariables }, graphqlOptions)
+  myLoad()
 }
 
-onResultListaRegistros(({ data }) => {
-  if (data) {
-    listaRegistros.value =
-      JSON.parse(JSON.stringify(data?.obtenerRegistros)) ?? 0
-
-    let saldoAnterior = saldo_periodo_anterior.value || 0
-
-    listaRegistros.value.forEach((registro) => {
-      registro.saldo = saldoAnterior + registro.importe
-      saldoAnterior = registro.saldo
-      // console.log('registro:', registro)
-      if (registro.traspaso) {
-        registro.tipoMovimiento = 'T'
-        registro.tipoMovimientoColor = 'blue'
-      } else {
-        if (registro.categoria.tipoMovimientoId === '2') {
-          registro.tipoMovimiento = 'E'
-          registro.tipoMovimientoColor = 'negative'
-        } else {
-          registro.tipoMovimiento = 'I'
-          registro.tipoMovimientoColor = 'positive'
-        }
-      }
-    })
+async function myLoad() {
+  try {
+    const result = await loadListaRegistros(
+      null,
+      { ...detalleVariables },
+      graphqlOptions
+    )
+    console.log('result:', result)
+    if (!result) {
+      const result = await refetchListaRegistros(
+        null,
+        { ...detalleVariables },
+        graphqlOptions
+      )
+      console.log('result:', result)
+    }
+  } catch (e) {
+    console.error('Error loading data:', e)
+    // Handle error
   }
-})
+}
+
+// onResultListaRegistros(({ data }) => {
+//   console.log('onResultListaRegistros', data)
+//   if (data) {
+//     listaRegistros.value =
+//       JSON.parse(JSON.stringify(data?.obtenerRegistros)) ?? 0
+
+//     let saldoAnterior = saldo_periodo_anterior.value || 0
+
+//     listaRegistros.value.forEach((registro) => {
+//       registro.saldo = saldoAnterior + registro.importe
+//       saldoAnterior = registro.saldo
+
+//       if (registro.traspaso) {
+//         registro.tipoMovimiento = 'T'
+//         registro.tipoMovimientoColor = 'blue'
+//         const traspasoDestino = registro.traspaso.traspasoDetalles.find(
+//           (detalle) => detalle.tipoCuentaTraspasoId === '2'
+//         )
+//         registro.conceptoTraspaso = `A cta: ${traspasoDestino.cuenta.nombre}`
+//       } else {
+//         if (registro.categoria.tipoMovimientoId === '2') {
+//           registro.tipoMovimiento = 'E'
+//           registro.tipoMovimientoColor = 'negative'
+//         } else {
+//           registro.tipoMovimiento = 'I'
+//           registro.tipoMovimientoColor = 'positive'
+//         }
+//       }
+//     })
+//   }
+// })
 
 onErrorListaRegistros((error) => {
   mostrarNotificacionNegativa(
@@ -633,7 +665,8 @@ const {
 onResultObtenerSaldoAFecha(({ data }) => {
   if (data) {
     saldo_periodo_anterior.value = data.obtenerSaldoAFecha
-    fetchOrRefetchListaRegistros(null, detalleVariables, graphqlOptions)
+    console.log('onResultObtenerSaldoAFecha')
+    // fetchOrRefetchListaRegistros(null, detalleVariables, graphqlOptions)
   }
 })
 
@@ -658,9 +691,10 @@ const isModificable = computed({
 
 const sumaMovimientos = computed({
   get() {
-    return listaRegistros.value.reduce((accumulator, registro) => {
-      return accumulator + registro.importe
-    }, 0)
+    // return listaRegistros.value.reduce((accumulator, registro) => {
+    //   return accumulator + registro.importe
+    // }, 0)
+    return 0
   }
 })
 
@@ -872,13 +906,17 @@ function onChangeEjercicio() {
  * Lista de registros de la tarjeta
  */
 function onChangePeriodo() {
+  console.log('onChangePeriodo')
   const fechaString = `${ejercicio_fiscal.value}-${('0' + mes.value.id).slice(
     -2
   )}-01`
   const fecha = DateTime.fromISO(fechaString)
   detalleVariables.fechaInicio = fecha.toISODate()
+  // console.log('fechaInicio establecida.')
   detalleVariables.fechaFin = fecha.endOf('month').toISODate()
+  // console.log('fechaFin establecida.')
   // variablesSaldoAlPeriodo.fechaFin = fecha.endOf('month').toISODate()
+  fetchOrRefetchListaRegistros()
   variablesSaldoAnterior.fechaFin = fecha
     .startOf('month')
     .plus({ days: -1 })
@@ -918,7 +956,8 @@ function cargaMasivaSaved(cuenta_id) {
   //   'Los movimientos fueron guardados correctamente.',
   //   900
   // )
-  refetchListaRegistros()
+  // refetchListaRegistros()
+  // fetchOrRefetchListaRegistros()
   refetchDatos()
 }
 
@@ -969,7 +1008,9 @@ registrosCrud.onErrorRegistroParcialUpdate((error) => {
 })
 
 function itemSaved(_itemSaved) {
-  refetchDatos()
+  console.log('on itemSaved', _itemSaved)
+  // refetchListaRegistros()
+  myLoad()
   showForm.value = false
 }
 
@@ -1043,7 +1084,7 @@ const columns = [
   {
     name: 'categoria',
     label: 'Concepto',
-    field: (row) => row.categoria?.nombre,
+    field: (row) => (!row.categoria ? 'Traspaso' : row.categoria.nombre),
     sortable: false,
     filter: false,
     align: 'left'
