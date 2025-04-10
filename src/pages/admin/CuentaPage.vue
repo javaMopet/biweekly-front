@@ -185,7 +185,7 @@
                     push
                     glossy
                     no-caps
-                    label="Nuevo"
+                    label="Agregar"
                     icon="add_circle"
                     class="medium-button"
                   >
@@ -233,7 +233,7 @@
                     no-caps
                     class="medium-button"
                     color="primary-button"
-                    label="Agregar Masivo"
+                    label="Insertar múltiples"
                     @click="addMasiveItems"
                     push
                     icon="add_circle"
@@ -968,22 +968,23 @@ registrosCrud.onErrorRegistroParcialUpdate((error) => {
   )
 })
 
-function itemSaved(registro) {
-  console.log('registro:', registro)
+function itemSaved(_itemSaved) {
   refetchDatos()
-  // cargarDatosCuenta(route.params.id, false)
   showForm.value = false
 }
 
-function onItemUpdated() {
+function onItemUpdated(_itemUpdated) {
   refetchDatos()
-  // cargarDatosCuenta(route.params.id, false)
   showForm.value = false
 }
 
-function itemsSaved() {
+/**
+ * Al guardar los items de carga masiva
+ * @param {[Object]} _itemsSaved - Objeto con los items guardados.
+ */
+function itemsSaved(_itemsSaved) {
+  refetchDatos()
   showFormCarga.value = false
-  refetchDatos()
 }
 /**
  * Actualizar el saldo final de la cuenta sin importar la fecha y actualizar en interfaz.

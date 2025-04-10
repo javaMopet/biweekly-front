@@ -220,9 +220,18 @@ registrosCrud.onErrorRegistroCreate((error) => {
 })
 
 traspasosCrud.onDoneTraspasoCreate(({ data }) => {
+  const traspasoCreate = data.traspasoCreate.traspaso
+  const traspasoDetalles = traspasoCreate.traspasoDetalles
+  const traspasoDestino = traspasoDetalles.find(
+    (det) => det.tipoCuentaTraspasoId === '2'
+  )
+  const importe = traspasoDestino.importe
+  const cuentaDestinoNombre = traspasoDestino.cuenta.nombre
   isSaving.value = false
-  console.log('traspaso creado', data)
-  mostrarNotificacionPositiva('El traspaso se creó correctamente.', 2100)
+  mostrarNotificacionPositiva(
+    `Se registro un traspaso por ${importe} a la cuenta ${cuentaDestinoNombre}`,
+    2100
+  )
   emit('itemSaved')
 })
 
@@ -399,7 +408,7 @@ function saveItem() {
         observaciones: editedFormItem.value.observaciones,
         userId
       }
-      console.log('[ input ] >', input)
+
       inputDetalle.push({
         cuentaId: parseInt(editedFormItem.value.cuenta.id),
         tipoCuentaTraspasoId: 1,

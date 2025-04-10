@@ -39,7 +39,6 @@ export function useTraspasosCrud() {
 
   onDoneTraspasoCreate(({ data }) => {
     const traspaso = data.traspasoCreate.traspaso
-    console.log('onDonetraspasoCreate', traspaso)
     const detalles = traspaso.traspasoDetalles
     const cuentaDestinoId = detalles.find(
       (detalle) => detalle.tipoCuentaTraspasoId === '2'
@@ -72,8 +71,6 @@ export function useTraspasosCrud() {
   })
 
   function actualizarInterfazCuentas(cuentaOrigenId, cuentaDestinoId) {
-    console.log('cuentaOrigenId:', cuentaOrigenId)
-    console.log('cuentaDestinoId:', cuentaDestinoId)
     cuentasCrud.cuentaSaldoUpdate({ cuentaId: cuentaOrigenId })
     cuentasCrud.cuentaSaldoUpdate({ cuentaId: cuentaDestinoId })
   }

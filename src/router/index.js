@@ -44,23 +44,22 @@ export default route(function (/* { store, ssrContext } */) {
       '/forgotPassword',
       '/forgotPasswordSended'
     ]
+
     const authRequired = !publicPages.includes(to.path)
 
     if (authRequired) {
-      if (
-        !SessionStorage.getItem('credentials') ||
-        !SessionStorage.getItem('current_user')
-      ) {
-        console.log('no credentials, no current_user')
-        return '/login'
+      const currentInstance = SessionStorage.getItem('current_instance')
+      const credentials = SessionStorage.getItem('credentials')
+      const currentUser = SessionStorage.getItem('current_user')
+
+      if (!currentInstance || !credentials || !currentUser) {
+        console.warn('no credentials, no current_user')
+        return { path: '/login' }
       }
       // Validará las rutas que asi se definan si no tenemos un problema con las rutas que no se
       // ponen como menú del usuario
-      if (to.meta && to.meta.permission) {
-        const tienePermiso = permissionService.can(to.meta.permission)
-        if (!tienePermiso) {
-          return '/403'
-        }
+      if (to.meta?.permission && !permissionService.can(to.meta.permission)) {
+        return { path: '/403' }
       }
     }
   })

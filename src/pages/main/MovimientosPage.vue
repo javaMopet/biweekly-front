@@ -5,7 +5,7 @@
     :rows="listaMovimientosIngreso"
     :columns="columnsT"
     row-key="id"
-    :filter="filter"
+    :filter="filterIngreso"
     :rows-per-page-options="[0]"
     separator="none"
     :class="{
@@ -38,7 +38,7 @@
           outlined
           dense
           debounce="400"
-          v-model="filter"
+          v-model="filterIngreso"
           placeholder="Buscar Ingreso"
           class="bg-accent-light"
         >
@@ -388,6 +388,7 @@ const saldosEgreso = ref([])
 const listaSaldosCuentas = ref([])
 const listaSaldosFinales = ref([])
 const listaSaldosMovimientos = ref([])
+const filterIngreso = ref('')
 const filter = ref()
 const editedItem = ref({ ...defaultItem })
 const editedIndex = ref(null)
@@ -684,7 +685,6 @@ const isModificable = computed({
 })
 
 function exportToExcel() {
-  console.log('Exportando a excel....')
   const params = obtenerParametros()
   api
     .get(`/movimientos/to_excel.xlsx`, {
@@ -692,25 +692,41 @@ function exportToExcel() {
       responseType: 'blob' // had to add this one here
     })
     .then((response) => {
-      console.log('response:', response)
-      let nombreArchivo = 'test50.xlsx' //getNombreArchivo()
-      console.log(
-        "response.headers('conteny-type'):",
-        response.headers['content-type']
-      )
-      const status = exportFile(nombreArchivo, response.data, {
+      let nombreArchivo = getNombreArchivo()
+      // console.log(
+      //   "response.headers('conteny-type'):",
+      //   response.headers['content-type']
+      // )
+      const _status = exportFile(nombreArchivo, response.data, {
         mimeType: response.headers['content-type']
       })
       // generandoReporte.value = false
       // // const content = response.headers['content-type'];
       // // download(response.data, 'mipdfprueba.pdf', content);
-      console.log('status cfdi', status)
+      // console.log('status cfdi', status)
     })
     .catch((error) => {
       console.log('error', error)
     })
 }
 
+function getNombreArchivo() {
+  const instance = SessionStorage.getItem('current_instance')
+  const instanceName = instance.dominio
+  const mesNombre = mes.value.nombre
+  const ejercicio = ejercicio_fiscal.value
+  const dia = DateTime.now().day
+  const nombreArchivo = `Movimientos_${instanceName}_${dia}_${mesNombre}_${ejercicio}.xlsx`
+  return nombreArchivo
+}
+/**
+ * * @description Obtiene los parámetros para la exportación a Excel
+ * * @param {Object} params
+ * * @param {Number} params.ejercicioFiscalId
+ * * @param {Number} params.mesId
+ * * @param {Number} params.instanceId
+ * * @returns {Object}
+ */
 function obtenerParametros() {
   return {
     ejercicioFiscalId: ejercicio_fiscal.value,
