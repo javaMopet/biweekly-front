@@ -54,8 +54,8 @@
           <q-toolbar class="" style="border: 0px solid green">
             <div class="row inline q-gutter-x-sm items-center">
               <PeriodoSelect
-                v-model:year="ejercicio_fiscal"
-                v-model:month="mes"
+                v-model:year="ejercicioFiscalPeriodo"
+                v-model:month="mesPeriodo"
                 @onChangePeriodo="onChangePeriodo"
                 :disable="loadingListaRegistros"
               ></PeriodoSelect>
@@ -82,35 +82,35 @@
           <div class="row text-condensed" v-if="!expanded">
             <div class="column items-center justify-center">
               <span class="tarjeta__resumen-etiqueta">Día de corte:</span
-              ><span class="resumen__valor"> {{ cuenta.diaCorte }}</span>
+              ><span class="resumen__valor"> {{ cuenta?.diaCorte }}</span>
             </div>
             <q-separator spaced vertical />
-            <div class="column items-center justify-center">
+            <div class="column items-center justify-center q-px-md">
               <span class="tarjeta__resumen-etiqueta">Periodo:</span
               ><span class="resumen__valor"
                 >{{ periodoInicio }} - {{ periodoFin }}</span
               >
             </div>
             <q-separator spaced vertical />
-            <div class="column items-center justify-center">
-              <span class="tarjeta__resumen-etiqueta"
+            <div class="column items-center justify-center q-px-md">
+              <span class="tarjeta__resumen-etiqueta text-bold"
                 >Pago para no generar intereses:</span
-              ><span class="resumen__valor">{{
+              ><span class="resumen__valor-lg text-bold text-blue-10">{{
                 formato.toCurrency(
                   saldo_pagar_periodo === 0 ? 0 : saldo_pagar_periodo * -1
                 )
               }}</span>
             </div>
             <q-separator spaced vertical />
-            <div class="column items-center justify-center">
+            <!-- <div class="column items-center justify-center">
               <span class="tarjeta__resumen-etiqueta"
                 >Fecha límite de pago:</span
               ><span class="resumen__valor">{{
                 fecha_limite_pago.toFormat('dd/MM/yyyy')
               }}</span>
-            </div>
-            <q-separator spaced vertical />
-            <div class="column items-center justify-center">
+            </div> -->
+            <!-- <q-separator spaced vertical /> -->
+            <div class="column items-center justify-center q-px-md">
               <span class="tarjeta__resumen-etiqueta"
                 >Saldo del periodo anterior:</span
               ><span class="resumen__valor">{{
@@ -122,10 +122,10 @@
               }}</span>
             </div>
             <q-separator spaced vertical />
-            <div class="column items-center justify-center">
+            <div class="column items-center justify-center q-px-xl">
               <span class="tarjeta__resumen-etiqueta">Saldo en tarjeta:</span
               ><span class="resumen__valor">{{
-                toCurrencyAbsoluteFormat(cuenta.saldo)
+                toCurrencyAbsoluteFormat(cuenta?.saldo || 0)
               }}</span>
               <!-- <pre>{{ cuenta.saldo }}</pre> -->
             </div>
@@ -158,7 +158,7 @@
                       DÍA DE CORTE
                     </span>
                     <span class="tarjeta-resumen__valor">
-                      {{ cuenta.dia_corte }}</span
+                      {{ cuenta?.dia_corte || 0 }}</span
                     >
                   </div>
                 </div>
@@ -185,7 +185,7 @@
                     >
                   </div>
                 </div>
-                <div class="row">
+                <!-- <div class="row">
                   <div class="col column items-center">
                     <span class="tarjeta-resumen__etiqueta">
                       FECHA LIMITE DE PAGO
@@ -194,7 +194,7 @@
                       {{ fecha_limite_pago.toFormat('dd/MM/yyyy') }}</span
                     >
                   </div>
-                </div>
+                </div> -->
               </div>
               <div class="col tarjeta-resumen__right q-gutter-y-xs">
                 <div class="row">
@@ -241,7 +241,7 @@
                     <span class="tarjeta-resumen__valor--importante">
                       {{
                         formato.toCurrency(
-                          cuenta.saldo === 0 ? 0 : cuenta.saldo * -1
+                          (cuenta?.saldo || 0) === 0 ? 0 : cuenta.saldo * -1
                         )
                       }}
                     </span>
@@ -610,6 +610,9 @@ const { toCurrencyAbsoluteFormat } = useFormato()
 /**
  * state
  */
+const ejercicioFiscalPeriodo = ref()
+const mesPeriodo = ref()
+
 const listaRegistrosMsi = ref([])
 const listaRegistros = ref([])
 
@@ -627,9 +630,8 @@ const showFormCargaMasiva = ref(false)
 // const showFormMSI = ref(false)
 const showFormCarga = ref(false)
 const showPagosTarjeta = ref(false)
-const cuenta = ref({})
-const ejercicio_fiscal = ref(0)
-const mes = ref({})
+const cuenta = ref()
+
 const saldo_pagar_periodo = ref(0)
 const saldo_anterior = ref(0)
 const saldo_final_periodo = ref(0)
@@ -642,10 +644,17 @@ const filterMsi = ref('')
 /**
  *
  */
-onBeforeMount(() => {
-  // console.log('route.params.id:', route.params.id)
+onBeforeMount(async () => {
+  console.log('route.params.id:', route.params.id)
   // console.log('cuentaStore.listaCuentas:', cuentaStore.listaCuentas)
-  cargarDatosCuenta(route.params.id)
+  const dateNow = DateTime.now()
+  // El ejercicio fiscal siempre va a ser el del año corriente
+  ejercicioFiscalPeriodo.value = dateNow.year
+  const mesId = dateNow.month
+  const mesValue = mesOptions.value.find((mesOption) => mesOption.id === mesId)
+  mesPeriodo.value = mesValue
+
+  await cargarDatosCuenta(route.params.id)
 })
 
 /**
@@ -653,34 +662,32 @@ onBeforeMount(() => {
  * @author Horacio Peña Mendoza <hpena.dtic@gmail.com>
  * @param {Number} cuenta_id - Id de la cuenta.
  */
-function cargarDatosCuenta(cuenta_id) {
+async function cargarDatosCuenta(cuenta_id) {
   if (cuentaStore.listaCuentas.length > 0) {
     obtenerCuentaDeListado(cuenta_id)
   } else {
-    console.log('cargando cuentas nuevamente...')
-    console.log('cuenta_id:', cuenta_id)
+    console.log('cargando cuentas nuevamente... cuenta_id:', cuenta_id)
     cuentasCrud.fetchOrRefetchCuentaById(cuenta_id)
     // router.push('/home')
   }
 }
+
 cuentasCrud.onResultCuentaById(({ data }) => {
   console.log('data.cuentaById:', data.cuentaById)
-  obtenerCuentaDeListado(data.cuentaById.id)
+  console.log('data.....:', data)
+  // obtenerCuentaDeListado(data.cuentaById.id)
+  cuenta.value = data.cuentaById
+  recargarDetalleCuenta()
 })
+
 cuentaCrud.onErrorCuentaById((error) => {
-  console.log('error:', error)
+  console.log('error obtenido:', error)
 })
 function obtenerCuentaDeListado(cuentaId) {
   cuenta.value = cuentaStore.listaCuentas.find(
     (cuenta) => cuenta.id === cuentaId
   )
-  const dateNow = DateTime.now()
-  ejercicio_fiscal.value = dateNow.year
-  const mes_id = dateNow.month
-  const mes_value = mesOptions.value.find(
-    (mesOption) => mesOption.id === mes_id
-  )
-  mes.value = mes_value
+  console.log('Cuenta encontrada:', cuenta.value)
 
   cuenta.value = cuentaStore.listaCuentas.find(
     (cuenta) => cuenta.id === route.params.id
@@ -715,18 +722,35 @@ onMounted(() => {
 /**
  * graphql
  */
-const listaRegistrosVariables = ref({
-  cuentaId: route.params.id,
-  fechaInicio: DateTime.now().startOf('month').toISODate(),
-  fechaFin: DateTime.now().endOf('month').toISODate(),
-  isMsi: null,
-  estadoRegistroTarjetaId: null
-})
-
 const graphqlOptions = reactive({
   fetchPolicy: 'no-cache'
   // debounce: 10000
 })
+
+const listaRegistrosVariables = ref({
+  cuentaId: route.params.id,
+  fechaInicio: obtenerFechaInicioCuenta(), // fechaInicioPeriodo.value,//DateTime.now().startOf('month').toISODate(),
+  fechaFin: obtenerFechaFinCuenta(), // DateTime.now().endOf('month').toISODate(),
+  isMsi: null,
+  estadoRegistroTarjetaId: null
+})
+
+function obtenerFechaInicioCuenta() {
+  console.log('cuenta.value:', cuenta.value)
+  if (cuenta.value) {
+    return fechaInicioPeriodo.value
+  } else {
+    null
+  }
+}
+function obtenerFechaFinCuenta() {
+  console.log('cuenta.value:', cuenta.value)
+  if (cuenta.value) {
+    return fechaFinPeriodo.value
+  } else {
+    null
+  }
+}
 
 const {
   // load: loadListaRegistrosTarjeta,
@@ -833,20 +857,20 @@ const isPagable = computed({
 
 const ejercicio_inicial_id = computed({
   get() {
-    return mes.value.id - 1 <= 0
-      ? ejercicio_fiscal.value - 1
-      : ejercicio_fiscal.value
+    return mesPeriodo.value.id - 1 <= 0
+      ? ejercicioFiscalPeriodo.value - 1
+      : ejercicioFiscalPeriodo.value
   }
 })
 const mes_inicial_id = computed({
   get() {
-    return mes.value.id - 1 <= 0 ? 12 : mes.value.id - 1
+    return mesPeriodo.value.id - 1 <= 0 ? 12 : mesPeriodo.value.id - 1
   }
 })
 
 const ejercicio_final_id = computed({
   get() {
-    return ejercicio_fiscal.value
+    return ejercicioFiscalPeriodo.value
   }
 })
 const dia_corte_inicial = computed({
@@ -861,21 +885,22 @@ const dia_corte_final = computed({
 })
 const mes_final_id = computed({
   get() {
-    return mes.value.id
+    return mesPeriodo.value.id
   }
 })
+
 const fechaInicioPeriodo = computed({
   get() {
     let mesInicio = 0
     let anioInicio = 0
 
     // console.log('[ mes.value.id ] >', mes.value.id)
-    if (mes.value.id - 1 <= 0) {
+    if (mesPeriodo.value.id - 1 <= 0) {
       mesInicio = 12
-      anioInicio = ejercicio_fiscal.value - 1
+      anioInicio = ejercicioFiscalPeriodo.value - 1
     } else {
-      mesInicio = mes.value.id - 1
-      anioInicio = ejercicio_fiscal.value
+      mesInicio = mesPeriodo.value.id - 1
+      anioInicio = ejercicioFiscalPeriodo.value
     }
 
     const dia_inicio = ('0' + (cuenta.value.diaCorte + 1)).slice(-2)
@@ -885,10 +910,18 @@ const fechaInicioPeriodo = computed({
 
 const fechaFinPeriodo = computed({
   get() {
-    const dia_fin = ('0' + cuenta.value.diaCorte).slice(-2)
-    return `${ejercicio_fiscal.value}-${('0' + mes.value.id).slice(
-      -2
-    )}-${dia_fin}`
+    if (cuenta.value) {
+      console.log('cuenta.value:', cuenta.value)
+      console.log('cuenta.value.diaCorte:', cuenta.value.diaCorte)
+      const dia_fin = ('0' + cuenta.value.diaCorte).slice(-2)
+      console.log('dia_fin:', dia_fin)
+      console.log('ejercicioFiscalPeriodo.value:', ejercicioFiscalPeriodo.value)
+      console.log('mesPeriodo.value.id:', mesPeriodo.value.id)
+      return `${ejercicioFiscalPeriodo.value}-${(
+        '0' + mesPeriodo.value.id
+      ).slice(-2)}-${dia_fin}`
+    }
+    return null
   }
 })
 
@@ -932,14 +965,14 @@ const periodoFin = computed({
   }
 })
 
-const fecha_limite_pago = computed({
-  get() {
-    const fecha = DateTime.fromISO(fechaFinPeriodo.value).plus({
-      days: cuenta.value.dias_gracia
-    })
-    return fecha
-  }
-})
+// const fecha_limite_pago = computed({
+//   get() {
+//     const fecha = DateTime.fromISO(fechaFinPeriodo.value).plus({
+//       days: cuenta.value.dias_gracia
+//     })
+//     return fecha
+//   }
+// })
 
 /**
  * graphql
@@ -974,7 +1007,7 @@ onErrorSaldoTarjetaCredito((error) => {
 
 const variablesMesAnterior = ref({
   cuentaId: route.params.id,
-  fechaFin: obtenerFechaMesAnterior(),// DateTime.now().endOf('month').toISODate(),
+  fechaFin: obtenerFechaMesAnterior(), // DateTime.now().endOf('month').toISODate(),
   isDetalle: 0
 })
 
@@ -984,14 +1017,32 @@ const {
   onError: onErrorSaldoAnteriorTC
 } = useQuery(SALDO_TARJETA_CREDITO, variablesMesAnterior, opcionesGraphql)
 
+/**
+ * Methods
+ */
+
+function recargarDetalleCuenta() {
+  listaRegistrosVariables.value = {
+    cuentaId: route.params.id,
+    fechaInicio: obtenerFechaInicioCuenta(),
+    fechaFin: obtenerFechaFinCuenta(),
+    isMsi: null,
+    estadoRegistroTarjetaId: null
+  }
+}
+
 function obtenerFechaMesAnterior() {
-  console.log('obteniendoFEchaAnterior:', fechaInicioPeriodo.value)
-  const fecha = DateTime.now()
-    .minus({ months: 1 })
-    .endOf('month')
-    .toISODate()
-    console.log('fecha:', fecha)
-  return fecha
+  if (cuenta.value && cuenta.value.id) {
+    console.log('fechaInicioPeriodo:', fechaInicioPeriodo.value)
+    const fecha = fechaInicioPeriodo.value
+      .minus({ days: 1 })
+      .endOf('month')
+      .toISODate()
+    console.log('fecha final periodo anterior:', fecha)
+    return fecha
+  } else {
+    return null
+  }
 }
 
 // function loadOrRefetchSaldoAnteriorTC() {
@@ -1179,11 +1230,11 @@ registrosTarjetaCrud.onDoneRegistroTarjetaPagoDelete(({ data }) => {
 function obtenerFechasInicialFinal() {
   console.log('obtenerFechaInicialFinal() cuenta.value:', cuenta.value)
   // if (cuenta.value) {
-  let mesInicio = mes.value.id - 1
-  let ejercicioFiscal = ejercicio_fiscal.value
+  let mesInicio = mesPeriodo.value.id - 1
+  let ejercicioFiscal = ejercicioFiscalPeriodo.value
   if (!mesInicio) {
     mesInicio = 12
-    ejercicioFiscal = ejercicio_fiscal.value - 1
+    ejercicioFiscal = ejercicioFiscalPeriodo.value - 1
   }
 
   const dia_inicio = ('0' + (cuenta.value.diaCorte + 1)).slice(-2)
@@ -1191,9 +1242,9 @@ function obtenerFechasInicialFinal() {
   const fechaInicio = `${ejercicioFiscal}-${('0' + mesInicio).slice(
     -2
   )}-${dia_inicio}`
-  const fechaFin = `${ejercicio_fiscal.value}-${('0' + mes.value.id).slice(
-    -2
-  )}-${dia_fin}`
+  const fechaFin = `${ejercicioFiscalPeriodo.value}-${(
+    '0' + mesPeriodo.value.id
+  ).slice(-2)}-${dia_fin}`
   // }
   listaRegistrosVariables.value = {
     cuentaId: route.params.id,
@@ -1204,10 +1255,19 @@ function obtenerFechasInicialFinal() {
   }
 }
 
+/**
+ * Al cambiar el periodo.
+ * @description: Se ejecuta cuando se hace un cambio de mes o o ejercicio
+ */
 function onChangePeriodo() {
   obtenerListaRegistros()
   obtenerSaldoTarjetaAlFinalPeriodo()
   // loadOrRefetchSaldoAnteriorTC()
+  variablesMesAnterior.value = {
+    cuentaId: route.params.id,
+    fechaFin: obtenerFechaMesAnterior(), // DateTime.now().endOf('month').toISODate(),
+    isDetalle: 0
+  }
 }
 
 function obtenerSaldoTarjetaAlFinalPeriodo() {
@@ -1494,6 +1554,10 @@ function getSelectedString() {
     // font-family: 'Roboto Slab', sans-serif;
     font-weight: 500;
     color: $input-label;
+    &-lg {
+      font-size: 1rem !important;
+      font-weight: 800;
+    }
   }
 }
 .tarjeta-resumen {

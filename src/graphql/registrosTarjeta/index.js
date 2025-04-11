@@ -2,9 +2,9 @@ import gql from 'graphql-tag'
 
 export const LISTA_REGISTROS_TARJETA = gql`
   query listaRegistrosTarjeta(
-    $cuentaId: ID
-    $fechaInicio: ISO8601Date!
-    $fechaFin: ISO8601Date!
+    $cuentaId: ID!
+    $fechaInicio: ISO8601Date
+    $fechaFin: ISO8601Date
     $isMsi: Boolean
     $estadoRegistroTarjetaId: ID
   ) {

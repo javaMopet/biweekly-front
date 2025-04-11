@@ -437,11 +437,11 @@ const filter = ref()
 /**
  * on before mount
  */
-onBeforeMount(() => {
+onBeforeMount(async () => {
   mes.value = generalStore.meses.find(
     (mesOption) => mesOption.id === DateTime.now().month
   )
-  cargarDatosCuenta(route.params.id, true)
+  await cargarDatosCuenta(route.params.id, true)
 })
 /**
  * onMounted
@@ -455,26 +455,26 @@ onMounted(() => {
  * @author Horacio Peña Mendoza <hpena.dtic@gmail.com>
  * @param {Number} cuenta_id - Id de la cuenta.
  */
-function cargarDatosCuenta(cuenta_id) {
+async function cargarDatosCuenta(cuenta_id) {
   // console.log('Cargando datos de la cuenta:')
   // console.log('cuenta_id:', cuenta_id)
   if (cuentaStore.listaCuentas.length > 0) {
     // console.log('lista cuentas con mas de 0 elementos')
-    obtenerCuentaDeListado(cuenta_id)
+    await obtenerCuentaDeListado(cuenta_id)
   } else {
     // console.log('lista cuentas con 0 o menos elementos')
-    cuentasCrud.fetchOrRefetchCuentaById(cuenta_id)
+    await cuentasCrud.fetchOrRefetchCuentaById(cuenta_id)
     // router.push('/home')
   }
 }
 
-cuentasCrud.onResultCuentaById(({ data }) => {
+cuentasCrud.onResultCuentaById(async ({ data }) => {
   // console.log('cuentasCrud.onResultCuentaById')
   // console.log('data.cuentaById:', data.cuentaById)
   cuenta.value = data.cuentaById
 })
 
-function obtenerCuentaDeListado(cuentaId) {
+async function obtenerCuentaDeListado(cuentaId) {
   // console.log('Obteniendo del listado la cuenta con id:', cuentaId)
   // console.log('cuentaStore.listaCuentas:', cuentaStore.listaCuentas)
   cuenta.value = cuentaStore.listaCuentas.find(
