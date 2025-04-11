@@ -72,7 +72,7 @@
     </q-btn>
   </div>
   <!-- <pre>{{ tipoMovimientoId }}-{{ tipoAfectacion }}-{{ categoria?.id }}</pre> -->
-  <Teleport to="#modal">
+  <!-- <Teleport to="#modal">
     <q-dialog
       v-model="showRegistroCategoria"
       persistent
@@ -84,14 +84,16 @@
         @categoriaSaved="onCategoriaSaved"
       ></FormRegistroCategoria>
     </q-dialog>
-  </Teleport>
+  </Teleport> -->
 </template>
 
 <script setup>
 import { computed, ref, onMounted } from 'vue'
 import CategoriaSelect from './CategoriaSelect.vue'
-import FormRegistroCategoria from '../categorias/FormRegistroCategoria.vue'
+// import FormRegistroCategoria from '../categorias/FormRegistroCategoria.vue'
 import SelectCuenta from './SelectCuenta.vue'
+import RegistroCategoriaDialog from '../categorias/RegistroCategoriaDialog.vue'
+import { Dialog } from 'quasar'
 
 /**
  * props
@@ -127,7 +129,6 @@ const props = defineProps({
  * state
  */
 const tipoAfectacion = ref(props.tipoAfectacion)
-const showRegistroCategoria = ref(false)
 const editedCategoriaParam = ref()
 const categoriaAux = {
   id: -1,
@@ -215,15 +216,36 @@ function agregarCategoria() {
     icono: 'insert_emoticon',
     color: '#019A9D'
   }
-  showRegistroCategoria.value = true
+  // showRegistroCategoria.value = true
+  openRegistroCategoriaDialog(editedCategoriaParam.value)
+}
+function openRegistroCategoriaDialog(itemToAddOrUpdate) {
+  console.log('itemToAddOrUpdate:', itemToAddOrUpdate)
+  Dialog.create({
+    component: RegistroCategoriaDialog,
+    parent: this,
+    componentProps: {
+      editedItem: itemToAddOrUpdate
+    },
+    onOk: (payload) => {
+      // categoriaSaved(itemSaved)
+      console.log('categoriaSaved', payload)
+      // onCategoriaSaved(payload)
+      // mostrarNotificacion(payload.operacion, payload.item)
+      // categoriasCrud.refetchListaCategorias()
+      categoria.value = payload.item
+    },
+    onCancel: () => {
+      console.log("'Cancel clicked'")
+    }
+  })
 }
 
-function onCategoriaSaved(categoriaSaved) {
-  showRegistroCategoria.value = false
-  categoria.value = categoriaSaved
-  emit('update:modelValue', categoriaSaved)
-  emit('categoriaSaved', categoriaSaved)
-}
+// function onCategoriaSaved(categoriaSaved) {
+//   showRegistroCategoria.value = false
+//   emit('update:modelValue', categoriaSaved)
+//   emit('categoriaSaved', categoriaSaved)
+// }
 </script>
 
 <style lang="scss" scoped></style>

@@ -19,14 +19,14 @@ export const LISTA_CATEGORIAS = gql`
         id
         nombre
       }
+      cuentaContable {
+        id
+        nombre
+        nombreCompleto
+      }
     }
   }
 `
-// cuentaContable {
-//   id
-//   nombre
-//   nombreCompleto
-// }
 // instanceId
 
 export const CATEGORIA_BY_ID = gql`

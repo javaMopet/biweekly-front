@@ -39,7 +39,6 @@ export function useCategoriaService() {
    */
   onDoneCategoriaCreate(({ data }) => {
     if (data) {
-      console.log('refrescando categorias', data)
       categoriaStore.listaCategorias.push(data.categoriaCreate.categoria)
     }
   })

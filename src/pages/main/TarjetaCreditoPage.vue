@@ -573,7 +573,7 @@ import { DateTime } from 'luxon'
 import FormRegistroMovimientoTarjeta from 'src/components/tarjetasCredito/FormRegistroMovimientoTarjeta.vue'
 // import { api } from 'src/boot/axios'
 import { LISTA_REGISTROS_TARJETA } from 'src/graphql/registrosTarjeta'
-import { useLazyQuery, useQuery } from '@vue/apollo-composable'
+import { useQuery } from '@vue/apollo-composable'
 import { useFormato } from 'src/composables/utils/useFormato'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { SessionStorage, useQuasar } from 'quasar'
@@ -635,14 +635,6 @@ const saldo_anterior = ref(0)
 const saldo_final_periodo = ref(0)
 const saldo_final_perido_anterior = ref(0)
 
-const listaRegistrosVariables = reactive({
-  cuentaId: route.params.id,
-  fechaInicio: '',
-  fechaFin: '',
-  isMsi: null,
-  estadoRegistroTarjetaId: null
-})
-
 const selected = ref([])
 const expanded = ref(false)
 const filter = ref('')
@@ -694,8 +686,9 @@ function obtenerCuentaDeListado(cuentaId) {
     (cuenta) => cuenta.id === route.params.id
   )
   obtenerFechasInicialFinal()
-  loadOrRefetchListaRegistrosTarjeta()
-  loadOrRefetchSaldoAnteriorTC()
+  // loadOrRefetchListaRegistrosTarjeta()
+  refetchListaRegistros()
+  // loadOrRefetchSaldoAnteriorTC()
 }
 /**
  * onMounted
@@ -722,27 +715,33 @@ onMounted(() => {
 /**
  * graphql
  */
+const listaRegistrosVariables = ref({
+  cuentaId: route.params.id,
+  fechaInicio: DateTime.now().startOf('month').toISODate(),
+  fechaFin: DateTime.now().endOf('month').toISODate(),
+  isMsi: null,
+  estadoRegistroTarjetaId: null
+})
+
 const graphqlOptions = reactive({
   fetchPolicy: 'no-cache'
   // debounce: 10000
 })
+
 const {
-  load: loadListaRegistrosTarjeta,
+  // load: loadListaRegistrosTarjeta,
   onResult: onResultListaRegistrosTarjeta,
   onError: onErrorListaRegistros,
   refetch: refetchListaRegistros,
   loading: loadingListaRegistros
-} = useLazyQuery(
-  LISTA_REGISTROS_TARJETA,
-  listaRegistrosVariables,
-  graphqlOptions
-)
+} = useQuery(LISTA_REGISTROS_TARJETA, listaRegistrosVariables, graphqlOptions)
 
-function loadOrRefetchListaRegistrosTarjeta() {
-  loadListaRegistrosTarjeta() || refetchListaRegistros()
-}
+// function loadOrRefetchListaRegistrosTarjeta() {
+//   loadListaRegistrosTarjeta() || refetchListaRegistros()
+// }
 
 onResultListaRegistrosTarjeta(({ data }) => {
+  console.log('data:', data)
   if (data) {
     listaRegistros.value = data?.listaRegistrosTarjeta.filter(
       (registro) => !registro.isMsi
@@ -946,13 +945,13 @@ const fecha_limite_pago = computed({
  * graphql
  */
 const opcionesGraphql = reactive({
-  fetchPolicy: 'network-only'
+  fetchPolicy: 'no-cache'
   // debounce: 1000
 })
 
-const saldoTarjetaVariables = reactive({
-  cuentaId: route.params.id,
-  fechaFin: null,
+const saldoTarjetaVariables = ref({
+  cuentaId: '1', //route.params.id,
+  fechaFin: DateTime.now().endOf('month').toISODate(),
   isDetalle: 0
 })
 
@@ -962,34 +961,57 @@ const {
 } = useQuery(SALDO_TARJETA_CREDITO, saldoTarjetaVariables, opcionesGraphql)
 
 onResultSaldoTarjetaCredito(({ data }) => {
+  console.log('onResultSaldoTarjetaCredito data:', data)
   saldo_final_periodo.value = data.saldoTarjetaCredito
 })
 
 onErrorSaldoTarjetaCredito((error) => {
   console.trace(error)
-  mostrarNotificacionNegativa('Ocurrió un error al intentar obtener el saldo')
+  mostrarNotificacionNegativa(
+    `Ocurrió un error al intentar obtener el saldo. ${error.message}`
+  )
+})
+
+const variablesMesAnterior = ref({
+  cuentaId: route.params.id,
+  fechaFin: obtenerFechaMesAnterior(),// DateTime.now().endOf('month').toISODate(),
+  isDetalle: 0
 })
 
 const {
-  load: loadSaldoAnteriorTC,
+  // load: loadSaldoAnteriorTC,
   onResult: onResultSaldoAnteriorTC,
   onError: onErrorSaldoAnteriorTC
-} = useLazyQuery(SALDO_TARJETA_CREDITO)
+} = useQuery(SALDO_TARJETA_CREDITO, variablesMesAnterior, opcionesGraphql)
 
-function loadOrRefetchSaldoAnteriorTC() {
-  const variables = {
-    cuentaId: route.params.id,
-    fechaFin: DateTime.fromISO(listaRegistrosVariables.fechaInicio)
-      .plus({ days: -1 })
-      .toISODate(),
-    isDetalle: 0
-  }
-  loadSaldoAnteriorTC(null, variables, opcionesGraphql) /* ||
-    refetchSaldoAnteriorTC(null, variables, opcionesGraphql )*/
+function obtenerFechaMesAnterior() {
+  console.log('obteniendoFEchaAnterior:', fechaInicioPeriodo.value)
+  const fecha = DateTime.now()
+    .minus({ months: 1 })
+    .endOf('month')
+    .toISODate()
+    console.log('fecha:', fecha)
+  return fecha
 }
 
+// function loadOrRefetchSaldoAnteriorTC() {
+// const variables = {
+//   cuentaId: route.params.id,
+//   fechaFin: DateTime.fromISO(listaRegistrosVariables.value.fechaInicio)
+//     .plus({ days: -1 })
+//     .toISODate(),
+//   isDetalle: 0
+// }
+// loadSaldoAnteriorTC(null, variables, opcionesGraphql)
+/* ||
+    refetchSaldoAnteriorTC(null, variables, opcionesGraphql )*/
+// }
+
 onResultSaldoAnteriorTC(({ data }) => {
-  saldo_final_perido_anterior.value = data.saldoTarjetaCredito
+  console.log('onResultSaldoAnteriorTC data:', data)
+  if (data) {
+    saldo_final_perido_anterior.value = data.saldoTarjetaCredito
+  }
 })
 
 onErrorSaldoAnteriorTC((error) => {
@@ -1026,7 +1048,8 @@ onErrorSaldoPagarTarjetaCredito((error) => {
 
 registrosTarjetaCrud.onDoneRegistroTarjetaDelete((response) => {
   if (response) {
-    loadOrRefetchListaRegistrosTarjeta()
+    // loadOrRefetchListaRegistrosTarjeta()
+    refetchListaRegistros()
     refetchSaldoPagarTarjetaCredito()
     showSuccessMessage('eliminó')
   }
@@ -1035,7 +1058,8 @@ registrosTarjetaCrud.onDoneRegistroTarjetaDelete((response) => {
 registrosTarjetaCrud.onDoneRegistrosTarjetaDelete(({ data }) => {
   mostrarNotificacionPositiva('Los movimientos han sido eliminados.', 2100)
   cuenta.value.saldo = data.registrosTarjetaDelete.saldo
-  loadOrRefetchListaRegistrosTarjeta()
+  // loadOrRefetchListaRegistrosTarjeta()
+  refetchListaRegistros()
   refetchSaldoPagarTarjetaCredito()
 })
 
@@ -1146,12 +1170,14 @@ function confirmDeleteRegistroTarjeta(row) {
 
 registrosTarjetaCrud.onDoneRegistroTarjetaPagoDelete(({ data }) => {
   console.log('[ data ] >', data)
-  loadOrRefetchListaRegistrosTarjeta()
+  // loadOrRefetchListaRegistrosTarjeta()
+  refetchListaRegistros()
   refetchSaldoPagarTarjetaCredito()
   showSuccessMessage('eliminó')
 })
 
 function obtenerFechasInicialFinal() {
+  console.log('obtenerFechaInicialFinal() cuenta.value:', cuenta.value)
   // if (cuenta.value) {
   let mesInicio = mes.value.id - 1
   let ejercicioFiscal = ejercicio_fiscal.value
@@ -1162,23 +1188,35 @@ function obtenerFechasInicialFinal() {
 
   const dia_inicio = ('0' + (cuenta.value.diaCorte + 1)).slice(-2)
   const dia_fin = ('0' + cuenta.value.diaCorte).slice(-2)
-  listaRegistrosVariables.fechaInicio = `${ejercicioFiscal}-${(
-    '0' + mesInicio
-  ).slice(-2)}-${dia_inicio}`
-  listaRegistrosVariables.fechaFin = `${ejercicio_fiscal.value}-${(
-    '0' + mes.value.id
-  ).slice(-2)}-${dia_fin}`
+  const fechaInicio = `${ejercicioFiscal}-${('0' + mesInicio).slice(
+    -2
+  )}-${dia_inicio}`
+  const fechaFin = `${ejercicio_fiscal.value}-${('0' + mes.value.id).slice(
+    -2
+  )}-${dia_fin}`
   // }
+  listaRegistrosVariables.value = {
+    cuentaId: route.params.id,
+    fechaInicio,
+    fechaFin,
+    isMsi: null,
+    estadoRegistroTarjetaId: null
+  }
 }
 
 function onChangePeriodo() {
   obtenerListaRegistros()
   obtenerSaldoTarjetaAlFinalPeriodo()
-  loadOrRefetchSaldoAnteriorTC()
+  // loadOrRefetchSaldoAnteriorTC()
 }
 
 function obtenerSaldoTarjetaAlFinalPeriodo() {
-  saldoTarjetaVariables.fechaFin = fechaFinPeriodo.value
+  // saldoTarjetaVariables.value = {
+  //   cuentaId: route.params.id,
+  //   fechaFin: fechaFinPeriodo.value,
+  //   isDetalle: 0
+  // }
+
   saldoPagarTarjetaVariables.fechaFin = fechaFinPeriodo.value
 }
 /**
@@ -1239,7 +1277,8 @@ cuentaCrud.onDoneCuentaSaldoUpdate(({ data }) => {
 })
 function pagosRegistrados() {
   showPagosTarjeta.value = false
-  loadOrRefetchListaRegistrosTarjeta()
+  // loadOrRefetchListaRegistrosTarjeta()
+  refetchListaRegistros()
 }
 function obtenerMensajePaginacion(firstRowIndex, endRowIndex, totalRowsNumber) {
   return `Número de movimientos en el periodo: ${totalRowsNumber}`

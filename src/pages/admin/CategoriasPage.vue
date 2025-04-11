@@ -42,7 +42,7 @@
               icon="add"
               label="Nuevo"
               no-caps
-              @click="addRow('1')"
+              @click="addItem('1')"
               class="addNew-button"
               rounded
             />
@@ -100,7 +100,7 @@
               class="button-edit"
               icon="las la-edit"
               dense
-              @click="editRow(props)"
+              @click="editItem(props)"
               round
               flat
             />
@@ -142,7 +142,7 @@
               icon="add"
               label="Nuevo"
               no-caps
-              @click="addRow('2')"
+              @click="addItem('2')"
               class="addNew-button"
               rounded
             />
@@ -195,7 +195,7 @@
               class="button-edit"
               icon="las la-edit"
               dense
-              @click="editRow(props)"
+              @click="editItem(props)"
               round
               flat
             />
@@ -213,7 +213,7 @@
     </div>
   </div>
 
-  <Teleport to="#modal">
+  <!-- <Teleport to="#modal">
     <q-dialog
       v-model="showFormItem"
       persistent
@@ -227,14 +227,15 @@
         @categoriaUpdated="categoriaUpdated"
       ></FormRegistroCategoria>
     </q-dialog>
-  </Teleport>
+  </Teleport> -->
 </template>
 
 <script setup>
 import { ref } from 'vue'
-import FormRegistroCategoria from 'src/components/categorias/FormRegistroCategoria.vue'
+// import FormRegistroCategoria from 'src/components/categorias/FormRegistroCategoria.vue'
+import RegistroCategoriaDialog from 'src/components/categorias/RegistroCategoriaDialog.vue'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
-import { useQuasar } from 'quasar'
+import { useQuasar, Dialog } from 'quasar'
 import { useCategoriaStore } from 'src/stores/common/categoriaStore'
 import { useCategoriaService } from 'src/composables/useCategoriaService'
 /**
@@ -269,11 +270,9 @@ const filterGastos = ref()
 const editedItem = ref({ ...defaultItem })
 const editedIndex = ref(-1)
 
-const showFormItem = ref(false)
 /**
  * GRAPHQL
  */
-
 categoriasCrud.onDoneCategoriaDelete(({ data }) => {
   if (data) {
     const deletedItem = data.categoriaDelete.categoria
@@ -324,12 +323,14 @@ categoriaStore.onErrorListaCategorias((error) => {
  * METHODS
  */
 
-function addRow(tipoMovimientoId) {
+function addItem(tipoMovimientoId) {
   editedItem.value = { ...defaultItem, tipoMovimientoId: tipoMovimientoId }
   editedIndex.value = null
-  showFormItem.value = true
+  // showFormItem.value = true
+  openRegistroCategoriaDialog(editedItem.value)
 }
-function editRow(item) {
+
+function editItem(item) {
   editedItem.value = {
     ...item.row,
     importeDefault: item.row.importeDefault
@@ -337,9 +338,28 @@ function editRow(item) {
       : '',
     tipoMovimientoId: item.row.tipoMovimiento.id
   }
-  // console.log('item', editedItem.value)
   editedIndex.value = item.rowIndex
-  showFormItem.value = true
+  openRegistroCategoriaDialog(editedItem.value)
+}
+
+function openRegistroCategoriaDialog(itemToAddOrUpdate) {
+  console.log('itemToAddOrUpdate:', itemToAddOrUpdate)
+  Dialog.create({
+    component: RegistroCategoriaDialog,
+    parent: this,
+    componentProps: {
+      editedItem: itemToAddOrUpdate
+    },
+    onOk: (payload) => {
+      // categoriaSaved(itemSaved)
+      console.log('categoriaSaved', payload)
+      // mostrarNotificacion(payload.operacion, payload.item)
+      categoriasCrud.refetchListaCategorias()
+    },
+    onCancel: () => {
+      console.log("'Cancel clicked'")
+    }
+  })
 }
 
 function deleteRow(item) {
@@ -365,18 +385,6 @@ function deleteRow(item) {
     })
     .onCancel(() => {})
     .onDismiss(() => {})
-}
-
-function categoriaSaved(/* itemSaved */) {
-  showFormItem.value = false
-  // mostrarNotificacion('guardó', itemSaved)
-  // categoriasCrud.refetchListaCategorias()
-}
-function categoriaUpdated(/* itemUpdated, indice */) {
-  showFormItem.value = false
-  editedItem.value = { ...defaultItem }
-  editedIndex.value = null
-  // categoriasCrud.refetchListaCategorias()
 }
 
 function mostrarNotificacion(action, cuenta) {

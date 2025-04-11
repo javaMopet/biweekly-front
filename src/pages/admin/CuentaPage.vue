@@ -58,8 +58,8 @@
               v-model:year="ejercicio_fiscal"
               v-model:month="mes"
               @onChangePeriodo="onChangePeriodo"
+              :disable="loadingRegistros"
             ></PeriodoSelect>
-            <!-- :disable="loadingRegistros" -->
           </q-toolbar-title>
         </q-toolbar>
         <q-card-actions
@@ -67,7 +67,6 @@
           bordered
           style="border: 0px solid red"
         >
-          <q-item-label class="q-pr-md"> RESUMEN: &nbsp; </q-item-label>
           <div class="col column items-center">
             <span class="resumen__etiqueta"> Periodo </span>
             <span class="resumen__valor">
@@ -134,9 +133,8 @@
           :filter="filter"
           no-data-label="No se han registrado movimientos"
           @selection="onSelection"
+          :loading="loadingRegistros"
         >
-          <!-- :loading="loadingRegistros" -->
-          <!-- v-model:selected="selectedItems" -->
           <template v-slot:header-selection="scope">
             <q-checkbox v-model="scope.selected" dense />
           </template>
@@ -168,17 +166,6 @@
                     rounded
                     push
                   />
-                  <!-- <q-btn
-                    class="medium-button"
-                    color="primary-button"
-                    no-caps
-                    label="Nuevo"
-                    @click="addItem"
-                    icon="add_circle"
-                    rounded
-                    push
-                  /> -->
-
                   <q-btn-dropdown
                     v-if="isModificable"
                     color="primary-button"
@@ -189,7 +176,6 @@
                     icon="add_circle"
                     class="medium-button"
                   >
-                    <!-- @click="addItem(1)" -->
                     <q-list class="bg-primary-light">
                       <q-item clickable v-close-popup @click="addItem('1')">
                         <q-item-section avatar>
@@ -353,13 +339,6 @@
                 flat
                 v-if="!props.row.disable"
               />
-              <!-- <q-btn
-                icon="las la-trash-alt"
-                class="button-delete"
-                dense
-                @click="deleteItem(props)"
-                flat
-              /> -->
             </q-td>
           </template>
           <!-- <template #bottom-row>
@@ -377,72 +356,13 @@
           </template>
         </q-table>
       </div>
-      <div class="summary">
+      <div class="summary text-condensed">
         Importe total de movimientos:
         <span> {{ toCurrency(sumaMovimientos) }}</span>
       </div>
     </div>
     <!-- <pre>{{ cuenta }}</pre> -->
   </div>
-
-  <Teleport to="#modal">
-    <q-dialog
-      v-model="showForm"
-      persistent
-      transition-show="jump-up"
-      transition-hide="jump-down"
-    >
-      <!-- style="z-index: 1"
-    v-if="showForm"
-    class="fixed-center shadow-15" -->
-      <FormCuentaRegistro
-        :cuenta-id="cuenta.id"
-        :edited-item="registroEditedItem"
-        @item-saved="itemSaved"
-        @item-updated="onItemUpdated"
-        :fecha="fecha_registro"
-      ></FormCuentaRegistro>
-    </q-dialog>
-  </Teleport>
-  <Teleport to="#modal">
-    <q-dialog
-      v-model="showFormCarga"
-      persistent
-      transition-show="jump-down"
-      transition-hide="jump-down"
-    >
-      <ImportarRegistrosCuenta
-        :cuenta="cuenta"
-        @items-saved="itemsSaved"
-        :fecha_desde="detalleVariables.fechaInicio"
-        :fecha_hasta="detalleVariables.fechaFin"
-      ></ImportarRegistrosCuenta>
-    </q-dialog>
-    <q-dialog
-      v-model="showCambioFecha"
-      persistent
-      transition-show="jump-down"
-      transition-hide="jump-down"
-    >
-      <CambioFechaPage
-        :registro="registroToEdit"
-        @date-updated="dateUpdated"
-      ></CambioFechaPage>
-    </q-dialog>
-    <q-dialog
-      v-model="showFormCargaMasiva"
-      persistent
-      transition-show="jump-up"
-      transition-hide="jump-down"
-    >
-      <FormInsercionMasivaCuenta
-        :cuenta="cuenta"
-        @items-saved="cargaMasivaSaved"
-        :fecha_desde="detalleVariables.fechaInicio"
-        :fecha_hasta="detalleVariables.fechaFin"
-      ></FormInsercionMasivaCuenta>
-    </q-dialog>
-  </Teleport>
 </template>
 
 <script setup>
@@ -454,16 +374,18 @@ import { useQuery } from '@vue/apollo-composable'
 import { useFormato } from 'src/composables/utils/useFormato'
 import { useRegistrosCrud } from 'src/composables/useRegistrosCrud'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
-import { SessionStorage, useQuasar } from 'quasar'
-import FormCuentaRegistro from 'src/components/movimientos/FormCuentaRegistro.vue'
-import CambioFechaPage from 'src/pages/cuentas/CambioFechaPage.vue'
+import { SessionStorage, useQuasar, Dialog } from 'quasar'
+// import FormCuentaRegistro from 'src/components/movimientos/FormCuentaRegistro.vue'
+import FormRegistroMovimientoCmp from 'src/components/cuentas/FormRegistroMovimientoCmp.vue'
+// import CambioFechaPage from 'src/pages/cuentas/CambioFechaPage.vue'
 import { OBTENER_SALDO_A_FECHA } from 'src/graphql/cuentas'
-import ImportarRegistrosCuenta from 'src/components/cuentas/ImportarRegistrosCuenta.vue'
+// import ImportarRegistrosCuenta from 'src/components/cuentas/ImportarRegistrosCuenta.vue'
 import { useCuentaStore } from 'src/stores/common/useCuentaStore'
 import { useCuentasCrud } from 'src/composables/useCuentasCrud'
 import PeriodoSelect from 'src/components/formComponents/PeriodoSelect.vue'
 import { useGeneralStore } from 'src/stores/common/useGeneralStore'
 import FormInsercionMasivaCuenta from 'src/components/cuentas/FormInsercionMasivaCuenta.vue'
+import ImportarRegistrosCuentaDialog from 'src/components/cuentas/ImportarRegistrosCuentaDialog.vue'
 
 /**
  * composables
@@ -491,7 +413,7 @@ const variablesSaldoAnterior = reactive({
   fechaFin: DateTime.now().startOf('month').plus({ days: -1 }).toISODate()
 })
 const showCambioFecha = ref(false)
-const showFormCargaMasiva = ref(false)
+
 // const loadingRegistros = ref(false)
 
 // const variablesSaldoAlPeriodo = reactive({
@@ -511,9 +433,6 @@ const saldo_periodo_anterior = ref(0)
 // const saldoFinalPeriodo = ref(0)
 
 const filter = ref()
-
-const showForm = ref(false)
-const showFormCarga = ref(false)
 
 /**
  * on before mount
@@ -579,6 +498,7 @@ const graphqlOptions = reactive({
 
 const {
   onError: onErrorListaRegistros,
+  loading: loadingRegistros,
   refetch,
   result: listaRegistrosResult
 } = useQuery(LISTA_REGISTROS, detalleVariables, graphqlOptions)
@@ -665,10 +585,9 @@ const isModificable = computed({
 
 const sumaMovimientos = computed({
   get() {
-    // return listaRegistros.value.reduce((accumulator, registro) => {
-    //   return accumulator + registro.importe
-    // }, 0)
-    return 0
+    return listaRegistros.value.reduce((accumulator, registro) => {
+      return accumulator + registro.importe
+    }, 0)
   }
 })
 
@@ -686,9 +605,10 @@ const fecha_registro = computed({
 
     return begin_date <= today && today <= end_date
       ? undefined
-      : detalleVariables.value.fechaFin
+      : detalleVariables.value.fechaInicio
   }
 })
+
 const periodoInicioStr = computed({
   get() {
     return `01/${mes.value?.nombre?.substring(0, 3)}/${ejercicio_fiscal.value}`
@@ -715,6 +635,27 @@ function refetchDatos() {
   refetchSaldoAFecha()
   actualizarSaldoFinal()
 }
+
+/**
+ * Muestra el formulario para agregar un registro, ingreso, gasto o traspaso.
+ */
+function addItem(tipoMovimientoId) {
+  const tipoAfectacion = tipoMovimientoId === '1' ? 'A' : 'C'
+  registroEditedItem.value = {
+    tipoMovimientoId,
+    tipoAfectacion,
+    categoria: null,
+    estadoRegistroId: 2,
+    importe: '',
+    fecha: formato.formatoFecha(new Date()),
+    observaciones: '',
+    cuenta: cuenta.value
+  }
+  // showForm.value = true
+  console.log('fecha_registro.value:', fecha_registro.value)
+  openItemFormDialog(registroEditedItem.value)
+}
+
 /**
  * Iniciar la edición de un elemento de la lista
  * @param {*} item - item de la tabla a editar.
@@ -732,7 +673,35 @@ function editItem(item) {
   registroEditedItem.value.tipoMovimientoId =
     registroEditedItem.value.categoria?.tipoMovimientoId || '3'
 
-  showForm.value = true
+  // showForm.value = true
+  openItemFormDialog(registroEditedItem.value)
+}
+
+function openItemFormDialog(itemToInsertOrEdit) {
+  Dialog.create({
+    component: FormRegistroMovimientoCmp,
+    // props forwarded to your custom component
+    componentProps: {
+      editedItem: itemToInsertOrEdit,
+      fecha: fecha_registro.value
+    }
+    // persistent: true
+  })
+    .onOk((payload) => {
+      console.log('OK')
+      mostrarNotificacionPositiva(
+        `Registro ${payload.operacion} correctamente.`,
+        1000
+      )
+      console.log('savedtem:', payload.item)
+      refetch()
+    })
+    .onCancel(() => {
+      console.log('Cancel')
+    })
+    .onDismiss(() => {
+      console.log('Called on OK or Cancel')
+    })
 }
 
 /**
@@ -796,6 +765,7 @@ registrosCrud.onDoneRegistrosDelete(({ data }) => {
     1600
   )
   selected.value.length = 0
+  refetch()
 })
 
 registrosCrud.onErrorRegistrosDelete(() => {
@@ -829,42 +799,40 @@ function onChangePeriodo() {
     .toISODate()
 }
 
-/**
- * Muestra el formulario para agregar un registro, ingreso, gasto o traspaso.
- */
-function addItem(tipoMovimientoId) {
-  const tipoAfectacion = tipoMovimientoId === '1' ? 'A' : 'C'
-  registroEditedItem.value = {
-    tipoMovimientoId,
-    tipoAfectacion,
-    categoria: null,
-    estadoRegistroId: 2,
-    importe: '',
-    fecha: formato.formatoFecha(new Date()),
-    observaciones: '',
-    cuenta: cuenta.value
-  }
-  showForm.value = true
-}
-
 function addMasiveItems() {
   console.log('')
-  console.log('cuenta:', cuenta)
-  showFormCargaMasiva.value = true
+  console.log('cuenta:', cuenta.value)
+  // showFormCargaMasiva.value = true
+  openMaviseFormDialog()
 }
 
-function cargaMasivaSaved(cuenta_id) {
-  showFormCargaMasiva.value = false
-  showFormCarga.value = false
-  console.log('cuenta_id:', cuenta_id)
-  cuentasCrud.cuentaSaldoUpdate({ cuentaId: cuenta.value.id })
-  // mostrarNotificacionPositiva(
-  //   'Los movimientos fueron guardados correctamente.',
-  //   900
-  // )
-  // refetchListaRegistros()
-  // fetchOrRefetchListaRegistros()
-  refetchDatos()
+function openMaviseFormDialog() {
+  Dialog.create({
+    component: FormInsercionMasivaCuenta,
+    // props forwarded to your custom component
+    componentProps: {
+      cuenta: cuenta.value,
+      fecha_desde: detalleVariables.value.fechaInicio,
+      fecha_hasta: '20250431' //detalleVariables.fechaFin
+    }
+  })
+    .onOk((_payload) => {
+      // console.log('OK')
+      // mostrarNotificacionPositiva(
+      //   `Registro ${payload.operacion} correctamente.`,
+      //   1000
+      // )
+      // console.log('savedtem:', payload.item)
+      refetch()
+      // cuentasCrud.cuentaSaldoUpdate({ cuentaId: cuenta.value.id })
+      // refetchDatos()
+    })
+    .onCancel(() => {
+      console.log('Cancel')
+    })
+    .onDismiss(() => {
+      console.log('Called on OK or Cancel')
+    })
 }
 
 function saveObs(id, row, observaciones) {
@@ -913,27 +881,6 @@ registrosCrud.onErrorRegistroParcialUpdate((error) => {
   )
 })
 
-function itemSaved(_itemSaved) {
-  console.log('on itemSaved', _itemSaved)
-  // refetchListaRegistros()
-  // myLoad()
-  refetch()
-  showForm.value = false
-}
-
-function onItemUpdated(_itemUpdated) {
-  refetchDatos()
-  showForm.value = false
-}
-
-/**
- * Al guardar los items de carga masiva
- * @param {[Object]} _itemsSaved - Objeto con los items guardados.
- */
-function itemsSaved(_itemsSaved) {
-  refetchDatos()
-  showFormCarga.value = false
-}
 /**
  * Actualizar el saldo final de la cuenta sin importar la fecha y actualizar en interfaz.
  */
@@ -950,7 +897,28 @@ function actualizarSaldoFinal() {
  * Iniciar el formulario de importación de movimientos.
  */
 function importarMovimientos() {
-  showFormCarga.value = true
+  // showFormCarga.value = true
+  openImportarRegistrosDialog()
+}
+function openImportarRegistrosDialog() {
+  Dialog.create({
+    component: ImportarRegistrosCuentaDialog,
+    // props forwarded to your custom component
+    componentProps: {
+      cuenta: cuenta.value,
+      fecha_desde: detalleVariables.value.fechaInicio,
+      fecha_hasta: detalleVariables.value.fechaFin
+    }
+  })
+    .onOk((_payload) => {
+      refetch()
+    })
+    .onCancel(() => {
+      console.log('Cancel')
+    })
+    .onDismiss(() => {
+      console.log('Called on OK or Cancel')
+    })
 }
 
 function cambiarFecha(row) {
@@ -958,10 +926,6 @@ function cambiarFecha(row) {
   registroToEdit.value = row
   fecha_registro.value
   showCambioFecha.value = true
-}
-function dateUpdated() {
-  refetchDatos()
-  showCambioFecha.value = false
 }
 
 // function onChangePeriodo(){

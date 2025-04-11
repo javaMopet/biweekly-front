@@ -1,167 +1,173 @@
 <template>
-  <div class="my-card" style="width: 500px">
-    <DialogTitle>{{ actionName }}</DialogTitle>
-    <div class="q-pa-lg">
-      <q-form @submit="saveItem" class="q-gutter-md">
-        <div class="q-gutter-md">
-          <q-btn-toggle
-            v-model="editedFormItem.tipoMovimientoId"
-            spread
-            no-caps
-            color="disable-button"
-            text-color="gray-2"
-            :toggle-color="active_color"
-            toggle-text-color="toggle-text-button"
-            :options="tipoMovimientoStore.tiposMovimientoCuenta"
-            @update:model-value="onChangeTipoMovimiento"
-            push
-            glossy
-            :disable="isEditing"
-          />
-          <div class="q-pt-md">
-            <div class="row q-gutter-x-md items-start">
-              <div
-                :style="{
-                  backgroundColor: `${editedFormItem.color}`,
-                  height: 40 + 'px',
-                  width: 40 + 'px'
-                }"
-                class="row items-center justify-center"
-              >
-                <q-icon
-                  name="colorize"
-                  size="sm"
-                  class="clickable text-grey-4"
-                  style="cursor: pointer"
-                  ><q-popup-proxy
-                    cover
-                    transition-show="scale"
-                    transition-hide="scale"
-                    ref="ppproxy"
-                  >
-                    <q-color
-                      v-model="editedFormItem.color"
-                      no-footer
-                      :palette="colours"
-                      default-view="palette"
-                      class="my-picker"
-                      @update:model-value="colorSelecionado"
-                    />
-                  </q-popup-proxy>
-                </q-icon>
+  <q-dialog ref="dialogRef" @hide="onDialogHide">
+    <div class="my-card" style="width: 500px">
+      <DialogTitle>{{ actionName }}</DialogTitle>
+      <div class="q-pa-lg">
+        <q-form @submit="saveItem" class="q-gutter-md">
+          <div class="q-gutter-md">
+            <q-btn-toggle
+              v-model="editedFormItem.tipoMovimientoId"
+              spread
+              no-caps
+              color="disable-button"
+              text-color="gray-2"
+              :toggle-color="active_color"
+              toggle-text-color="toggle-text-button"
+              :options="tipoMovimientoStore.tiposMovimientoCuenta"
+              @update:model-value="onChangeTipoMovimiento"
+              push
+              glossy
+              :disable="isEditing"
+            />
+            <div class="q-pt-md">
+              <div class="row q-gutter-x-md items-start">
+                <div
+                  :style="{
+                    backgroundColor: `${editedFormItem.color}`,
+                    height: 40 + 'px',
+                    width: 40 + 'px'
+                  }"
+                  class="row items-center justify-center"
+                >
+                  <q-icon
+                    name="colorize"
+                    size="sm"
+                    class="clickable text-grey-4"
+                    style="cursor: pointer"
+                    ><q-popup-proxy
+                      cover
+                      transition-show="scale"
+                      transition-hide="scale"
+                      ref="ppproxy"
+                    >
+                      <q-color
+                        v-model="editedFormItem.color"
+                        no-footer
+                        :palette="colours"
+                        default-view="palette"
+                        class="my-picker"
+                        @update:model-value="colorSelecionado"
+                      />
+                    </q-popup-proxy>
+                  </q-icon>
+                </div>
+                <div
+                  class="col-auto bg-high-contrast clickable"
+                  @click="selectIcon"
+                >
+                  <q-icon
+                    color="accent-light"
+                    :name="editedFormItem.icono || 'extension'"
+                    class="size"
+                    size="2em"
+                  />
+                </div>
+                <div class="col">
+                  <q-input
+                    v-model="editedFormItem.nombre"
+                    type="text"
+                    label="* Nombre de categoría"
+                    dense
+                    outlined
+                    color="positive"
+                    autofocus
+                    :rules="[(val) => !!val || 'Favor de ingresar el nombre']"
+                    lazyRules
+                  />
+                </div>
               </div>
-              <div
-                class="col-auto bg-high-contrast clickable"
-                @click="selectIcon"
-              >
-                <q-icon
-                  color="accent-light"
-                  :name="editedFormItem.icono || 'extension'"
-                  class="size"
-                  size="2em"
-                />
-              </div>
+            </div>
+            <div class="row">
               <div class="col">
                 <q-input
-                  v-model="editedFormItem.nombre"
+                  v-model="editedFormItem.descripcion"
                   type="text"
-                  label="* Nombre de categoría"
+                  placeholder="Descripción"
                   dense
                   outlined
                   color="positive"
-                  autofocus
-                  :rules="[(val) => !!val || 'Favor de ingresar el nombre']"
                   lazyRules
                 />
               </div>
             </div>
-          </div>
-          <div class="row">
+            <div></div>
+            <div class="row">
+              <div class="col-5 q-pr-xs">
+                <PriceInput
+                  currency-code="MNX"
+                  v-model="editedFormItem.importeDefault"
+                  label="Precio (opcional)"
+                ></PriceInput>
+              </div>
+              <div class="col-7">
+                <CuentaComponent
+                  v-model="editedFormItem.cuentaDefault"
+                  :opcional="true"
+                  :filter-array="['1', '2']"
+                  label="Cuenta Bancaria (opcional)"
+                  hint="Esta cuenta se tomará por defecto al agregar un movimiento"
+                ></CuentaComponent>
+              </div>
+            </div>
+
             <div class="col">
-              <q-input
-                v-model="editedFormItem.descripcion"
-                type="text"
-                placeholder="Descripción"
-                dense
-                outlined
-                color="positive"
-                lazyRules
-              />
+              <CuentaContableSelect
+                v-model="editedFormItem.cuentaContable"
+                :subnivel="cuentaContableOptions.cuentaContableSubnivel"
+                :clasificacion="cuentaContableOptions.clasificacion"
+                :tipo-afectacion="cuentaContableOptions.tipoAfectacion"
+                :is-alta="false"
+                input-label="Cuenta Contable (opcional)"
+              ></CuentaContableSelect>
             </div>
           </div>
-          <div></div>
-          <div class="row">
-            <div class="col-5 q-pr-xs">
-              <PriceInput
-                currency-code="MNX"
-                v-model="editedFormItem.importeDefault"
-                label="Precio (opcional)"
-              ></PriceInput>
-            </div>
-            <div class="col-7">
-              <CuentaComponent
-                v-model="editedFormItem.cuentaDefault"
-                :opcional="true"
-                :filter-array="['1', '2']"
-                label="Cuenta Bancaria (opcional)"
-                hint="Esta cuenta se tomará por defecto al agregar un movimiento"
-              ></CuentaComponent>
-            </div>
+          <div class="col row justify-end q-pt-lg q-gutter-lg">
+            <q-btn
+              label="Cancelar"
+              flat
+              v-close-popup
+              class="q-ml-sm"
+              color="negative"
+              no-caps
+              rounded
+            />
+            <q-btn
+              :label="lblSubmit"
+              type="submit"
+              color="primary-button"
+              no-caps
+            />
           </div>
-
-          <div class="col">
-            <CuentaContableSelect
-              v-model="editedFormItem.cuentaContable"
-              :subnivel="cuentaContableOptions.cuentaContableSubnivel"
-              :clasificacion="cuentaContableOptions.clasificacion"
-              :tipo-afectacion="cuentaContableOptions.tipoAfectacion"
-              :is-alta="false"
-              input-label="Cuenta Contable (opcional)"
-            ></CuentaContableSelect>
-          </div>
-        </div>
-        <div class="col row justify-end q-pt-lg q-gutter-lg">
-          <q-btn
-            label="Cancelar"
-            flat
-            v-close-popup
-            class="q-ml-sm"
-            color="negative"
-            no-caps
-            rounded
-          />
-          <q-btn
-            :label="lblSubmit"
-            type="submit"
-            color="primary-button"
-            no-caps
-          />
-        </div>
-      </q-form>
+        </q-form>
+      </div>
+      <!-- <pre
+        >{{ editedFormItem }} - {{
+          editedFormItem.cuentaContable
+        }}</pre> -->
     </div>
-  </div>
 
-  <Teleport to="#modal">
-    <q-dialog
-      v-model="show_icon_picker"
-      transition-show="jump-up"
-      transition-hide="jump-down"
-    >
-      <IconPicker
-        v-model="editedFormItem.icono"
-        @onClose="cancelIconPicker"
-        @onIconSelected="onIconSelected"
-      ></IconPicker>
-    </q-dialog>
-  </Teleport>
+    <Teleport to="#modal">
+      <q-dialog
+        v-model="show_icon_picker"
+        transition-show="jump-up"
+        transition-hide="jump-down"
+      >
+        <IconPicker
+          v-model="editedFormItem.icono"
+          @onClose="cancelIconPicker"
+          @onIconSelected="onIconSelected"
+        ></IconPicker>
+      </q-dialog>
+    </Teleport>
+  </q-dialog>
 </template>
 
 <script setup>
+import { useDialogPluginComponent, SessionStorage } from 'quasar'
 import { ref, computed, onMounted } from 'vue'
 import IconPicker from '/src/components/IconPicker.vue'
 import PriceInput from '../formComponents/PriceInput.vue'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
-import { SessionStorage } from 'quasar'
 import { useTipoMovimientoStore } from 'src/stores/common/useTipoMovimientoStore'
 import { useCategoriaService } from 'src/composables/useCategoriaService'
 import CuentaContableSelect from '../formComponents/CuentaContableSelect.vue'
@@ -229,17 +235,35 @@ const props = defineProps({
         id: null
       }
     }
-  },
-  editedIndex: {
-    type: Number,
-    required: false,
-    default: -1
   }
 })
 /**
  * emits
  */
-const emit = defineEmits(['categoriaSaved', 'categoriaUpdated'])
+defineEmits([
+  // REQUIRED; need to specify some events that your
+  // component will emit through useDialogPluginComponent()
+  ...useDialogPluginComponent.emits
+])
+
+// const emit = defineEmits(['categoriaSaved', 'categoriaUpdated'])
+const { dialogRef, onDialogHide, onDialogOK, _onDialogCancel } =
+  useDialogPluginComponent()
+// dialogRef      - Vue ref to be applied to QDialog
+// onDialogHide   - Function to be used as handler for @hide on QDialog
+// onDialogOK     - Function to call to settle dialog with "ok" outcome
+//                    example: onDialogOK() - no payload
+//                    example: onDialogOK({ /*...*/ }) - with payload
+// onDialogCancel - Function to call to settle dialog with "cancel" outcome
+
+// this is part of our example (so not required)
+// function onOKClick() {
+// on OK, it is REQUIRED to
+// call onDialogOK (with optional payload)
+// onDialogOK()
+// or with payload: onDialogOK({ ... })
+// ...and it will also hide the dialog automatically
+// }
 /**
  * computed
  */
@@ -344,7 +368,8 @@ categoriaService.onDoneCategoriaCreate(({ data }) => {
       `Categoría "${itemSaved.nombre}" creada correctamente.`,
       1600
     )
-    emit('categoriaSaved', itemSaved)
+    console.log('onDoneCategoriaCreate:', itemSaved)
+    onDialogOK({ operacion: 'guardado', item: itemSaved })
   }
 })
 
@@ -355,7 +380,7 @@ categoriaService.onDoneCategoriaUpdate(({ data }) => {
       `Categoría "${itemUpdated.nombre}" actualizada correctamente.`,
       1600
     )
-    emit('categoriaUpdated', itemUpdated, props.editedIndex)
+    onDialogOK({ operacion: 'actualizado', item: itemUpdated })
   }
 })
 
@@ -388,6 +413,7 @@ categoriaService.onErrorCategoriaUpdate((error) => {
  * onMounted
  */
 onMounted(() => {
+  // console.log('props.editedItem:', props.editedItem)
   obtenerCuentasContables(editedFormItem.value.tipoMovimientoId)
 })
 

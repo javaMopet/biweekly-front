@@ -214,7 +214,7 @@
     </q-card-actions>
   </q-card>
 
-  <Teleport to="#modal">
+  <!-- <Teleport to="#modal">
     <q-dialog
       v-model="showRegistroCategoria"
       persistent
@@ -226,7 +226,7 @@
         @categoriaSaved="categoriaSaved"
       ></FormRegistroCategoria>
     </q-dialog>
-  </Teleport>
+  </Teleport> -->
 </template>
 
 <script setup>
@@ -241,15 +241,14 @@ import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import DialogTitle from '../formComponents/modal/DialogTitle.vue'
 import { useRegistrosTarjetaCrud } from 'src/composables/useRegistrosTarjetaCrud'
 import PriceInput from '../formComponents/PriceInput.vue'
-import FormRegistroCategoria from '../categorias/FormRegistroCategoria.vue'
-import { useQuasar } from 'quasar'
+import { Dialog, useQuasar } from 'quasar'
+import RegistroCategoriaDialog from '../categorias/RegistroCategoriaDialog.vue'
 
 /**
  * state
  */
 
 const registrosSelected = ref([])
-const showRegistroCategoria = ref(false)
 const listaRegistrosTarjeta = ref([])
 const fecha_inicio = ref('01/01/1900')
 const fecha_fin = ref('01/01/1900')
@@ -573,14 +572,29 @@ function addItemCategoria(_props_row) {
     icono: 'insert_emoticon',
     color: '#019A9D'
   }
-  showRegistroCategoria.value = true
+  // showRegistroCategoria.value = true
+  openRegistroCategoriaDialog(editedCategoriaParam.value)
+}
+function openRegistroCategoriaDialog(itemToAddOrUpdate) {
+  console.log('itemToAddOrUpdate:', itemToAddOrUpdate)
+  Dialog.create({
+    component: RegistroCategoriaDialog,
+    parent: this,
+    componentProps: {
+      editedItem: itemToAddOrUpdate
+    },
+    onOk: (payload) => {
+      // categoriaSaved(itemSaved)
+      console.log('categoriaSaved', payload)
+      // mostrarNotificacion(payload.operacion, payload.item)
+      // categoriasCrud.refetchListaCategorias()
+    },
+    onCancel: () => {
+      console.log("'Cancel clicked'")
+    }
+  })
 }
 
-function categoriaSaved(_value) {
-  console.log('categoria saved')
-  // categoria.value = value
-  showRegistroCategoria.value = false
-}
 function focusDate(props) {
   const rowIndex = props.rowIndex
   // const columnIndex = props.colIndex

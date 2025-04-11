@@ -56,7 +56,7 @@
     </div> -->
   </div>
 
-  <Teleport to="#modal">
+  <!-- <Teleport to="#modal">
     <q-dialog
       v-model="showRegistroCategoria"
       persistent
@@ -68,13 +68,15 @@
         @categoriaSaved="categoriaSaved"
       ></FormRegistroCategoria>
     </q-dialog>
-  </Teleport>
+  </Teleport> -->
 </template>
 
 <script setup>
 import { ref, toRefs, watch, onMounted, computed } from 'vue'
-import FormRegistroCategoria from '../categorias/FormRegistroCategoria.vue'
+// import FormRegistroCategoria from '../categorias/FormRegistroCategoria.vue'
 import { useCategoriaStore } from 'src/stores/common/categoriaStore'
+import RegistroCategoriaDialog from '../categorias/RegistroCategoriaDialog.vue'
+import { Dialog } from 'quasar'
 
 /**
  *
@@ -99,7 +101,6 @@ onMounted(() => {
  * state
  */
 const filteredOptions = ref([])
-const showRegistroCategoria = ref(false)
 const tipoMovimientoId = ref('1')
 const editedCategoriaParam = ref({ tipoMovimientoId: tipoMovimientoId.value })
 
@@ -240,13 +241,28 @@ function addItemCategoria(_props_row) {
     icono: 'insert_emoticon',
     color: '#019A9D'
   }
-  showRegistroCategoria.value = true
+  // showRegistroCategoria.value = true
+  openRegistroCategoriaDialog()
 }
-
-function categoriaSaved(value) {
-  console.log('categoria saved')
-  categoria.value = value
-  showRegistroCategoria.value = false
+function openRegistroCategoriaDialog() {
+  Dialog.create({
+    component: RegistroCategoriaDialog,
+    parent: this,
+    componentProps: {
+      editedItem: editedCategoriaParam.value
+    },
+    // persistent: true,
+    // noEscDismiss: true,
+    // noBackdropDismiss: true,
+    // transitionShow: 'jump-up',
+    // transitionHide: 'jump-down',
+    onOk: (value) => {
+      categoria.value = value
+    },
+    onCancel: () => {
+      console.log('cancel')
+    }
+  })
 }
 
 function onSelectCategoria(_value) {
