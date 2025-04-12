@@ -1,5 +1,13 @@
 <template>
-  <q-dialog ref="dialogRef" @hide="onDialogHide">
+  <q-dialog
+    ref="dialogRef"
+    @hide="onDialogHide"
+    transition-show="jump-up"
+    transition-hide="jump-down"
+    :persistent="props.persistent"
+    noBackdropDismiss
+    title="Categoría"
+  >
     <div class="my-card" style="width: 500px">
       <DialogTitle>{{ actionName }}</DialogTitle>
       <div class="q-pa-lg">
@@ -235,6 +243,10 @@ const props = defineProps({
         id: null
       }
     }
+  },
+  persistent: {
+    type: Boolean,
+    default: false
   }
 })
 /**

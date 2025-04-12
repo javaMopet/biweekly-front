@@ -1,5 +1,11 @@
 <template>
-  <q-dialog ref="dialogRef" @hide="onDialogHide">
+  <q-dialog
+    ref="dialogRef"
+    @hide="onDialogHide"
+    transition-show="jump-up"
+    transition-hide="jump-down"
+    noBackdropDismiss
+  >
     <!--  -->
     <q-card class="q-dialog-plugin" style="width: 630px; min-width: 630px">
       <DialogTitle>{{ actionName }}</DialogTitle>

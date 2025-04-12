@@ -348,7 +348,8 @@ function openRegistroCategoriaDialog(itemToAddOrUpdate) {
     component: RegistroCategoriaDialog,
     parent: this,
     componentProps: {
-      editedItem: itemToAddOrUpdate
+      editedItem: itemToAddOrUpdate,
+      persistent: false
     },
     onOk: (payload) => {
       // categoriaSaved(itemSaved)

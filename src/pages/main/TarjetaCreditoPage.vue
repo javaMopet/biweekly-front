@@ -347,6 +347,7 @@
             row-key="id"
             :filter="filter"
             @selection="onSelection"
+            :table-row-class-fn="getRowClass"
           >
             <!-- <template v-slot:header-selection>
               <q-checkbox v-model="scope.selected" dense />
@@ -505,46 +506,6 @@
 
   <Teleport to="#modal">
     <q-dialog
-      v-model="showForm"
-      persistent
-      transition-show="jump-up"
-      transition-hide="jump-down"
-    >
-      <FormRegistroMovimientoTarjeta
-        :cuenta-id="cuenta.id"
-        :registro-edited-item="registroEditedItem"
-        @registro-created="registroCreated"
-        @registro-updated="registroUpdated"
-        :fecha="fecha_registro"
-      ></FormRegistroMovimientoTarjeta>
-    </q-dialog>
-    <q-dialog
-      v-model="showFormCarga"
-      persistent
-      transition-show="jump-up"
-      transition-hide="jump-down"
-    >
-      <ImportarRegistrosTarjeta
-        :cuenta="cuenta"
-        @items-saved="cargaMasivaSaved"
-        :fecha_desde="fechaInicioPeriodo"
-        :fecha_hasta="fechaFinPeriodo"
-      ></ImportarRegistrosTarjeta>
-    </q-dialog>
-    <q-dialog
-      v-model="showFormCargaMasiva"
-      persistent
-      transition-show="jump-up"
-      transition-hide="jump-down"
-    >
-      <FormInsercionMasivaTarjeta
-        :cuenta="cuenta"
-        @items-saved="cargaMasivaSaved"
-        :fecha_desde="fechaInicioPeriodo"
-        :fecha_hasta="fechaFinPeriodo"
-      ></FormInsercionMasivaTarjeta>
-    </q-dialog>
-    <q-dialog
       v-model="showPagosTarjeta"
       persistent
       transition-show="jump-up"
@@ -560,26 +521,19 @@
       ></PagosTarjeta>
     </q-dialog>
   </Teleport>
-  <!-- <pre>{{ Math.round(sumaMovimientos) }}</pre>-->
-  <!-- <pre>{{ Math.round(sumaMovimientos) }}</pre>
-  <pre>{{ listaRegistros.filter((registro) => !registro.isPago) }}</pre> -->
   <!-- <pre>{{ cuenta }}</pre> -->
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted, onBeforeMount } from 'vue'
+import { ref, reactive, computed, onMounted, onBeforeMount, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { DateTime } from 'luxon'
-import FormRegistroMovimientoTarjeta from 'src/components/tarjetasCredito/FormRegistroMovimientoTarjeta.vue'
-// import { api } from 'src/boot/axios'
 import { LISTA_REGISTROS_TARJETA } from 'src/graphql/registrosTarjeta'
 import { useQuery } from '@vue/apollo-composable'
 import { useFormato } from 'src/composables/utils/useFormato'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
-import { SessionStorage, useQuasar } from 'quasar'
+import { Dialog, SessionStorage, useQuasar } from 'quasar'
 import PagosTarjeta from 'src/components/tarjetasCredito/PagosTarjeta.vue'
-import ImportarRegistrosTarjeta from 'src/components/tarjetasCredito/ImportarRegistrosTarjeta.vue'
-import FormInsercionMasivaTarjeta from 'src/components/tarjetasCredito/FormInsercionMasivaTarjeta.vue'
 import { useRegistrosTarjetaCrud } from 'src/composables/useRegistrosTarjetaCrud'
 import { useCuentasCrud } from 'src/composables/useCuentasCrud'
 import {
@@ -588,6 +542,9 @@ import {
 } from 'src/graphql/cuentas'
 import PeriodoSelect from 'src/components/formComponents/PeriodoSelect.vue'
 import { useCuentaStore } from 'src/stores/common/useCuentaStore'
+import CardMovementUpsertDialog from 'src/components/tarjetasCredito/CardMovementUpsertDialog.vue'
+import CardMovementBulkInsertDialog from 'src/components/tarjetasCredito/CardMovementBulkInsertDialog.vue'
+import CardMovementMassImportDialog from 'src/components/tarjetasCredito/CardMovementMassImportDialog.vue'
 
 /**
  * composables
@@ -605,14 +562,13 @@ const cuentasCrud = useCuentasCrud()
 const { mostrarNotificacionPositiva, mostrarNotificacionNegativa } =
   useNotificacion()
 
-const { toCurrencyAbsoluteFormat } = useFormato()
+const { toCurrencyAbsoluteFormat, toCurrency } = useFormato()
 
 /**
  * state
  */
 const ejercicioFiscalPeriodo = ref()
 const mesPeriodo = ref()
-
 const listaRegistrosMsi = ref([])
 const listaRegistros = ref([])
 
@@ -625,10 +581,6 @@ const registroEditedItem = ref([
   }
 ])
 
-const showForm = ref(false)
-const showFormCargaMasiva = ref(false)
-// const showFormMSI = ref(false)
-const showFormCarga = ref(false)
 const showPagosTarjeta = ref(false)
 const cuenta = ref()
 
@@ -645,8 +597,6 @@ const filterMsi = ref('')
  *
  */
 onBeforeMount(async () => {
-  console.log('route.params.id:', route.params.id)
-  // console.log('cuentaStore.listaCuentas:', cuentaStore.listaCuentas)
   const dateNow = DateTime.now()
   // El ejercicio fiscal siempre va a ser el del año corriente
   ejercicioFiscalPeriodo.value = dateNow.year
@@ -666,16 +616,12 @@ async function cargarDatosCuenta(cuenta_id) {
   if (cuentaStore.listaCuentas.length > 0) {
     obtenerCuentaDeListado(cuenta_id)
   } else {
-    console.log('cargando cuentas nuevamente... cuenta_id:', cuenta_id)
     cuentasCrud.fetchOrRefetchCuentaById(cuenta_id)
     // router.push('/home')
   }
 }
 
 cuentasCrud.onResultCuentaById(({ data }) => {
-  console.log('data.cuentaById:', data.cuentaById)
-  console.log('data.....:', data)
-  // obtenerCuentaDeListado(data.cuentaById.id)
   cuenta.value = data.cuentaById
   recargarDetalleCuenta()
 })
@@ -687,56 +633,18 @@ function obtenerCuentaDeListado(cuentaId) {
   cuenta.value = cuentaStore.listaCuentas.find(
     (cuenta) => cuenta.id === cuentaId
   )
-  console.log('Cuenta encontrada:', cuenta.value)
-
   cuenta.value = cuentaStore.listaCuentas.find(
     (cuenta) => cuenta.id === route.params.id
   )
   obtenerFechasInicialFinal()
-  // loadOrRefetchListaRegistrosTarjeta()
   refetchListaRegistros()
-  // loadOrRefetchSaldoAnteriorTC()
 }
 /**
  * onMounted
  */
-onMounted(() => {
-  /*
-  console.log('corriendo en onMounted...')
-  const dateNow = DateTime.now()
-  ejercicio_fiscal.value = dateNow.year
-  const mes_id = dateNow.month
-  const mes_value = mesOptions.value.find(
-    (mesOption) => mesOption.id === mes_id
-  )
-  mes.value = mes_value
-  // const cuenta_id = route.params.id.toString()
-  cuenta.value = cuentaStore.listaCuentas.find(
-    (cuenta) => cuenta.id === route.params.id
-  )
-  obtenerFechasInicialFinal()
-  loadOrRefetchListaRegistrosTarjeta()
-  loadOrRefetchSaldoAnteriorTC()
-  */
-})
-/**
- * graphql
- */
-const graphqlOptions = reactive({
-  fetchPolicy: 'no-cache'
-  // debounce: 10000
-})
-
-const listaRegistrosVariables = ref({
-  cuentaId: route.params.id,
-  fechaInicio: obtenerFechaInicioCuenta(), // fechaInicioPeriodo.value,//DateTime.now().startOf('month').toISODate(),
-  fechaFin: obtenerFechaFinCuenta(), // DateTime.now().endOf('month').toISODate(),
-  isMsi: null,
-  estadoRegistroTarjetaId: null
-})
+onMounted(() => {})
 
 function obtenerFechaInicioCuenta() {
-  console.log('cuenta.value:', cuenta.value)
   if (cuenta.value) {
     return fechaInicioPeriodo.value
   } else {
@@ -744,7 +652,6 @@ function obtenerFechaInicioCuenta() {
   }
 }
 function obtenerFechaFinCuenta() {
-  console.log('cuenta.value:', cuenta.value)
   if (cuenta.value) {
     return fechaFinPeriodo.value
   } else {
@@ -752,29 +659,41 @@ function obtenerFechaFinCuenta() {
   }
 }
 
+/**
+ * graphql
+ */
+const graphqlOptions = reactive({
+  fetchPolicy: 'no-cache'
+  // debounce: 10000
+})
+const listaRegistrosVariables = ref({
+  cuentaId: route.params.id,
+  fechaInicio: obtenerFechaInicioCuenta(),
+  fechaFin: obtenerFechaFinCuenta(),
+  isMsi: null,
+  estadoRegistroTarjetaId: null
+})
 const {
-  // load: loadListaRegistrosTarjeta,
-  onResult: onResultListaRegistrosTarjeta,
   onError: onErrorListaRegistros,
   refetch: refetchListaRegistros,
-  loading: loadingListaRegistros
+  loading: loadingListaRegistros,
+  result: listaRegistrosTarjetaResult
 } = useQuery(LISTA_REGISTROS_TARJETA, listaRegistrosVariables, graphqlOptions)
 
-// function loadOrRefetchListaRegistrosTarjeta() {
-//   loadListaRegistrosTarjeta() || refetchListaRegistros()
-// }
-
-onResultListaRegistrosTarjeta(({ data }) => {
-  console.log('data:', data)
-  if (data) {
-    listaRegistros.value = data?.listaRegistrosTarjeta.filter(
-      (registro) => !registro.isMsi
-    )
-    listaRegistrosMsi.value = data?.listaRegistrosTarjeta.filter(
-      (registro) => registro.isMsi
-    )
-  }
+watch(listaRegistrosTarjetaResult, (value) => {
+  cargarResultado(value.listaRegistrosTarjeta)
 })
+
+function cargarResultado(data) {
+  if (data && data.length > 0) {
+    console.log('cargarResultado data:', data)
+    listaRegistros.value = data?.filter((registro) => !registro.isMsi)
+    listaRegistrosMsi.value = data?.filter((registro) => registro.isMsi)
+  } else {
+    listaRegistros.value = []
+    listaRegistrosMsi.value = []
+  }
+}
 
 onErrorListaRegistros((error) => {
   console.error('response', error)
@@ -835,25 +754,16 @@ const isPagable = computed({
   get() {
     return (
       Math.round(
-        listaRegistros.value.reduce(
-          (acumulador, registro) => acumulador + parseFloat(registro.importe),
-          0
-        )
+        listaRegistros.value
+          .filter((det) => det.estadoRegistroTarjeta.id === '1')
+          .reduce(
+            (acumulador, registro) => acumulador + parseFloat(registro.importe),
+            0
+          )
       ) !== 0
     )
   }
 })
-
-// const sumaMovimientos = computed({
-//   get() {
-//     return (
-//       listaRegistros.value.reduce(
-//         (acumulador, registro) => acumulador + parseFloat(registro.importe),
-//         0
-//       ) != 0
-//     )
-//   }
-// })
 
 const ejercicio_inicial_id = computed({
   get() {
@@ -862,6 +772,7 @@ const ejercicio_inicial_id = computed({
       : ejercicioFiscalPeriodo.value
   }
 })
+
 const mes_inicial_id = computed({
   get() {
     return mesPeriodo.value.id - 1 <= 0 ? 12 : mesPeriodo.value.id - 1
@@ -911,12 +822,7 @@ const fechaInicioPeriodo = computed({
 const fechaFinPeriodo = computed({
   get() {
     if (cuenta.value) {
-      console.log('cuenta.value:', cuenta.value)
-      console.log('cuenta.value.diaCorte:', cuenta.value.diaCorte)
       const dia_fin = ('0' + cuenta.value.diaCorte).slice(-2)
-      console.log('dia_fin:', dia_fin)
-      console.log('ejercicioFiscalPeriodo.value:', ejercicioFiscalPeriodo.value)
-      console.log('mesPeriodo.value.id:', mesPeriodo.value.id)
       return `${ejercicioFiscalPeriodo.value}-${(
         '0' + mesPeriodo.value.id
       ).slice(-2)}-${dia_fin}`
@@ -934,7 +840,7 @@ const fecha_registro = computed({
     // console.log(end_date)
     return begin_date <= today && today <= end_date
       ? undefined
-      : fechaFinPeriodo.value
+      : fechaInicioPeriodo.value
   }
 })
 
@@ -962,6 +868,13 @@ const periodoFin = computed({
       }`
     }
     return ''
+  }
+})
+const saldo_del_periodo = computed({
+  get() {
+    return listaRegistros.value.reduce((accumulator, registro) => {
+      return accumulator + parseFloat(registro.importe || 0) * -1
+    }, 0)
   }
 })
 
@@ -994,7 +907,6 @@ const {
 } = useQuery(SALDO_TARJETA_CREDITO, saldoTarjetaVariables, opcionesGraphql)
 
 onResultSaldoTarjetaCredito(({ data }) => {
-  console.log('onResultSaldoTarjetaCredito data:', data)
   saldo_final_periodo.value = data.saldoTarjetaCredito
 })
 
@@ -1020,6 +932,17 @@ const {
 /**
  * Methods
  */
+function getRowClass(row) {
+  return row.estadoRegistroTarjeta?.id === '1'
+    ? ''
+    : row.estadoRegistroTarjeta?.id === '2'
+      ? 'tr-fade bg-yellow-1'
+      : row.estadoRegistroTarjeta?.id === '3'
+        ? 'tr-fade bg-green-1'
+        : row.estadoRegistroTarjeta?.id === '4'
+          ? 'tr-fade bg-red-1'
+          : ''
+}
 
 function recargarDetalleCuenta() {
   listaRegistrosVariables.value = {
@@ -1033,13 +956,9 @@ function recargarDetalleCuenta() {
 
 function obtenerFechaMesAnterior() {
   if (cuenta.value && cuenta.value.id) {
-    console.log('fechaInicioPeriodo:', fechaInicioPeriodo.value)
-    const fecha = fechaInicioPeriodo.value
+    return DateTime.fromISO(fechaInicioPeriodo.value)
       .minus({ days: 1 })
-      .endOf('month')
       .toISODate()
-    console.log('fecha final periodo anterior:', fecha)
-    return fecha
   } else {
     return null
   }
@@ -1059,7 +978,6 @@ function obtenerFechaMesAnterior() {
 // }
 
 onResultSaldoAnteriorTC(({ data }) => {
-  console.log('onResultSaldoAnteriorTC data:', data)
   if (data) {
     saldo_final_perido_anterior.value = data.saldoTarjetaCredito
   }
@@ -1145,7 +1063,7 @@ function editItem(item) {
   registroEditedItem.value.fecha = formato.convertDateFromIsoToInput(
     registroEditedItem.value.fecha
   )
-  showForm.value = true
+  openCardMovementUpsertDialog(registroEditedItem.value)
 }
 
 function deleteSelectedItems() {
@@ -1228,7 +1146,6 @@ registrosTarjetaCrud.onDoneRegistroTarjetaPagoDelete(({ data }) => {
 })
 
 function obtenerFechasInicialFinal() {
-  console.log('obtenerFechaInicialFinal() cuenta.value:', cuenta.value)
   // if (cuenta.value) {
   let mesInicio = mesPeriodo.value.id - 1
   let ejercicioFiscal = ejercicioFiscalPeriodo.value
@@ -1257,7 +1174,7 @@ function obtenerFechasInicialFinal() {
 
 /**
  * Al cambiar el periodo.
- * @description: Se ejecuta cuando se hace un cambio de mes o o ejercicio
+ * @description: Se ejecuta cuando se hace un cambio de mes o de ejercicio
  */
 function onChangePeriodo() {
   obtenerListaRegistros()
@@ -1287,51 +1204,82 @@ function obtenerListaRegistros() {
 }
 
 function cargarMovimientos() {
-  showFormCarga.value = true
+  openCardMovementMassImportDialog()
 }
+
+function openCardMovementMassImportDialog() {
+  Dialog.create({
+    component: CardMovementMassImportDialog,
+    componentProps: {
+      cuenta: cuenta.value,
+      fecha_desde: fechaInicioPeriodo.value,
+      fecha_hasta: fechaFinPeriodo.value
+    }
+  }).onOk((data) => {
+    console.log('Dialog data:', data)
+    if (data) {
+      refetchListaRegistros()
+      refetchSaldoPagarTarjetaCredito()
+    }
+  })
+}
+
 function addItem() {
   registroEditedItem.value = null
-  showForm.value = true
+  openCardMovementUpsertDialog(registroEditedItem.value)
 }
+
+function openCardMovementUpsertDialog(itemToUpsert) {
+  Dialog.create({
+    component: CardMovementUpsertDialog,
+    componentProps: {
+      cuentaId: cuenta.value.id,
+      registroEditedItem: itemToUpsert,
+      fecha: fecha_registro.value
+    }
+  }).onOk((data) => {
+    if (data) {
+      refetchListaRegistros()
+      refetchSaldoPagarTarjetaCredito()
+    }
+  })
+}
+
 function addMasiveItems() {
-  showFormCargaMasiva.value = true
+  openCardMovementBulkInsertDialog()
+}
+function openCardMovementBulkInsertDialog() {
+  Dialog.create({
+    component: CardMovementBulkInsertDialog,
+    componentProps: {
+      cuenta: cuenta.value,
+      fecha_desde: fechaInicioPeriodo.value,
+      fecha_hasta: fechaFinPeriodo.value
+    }
+  }).onOk((data) => {
+    console.log('Dialog data:', data)
+    if (data) {
+      refetchListaRegistros()
+      refetchSaldoPagarTarjetaCredito()
+    }
+  })
 }
 
 function pagosTarjeta() {
   showPagosTarjeta.value = true
 }
 
-function registroCreated(/* registro */) {
-  notificacion.mostrarNotificacionPositiva(
-    'Se ha ingresado un nuevo registro.',
-    1200
-  )
-  refetchListaRegistros()
-  refetchSaldoPagarTarjetaCredito()
-  showForm.value = false
-}
-
-function registroUpdated() {
-  notificacion.mostrarNotificacionPositiva(
-    'Se ha actualizado el registro correctamente.',
-    1200
-  )
-  refetchListaRegistros()
-  refetchSaldoPagarTarjetaCredito()
-  showForm.value = false
-}
-
-function cargaMasivaSaved(cuenta_id) {
-  showFormCargaMasiva.value = false
-  showFormCarga.value = false
-  cuentaCrud.cuentaSaldoUpdate({ cuentaId: cuenta_id })
-  notificacion.mostrarNotificacionPositiva(
-    'Los movimientos fueron guardados correctamente.',
-    900
-  )
-  refetchSaldoPagarTarjetaCredito()
-  refetchListaRegistros()
-}
+// function cargaMasivaSaved(cuenta_id) {
+//   showFormCargaMasiva.value = false
+//   showFormCarga.value = false
+//   cuentaCrud.cuentaSaldoUpdate({ cuentaId: cuenta_id })
+//   notificacion.mostrarNotificacionPositiva(
+//     'Los movimientos fueron guardados correctamente.',
+//     900
+//   )
+//   refetchSaldoPagarTarjetaCredito()
+//   refetchListaRegistros()
+// }
 cuentaCrud.onDoneCuentaSaldoUpdate(({ data }) => {
   cuenta.value.saldo = data.cuentaSaldoUpdate.cuenta.saldo
 })
@@ -1341,7 +1289,7 @@ function pagosRegistrados() {
   refetchListaRegistros()
 }
 function obtenerMensajePaginacion(firstRowIndex, endRowIndex, totalRowsNumber) {
-  return `Número de movimientos en el periodo: ${totalRowsNumber}`
+  return `Número de movimientos en el periodo: ${totalRowsNumber}, saldo del periodo: ${toCurrency(saldo_del_periodo.value)}`
 }
 
 function saveConcepto(props) {

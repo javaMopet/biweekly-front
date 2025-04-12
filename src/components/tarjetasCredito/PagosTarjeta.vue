@@ -161,8 +161,14 @@ const emit = defineEmits(['itemsSaved'])
  */
 onMounted(() => {
   formItem.value.saldo_periodo = props.sumaMovimientos.toString()
-  formItem.value.fecha = DateTime.now().toFormat('dd/MM/yyyy')
+  formItem.value.fecha = obtenerFechaPago()
 })
+
+function obtenerFechaPago() {
+  return DateTime.fromISO(props.fecha_fin)
+    .plus({ days: props.cuenta.diasGracia || 1 })
+    .toFormat('dd/MM/yyyy')
+}
 /**
  * funciones
  */

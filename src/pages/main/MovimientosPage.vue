@@ -299,7 +299,7 @@
         @registro-deleted="onRegistroDeleted"
       ></ListaMovimientos>
     </q-dialog>
-    <q-dialog
+    <!-- <q-dialog
       v-model="showRegistroCategoria"
       persistent
       transition-show="jump-up"
@@ -310,7 +310,7 @@
         @categoriaSaved="categoriaSaved"
         @categoriaUpdated="categoriaUpdated"
       ></FormRegistroCategoria>
-    </q-dialog>
+    </q-dialog> -->
   </Teleport>
 </template>
 
@@ -322,9 +322,10 @@ import { useFormato } from 'src/composables/utils/useFormato'
 import { api } from 'src/boot/axios'
 import ListaMovimientos from 'src/components/movimientos/ListaMovimientos.vue'
 import FormCuentaRegistro from 'src/components/movimientos/FormCuentaRegistro.vue'
-import FormRegistroCategoria from 'src/components/categorias/FormRegistroCategoria.vue'
+// import FormRegistroCategoria from 'src/components/categorias/FormRegistroCategoria.vue'
 import PeriodoSelect from 'src/components/formComponents/PeriodoSelect.vue'
-import { SessionStorage, exportFile } from 'quasar'
+import { Dialog, SessionStorage, exportFile } from 'quasar'
+import RegistroCategoriaDialog from 'src/components/categorias/RegistroCategoriaDialog.vue'
 
 /**
  * composables
@@ -398,7 +399,7 @@ const cellData = ref({})
 
 const columnsT = ref([])
 const columnasSaldos = ref([])
-const showRegistroCategoria = ref(false)
+// const showRegistroCategoria = ref(false)
 const registroCategoriaItem = ref()
 /**
  * onMount
@@ -461,7 +462,26 @@ function addCategoria(tipoMovimientoId) {
   }
   console.dir('editeditem', registroCategoriaItem.value)
   editedIndex.value = null
-  showRegistroCategoria.value = true
+
+  openRegistroCategoriaDialog()
+}
+function openRegistroCategoriaDialog() {
+  Dialog.create({
+    component: RegistroCategoriaDialog,
+    componentProps: {
+      editedItem: registroCategoriaItem.value,
+      editedIndex: editedIndex.value
+    }
+  })
+    .onOk((data) => {
+      console.log('ok', data)
+    })
+    .onCancel(() => {
+      console.log('cancel')
+    })
+    .onDismiss(() => {
+      console.log('dismiss')
+    })
 }
 
 function obtenerColumnas(ejercicio_fiscal, mes) {
@@ -670,9 +690,6 @@ function onChangePeriodo() {
   cargarDatos()
   obtenerColumnas(ejercicio_fiscal.value, mes.value.id)
 }
-
-function categoriaSaved() {}
-function categoriaUpdated() {}
 
 /**
  * computed

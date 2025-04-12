@@ -1,220 +1,234 @@
 <template>
-  <q-card class="my-card" dense style="width: 85%; min-width: 85%">
-    <q-inner-loading
-      :showing="isLoading"
-      label="Guardando... Por favor espere..."
-      label-class="text-teal"
-      label-style="font-size: 1.1em"
-      style="z-index: 500"
-    />
-    <DialogTitle
-      >Tarjeta de crédito &nbsp;&nbsp;~ {{ cuenta.nombre }} ~</DialogTitle
-    >
-    <q-card-section>
-      <q-toolbar class="q-gutter-x-md">
-        <!-- <q-separator vertical></q-separator> -->
-        <q-toolbar-title></q-toolbar-title>
-        <q-btn
-          :disable="!isSelected"
-          label="Eliminar"
-          @click="eliminarSeleccionados"
-          outline
-          color="negative"
-        />
-      </q-toolbar>
+  <q-dialog
+    ref="dialogRef"
+    @hide="onDialogHide"
+    transition-show="jump-up"
+    transition-hide="jump-down"
+    noBackdropDismiss
+    title="Categoría"
+  >
+    <q-card class="my-card" dense style="width: 85%; min-width: 85%">
+      <q-inner-loading
+        :showing="isLoading"
+        label="Guardando... Por favor espere..."
+        label-class="text-teal"
+        label-style="font-size: 1.1em"
+        style="z-index: 500"
+      />
+      <DialogTitle
+        >Tarjeta de crédito &nbsp;&nbsp;~ {{ cuenta.nombre }} ~</DialogTitle
+      >
+      <q-card-section>
+        <q-toolbar class="q-gutter-x-md">
+          <!-- <q-separator vertical></q-separator> -->
+          <q-toolbar-title></q-toolbar-title>
+          <q-btn
+            :disable="!isSelected"
+            label="Eliminar"
+            @click="eliminarSeleccionados"
+            outline
+            color="negative"
+          />
+        </q-toolbar>
 
-      <transition name="fade">
-        <div class="errors-message bg-pink-1" v-if="isErrors">
-          <div class="row">
-            <div class="col-1">
-              <div
-                class="row justify-center items-start q-pt-md"
-                style="height: 100%"
-              >
-                <q-icon name="warning" size="3rem" color="negative" />
-              </div>
-            </div>
-            <div class="col-10">
-              <div class="q-py-sm">
-                <q-linear-progress
-                  query
-                  rounded
-                  color="primary-light"
-                  class="q-mt-sm"
-                  size="8px"
-                  stripe
-                />
+        <transition name="fade">
+          <div class="errors-message bg-pink-1" v-if="isErrors">
+            <div class="row">
+              <div class="col-1">
                 <div
-                  class="row items-center q-gutter-x-lg"
-                  style="border: 0px solid red"
+                  class="row justify-center items-start q-pt-md"
+                  style="height: 100%"
                 >
-                  <span class="errors-message__title"
-                    >El formulario contiene los siguientes errores:</span
-                  >
+                  <q-icon name="warning" size="3rem" color="negative" />
                 </div>
               </div>
-              <q-list dense>
-                <q-item
-                  dense
-                  v-for="item in errorItems"
-                  :key="item.id"
-                  class="errors-message__item"
-                >
-                  {{ !item.numeroLinea ? '' : `No. Línea ${item.numeroLinea}` }}
-                  -> {{ item.message }}
-                </q-item>
-              </q-list>
-            </div>
-            <!-- <div class="col">
+              <div class="col-10">
+                <div class="q-py-sm">
+                  <q-linear-progress
+                    query
+                    rounded
+                    color="primary-light"
+                    class="q-mt-sm"
+                    size="8px"
+                    stripe
+                  />
+                  <div
+                    class="row items-center q-gutter-x-lg"
+                    style="border: 0px solid red"
+                  >
+                    <span class="errors-message__title"
+                      >El formulario contiene los siguientes errores:</span
+                    >
+                  </div>
+                </div>
+                <q-list dense>
+                  <q-item
+                    dense
+                    v-for="item in errorItems"
+                    :key="item.id"
+                    class="errors-message__item"
+                  >
+                    {{
+                      !item.numeroLinea ? '' : `No. Línea ${item.numeroLinea}`
+                    }}
+                    -> {{ item.message }}
+                  </q-item>
+                </q-list>
+              </div>
+              <!-- <div class="col">
               <q-spinner-tail color="blue-grey" size="25px" />
             </div> -->
-            <div class="col">
-              <div class="column items-end">
-                <q-btn
-                  color="primary"
-                  icon="close"
-                  dense
-                  flat
-                  class="errors-message__closeBtn"
-                  @click="closeErrors"
-                />
+              <div class="col">
+                <div class="column items-end">
+                  <q-btn
+                    color="primary"
+                    icon="close"
+                    dense
+                    flat
+                    class="errors-message__closeBtn"
+                    @click="closeErrors"
+                  />
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </transition>
-    </q-card-section>
-    <q-card-section style="max-height: 70vh; height: 60vh" class="scroll">
-      <q-table
-        :rows="listaRegistrosTarjeta"
-        :columns="columns"
-        :rows-per-page-options="[0]"
-        row-key="consecutivo"
-        separator="cell"
-        dense
-        selection="multiple"
-        v-model:selected="registrosSelected"
-        :selected-rows-label="getSelectedString"
-        table-header-class="text-condensed bg-primary-light text-accent"
-        no-data-label="No existen datos disponibles"
-        hide-pagination
-        class="my-sticky-header-table"
-        :loading="loadingRows"
-      >
-        <template #top>
-          <q-th
-            class="text-left"
-            style="width: 120px; min-width: 120px; max-width: 120px"
-          >
-            <q-btn
-              color="primary-button"
-              icon="add"
-              @click="addItem"
-              dense
-              glossy
-              push
-              class="small-button"
+        </transition>
+      </q-card-section>
+      <q-card-section style="max-height: 70vh; height: 60vh" class="scroll">
+        <q-table
+          :rows="listaRegistrosTarjeta"
+          :columns="columns"
+          :rows-per-page-options="[0]"
+          row-key="consecutivo"
+          separator="cell"
+          dense
+          selection="multiple"
+          v-model:selected="registrosSelected"
+          :selected-rows-label="getSelectedString"
+          table-header-class="text-condensed bg-primary-light text-accent"
+          no-data-label="No existen datos disponibles"
+          hide-pagination
+          class="my-sticky-header-table"
+          :loading="loadingRows"
+        >
+          <template #top>
+            <q-th
+              class="text-left"
+              style="width: 120px; min-width: 120px; max-width: 120px"
             >
-              <q-tooltip> Agregar Registro </q-tooltip>
-            </q-btn>
-          </q-th>
-        </template>
-        <template #header-cell-categoria="props">
-          <q-th :props="props" class="text-left">
-            <div class="row justify-start items-center">
-              <span class="q-pl-md q-pr-sm">{{ props.col.label }}</span>
               <q-btn
-                color="button-new"
+                color="primary-button"
                 icon="add"
-                label="Agregar"
-                @click="addItemCategoria(props)"
+                @click="addItem"
                 dense
-                class="small-button"
                 glossy
                 push
-                tabindex="100"
+                class="small-button"
               >
-                <q-tooltip> Nueva Categoría </q-tooltip>
+                <q-tooltip> Agregar Registro </q-tooltip>
               </q-btn>
-            </div>
-          </q-th>
-        </template>
-        <!-- <template #body-cell-concepto="props">
+            </q-th>
+          </template>
+          <template #header-cell-categoria="props">
+            <q-th :props="props" class="text-left">
+              <div class="row justify-start items-center">
+                <span class="q-pl-md q-pr-sm">{{ props.col.label }}</span>
+                <q-btn
+                  color="button-new"
+                  icon="add"
+                  label="Agregar"
+                  @click="addItemCategoria(props)"
+                  dense
+                  class="small-button"
+                  glossy
+                  push
+                  tabindex="100"
+                >
+                  <q-tooltip> Nueva Categoría </q-tooltip>
+                </q-btn>
+              </div>
+            </q-th>
+          </template>
+          <!-- <template #body-cell-concepto="props">
           <q-td :props="props" :class="props.row.clase">
             {{ props.row.concepto }}
           </q-td>
         </template> -->
-        <template #body-cell-fecha="props">
-          <q-td :props="props">
-            <DateInput
-              v-model="props.row.fecha"
-              :fecha-inicio="fecha_inicio"
-              :fecha-fin="fecha_fin"
-              :agregar="true"
-              @focus="focusDate(props)"
-            ></DateInput>
-          </q-td>
-        </template>
-        <template #body-cell-concepto="props">
-          <q-td :props="props">
-            <q-input
-              v-model="props.row.concepto"
-              :class="props.row.clase"
-              dense
-              lazy-rules
-              outlined
-              color="primary-button"
-              bg-color="blue-1"
-              label-color="input-label"
-              style="width: 100%"
-            ></q-input>
-          </q-td>
-        </template>
-        <template #body-cell-categoria="props">
-          <q-td :props="props">
-            <CategoriaSelect
-              v-model="props.row.categoria"
-              :tipo-afectacion="props.row.tipoAfectacion"
-              :agregar="false"
-              :clearable="false"
-            ></CategoriaSelect>
-          </q-td>
-        </template>
-        <template #body-cell-importe="props">
-          <q-td :props="props">
-            <PriceInput
-              v-model="props.row.importe"
-              label="Importe"
-            ></PriceInput>
-          </q-td>
-        </template>
-      </q-table>
-    </q-card-section>
-    <q-card-actions class="q-pa-xs">
-      <div class="row justify-between items-center full-width text-accent">
-        <div class="col-9 q-pl-xl">
-          <table style="border: 0px solid red">
-            <tbody>
-              <tr>
-                <td>Importe Total:</td>
-                <td class="summary__value">
-                  {{ toCurrency(sumatoriaImporte) }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="col-3 q-py-md">
-          <div class="row justify-center">
-            <q-btn flat label="Cancelar" v-close-popup class="q-mr-lg" />
-            <q-btn label="Guardar" color="primary-button" @click="saveItems" />
+          <template #body-cell-fecha="props">
+            <q-td :props="props">
+              <DateInput
+                v-model="props.row.fecha"
+                :fecha-inicio="fecha_inicio"
+                :fecha-fin="fecha_fin"
+                :agregar="true"
+                @focus="focusDate(props)"
+              ></DateInput>
+            </q-td>
+          </template>
+          <template #body-cell-concepto="props">
+            <q-td :props="props">
+              <q-input
+                v-model="props.row.concepto"
+                :class="props.row.clase"
+                dense
+                lazy-rules
+                outlined
+                color="primary-button"
+                bg-color="blue-1"
+                label-color="input-label"
+                style="width: 100%"
+              ></q-input>
+            </q-td>
+          </template>
+          <template #body-cell-categoria="props">
+            <q-td :props="props">
+              <CategoriaSelect
+                v-model="props.row.categoria"
+                :tipo-afectacion="props.row.tipoAfectacion"
+                :agregar="false"
+                :clearable="false"
+              ></CategoriaSelect>
+            </q-td>
+          </template>
+          <template #body-cell-importe="props">
+            <q-td :props="props">
+              <PriceInput
+                v-model="props.row.importe"
+                label="Importe"
+              ></PriceInput>
+            </q-td>
+          </template>
+        </q-table>
+      </q-card-section>
+      <q-card-actions class="q-pa-xs">
+        <div class="row justify-between items-center full-width text-accent">
+          <div class="col-9 q-pl-xl">
+            <table style="border: 0px solid red">
+              <tbody>
+                <tr>
+                  <td>Importe Total:</td>
+                  <td class="summary__value">
+                    {{ toCurrency(sumatoriaImporte) }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="col-3 q-py-md">
+            <div class="row justify-center">
+              <q-btn flat label="Cancelar" v-close-popup class="q-mr-lg" />
+              <q-btn
+                label="Guardar"
+                color="primary-button"
+                @click="saveItems"
+              />
+            </div>
           </div>
         </div>
-      </div>
-    </q-card-actions>
-  </q-card>
+      </q-card-actions>
+    </q-card>
 
-  <!-- <Teleport to="#modal">
+    <!-- <Teleport to="#modal">
     <q-dialog
       v-model="showRegistroCategoria"
       persistent
@@ -227,6 +241,7 @@
       ></FormRegistroCategoria>
     </q-dialog>
   </Teleport> -->
+  </q-dialog>
 </template>
 
 <script setup>
@@ -241,7 +256,7 @@ import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import DialogTitle from '../formComponents/modal/DialogTitle.vue'
 import { useRegistrosTarjetaCrud } from 'src/composables/useRegistrosTarjetaCrud'
 import PriceInput from '../formComponents/PriceInput.vue'
-import { Dialog, useQuasar } from 'quasar'
+import { Dialog, useDialogPluginComponent, useQuasar } from 'quasar'
 import RegistroCategoriaDialog from '../categorias/RegistroCategoriaDialog.vue'
 
 /**
@@ -262,7 +277,10 @@ const editedCategoriaParam = ref({ tipoMovimientoId: tipoMovimientoId.value })
  * composables
  */
 const formato = useFormato()
-const notificacion = useNotificacion()
+
+const { mostrarNotificacionPositiva, mostrarNotificacionNegativa } =
+  useNotificacion()
+
 const { toCurrency } = useFormato()
 const registrosTarjetaCrud = useRegistrosTarjetaCrud()
 const $q = useQuasar()
@@ -322,7 +340,15 @@ onMounted(() => {
 /**
  * emits
  */
-const emit = defineEmits(['itemsSaved'])
+defineEmits([
+  // REQUIRED; need to specify some events that your
+  // component will emit through useDialogPluginComponent()
+  ...useDialogPluginComponent.emits
+])
+
+// const emit = defineEmits(['categoriaSaved', 'categoriaUpdated'])
+const { dialogRef, onDialogHide, onDialogOK, _onDialogCancel } =
+  useDialogPluginComponent()
 
 /**
  * computed
@@ -424,16 +450,26 @@ function addItem() {
 }
 
 registrosTarjetaCrud.onDoneRegistroTarjetaMultipleCreate(({ data }) => {
-  console.log('data:', data)
-  const registrosTarjeta = data.registroTarjetaMultipleCreate.registrosTarjeta
-  const cuenta_id = registrosTarjeta[0].cuenta.id
-  isLoading.value = false
-  emit('itemsSaved', cuenta_id)
+  if (data) {
+    console.log('data:', data)
+    const registrosTarjeta = data.registroTarjetaMultipleCreate.registrosTarjeta
+    if (registrosTarjeta) {
+      const cuenta_id = registrosTarjeta[0].cuenta.id
+      isLoading.value = false
+      // emit('itemsSaved', cuenta_id)
+      mostrarNotificacionPositiva(
+        'Se guardaron los registros correctamente',
+        900
+      )
+      onDialogOK(cuenta_id)
+    }
+  }
 })
+
 registrosTarjetaCrud.onErrorRegistroTarjetaMultipleCreate((error) => {
   console.error(error)
   isLoading.value = false
-  notificacion.mostrarNotificacionNegativa(
+  mostrarNotificacionNegativa(
     'No fue posible posible guardar los registro, revisar consola',
     900
   )

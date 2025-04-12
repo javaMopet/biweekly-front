@@ -79,7 +79,7 @@ const month = defineModel('month')
 
 const monthOptions = generalStore.meses
 
-const emit = defineEmits(['onChangePeriodo', 'onChangeMonth'])
+const emit = defineEmits(['onChangePeriodo', 'onChangeYear', 'onChangeMonth'])
 /**
  * properties
  */

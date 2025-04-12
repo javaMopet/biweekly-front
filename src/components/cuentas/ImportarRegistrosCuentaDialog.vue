@@ -1,5 +1,11 @@
 <template>
-  <q-dialog ref="dialogRef" @hide="onDialogHide">
+  <q-dialog
+    ref="dialogRef"
+    @hide="onDialogHide"
+    transition-show="jump-up"
+    transition-hide="jump-down"
+    noBackdropDismiss
+  >
     <div class="my-card" style="width: 80%; min-width: 80%; max-width: 80%">
       <q-inner-loading
         :showing="isLoading"
@@ -814,7 +820,7 @@ function afterSaveItems() {
     'Los movimientos se guardaron correctamente.',
     1700
   )
-  onDialogOK({operacion: 'guardar' })
+  onDialogOK({ operacion: 'guardar' })
 }
 
 registrosCrud.onErrorImportarRegistros((error) => {
