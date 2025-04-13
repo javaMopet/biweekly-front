@@ -168,7 +168,7 @@
               <CategoriaSelect
                 v-model="props.row.categoria"
                 :tipo-afectacion="props.row.tipoAfectacion"
-                :agregar="true"
+                :agregar="false"
               ></CategoriaSelect>
             </q-td>
           </template>
@@ -179,7 +179,7 @@
               </span>
             </q-td>
           </template>
-          <template #body-cell-acciones="props">
+          <!-- <template #body-cell-acciones="props">
             <q-td :props="props">
               <q-btn
                 icon="delete_sweep"
@@ -189,10 +189,8 @@
                 @click="deleteRow(props)"
                 flat
               />
-              <!-- class="q-ml-sm"
-              color="accent" -->
             </q-td>
-          </template>
+          </template> -->
         </q-table>
       </q-card-section>
       <q-card-actions class="q-pa-xs">
@@ -724,15 +722,15 @@ function eliminarSeleccionados() {
   registrosSelected.value.length = 0
 }
 
-function deleteRow(props) {
-  // const rowIndex = props.rowIndex
-  const id = props.row.id
-  // console.log(id)
-  const index = listaRegistrosTarjeta.value.findIndex((r) => r.id == id)
-  // listaRegistrosTarjeta.find
+// function deleteRow(props) {
+//   // const rowIndex = props.rowIndex
+//   const id = props.row.id
+//   // console.log(id)
+//   const index = listaRegistrosTarjeta.value.findIndex((r) => r.id == id)
+//   // listaRegistrosTarjeta.find
 
-  listaRegistrosTarjeta.value.splice(index, 1)
-}
+//   listaRegistrosTarjeta.value.splice(index, 1)
+// }
 function fileClear() {
   listaRegistrosTarjeta.value.length = 0
 }
@@ -793,16 +791,16 @@ const columns = [
     align: 'left',
     style: 'width:400px;max-width:400px',
     headerStyle: 'width:400px;max-width:400px'
-  },
-  {
-    name: 'acciones',
-    label: '',
-    field: 'action',
-    sortable: false,
-    align: 'center',
-    style: 'width:70px',
-    headerStyle: 'width:70px'
   }
+  // {
+  //   name: 'acciones',
+  //   label: '',
+  //   field: 'action',
+  //   sortable: false,
+  //   align: 'center',
+  //   style: 'width:70px',
+  //   headerStyle: 'width:70px'
+  // }
 ]
 function closeErrors() {
   errorItems.value = []
