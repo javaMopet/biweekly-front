@@ -622,6 +622,7 @@ function focusDate(props) {
     props.row.fecha = item.fecha
   }
 }
+
 function addItemCategoria(_props_row) {
   editedCategoriaParam.value = {
     tipoMovimientoId: tipoMovimientoId.value,
@@ -630,17 +631,6 @@ function addItemCategoria(_props_row) {
     icono: 'insert_emoticon',
     color: '#019A9D'
   }
-  // showRegistroCategoria.value = true
-  // Dialog.create({
-  //   component: FormRegistroCategoria,
-  //   componentProps: {
-  //     editedItem: editedCategoriaParam.value
-  //   },
-  //   persistent: true,
-  //   noEscDismiss: true,
-  //   noBackdropDismiss: true,
-  //   style: 'width: 90%; min-width: 90%; max-width: 90%'
-  // })
   openRegistroCategoriaDialog(editedCategoriaParam.value)
 }
 

@@ -36,6 +36,7 @@
                   label-color="primary"
                   clearable
                   @clear="fileClear"
+                  tabindex="1"
                 >
                   <template #prepend>
                     <q-icon color="primary" name="cloud_upload" />
@@ -55,6 +56,7 @@
                   lbl_field="Fecha"
                   :opcional="false"
                   style="width: 140px"
+                  :tabindex="1"
                 ></DateInput>
               </div>
               <div class="column">
@@ -64,6 +66,7 @@
                   lbl_field="Fecha"
                   :opcional="false"
                   style="width: 140px"
+                  :tabindex="2"
                 ></DateInput>
               </div>
             </div>
@@ -156,6 +159,26 @@
               :loading="loadingRows"
               :table-row-class-fn="getRowClass"
             >
+              <template #header-cell-categoria="props">
+                <q-th :props="props" class="text-left">
+                  <div class="row justify-start items-center">
+                    <span class="q-pl-md q-pr-sm">{{ props.col.label }}</span>
+                    <q-btn
+                      color="button-new"
+                      icon="add"
+                      label="Agregar"
+                      @click="addItemCategoria(props)"
+                      dense
+                      class="small-button"
+                      glossy
+                      push
+                      tabindex="100"
+                    >
+                      <q-tooltip> Nueva Categoría </q-tooltip>
+                    </q-btn>
+                  </div>
+                </q-th>
+              </template>
               <template #body-cell-concepto="props">
                 <q-td :props="props">
                   <q-input
@@ -168,6 +191,8 @@
                     bg-color="blue-1"
                     label-color="input-label"
                     style="width: 100%"
+                    :tabindex="props.row.consecutivo + 1"
+                    :autofocus="props.row.autofocus"
                   ></q-input>
                 </q-td>
               </template>
@@ -183,6 +208,7 @@
                         v-model:cuentaDestino="props.row.cuentaDestino"
                         :tipo-afectacion="props.row.tipo_afectacion"
                         @categoriaSaved="categoriaSaved"
+                        :tabindex="props.row.consecutivo + 1"
                       ></CategoriaSelectionComponent>
                     </div>
                   </div>
@@ -201,9 +227,9 @@
                   </span>
                 </q-td>
               </template>
-              <template #body-cell-acciones="props">
+              <!-- <template #body-cell-acciones="props">
                 <q-td :props="props" fit class="bg-white">
-                  <!-- icon="delete_sweep" -->
+
                   <q-btn
                     icon="las la-trash-alt"
                     size="md"
@@ -214,7 +240,8 @@
                     flat
                   />
                 </q-td>
-              </template>
+              </template> -->
+              <!-- icon="delete_sweep" -->
               <!-- <template #bottom-row>
           <q-tr>
             <q-td class="text-bold" colspan="4">Total Movimientos:</q-td>
@@ -272,7 +299,7 @@ import { useFormato } from 'src/composables/utils/useFormato'
 import { DateTime } from 'luxon'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import DateInput from '../formComponents/DateInput.vue'
-import { SessionStorage, useDialogPluginComponent } from 'quasar'
+import { Dialog, SessionStorage, useDialogPluginComponent } from 'quasar'
 import { useRegistrosCrud } from 'src/composables/useRegistrosCrud'
 import DialogTitle from '../formComponents/modal/DialogTitle.vue'
 import { parse, format } from 'date-fns'
@@ -281,6 +308,7 @@ import en from 'date-fns/locale/en-US'
 import { useCategoriaStore } from 'src/stores/common/categoriaStore'
 import CategoriaSelectionComponent from '../formComponents/CategoriaSelectionComponent.vue'
 import { useRouter } from 'vue-router'
+import RegistroCategoriaDialog from '../categorias/RegistroCategoriaDialog.vue'
 
 /**
  * Composables
@@ -303,6 +331,8 @@ const fecha_inicio = ref('01/01/1900')
 const fecha_fin = ref('01/01/1900')
 const isLoading = ref(false)
 const loadingRows = ref(false)
+const tipoMovimientoId = ref('2')
+const editedCategoriaParam = ref({ tipoMovimientoId: tipoMovimientoId.value })
 
 /**
  * composables
@@ -488,6 +518,7 @@ function obtenerMovimientosSantanderNuevo(wb) {
 
   // console.table(todos.value)
 
+  let autofocus = true
   todos.value.forEach((row, index) => {
     let fecha = convertidorFecha(row.fecha.toString())
     if (fecha) {
@@ -512,9 +543,12 @@ function obtenerMovimientosSantanderNuevo(wb) {
           importe,
           saldo: row.saldo,
           referencia: row.referencia,
-          tipoMovimiento: {}
+          tipoMovimiento: {},
+          isValid: true,
+          autofocus
         }
         listaRegistros.value.push(item)
+        autofocus = false
       }
     }
   })
@@ -788,7 +822,7 @@ function saveItems() {
       errorsList.value.reverse().forEach((error) => {
         mostrarNotificacionNegativa(
           `Error en la línea ${error.numero_linea}: ${error.message}`,
-          5000,
+          3000,
           'top-right'
         )
       })
@@ -885,11 +919,11 @@ function eliminarSeleccionados() {
   registrosSelected.value.length = 0
 }
 
-function deleteRow(props) {
-  const index = listaRegistros.value.findIndex((r) => r.id == props.row.id)
+// function deleteRow(props) {
+//   const index = listaRegistros.value.findIndex((r) => r.id == props.row.id)
 
-  listaRegistros.value.splice(index, 1)
-}
+//   listaRegistros.value.splice(index, 1)
+// }
 function fileClear() {
   listaRegistros.value.length = 0
 }
@@ -957,7 +991,7 @@ const columns = [
     name: 'concepto',
     label: 'Concepto',
     field: 'concepto',
-    sortable: true,
+    sortable: false,
     align: 'left',
     filter: true
     // headerStyle: 'width:250px;max-width:250px',
@@ -967,7 +1001,7 @@ const columns = [
     name: 'importe',
     label: 'Importe',
     field: 'importe',
-    sortable: true,
+    sortable: false,
     align: 'right',
     headerStyle: 'width:100px;max-width:100px'
   },
@@ -975,19 +1009,20 @@ const columns = [
     name: 'categoria',
     label: 'Categoria',
     field: 'categoria',
-    sortable: true,
+    sortable: false,
+    filter: false,
     align: 'center',
     headerStyle: 'width:400px;max-width:400px',
     style: 'width:400px;max-width:400px'
-  },
-  {
-    name: 'acciones',
-    label: '',
-    field: 'action',
-    sortable: false,
-    align: 'center',
-    style: 'width:5%'
   }
+  // {
+  //   name: 'acciones',
+  //   label: '',
+  //   field: 'action',
+  //   sortable: false,
+  //   align: 'center',
+  //   style: 'width:5%'
+  // }
 ]
 // function closeErrors() {
 //   errorsList.value.length = 0
@@ -998,6 +1033,37 @@ function categoriaSaved() {
 
 function getRowClass(row) {
   return !row.isValid ? 'tr-fade bg-red-1' : ''
+}
+
+function addItemCategoria(_props_row) {
+  editedCategoriaParam.value = {
+    tipoMovimientoId: tipoMovimientoId.value,
+    cuentaContable: null,
+    cuentaDefault: null,
+    icono: 'insert_emoticon',
+    color: '#019A9D'
+  }
+  openRegistroCategoriaDialog(editedCategoriaParam.value)
+}
+
+function openRegistroCategoriaDialog(itemToAddOrUpdate) {
+  console.log('itemToAddOrUpdate:', itemToAddOrUpdate)
+  Dialog.create({
+    component: RegistroCategoriaDialog,
+    parent: this,
+    componentProps: {
+      editedItem: itemToAddOrUpdate
+    },
+    onOk: (payload) => {
+      // categoriaSaved(itemSaved)
+      console.log('categoriaSaved', payload)
+      // mostrarNotificacion(payload.operacion, payload.item)
+      // categoriasCrud.refetchListaCategorias()
+    },
+    onCancel: () => {
+      console.log("'Cancel clicked'")
+    }
+  })
 }
 </script>
 

@@ -22,6 +22,7 @@
       :autofocus="autofocus"
       :clearable="clearable"
       @update:model-value="onSelectCategoria"
+      :tabindex="props.tabindex"
     >
       <template #after>
         <q-btn
@@ -147,6 +148,10 @@ const props = defineProps({
     type: Boolean,
     required: false,
     default: true
+  },
+  tabindex: {
+    type: Number,
+    required: false
   }
 })
 

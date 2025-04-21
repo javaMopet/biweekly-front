@@ -6,6 +6,7 @@
       :tipo-afectacion="tipoAfectacion"
       :agregar="false"
       @update:model-value="onSelectCategoriaCuenta"
+      :tabindex="props.tabindex"
     ></CategoriaSelect>
     <SelectCuenta
       v-else
@@ -101,7 +102,7 @@ import { Dialog } from 'quasar'
 const props = defineProps({
   modelValue: {
     type: Object, // depende de qué tipo sea el value seleccionado
-    required: true
+    required: false
   },
   cuentaDestino: {
     type: Object,
@@ -122,6 +123,10 @@ const props = defineProps({
     type: Boolean,
     required: false,
     default: true
+  },
+  tabindex: {
+    type: Number,
+    required: false
   }
 })
 

@@ -407,7 +407,7 @@
                     />
                     <q-btn
                       color="primary-button"
-                      flat
+                      outline
                       @click="cargarMovimientos"
                       no-caps
                       rounded

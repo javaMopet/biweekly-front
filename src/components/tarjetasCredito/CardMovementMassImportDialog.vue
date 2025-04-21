@@ -77,69 +77,6 @@
             color="negative"
           />
         </q-toolbar>
-
-        <transition name="fade">
-          <div class="errors-message bg-pink-1" v-if="isErrors">
-            <div class="row">
-              <div class="col-1">
-                <div
-                  class="row justify-center items-start q-pt-md"
-                  style="height: 100%"
-                >
-                  <q-icon name="warning" size="3rem" color="negative" />
-                </div>
-              </div>
-              <div class="col-10">
-                <div class="q-py-sm">
-                  <q-linear-progress
-                    query
-                    rounded
-                    color="primary-light"
-                    class="q-mt-sm"
-                    size="8px"
-                    stripe
-                  />
-                  <div
-                    class="row items-center q-gutter-x-lg"
-                    style="border: 0px solid red"
-                  >
-                    <span class="errors-message__title"
-                      >El formulario contiene los siguientes errores:</span
-                    >
-                  </div>
-                </div>
-                <q-list dense>
-                  <q-item
-                    dense
-                    v-for="item in errorItems"
-                    :key="item.id"
-                    class="errors-message__item"
-                  >
-                    {{
-                      !item.numeroLinea ? '' : `No. Línea ${item.numeroLinea}`
-                    }}
-                    -> {{ item.message }}
-                  </q-item>
-                </q-list>
-              </div>
-              <!-- <div class="col">
-              <q-spinner-tail color="blue-grey" size="25px" />
-            </div> -->
-              <div class="col">
-                <div class="column items-end">
-                  <q-btn
-                    color="primary"
-                    icon="close"
-                    dense
-                    flat
-                    class="errors-message__closeBtn"
-                    @click="closeErrors"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </transition>
       </q-card-section>
       <q-card-section style="max-height: 70vh; height: 60vh" class="scroll">
         <q-table
@@ -157,10 +94,43 @@
           hide-pagination
           class="my-sticky-header-table"
           :loading="loadingRows"
+          :table-row-class-fn="getRowClass"
         >
+          <template #header-cell-categoria="props">
+            <q-th :props="props" class="text-left">
+              <div class="row justify-start items-center">
+                <span class="q-pl-md q-pr-sm">{{ props.col.label }}</span>
+                <q-btn
+                  color="button-new"
+                  icon="add"
+                  label="Agregar"
+                  @click="addItemCategoria(props)"
+                  dense
+                  class="small-button"
+                  glossy
+                  push
+                  tabindex="100"
+                >
+                  <q-tooltip> Nueva Categoría </q-tooltip>
+                </q-btn>
+              </div>
+            </q-th>
+          </template>
           <template #body-cell-concepto="props">
-            <q-td :props="props" :class="props.row.clase">
-              {{ props.row.concepto }}
+            <q-td :props="props">
+              <q-input
+                v-model="props.row.concepto"
+                :class="props.row.clase"
+                dense
+                lazy-rules
+                outlined
+                color="primary-button"
+                bg-color="lime-1"
+                label-color="input-label"
+                style="width: 100%"
+                :tabindex="props.row.consecutivo + 1"
+                :autofocus="props.row.autofocus"
+              ></q-input>
             </q-td>
           </template>
           <template #body-cell-categoria="props">
@@ -169,6 +139,7 @@
                 v-model="props.row.categoria"
                 :tipo-afectacion="props.row.tipoAfectacion"
                 :agregar="false"
+                :tabindex="props.row.consecutivo + 1"
               ></CategoriaSelect>
             </q-td>
           </template>
@@ -207,13 +178,21 @@
               </tbody>
             </table>
           </div>
-          <div class="col-3 q-py-md">
-            <div class="row justify-center">
-              <q-btn flat label="Cancelar" v-close-popup class="q-mr-lg" />
+          <div class="col-3 q-py-md q-pr-lg">
+            <div class="row justify-end">
+              <!-- <q-btn
+                label="Cancelar"
+                v-close-popup
+                class="q-mr-lg"
+                tabindex="50"
+                color="negative-pastel"
+                outline
+              /> -->
               <q-btn
                 label="Guardar"
                 color="primary-button"
                 @click="saveItems"
+                tabindex="51"
               />
             </div>
           </div>
@@ -239,7 +218,8 @@ import DialogTitle from '../formComponents/modal/DialogTitle.vue'
 import { useRegistrosTarjetaCrud } from 'src/composables/useRegistrosTarjetaCrud'
 import { parse, format } from 'date-fns'
 import es from 'date-fns/locale/es'
-import { useDialogPluginComponent } from 'quasar'
+import { Dialog, useDialogPluginComponent } from 'quasar'
+import RegistroCategoriaDialog from '../categorias/RegistroCategoriaDialog.vue'
 
 /**
  * state
@@ -250,16 +230,19 @@ const listaRegistrosTarjeta = ref([])
 const todos = ref()
 const fecha_inicio = ref('01/01/1900')
 const fecha_fin = ref('01/01/1900')
-const errorItems = ref([])
 const isLoading = ref(false)
 const loadingRows = ref(false)
+const tipoMovimientoId = ref('2')
+const editedCategoriaParam = ref({ tipoMovimientoId: tipoMovimientoId.value })
+const errorsList = ref([])
 /**
  * composables
  */
 const formato = useFormato()
-const notificacion = useNotificacion()
 const { toCurrency } = useFormato()
 const registrosTarjetaCrud = useRegistrosTarjetaCrud()
+const { mostrarNotificacionNegativa, _mostrarNotificacionPositiva } =
+  useNotificacion()
 
 /**
  * defProperties
@@ -563,6 +546,7 @@ function cargarMovimientosAmericanExpress(wb) {
  */
 function crearListaRegistrosTarjeta(excelData) {
   // console.table(excelData)
+  let autofocus = true
   excelData.forEach((row, index) => {
     if (row.fecha) {
       const fechaObject = DateTime.fromFormat(
@@ -578,14 +562,22 @@ function crearListaRegistrosTarjeta(excelData) {
           concepto: row.concepto,
           tipoAfectacion: 'C',
           clase: row.importe < 0 ? 'registro-abono' : '',
-          saved: false
+          saved: false,
+          autofocus,
+          isValid: true
         }
         listaRegistrosTarjeta.value.push(item)
+        autofocus = false
       }
     }
   })
   // console.log(listaRegistrosTarjeta.value)
 }
+
+function getRowClass(row) {
+  return !row.isValid ? 'tr-fade bg-red-1' : ''
+}
+
 /**
  * computed
  */
@@ -600,11 +592,6 @@ const listaRegistroFiltrados = computed({
     })
   }
 })
-const isErrors = computed({
-  get() {
-    return errorItems.value.length > 0
-  }
-})
 
 const sumatoriaImporte = computed({
   get() {
@@ -615,55 +602,68 @@ const sumatoriaImporte = computed({
 })
 
 function saveItems() {
-  const containsErrors = validarMovimientos()
-  if (containsErrors) {
-    setTimeout(() => {
-      errorItems.value = []
-    }, 6000)
-  } else {
-    var lista_registros_tarjeta = []
+  try {
+    const containsErrors = validarMovimientos()
+    if (containsErrors) {
+      // setTimeout(() => {
+      //   errorItems.value = []
+      // }, 6000)
+      errorsList.value.reverse().forEach((error) => {
+        mostrarNotificacionNegativa(
+          `Error en la línea ${error.numero_linea}: ${error.message}`,
+          3000,
+          'top-right'
+        )
+      })
+    } else {
+      var lista_registros_tarjeta = []
 
-    listaRegistroFiltrados.value.forEach((item) => {
-      const registro = {
-        estadoRegistroTarjetaId: 1, //pendiente
-        tipoAfectacion: item.tipoAfectacion,
-        cuentaId: props.cuenta.id,
-        categoriaId: item.categoria.id,
-        importe: item.importe * -1,
-        fecha: item.fecha,
-        concepto: item.concepto
-      }
-      lista_registros_tarjeta.push(registro)
-    })
+      listaRegistroFiltrados.value.forEach((item) => {
+        const registro = {
+          estadoRegistroTarjetaId: 1, //pendiente
+          tipoAfectacion: item.tipoAfectacion,
+          cuentaId: props.cuenta.id,
+          categoriaId: item.categoria.id,
+          importe: item.importe * -1,
+          fecha: item.fecha,
+          concepto: item.concepto
+        }
+        lista_registros_tarjeta.push(registro)
+      })
 
-    isLoading.value = true
-    console.log('lista_registros_tarjeta:', lista_registros_tarjeta)
-    registrosTarjetaCrud.registroTarjetaMultipleCreate({
-      input: lista_registros_tarjeta
-    })
+      isLoading.value = true
+      console.log('lista_registros_tarjeta:', lista_registros_tarjeta)
+      registrosTarjetaCrud.registroTarjetaMultipleCreate({
+        input: lista_registros_tarjeta
+      })
 
-    // api
-    //   .post('/create_multiple_registros_tarjeta', {
-    //     lista_registros_tarjeta
-    //   })
-    //   .then((response) => {
-    //     // console.log('guardado correctamente')
-    //     // console.log('response', response)
-    //     const cuenta_id = response.data.retorno[0].cuenta_id
-    //     // console.log('cuenta', cuenta_id)
-    //     isLoading.value = false
-    //     emit('itemsSaved', cuenta_id)
-    //   })
-    //   .catch((error) => {
-    //     isLoading.value = false
-    //     // console.error(error.response.data.exception)
-    //     notificacion.mostrarNotificacionNegativa(
-    //       'No fue posible posible guardar los registro, revisar consola',
-    //       900
-    //     )
-    //   })
-    // console.log('items guardados')
+      // api
+      //   .post('/create_multiple_registros_tarjeta', {
+      //     lista_registros_tarjeta
+      //   })
+      //   .then((response) => {
+      //     // console.log('guardado correctamente')
+      //     // console.log('response', response)
+      //     const cuenta_id = response.data.retorno[0].cuenta_id
+      //     // console.log('cuenta', cuenta_id)
+      //     isLoading.value = false
+      //     emit('itemsSaved', cuenta_id)
+      //   })
+      //   .catch((error) => {
+      //     isLoading.value = false
+      //     // console.error(error.response.data.exception)
+      //     notificacion.mostrarNotificacionNegativa(
+      //       'No fue posible posible guardar los registro, revisar consola',
+      //       900
+      //     )
+      //   })
+      // console.log('items guardados')
+    }
+  } catch (e) {
+    console.log('error', e)
+    mostrarNotificacionNegativa(e.message, 2500, 'top-right')
   }
+  isLoading.value = false
 }
 registrosTarjetaCrud.onDoneRegistroTarjetaMultipleCreate(({ data }) => {
   console.log('data:', data)
@@ -676,7 +676,7 @@ registrosTarjetaCrud.onDoneRegistroTarjetaMultipleCreate(({ data }) => {
 registrosTarjetaCrud.onErrorRegistroTarjetaMultipleCreate((error) => {
   console.error(error)
   isLoading.value = false
-  notificacion.mostrarNotificacionNegativa(
+  mostrarNotificacionNegativa(
     'No fue posible posible guardar los registro, revisar consola',
     900
   )
@@ -686,26 +686,38 @@ registrosTarjetaCrud.onErrorRegistroTarjetaMultipleCreate((error) => {
  * Funcion utilizada para validar los movimiento al momento de guardar
  */
 function validarMovimientos() {
-  errorItems.value = []
-  if (listaRegistroFiltrados.value.length <= 0) {
-    errorItems.value.push({
-      id: 1,
-      numeroLinea: undefined,
-      message: 'Favor de ingresar los datos que desea guardar.'
-    })
-  } else {
-    // console.table(listaRegistroFiltrados.value)
-    listaRegistroFiltrados.value.forEach((item, index) => {
-      if (!item.categoria) {
-        errorItems.value.push({
-          id: index,
-          numeroLinea: item.id,
-          message: 'Favor de ingresar la categoria.'
-        })
-      }
-    })
+  errorsList.value.length = 0
+
+  if (listaRegistrosTarjeta.value.length <= 0) {
+    throw new Error('No hay registros para guardar')
   }
-  return errorItems.value.length > 0
+
+  listaRegistrosTarjeta.value.forEach((item) => {
+    if (!item.categoria || !item.categoria.id) {
+      if (item.tipoMovimientoId === '3') {
+        if (!item.cuentaDestino || !item.cuentaDestino.id) {
+          addError(1, item.consecutivo, 'Seleccionar cuenta destino.')
+          item.isValid = false
+        } else {
+          item.isValid = true
+        }
+      } else {
+        addError(1, item.consecutivo, 'Seleccionar categoria.')
+        item.isValid = false
+      }
+    } else {
+      item.isValid = true
+    }
+  })
+  return errorsList.value.length > 0
+}
+
+function addError(code, numero_linea, message) {
+  errorsList.value.push({
+    code,
+    numero_linea,
+    message
+  })
 }
 
 /**
@@ -802,9 +814,6 @@ const columns = [
   //   headerStyle: 'width:70px'
   // }
 ]
-function closeErrors() {
-  errorItems.value = []
-}
 
 const importe_seleccionado = computed({
   get() {
@@ -823,6 +832,38 @@ function getSelectedString() {
         importe_seleccionado.value
       )} `
   //de ${listaRegistrosFiltrados.value.length}
+}
+
+function addItemCategoria(_props_row) {
+  editedCategoriaParam.value = {
+    tipoMovimientoId: tipoMovimientoId.value,
+    cuentaContable: null,
+    cuentaDefault: null,
+    icono: 'insert_emoticon',
+    color: '#019A9D'
+  }
+  // showRegistroCategoria.value = true
+  openRegistroCategoriaDialog(editedCategoriaParam.value)
+}
+
+function openRegistroCategoriaDialog(itemToAddOrUpdate) {
+  console.log('itemToAddOrUpdate:', itemToAddOrUpdate)
+  Dialog.create({
+    component: RegistroCategoriaDialog,
+    parent: this,
+    componentProps: {
+      editedItem: itemToAddOrUpdate
+    },
+    onOk: (payload) => {
+      // categoriaSaved(itemSaved)
+      console.log('categoriaSaved', payload)
+      // mostrarNotificacion(payload.operacion, payload.item)
+      // categoriasCrud.refetchListaCategorias()
+    },
+    onCancel: () => {
+      console.log("'Cancel clicked'")
+    }
+  })
 }
 </script>
 
