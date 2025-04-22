@@ -688,11 +688,11 @@ registrosTarjetaCrud.onErrorRegistroTarjetaMultipleCreate((error) => {
 function validarMovimientos() {
   errorsList.value.length = 0
 
-  if (listaRegistrosTarjeta.value.length <= 0) {
+  if (listaRegistroFiltrados.value.length <= 0) {
     throw new Error('No hay registros para guardar')
   }
 
-  listaRegistrosTarjeta.value.forEach((item) => {
+  listaRegistroFiltrados.value.forEach((item) => {
     if (!item.categoria || !item.categoria.id) {
       if (item.tipoMovimientoId === '3') {
         if (!item.cuentaDestino || !item.cuentaDestino.id) {
