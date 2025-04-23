@@ -8,12 +8,13 @@
     :filter="filterIngreso"
     :rows-per-page-options="[0]"
     separator="none"
-    :class="{
-      'my-sticky-header-table-ingreso': listaMovimientosIngreso.length > 4
-    }"
+    class="my-sticky-header-table-ingreso"
     hide-bottom
     hide-pagination
   >
+    <!-- :class="{
+      'my-sticky-header-table-ingreso': listaMovimientosIngreso.length > 4
+    }" -->
     <template #top-left>
       <div class="row inline q-gutter-x-md items-center">
         <PeriodoSelect
@@ -85,43 +86,20 @@
         class="q-pa-xs q-ma-none"
         style="padding: 0px !important"
       >
-        <!-- <span class="movimientos__celda--importe"> {{ props.value }}</span> -->
-        <!-- <q-input v-model="props.value" type="text" class="mi-input" /> -->
-        <!-- <q-input
-          v-model="props.value"
-          outlined
-          rounded
-          dense
-          color="indigo"
-          class="q-mb-md"
-        /> -->
-        <!-- <q-input
-          v-model="props.value"
-          outlined
-          dense
-          input-class="text-center q-pa-xs"
-          class="input-mini"
-        /> -->
-        <!-- <q-input
-          v-model="props.value"
-          dense
-          outlined
-          input-class="text-center q-pa-none"
-          class="input-ultra-compact"
-        /> -->
-        <!-- <q-input
-          v-model="props.value"
-          borderless
-          dense
-          input-class="skinny-inner"
-          class="skinny-qinput"
-        /> -->
         <input
           v-model="props.value"
           type="text"
           class="ultra-skinny-input"
           readonly
-          @keydown="handleKey"
+          @keydown="(e) => handleKey(e, props)"
+          :ref="
+            (el) => {
+              if (el) {
+                inputIngresoRefs[`${props.col.field}_${props.rowIndex + 1}`] =
+                  el
+              }
+            }
+          "
         />
       </q-td>
     </template>
@@ -314,10 +292,11 @@
       ></ListaMovimientos>
     </q-dialog>
   </Teleport>
+  <!-- <pre>{{ inputIngresoRefs }}</pre> -->
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, nextTick, computed, onMounted } from 'vue'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { DateTime } from 'luxon'
 import { useFormato } from 'src/composables/utils/useFormato'
@@ -335,6 +314,7 @@ const formato = useFormato()
 /**
  * state
  */
+const inputIngresoRefs = ref({})
 
 // const defaultItem = {
 //   categoria: null,
@@ -706,21 +686,47 @@ function obtenerParametros() {
     instanceId: SessionStorage.getItem('current_instance').id
   }
 }
-function handleKey(event) {
+function handleKey(event, props) {
+  // console.log('props:', props)
+  // console.log('colFieldOrigen:', props.col.field)
+  // console.log('rowindex origen:', props.rowIndex)
+  const indiceRow = props.rowIndex + 1
   switch (event.key) {
     case 'ArrowUp':
-      console.log('↑ Arriba')
+      // console.log('↑ Arriba')
+      focusInput(props.col.field, indiceRow - 1)
       break
     case 'ArrowDown':
-      console.log('↓ Abajo')
+      // console.log('↓ Abajo')
+      focusInput(props.col.field, indiceRow + 1)
       break
     case 'ArrowLeft':
-      console.log('← Izquierda')
+      // console.log('← Izquierda')
+      focusInput(Number(props.col.field) - 1, indiceRow)
       break
     case 'ArrowRight':
-      console.log('→ Derecha')
+      // console.log('→ Derecha')
+      focusInput(Number(props.col.field) + 1, indiceRow)
+      break
+    case 'Enter':
+      console.log('Enter')
+      // focusInput(Number(props.col.field) + 1, props.rowIndex + 1)
       break
   }
+}
+function focusInput(colField, rowIndex) {
+  // console.log('focusing........')
+  // console.log('colField:', colField)
+  // console.log('rowIndex:', rowIndex)
+  nextTick(() => {
+    const key = `${colField}_${rowIndex}`
+    // console.log('key:', key)
+    const inputElement = inputIngresoRefs.value[key]
+    // console.log('inputElement:', inputElement)
+    if (inputElement) {
+      inputElement.focus() // Enfoca el input
+    }
+  })
 }
 </script>
 
@@ -751,8 +757,8 @@ body {
 }
 .my-sticky-header-table-ingreso {
   /* height or max-height is important */
-  height: 250px;
-  min-height: 250px;
+  height: 230px;
+  min-height: 230px;
 
   .q-table__top,
   .q-table__bottom,
