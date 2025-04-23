@@ -57,15 +57,6 @@
           :props="props"
         >
           <span> {{ col.periodo_id === 0 ? 'INGRESOS' : col.label }}</span>
-          <q-btn
-            v-if="col.periodo_id === 0"
-            class="button-new"
-            label="Nuevo"
-            color="traspaso-button"
-            icon="add_circle"
-            dense
-            @click="addCategoria('1')"
-          />
         </q-th>
       </q-tr>
     </template>
@@ -86,12 +77,57 @@
       </q-td>
     </template>
     <template v-slot:body-cell="props">
-      <q-td dense :props="props" clickable @dblclick="addItem(props)">
-        <span class="movimientos__celda--importe"> {{ props.value }}</span>
+      <q-td
+        dense
+        :props="props"
+        clickable
+        @dblclick="addItem(props)"
+        class="q-pa-xs q-ma-none"
+        style="padding: 0px !important"
+      >
+        <!-- <span class="movimientos__celda--importe"> {{ props.value }}</span> -->
+        <!-- <q-input v-model="props.value" type="text" class="mi-input" /> -->
+        <!-- <q-input
+          v-model="props.value"
+          outlined
+          rounded
+          dense
+          color="indigo"
+          class="q-mb-md"
+        /> -->
+        <!-- <q-input
+          v-model="props.value"
+          outlined
+          dense
+          input-class="text-center q-pa-xs"
+          class="input-mini"
+        /> -->
+        <!-- <q-input
+          v-model="props.value"
+          dense
+          outlined
+          input-class="text-center q-pa-none"
+          class="input-ultra-compact"
+        /> -->
+        <!-- <q-input
+          v-model="props.value"
+          borderless
+          dense
+          input-class="skinny-inner"
+          class="skinny-qinput"
+        /> -->
+        <input
+          v-model="props.value"
+          type="text"
+          class="ultra-skinny-input"
+          readonly
+          @keydown="handleKey"
+        />
       </q-td>
     </template>
   </q-table>
   <!-- END Lista del detalle de ingresos -->
+
   <!-- tabla de saldos totales de ingresos -->
   <q-table
     :rows="saldosIngreso"
@@ -145,15 +181,6 @@
           :props="props"
         >
           <span> {{ col.periodo_id === 0 ? 'EGRESOS' : col.label }}</span>
-          <q-btn
-            v-if="col.periodo_id === 0"
-            class="button-new"
-            label="Nuevo"
-            color="traspaso-button"
-            icon="add_circle"
-            dense
-            @click="addCategoria('2')"
-          />
         </q-th>
       </q-tr>
     </template>
@@ -274,19 +301,6 @@
 
   <Teleport to="#modal">
     <q-dialog
-      v-model="showFormItem"
-      persistent
-      transition-show="jump-up"
-      transition-hide="jump-down"
-    >
-      <FormCuentaRegistro
-        :edited-item="editedItem"
-        :edited-index="editedIndex"
-        @movimientoSaved="movimientoSaved"
-        @movimientoUpdated="movimientoUpdated"
-      ></FormCuentaRegistro>
-    </q-dialog>
-    <q-dialog
       v-model="show_movimientos"
       persistent
       transition-show="jump-up"
@@ -299,18 +313,6 @@
         @registro-deleted="onRegistroDeleted"
       ></ListaMovimientos>
     </q-dialog>
-    <!-- <q-dialog
-      v-model="showRegistroCategoria"
-      persistent
-      transition-show="jump-up"
-      transition-hide="jump-down"
-    >
-      <FormRegistroCategoria
-        :edited-item="registroCategoriaItem"
-        @categoriaSaved="categoriaSaved"
-        @categoriaUpdated="categoriaUpdated"
-      ></FormRegistroCategoria>
-    </q-dialog> -->
   </Teleport>
 </template>
 
@@ -321,42 +323,30 @@ import { DateTime } from 'luxon'
 import { useFormato } from 'src/composables/utils/useFormato'
 import { api } from 'src/boot/axios'
 import ListaMovimientos from 'src/components/movimientos/ListaMovimientos.vue'
-import FormCuentaRegistro from 'src/components/movimientos/FormCuentaRegistro.vue'
-// import FormRegistroCategoria from 'src/components/categorias/FormRegistroCategoria.vue'
 import PeriodoSelect from 'src/components/formComponents/PeriodoSelect.vue'
-import { Dialog, SessionStorage, exportFile } from 'quasar'
-import RegistroCategoriaDialog from 'src/components/categorias/RegistroCategoriaDialog.vue'
+import { SessionStorage, exportFile } from 'quasar'
 
 /**
  * composables
  */
-const notificacion = useNotificacion()
+const { _mostrarNotificacionPositiva } = useNotificacion()
 const formato = useFormato()
 
 /**
  * state
  */
-const defaultCategoriaItem = {
-  id: null,
-  nombre: null,
-  icono: 'insert_emoticon',
-  descripcion: null,
-  color: '#019A9D',
-  tipoMovimiento: null,
-  tipoMovimientoId: '1',
-  cuentaContable: null
-}
-const defaultItem = {
-  categoria: null,
-  cuenta: null,
-  registro: {
-    estadoRegistroId: 2,
-    importe: '',
-    fecha: '',
-    date: formato.formatoFecha(new Date())
-  },
-  observaciones: ''
-}
+
+// const defaultItem = {
+//   categoria: null,
+//   cuenta: null,
+//   registro: {
+//     estadoRegistroId: 2,
+//     importe: '',
+//     fecha: '',
+//     date: formato.formatoFecha(new Date())
+//   },
+//   observaciones: ''
+// }
 const pagination = ref({
   rowsPerPage: 0
 })
@@ -391,16 +381,12 @@ const listaSaldosFinales = ref([])
 const listaSaldosMovimientos = ref([])
 const filterIngreso = ref('')
 const filter = ref()
-const editedItem = ref({ ...defaultItem })
-const editedIndex = ref(null)
-const showFormItem = ref(false)
 const show_movimientos = ref(false)
 const cellData = ref({})
 
 const columnsT = ref([])
 const columnasSaldos = ref([])
-// const showRegistroCategoria = ref(false)
-const registroCategoriaItem = ref()
+
 /**
  * onMount
  */
@@ -451,37 +437,6 @@ function addItem(props) {
   } else {
     console.log("Can't modify")
   }
-}
-
-function addCategoria(tipoMovimientoId) {
-  // console.log('Agregando nueva categoria', tipoMovimientoId)
-  // console.log('tipoMovimientoId', tipoMovimientoId)
-  registroCategoriaItem.value = {
-    ...defaultCategoriaItem,
-    tipoMovimientoId: tipoMovimientoId
-  }
-  console.dir('editeditem', registroCategoriaItem.value)
-  editedIndex.value = null
-
-  openRegistroCategoriaDialog()
-}
-function openRegistroCategoriaDialog() {
-  Dialog.create({
-    component: RegistroCategoriaDialog,
-    componentProps: {
-      editedItem: registroCategoriaItem.value,
-      editedIndex: editedIndex.value
-    }
-  })
-    .onOk((data) => {
-      console.log('ok', data)
-    })
-    .onCancel(() => {
-      console.log('cancel')
-    })
-    .onDismiss(() => {
-      console.log('dismiss')
-    })
 }
 
 function obtenerColumnas(ejercicio_fiscal, mes) {
@@ -656,24 +611,24 @@ function obtenerSaldosFinales() {
     })
 }
 
-function movimientoSaved(itemSaved) {
-  showFormItem.value = false
-  listaMovimientos.value.push(itemSaved)
-  mostrarNotificacion('guardó', itemSaved)
-}
-function movimientoUpdated(itemUpdated) {
-  showFormItem.value = false
-  mostrarNotificacion('actualizó', itemUpdated)
-  listaMovimientos.value[editedIndex.value] = itemUpdated
-  editedItem.value = { ...defaultItem }
-  editedIndex.value = null
-}
-function mostrarNotificacion(action, cuenta) {
-  notificacion.mostrarNotificacionPositiva(
-    `La movimiento "${cuenta.nombre}" se ${action} correctamente`,
-    2500
-  )
-}
+// function movimientoSaved(itemSaved) {
+//   showFormItem.value = false
+//   listaMovimientos.value.push(itemSaved)
+//   mostrarNotificacion('guardó', itemSaved)
+// }
+// function movimientoUpdated(itemUpdated) {
+//   showFormItem.value = false
+//   mostrarNotificacion('actualizó', itemUpdated)
+//   listaMovimientos.value[editedIndex.value] = itemUpdated
+//   editedItem.value = { ...defaultItem }
+//   editedIndex.value = null
+// }
+// function mostrarNotificacion(action, cuenta) {
+//   notificacion.mostrarNotificacionPositiva(
+//     `La movimiento "${cuenta.nombre}" se ${action} correctamente`,
+//     2500
+//   )
+// }
 function onRegistroCreated(/* itemCreated */) {
   // console.log('El registro fue creado', itemCreated)
   // show_movimientos.value = false
@@ -749,6 +704,22 @@ function obtenerParametros() {
     ejercicioFiscalId: ejercicio_fiscal.value,
     mesId: mes.value.id,
     instanceId: SessionStorage.getItem('current_instance').id
+  }
+}
+function handleKey(event) {
+  switch (event.key) {
+    case 'ArrowUp':
+      console.log('↑ Arriba')
+      break
+    case 'ArrowDown':
+      console.log('↓ Abajo')
+      break
+    case 'ArrowLeft':
+      console.log('← Izquierda')
+      break
+    case 'ArrowRight':
+      console.log('→ Derecha')
+      break
   }
 }
 </script>
@@ -887,6 +858,14 @@ body {
   font-weight: 500;
 }
 /* ***************************************************** */
+.movimientos__celda--importe1 {
+  margin: 0px !important;
+  font-family: 'Roboto Slab', 'Open Sans', sans-serif;
+  font-size: 0.75rem !important;
+  font-weight: 300 !important;
+  color: #242121;
+  // border: 0px solid white !important;
+}
 .movimientos__celda--importe {
   font-family: 'Roboto Slab', 'Open Sans', sans-serif;
   font-size: 0.75rem !important;
@@ -936,5 +915,117 @@ body {
   // letter-spacing: -0.0015rem;
   color: $categoria;
   font-weight: 600;
+}
+.mi-input {
+  height: 20px;
+  border: 1px solid #1976d2;
+  border-radius: 5px;
+  padding: 0px;
+  // background-color: #e3f2fd;
+  margin: 0px;
+}
+
+.mi-input input {
+  // color: #0d47a1;
+  font-weight: bold;
+  padding: 0px 0px;
+}
+.rounded-input {
+  border-radius: 999px; /* bordes muy redondos */
+  min-width: 120px;
+  height: 38px;
+  padding: 0;
+  margin: 2px;
+}
+
+/* borde más visible cuando está enfocado */
+.rounded-input.q-input--focused {
+  box-shadow: 0 0 0 2px #3f51b5;
+}
+
+/* borde sutil cuando no está enfocado */
+.rounded-input .q-field__control {
+  border: 1px solid #ccc;
+  transition: border 0.2s;
+  border-radius: 999px;
+}
+.input-mini {
+  border-radius: 999px;
+  min-width: 90px; /* o más pequeño si quieres */
+  height: 25px !important;
+  padding: 0;
+  margin: 1px;
+  font-size: 13px;
+}
+
+.input-mini .q-field__control {
+  height: 22px;
+  min-height: 23px !important;
+  padding: 0 6px !important;
+  font-size: 13px;
+  border-radius: 999px;
+  margin: 0px;
+}
+
+/* Enfocado: borde más visible */
+.input-mini.q-input--focused {
+  box-shadow: 0 0 0 2px #1976d2;
+}
+.input-ultra-compact {
+  min-width: 70px;
+  height: 24px !important;
+  font-size: 12px;
+  margin: 1px;
+  border-radius: 999px;
+}
+
+.input-ultra-compact .q-field__control {
+  min-height: 22px !important;
+  padding: 0 4px !important;
+  font-size: 12px;
+  border-radius: 999px;
+}
+
+.input-ultra-compact.q-input--focused {
+  box-shadow: 0 0 0 1.5px #2196f3;
+}
+.skinny-qinput {
+  width: 65px;
+  height: 20px;
+  font-size: 11px;
+}
+
+.skinny-qinput .q-field__control {
+  padding: 0 4px !important;
+  min-height: 20px !important;
+  font-size: 11px;
+  border-radius: 999px;
+  border: 1px solid #ccc;
+}
+
+.skinny-qinput.q-input--focused {
+  box-shadow: 0 0 0 1px #1976d2;
+}
+
+.ultra-skinny-input {
+  // width: 65px;
+  width: 100%;
+  height: 27px;
+  font-size: 12px;
+  text-align: center;
+  padding: 0 1px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  outline: none;
+  background-color: white;
+  margin: 0px;
+  transition:
+    box-shadow 0.2s,
+    border-color 0.2s;
+}
+
+.ultra-skinny-input:focus {
+  border-color: #2196f3;
+  box-shadow: 0 0 0 1px #2196f3;
 }
 </style>

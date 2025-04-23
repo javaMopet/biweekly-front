@@ -78,7 +78,6 @@
                       class="small-button"
                       glossy
                       push
-                      tabindex="100"
                     >
                       <q-tooltip> Nueva Categoría </q-tooltip>
                     </q-btn>
@@ -93,6 +92,8 @@
                     :fecha-fin="fecha_fin"
                     :agregar="true"
                     @focus="focusDate(props)"
+                    :autofocus="props.row.autofocus"
+                    :tabindex="props.row.tabindex + 1"
                   ></DateInput>
                 </q-td>
               </template>
@@ -108,6 +109,7 @@
                     bg-color="blue-1"
                     label-color="input-label"
                     style="width: 100%"
+                    :tabindex="props.row.tabindex + 2"
                   ></q-input>
                 </q-td>
               </template>
@@ -116,6 +118,7 @@
                   <PriceInput
                     v-model="props.row.importe"
                     label="Importe"
+                    :tabindex="props.row.tabindex + 3"
                   ></PriceInput>
                 </q-td>
               </template>
@@ -129,6 +132,7 @@
                         v-model:cuentaDestino="props.row.cuentaDestino"
                         :tipo-afectacion="props.row.tipo_afectacion"
                         @categoriaSaved="categoriaSaved"
+                        :tabindex="props.row.tabindex + 4"
                       ></CategoriaSelectionComponent>
                     </div>
                   </div>
@@ -279,11 +283,14 @@ onMounted(() => {
   // console.log('desde', desde)
   fecha_inicio.value = desde
   fecha_fin.value = hasta
+  let autofocus = true
+  let tabindex = 0
   for (let i = 0; i < 10; i++) {
     let fecha = ''
     if (i == 0) {
       fecha = desde
     }
+    tabindex = i * 4
     listaRegistros.value.push({
       id: undefined,
       fecha: fecha,
@@ -297,8 +304,11 @@ onMounted(() => {
       tipoMovimientoId: '2',
       tipo_afectacion: 'C',
       clase: '',
-      cuentaDestino: null
+      cuentaDestino: null,
+      autofocus,
+      tabindex
     })
+    autofocus = false
   }
 })
 
@@ -563,7 +573,7 @@ const columns = [
     name: 'consecutivo',
     label: 'No.',
     field: 'consecutivo',
-    sortable: true,
+    sortable: false,
     align: 'left',
     filter: false,
     headerStyle: 'width:40px;max-width:40px'
@@ -572,7 +582,7 @@ const columns = [
     name: 'fecha',
     label: 'Fecha',
     field: 'fecha',
-    sortable: true,
+    sortable: false,
     align: 'left',
     filter: false,
     headerStyle: 'width:150px;max-width:150px',
@@ -582,9 +592,9 @@ const columns = [
     name: 'concepto',
     label: 'Concepto',
     field: 'concepto',
-    sortable: true,
+    sortable: false,
     align: 'left',
-    filter: true
+    filter: false
     // headerStyle: 'width:250px;max-width:250px',
     // style: 'width:250px;max-width:250px'
   },
@@ -592,7 +602,7 @@ const columns = [
     name: 'importe',
     label: 'Importe',
     field: 'importe',
-    sortable: true,
+    sortable: false,
     align: 'right',
     headerStyle: 'width:160px;max-width:160px',
     style: 'width:160px;max-width:160px'
@@ -602,6 +612,7 @@ const columns = [
     label: 'Categoria',
     field: 'categoria',
     sortable: false,
+    filter: false,
     align: 'center',
     headerStyle: 'width:400px;max-width:400px',
     style: 'width:400px;max-width:400px'

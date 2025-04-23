@@ -138,6 +138,9 @@
           <template v-slot:header-selection="scope">
             <q-checkbox v-model="scope.selected" dense />
           </template>
+          <template #header-cell-acciones="props">
+            <q-th :props="props" class="q-gutter-x-md"> </q-th>
+          </template>
 
           <template v-slot:body-selection="scope">
             <q-checkbox
@@ -148,7 +151,18 @@
           </template>
           <template #top-left>
             <q-tr class="cuenta__data-subtitle">
-              <span>Movimientos del periodo</span>
+              <span class="q-pr-md">Movimientos del periodo</span>
+              <q-btn
+                color="primary-button"
+                icon="add"
+                @click="addItem('1')"
+                dense
+                glossy
+                push
+                class="small-button"
+              >
+                <q-tooltip> Agregar Registro </q-tooltip>
+              </q-btn>
             </q-tr>
           </template>
           <template #top-right>
@@ -166,13 +180,12 @@
                     rounded
                     push
                   />
-                  <q-btn-dropdown
+                  <!-- <q-btn-dropdown
                     v-if="isModificable"
                     color="primary-button"
                     push
                     glossy
                     no-caps
-                    label="Agregar"
                     icon="add_circle"
                     class="medium-button"
                   >
@@ -214,7 +227,7 @@
                         </q-item-section>
                       </q-item>
                     </q-list>
-                  </q-btn-dropdown>
+                  </q-btn-dropdown> -->
                   <q-btn
                     no-caps
                     class="medium-button"
@@ -341,16 +354,6 @@
               />
             </q-td>
           </template>
-          <!-- <template #bottom-row>
-            <q-tr>
-              <q-td colspan="4" class="text-condensed text-bold"
-                >Importe total de movimientos del periodo</q-td
-              >
-              <q-td class="text-bold" align="right">{{
-                formato.toCurrency(sumaMovimientos)
-              }}</q-td>
-            </q-tr>
-          </template> -->
           <template v-slot:loading>
             <q-inner-loading showing color="primary" />
           </template>
@@ -361,7 +364,6 @@
         <span> {{ toCurrency(sumaMovimientos) }}</span>
       </div>
     </div>
-    <!-- <pre>{{ cuenta }}</pre> -->
   </div>
 </template>
 
@@ -375,17 +377,15 @@ import { useFormato } from 'src/composables/utils/useFormato'
 import { useRegistrosCrud } from 'src/composables/useRegistrosCrud'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { SessionStorage, useQuasar, Dialog } from 'quasar'
-// import FormCuentaRegistro from 'src/components/movimientos/FormCuentaRegistro.vue'
 import FormRegistroMovimientoCmp from 'src/components/cuentas/FormRegistroMovimientoCmp.vue'
 // import CambioFechaPage from 'src/pages/cuentas/CambioFechaPage.vue'
 import { OBTENER_SALDO_A_FECHA } from 'src/graphql/cuentas'
-// import ImportarRegistrosCuenta from 'src/components/cuentas/ImportarRegistrosCuenta.vue'
 import { useCuentaStore } from 'src/stores/common/useCuentaStore'
 import { useCuentasCrud } from 'src/composables/useCuentasCrud'
 import PeriodoSelect from 'src/components/formComponents/PeriodoSelect.vue'
 import { useGeneralStore } from 'src/stores/common/useGeneralStore'
-import FormInsercionMasivaCuenta from 'src/components/cuentas/FormInsercionMasivaCuenta.vue'
-import ImportarRegistrosCuentaDialog from 'src/components/cuentas/ImportarRegistrosCuentaDialog.vue'
+import AccountMovementMassImportDialog from 'src/components/cuentas/AccountMovementMassImportDialog.vue'
+import AccountMovementBulkInsertDialog from 'src/components/cuentas/AccountMovementBulkInsertDialog.vue'
 
 /**
  * composables
@@ -413,13 +413,6 @@ const variablesSaldoAnterior = reactive({
   fechaFin: DateTime.now().startOf('month').plus({ days: -1 }).toISODate()
 })
 const showCambioFecha = ref(false)
-
-// const loadingRegistros = ref(false)
-
-// const variablesSaldoAlPeriodo = reactive({
-//   cuentaId: route.params.id,
-//   fechaFin: DateTime.now().endOf('month').toISODate()
-// })
 
 const cuenta = ref({})
 const listaRegistros = ref([])
@@ -463,7 +456,7 @@ async function cargarDatosCuenta(cuenta_id) {
     await obtenerCuentaDeListado(cuenta_id)
   } else {
     // console.log('lista cuentas con 0 o menos elementos')
-    await cuentasCrud.fetchOrRefetchCuentaById(cuenta_id)
+    cuentasCrud.fetchOrRefetchCuentaById(cuenta_id)
     // router.push('/home')
   }
 }
@@ -800,20 +793,17 @@ function onChangePeriodo() {
 }
 
 function addMasiveItems() {
-  console.log('')
-  console.log('cuenta:', cuenta.value)
-  // showFormCargaMasiva.value = true
   openMaviseFormDialog()
 }
 
 function openMaviseFormDialog() {
   Dialog.create({
-    component: FormInsercionMasivaCuenta,
+    component: AccountMovementBulkInsertDialog,
     // props forwarded to your custom component
     componentProps: {
       cuenta: cuenta.value,
       fecha_desde: detalleVariables.value.fechaInicio,
-      fecha_hasta: '20250431' //detalleVariables.fechaFin
+      fecha_hasta: detalleVariables.value.fechaFin
     }
   })
     .onOk((_payload) => {
@@ -902,7 +892,7 @@ function importarMovimientos() {
 }
 function openImportarRegistrosDialog() {
   Dialog.create({
-    component: ImportarRegistrosCuentaDialog,
+    component: AccountMovementMassImportDialog,
     // props forwarded to your custom component
     componentProps: {
       cuenta: cuenta.value,

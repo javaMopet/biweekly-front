@@ -27,6 +27,7 @@ export const useBancoStore = defineStore('bancoStore', () => {
   onResultListaBancos(({ data }) => {
     if (data) {
       // console.log('cargando lista de bancos al store ....')
+      console.log('onResultListaBancos', data.listaBancos.length)
       listaBancos.value = JSON.parse(JSON.stringify(data.listaBancos)) ?? []
     }
   })

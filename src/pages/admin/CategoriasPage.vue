@@ -88,9 +88,6 @@
                   {{ props.row.descripcion }}
                 </q-tooltip>
               </div>
-              <!-- <span class="text-positive text-condensed">{{
-                props.row.descripcion
-              }}</span> -->
             </div>
           </q-td>
         </template>
@@ -212,32 +209,19 @@
       </q-table>
     </div>
   </div>
-
-  <!-- <Teleport to="#modal">
-    <q-dialog
-      v-model="showFormItem"
-      persistent
-      transition-show="jump-up"
-      transition-hide="jump-down"
-    >
-      <FormRegistroCategoria
-        :edited-item="editedItem"
-        :edited-index="editedIndex"
-        @categoriaSaved="categoriaSaved"
-        @categoriaUpdated="categoriaUpdated"
-      ></FormRegistroCategoria>
-    </q-dialog>
-  </Teleport> -->
 </template>
 
 <script setup>
+/**
+ * Libraries
+ */
 import { ref } from 'vue'
-// import FormRegistroCategoria from 'src/components/categorias/FormRegistroCategoria.vue'
 import RegistroCategoriaDialog from 'src/components/categorias/RegistroCategoriaDialog.vue'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { useQuasar, Dialog } from 'quasar'
 import { useCategoriaStore } from 'src/stores/common/categoriaStore'
 import { useCategoriaService } from 'src/composables/useCategoriaService'
+
 /**
  * composables
  */

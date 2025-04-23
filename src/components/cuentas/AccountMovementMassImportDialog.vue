@@ -6,7 +6,7 @@
     transition-hide="jump-down"
     noBackdropDismiss
   >
-    <div class="my-card" style="width: 80%; min-width: 80%; max-width: 80%">
+    <div class="my-card" style="width: 85%; min-width: 85%; max-width: 85%">
       <q-inner-loading
         :showing="isLoading"
         label="Saving... Please wait..."
@@ -14,7 +14,23 @@
         label-style="font-size: 1.1em"
         style="z-index: 500"
       />
-      <DialogTitle>Cuenta &nbsp;&nbsp;~ {{ account?.nombre }} ~</DialogTitle>
+      <DialogTitle
+        ><div
+          style="border: 0px solid green"
+          class="row row-inline items-center"
+        >
+          <span class="q-mt-xs"> Cuenta: &nbsp;&nbsp;~&nbsp;</span>
+          <q-img
+            v-if="!!account"
+            :src="`/icons/${account.banco?.icono ?? 'cash.png'}`"
+            width="40px"
+            height="40px"
+          />
+          <span class="q-pl-md q-mt-xs" style="border: 0px solid red"
+            >{{ account?.nombre }} &nbsp;~
+          </span>
+        </div>
+      </DialogTitle>
       <div class="main-content q-py-lg">
         <div class="q-pa-lg cuenta-content">
           <q-toolbar class="q-gutter-x-md">
@@ -36,7 +52,6 @@
                   label-color="primary"
                   clearable
                   @clear="fileClear"
-                  tabindex="1"
                 >
                   <template #prepend>
                     <q-icon color="primary" name="cloud_upload" />
@@ -56,7 +71,6 @@
                   lbl_field="Fecha"
                   :opcional="false"
                   style="width: 140px"
-                  :tabindex="1"
                 ></DateInput>
               </div>
               <div class="column">
@@ -66,7 +80,6 @@
                   lbl_field="Fecha"
                   :opcional="false"
                   style="width: 140px"
-                  :tabindex="2"
                 ></DateInput>
               </div>
             </div>
@@ -153,7 +166,7 @@
               v-model:selected="registrosSelected"
               :selected-rows-label="getSelectedString"
               table-header-class="text-accent text-condensed bg-primary-light"
-              no-data-label="No existen datos disponibles"
+              no-data-label="No existen datos a guardar para el periodo seleccionado."
               hide-pagination
               class="my-sticky-header-table"
               :loading="loadingRows"
@@ -166,7 +179,6 @@
                     <q-btn
                       color="button-new"
                       icon="add"
-                      label="Agregar"
                       @click="addItemCategoria(props)"
                       dense
                       class="small-button"
@@ -178,6 +190,11 @@
                     </q-btn>
                   </div>
                 </q-th>
+              </template>
+              <template #body-cell-consecutivo="props">
+                <q-td :props="props">
+                  {{ props.rowIndex + 1 }}
+                </q-td>
               </template>
               <template #body-cell-concepto="props">
                 <q-td :props="props">
@@ -191,8 +208,8 @@
                     bg-color="blue-1"
                     label-color="input-label"
                     style="width: 100%"
-                    :tabindex="props.row.consecutivo + 1"
-                    :autofocus="props.row.autofocus"
+                    :tabindex="(props.rowIndex + 1) * 2"
+                    :autofocus="props.rowIndex === 0"
                   ></q-input>
                 </q-td>
               </template>
@@ -208,7 +225,7 @@
                         v-model:cuentaDestino="props.row.cuentaDestino"
                         :tipo-afectacion="props.row.tipo_afectacion"
                         @categoriaSaved="categoriaSaved"
-                        :tabindex="props.row.consecutivo + 1"
+                        :tabindex="(props.rowIndex + 1) * 2 + 1"
                       ></CategoriaSelectionComponent>
                     </div>
                   </div>
@@ -264,14 +281,14 @@
                 }}</span>
               </div>
               <div class="row q-gutter-x-lg">
-                <q-btn
+                <!-- <q-btn
                   flat
                   label="Cancelar"
                   v-close-popup
                   no-caps
                   color="negative"
                   rounded
-                />
+                /> -->
                 <q-btn
                   label="Guardar"
                   color="primary-button"
@@ -309,7 +326,8 @@ import { useCategoriaStore } from 'src/stores/common/categoriaStore'
 import CategoriaSelectionComponent from '../formComponents/CategoriaSelectionComponent.vue'
 import { useRouter } from 'vue-router'
 import RegistroCategoriaDialog from '../categorias/RegistroCategoriaDialog.vue'
-
+import { toast } from 'vue3-toastify'
+import 'vue3-toastify/dist/index.css'
 /**
  * Composables
  */
@@ -317,7 +335,8 @@ const notificacion = useNotificacion()
 const registrosCrud = useRegistrosCrud()
 const categoriaStore = useCategoriaStore()
 const router = useRouter()
-const { mostrarNotificacionNegativa } = useNotificacion()
+const { mostrarNotificacionNegativa, mostrarNotificacionAdvertencia } =
+  useNotificacion()
 /**
  * state
  */
@@ -419,7 +438,8 @@ async function updateFile(v) {
     //   }
     // }
 
-    // console.log('props.cuenta.banco.id:', props.cuenta.banco)
+    // console.log('props.cuenta.banco:', props.cuenta.banco)
+    // console.log('props.cuenta.banco:', props.cuenta.banco.id)
     if (props.cuenta.banco) {
       switch (props.cuenta.banco.id) {
         case '1':
@@ -587,33 +607,65 @@ function convertirImporte(importe) {
   return parseFloat(importe.replace(/[$,]/g, ''))
 }
 
+/**
+ * Obtener movimientos de Bancomer de acuerdo con la plantilla de carga.
+ * @author Horacio Peña
+ * @date 2023-10-02
+ * @param wb archivo Excel obtenido.
+ */
 function obtenerMovimientosBancomer(wb) {
-  const data = utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {
-    header: ['A', 'B', 'C', 'D', 'E'],
-    skipHeader: true,
-    raw: false
-  })
+  try {
+    // Propio de la plantilla de carga de Bancomer
+    const data = utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {
+      header: ['A', 'B', 'C', 'D', 'E'],
+      skipHeader: true,
+      raw: false
+    })
 
-  todos.value = data.map((row) => ({
-    fecha: row.A,
-    concepto: row.B,
-    cargo: row.C,
-    abono: row.D,
-    saldo: row.E
-  }))
+    // Propio de la plantilla de carga de Bancomer
+    todos.value = data.map((row) => ({
+      fecha: row.A,
+      concepto: row.B,
+      cargo: row.C,
+      abono: row.D,
+      saldo: row.E
+    }))
 
-  todos.value.forEach((row, index) => {
-    let fecha = row.fecha.toString()
-    const fechaObject = DateTime.fromFormat(fecha, 'dd/MM/yyyy')
-    if (fechaObject.isValid) {
-      const cargo = row.cargo?.replace(',', '')
-      const abono = row.abono?.replace(',', '')
-      const tipo_afectacion = cargo ? 'C' : abono ? 'A' : 'N/A'
-      row.consecutivo = index
-      const importe = cargo ? parseFloat(cargo) : abono ? parseFloat(abono) : 0
-      addItemToSave(row, index, fecha, importe, tipo_afectacion)
-    }
-  })
+    let autofocus = true
+    todos.value.forEach((row, index) => {
+      let fecha = row.fecha?.toString() || undefined
+      if (fecha) {
+        const fechaObject = DateTime.fromFormat(fecha, 'dd/MM/yyyy')
+        if (fechaObject.isValid) {
+          const cargo = row.cargo?.replace(',', '')
+          const abono = row.abono?.replace(',', '')
+          const tipo_afectacion = cargo ? 'C' : abono ? 'A' : 'N/A'
+          row.consecutivo = index
+          const importe = cargo
+            ? parseFloat(cargo)
+            : abono
+              ? parseFloat(abono)
+              : 0
+          addItemToList(
+            row,
+            index,
+            fecha,
+            importe,
+            tipo_afectacion,
+            undefined,
+            autofocus
+          )
+        }
+        autofocus = false
+      }
+    })
+    // console.table(listaRegistros.value)
+    // console.log(listaRegistros.value.length)
+    afterLoadExcelItems()
+  } catch (e) {
+    console.log('error', e)
+    loadingRows.value = false
+  } // console.table(todos.value)
   // console.table(listaRegistros.value)
 }
 
@@ -681,13 +733,25 @@ function obtenerMovimientosEfectivo(wb) {
             ? 'C'
             : 'A'
 
-        addItemToSave(row, index, fecha, importe, tipo_afectacion, categoria)
+        addItemToList(row, index, fecha, importe, tipo_afectacion, categoria)
       }
     })
     // console.table(listaRegistros.value)
   } catch (e) {
     console.log(e)
     loadingRows.value = false
+  }
+}
+
+function afterLoadExcelItems() {
+  if (listaRegistros.value.length == 0) {
+    mostrarNotificacionAdvertencia(
+      'Carga vacía',
+      'Verifique que el archivo cumpla con el formato esperado para el banco utilizado.',
+      3000,
+      'top-right',
+      'red'
+    )
   }
 }
 
@@ -712,22 +776,38 @@ function buscarCategoriaPorCadena(cadena, _index) {
  * @param {*} importe
  * @param {*} tipo_afectacion
  */
-function addItemToSave(row, index, fecha, importe, tipo_afectacion, categoria) {
+function addItemToList(
+  row,
+  index,
+  fecha,
+  importe,
+  tipo_afectacion,
+  categoria,
+  autofocus
+) {
+  const fecha_registro = DateTime.fromFormat(fecha, 'dd/MM/yyyy').isValid
+    ? DateTime.fromFormat(fecha, 'dd/MM/yyyy')
+    : DateTime.fromFormat(fecha, 'dd-MM-yyyy')
   const categoriaInput = !categoria ? { ...categoriaAux } : categoria
+  const tabindex = index * 4
   const item = {
     id: index,
     consecutivo: row.consecutivo,
     tipo_afectacion,
     fecha: fecha,
+    fecha_registro,
     concepto: row.concepto,
     importe,
     saldo: row.saldo,
     categoria: categoriaInput,
     saved: false,
-    isValid: true
+    isValid: true,
+    tabindex,
+    autofocus
   }
   listaRegistros.value.push(item)
 }
+
 const categoriaAux = {
   id: undefined,
   nombre: '',
@@ -744,8 +824,11 @@ function obtenerRegistros() {
   // var opciones = ['1', '2']
   const user = SessionStorage.getItem('current_user')
   // console.log('listaRegistrosFiltrados.value:', listaRegistrosFiltrados.value)
+  // listaRegistrosFiltrados.value.forEach((r) => {
+  //   console.log('categoriaId:', r.categoria.id, 'Tipo:', typeof r.categoria.id)
+  // })
   listaRegistrosFiltrados.value
-    .filter((detalle) => !!detalle.categoria)
+    .filter((r) => Number(r.categoria.id) !== -1)
     .forEach((item) => {
       // console.log('recorriendo arreglo')
       // console.dir(item)
@@ -808,17 +891,7 @@ function obtenerTraspasos() {
 function saveItems() {
   try {
     const containsErrors = validarMovimientos()
-    // console.log('containsErrors:', containsErrors)
     if (containsErrors) {
-      // toast.error("El formulario contiene algunos errores o datos faltantes", {
-      //   position: toast.POSITION.TOP_CENTER,
-      //   autoClose: 7000,
-      //   theme: 'dark',
-      //   transition: 'bounce',
-      //   pauseOnFocusLoss: false,
-      //   style: 'width: 450px; min-width: 450px'
-      // })
-
       errorsList.value.reverse().forEach((error) => {
         mostrarNotificacionNegativa(
           `Error en la línea ${error.numero_linea}: ${error.message}`,
@@ -829,11 +902,18 @@ function saveItems() {
     } else {
       var registrosInput = obtenerRegistros()
       var traspasosInput = obtenerTraspasos()
+      console.log('registrosInput:', registrosInput)
+      console.log('traspasosInput:', traspasosInput)
       saveItemsAfterValidate(registrosInput, traspasosInput)
     }
   } catch (e) {
     console.log('error', e)
-    mostrarNotificacionNegativa(e.message, 2500, 'top-right')
+    toast(`${e.message}`, {
+      autoClose: 2000,
+      type: 'error',
+      theme: 'dark'
+    }) // ToastOptions
+    // mostrarNotificacionNegativa(e.message, 2500, 'top-right')
   }
   isLoading.value = false
 }
@@ -875,26 +955,26 @@ function validarMovimientos() {
     throw new Error('No hay registros para guardar')
   }
 
-  listaRegistrosFiltrados.value.forEach((item) => {
+  listaRegistrosFiltrados.value.forEach((item, index) => {
     // console.log('item:', item)
     // console.log('item.categoria:', item.categoria)
     if (!item.categoria || !item.categoria.id) {
       if (item.tipoMovimientoId === '3') {
         if (!item.cuentaDestino || !item.cuentaDestino.id) {
-          addError(1, item.consecutivo, 'Seleccionar cuenta destino.')
+          addError(1, index + 1, 'Seleccionar cuenta destino.')
           item.isValid = false
         } else {
           item.isValid = true
         }
       } else {
-        addError(1, item.consecutivo, 'Seleccionar categoria.')
+        addError(1, index + 1, 'Seleccionar categoria.')
         item.isValid = false
       }
     } else {
       item.isValid = true
     }
   })
-  // console.log('errorsList:', errorsList.value)
+  console.log('errorsList:', errorsList.value)
   return errorsList.value.length > 0
   // , 4000
   // })
@@ -938,16 +1018,22 @@ const isSelected = computed({
 
 const listaRegistrosFiltrados = computed({
   get() {
-    const start_date = DateTime.fromFormat(fecha_inicio.value, 'dd/MM/yyyy')
-    const end_date = DateTime.fromFormat(fecha_fin.value, 'dd/MM/yyyy')
-
     return listaRegistros.value.filter((registro) => {
-      const fecha_registro = DateTime.fromFormat(registro.fecha, 'dd/MM/yyyy')
-        .isValid
-        ? DateTime.fromFormat(registro.fecha, 'dd/MM/yyyy')
-        : DateTime.fromFormat(registro.fecha, 'dd-MM-yyyy')
-      return fecha_registro >= start_date && fecha_registro <= end_date
+      return (
+        registro.fecha_registro >= startDate.value &&
+        registro.fecha_registro <= endDate.value
+      )
     })
+  }
+})
+const startDate = computed({
+  get() {
+    return DateTime.fromFormat(fecha_inicio.value, 'dd/MM/yyyy')
+  }
+})
+const endDate = computed({
+  get() {
+    return DateTime.fromFormat(fecha_fin.value, 'dd/MM/yyyy')
   }
 })
 

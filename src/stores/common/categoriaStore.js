@@ -34,6 +34,7 @@ export const useCategoriaStore = defineStore('categoriaStore', () => {
 
   onResultListaCategorias(({ data }) => {
     if (data) {
+      console.log('onResultListaCategorias', data.listaCategorias.length)
       listaCategorias.value = JSON.parse(
         JSON.stringify(data.listaCategorias ?? [])
       )
@@ -43,28 +44,6 @@ export const useCategoriaStore = defineStore('categoriaStore', () => {
   onErrorListaCategorias((error) => {
     console.error(error)
   })
-
-  // const {
-  //   onDoneCategoriaCreate,
-  //   onDoneCategoriaDelete,
-  //   onErrorCategoriaCreate,
-  //   onErrorCategoriaDelete
-  // } = categoriasCrud
-
-  // categoriasCrud.onDoneCategoriaCreate(({ data }) => {
-  //   if (data) {
-  //     const itemSaved = data.categoriaCreate.categoria
-  //     listaCategorias.value.push(itemSaved)
-  //   }
-  // })
-
-  // onDoneCategoriaDelete(({ data }) => {
-  //   console.log('aqui eliminar elemento de la lista', data)
-  //   const id = data.categoriaDelete.categoria.id
-  //   const index = listaCategorias.value.findIndex((c) => c.id === id)
-  //   console.dir(index)
-  //   listaCategorias.value.splice(index, 1)
-  // })
 
   const listaCategoriasIngresos = computed({
     get() {
@@ -88,7 +67,6 @@ export const useCategoriaStore = defineStore('categoriaStore', () => {
     listaCategorias,
     loadingListaCategorias,
     onErrorListaCategorias,
-    // onErrorCategoriaDelete,
     listaCategoriasIngresos,
     listaCategoriasEgresos
   }

@@ -10,21 +10,13 @@
           @click="toggleLeftDrawer"
           class="float-right text-primary"
         />
-        <!-- <q-img
-          src="/icons/logoHorizontal3.png"
-          spinner-color="primary"
-          spinner-size="72px"
-          width="380px"
-        /> -->
         <span>{{ instanceName }}</span>
         <q-toolbar-title class="font-title"> </q-toolbar-title>
-        <!-- <span class="q-pr-sm text-bold" v-if="user">{{ user.name }}</span> -->
-        <!-- {{ user.id }} -->
         <q-btn
           icon-right="account_circle"
           @click="onClickAccount"
           size="1rem"
-          :label="user.name"
+          :label="username"
           no-caps
           flat
           dense
@@ -42,7 +34,9 @@
                   />
                 </q-item-section>
                 <q-item-section>
-                  <q-item-label class="text-bold">{{ user.name }}</q-item-label>
+                  <q-item-label class="text-bold hidden-xs">{{
+                    user.name
+                  }}</q-item-label>
                   <q-item-label>{{ user.email }}</q-item-label>
                   <q-item-label class="text-bold" v-if="user.isAdmin">{{
                     'Administrador'
@@ -130,7 +124,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { SessionStorage, useQuasar } from 'quasar'
 import EssentialLink from 'src/components/EssentialLink.vue'
@@ -274,6 +268,14 @@ function onClickAccount() {}
 // onResult(({ data }) => {
 //   essentialLinks.value = data.menuLevels;
 // });
+/**
+ * computed
+ */
+const username = computed({
+  get() {
+    return $q.screen.lt.sm ? '' : user.value.name
+  }
+})
 </script>
 <style lang="scss">
 .application-title {

@@ -35,9 +35,28 @@ export function useNotificacion() {
     })
   }
 
+  const mostrarNotificacionAdvertencia = (
+    message,
+    caption,
+    timeout,
+    position,
+    textColor
+  ) => {
+    $q.notify({
+      position: position || 'top-right',
+      type: 'warning',
+      message,
+      caption,
+      timeout,
+      color: 'warning',
+      textColor: textColor || 'red'
+    })
+  }
+
   return {
     mostrarNotificacionPositiva,
     mostrarNotificacionNegativa,
-    mostrarNotificacionInformativa
+    mostrarNotificacionInformativa,
+    mostrarNotificacionAdvertencia
   }
 }
