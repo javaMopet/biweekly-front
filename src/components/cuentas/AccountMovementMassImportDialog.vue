@@ -669,9 +669,14 @@ function obtenerMovimientosBancomer(wb) {
   // console.table(listaRegistros.value)
 }
 
+/**
+ * Obtener movimientos a partir del archivo de efectivo.
+ * @author Horacio Peña
+ * @param wb
+ */
 function obtenerMovimientosEfectivo(wb) {
-  // console.log('movimientos efectivo')
-  // console.log('wb.SheetNames:', wb.SheetNames)
+  console.log('obtenerMovimientosEfectivo()')
+  console.log('wb.SheetNames:', wb.SheetNames)
   const data = utils.sheet_to_json(wb.Sheets[wb.SheetNames[1]], {
     header: ['A', 'B', 'C', 'D', 'E', 'F', 'G'],
     skipHeader: true,

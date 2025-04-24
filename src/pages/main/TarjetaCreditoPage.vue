@@ -366,7 +366,18 @@
             <template #top-left>
               <q-tr class="cuenta__data-subtitle">
                 <div class="table-title row items-center">
-                  Movimientos de la tarjeta
+                  <span class="q-pr-md"> Movimientos de la tarjeta</span>
+                  <q-btn
+                    color="primary-button"
+                    icon="add"
+                    @click="addItem"
+                    dense
+                    glossy
+                    push
+                    class="small-button"
+                  >
+                    <q-tooltip> Agregar movimiento en tarjeta </q-tooltip>
+                  </q-btn>
                 </div>
               </q-tr>
             </template>
