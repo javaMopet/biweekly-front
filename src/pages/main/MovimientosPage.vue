@@ -91,7 +91,7 @@
           type="text"
           class="ultra-skinny-input"
           readonly
-          @keydown="(e) => handleKey(e, props)"
+          @keydown="(e) => handleKey(e, props, '1')"
           :ref="
             (el) => {
               if (el) {
@@ -177,9 +177,34 @@
         >
       </q-td>
     </template>
-    <template v-slot:body-cell="props">
+    <!-- <template v-slot:body-cell="props">
       <q-td dense :props="props" clickable @dblclick="addItem(props)">
         <span class="movimientos__celda--importe"> {{ props.value }}</span>
+      </q-td>
+    </template> -->
+    <template v-slot:body-cell="props">
+      <q-td
+        dense
+        :props="props"
+        clickable
+        @dblclick="addItem(props)"
+        class="q-pa-xs q-ma-none"
+        style="padding: 0px !important"
+      >
+        <input
+          v-model="props.value"
+          type="text"
+          class="ultra-skinny-input"
+          readonly
+          @keydown="(e) => handleKey(e, props, '2')"
+          :ref="
+            (el) => {
+              if (el) {
+                inputEgresoRefs[`${props.col.field}_${props.rowIndex + 1}`] = el
+              }
+            }
+          "
+        />
       </q-td>
     </template>
   </q-table>
@@ -277,7 +302,7 @@
     <!-- <pre>{{ cellData }}</pre> -->
   </div>
 
-  <Teleport to="#modal">
+  <!-- <Teleport to="#modal">
     <q-dialog
       v-model="show_movimientos"
       persistent
@@ -291,7 +316,7 @@
         @registro-deleted="onRegistroDeleted"
       ></ListaMovimientos>
     </q-dialog>
-  </Teleport>
+  </Teleport> -->
   <!-- <pre>{{ inputIngresoRefs }}</pre> -->
 </template>
 
@@ -301,9 +326,10 @@ import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { DateTime } from 'luxon'
 import { useFormato } from 'src/composables/utils/useFormato'
 import { api } from 'src/boot/axios'
-import ListaMovimientos from 'src/components/movimientos/ListaMovimientos.vue'
+// import ListaMovimientos from 'src/components/movimientos/ListaMovimientos.vue'
 import PeriodoSelect from 'src/components/formComponents/PeriodoSelect.vue'
-import { SessionStorage, exportFile } from 'quasar'
+import { Dialog, SessionStorage, exportFile } from 'quasar'
+import MovimientosBulkInsertDialog from 'src/components/movimientos/MovimientosBulkInsertDialog.vue'
 
 /**
  * composables
@@ -315,6 +341,7 @@ const formato = useFormato()
  * state
  */
 const inputIngresoRefs = ref({})
+const inputEgresoRefs = ref({})
 
 // const defaultItem = {
 //   categoria: null,
@@ -361,7 +388,6 @@ const listaSaldosFinales = ref([])
 const listaSaldosMovimientos = ref([])
 const filterIngreso = ref('')
 const filter = ref()
-const show_movimientos = ref(false)
 const cellData = ref({})
 
 const columnsT = ref([])
@@ -412,11 +438,38 @@ function addItem(props) {
       label: col.label
     }
     if (cellData.value.periodo_id) {
-      show_movimientos.value = true
+      openMovimientosBulkInsertDialog(cellData.value)
     }
   } else {
     console.log("Can't modify")
   }
+}
+function openMovimientosBulkInsertDialog(cellData) {
+  console.log('cellData:', cellData)
+  Dialog.create({
+    component: MovimientosBulkInsertDialog,
+    // props forwarded to your custom component
+    componentProps: {
+      cellData,
+      context: {
+        onSaveData: (itemSaved) => {
+          console.log('Recibido desde hijo:', itemSaved)
+          // puedes agregarlo directamente a la lista del padre también
+          cargarDatos()
+        }
+      }
+    }
+    // persistent: true
+  })
+    .onOk((payload) => {
+      console.log('OK', payload)
+    })
+    .onCancel(() => {
+      console.log('Cancel')
+    })
+    .onDismiss(() => {
+      console.log('Called on OK or Cancel')
+    })
 }
 
 function obtenerColumnas(ejercicio_fiscal, mes) {
@@ -609,17 +662,17 @@ function obtenerSaldosFinales() {
 //     2500
 //   )
 // }
-function onRegistroCreated(/* itemCreated */) {
-  // console.log('El registro fue creado', itemCreated)
-  // show_movimientos.value = false
-  cargarDatos()
-}
-function onRegistroUpdated(/* itemUpdated */) {
-  cargarDatos()
-}
-function onRegistroDeleted(/* cuentasIds */) {
-  cargarDatos()
-}
+// function onRegistroCreated(/* itemCreated */) {
+//   // console.log('El registro fue creado', itemCreated)
+//   // show_movimientos.value = false
+//   cargarDatos()
+// }
+// function onRegistroUpdated(/* itemUpdated */) {
+//   cargarDatos()
+// }
+// function onRegistroDeleted(/* cuentasIds */) {
+//   cargarDatos()
+// }
 
 function onChangePeriodo() {
   cargarDatos()
@@ -686,7 +739,7 @@ function obtenerParametros() {
     instanceId: SessionStorage.getItem('current_instance').id
   }
 }
-function handleKey(event, props) {
+function handleKey(event, props, tipo) {
   // console.log('props:', props)
   // console.log('colFieldOrigen:', props.col.field)
   // console.log('rowindex origen:', props.rowIndex)
@@ -694,34 +747,36 @@ function handleKey(event, props) {
   switch (event.key) {
     case 'ArrowUp':
       // console.log('↑ Arriba')
-      focusInput(props.col.field, indiceRow - 1)
+      focusInput(props.col.field, indiceRow - 1, tipo)
       break
     case 'ArrowDown':
       // console.log('↓ Abajo')
-      focusInput(props.col.field, indiceRow + 1)
+      focusInput(props.col.field, indiceRow + 1, tipo)
       break
     case 'ArrowLeft':
       // console.log('← Izquierda')
-      focusInput(Number(props.col.field) - 1, indiceRow)
+      focusInput(Number(props.col.field) - 1, indiceRow, tipo)
       break
     case 'ArrowRight':
       // console.log('→ Derecha')
-      focusInput(Number(props.col.field) + 1, indiceRow)
+      focusInput(Number(props.col.field) + 1, indiceRow, tipo)
       break
     case 'Enter':
       console.log('Enter')
       // focusInput(Number(props.col.field) + 1, props.rowIndex + 1)
+      addItem(props)
       break
   }
 }
-function focusInput(colField, rowIndex) {
+function focusInput(colField, rowIndex, tipo) {
   // console.log('focusing........')
   // console.log('colField:', colField)
   // console.log('rowIndex:', rowIndex)
   nextTick(() => {
     const key = `${colField}_${rowIndex}`
     // console.log('key:', key)
-    const inputElement = inputIngresoRefs.value[key]
+    const inputElement =
+      tipo === '1' ? inputIngresoRefs.value[key] : inputEgresoRefs.value[key]
     // console.log('inputElement:', inputElement)
     if (inputElement) {
       inputElement.focus() // Enfoca el input

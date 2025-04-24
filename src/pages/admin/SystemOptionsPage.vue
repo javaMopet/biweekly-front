@@ -37,12 +37,10 @@
 
       <div class="text-h6">User instance</div>
       <div class="text-subtitle2">
-        <span class="text-bold"
-          >{{ user.instance.id }} - {{ user.instance.name }}</span
-        >
+        <span class="text-bold">{{ instance.id }} - {{ instance.name }}</span>
       </div>
       <div class="text-subtitle2">
-        Logo: <span class="text-bold">{{ user.instance.logoImage }}</span>
+        Logo: <span class="text-bold">{{ instance.logoImage }}</span>
       </div>
     </q-card-section>
     <q-card-section> </q-card-section>
@@ -60,6 +58,7 @@ import { api } from 'src/boot/axios'
 /**state */
 // const cuentaStore = useCuentaStore()
 const user = SessionStorage.getItem('current_user')
+const instance = SessionStorage.getItem('current_instance')
 
 function clearPinia() {
   console.log('Clearing pinia')

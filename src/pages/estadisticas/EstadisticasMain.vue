@@ -1,8 +1,31 @@
 <template>
   <q-card class="my-card" flat>
-    <!-- <div class="column justify-center items-center">ESTADISTICAS</div> -->
+    <div class="column justify-center items-center">ESTADISTICAS</div>
+    <div
+      class="q-px-md row full-width justify-center q-gutter-lg"
+      style="border: 1px solid red"
+    >
+      <div>
+        <q-select
+          v-model="year"
+          :options="yearOptions"
+          label="Ejercicio"
+          filled
+          color="secondary"
+          style="width: 180px"
+          dense
+        />
+      </div>
+      <q-btn
+        color="primary"
+        icon="refresh"
+        label="Cargar"
+        @click="cargar"
+        dense
+      />
+    </div>
     <!-- <q-toolbar>
-      <PeriodoSelect></PeriodoSelect>
+
       <q-toolbar-title> Toolbar </q-toolbar-title>
       <q-btn flat round dense icon="apps" class="q-mr-xs" />
       <q-btn flat round dense icon="more_vert" />
@@ -40,7 +63,7 @@
                     :data="dataBar"
                     :options="options"
                     aria-label="mititulo"
-                    v-if="loaded"
+                    v-if="bothDataloaded"
                   />
                   <!-- </div> -->
                 </div>
@@ -117,6 +140,7 @@ import {
   LinearScale
 } from 'chart.js'
 import { Bar, Doughnut } from 'vue-chartjs'
+import { SessionStorage } from 'quasar'
 
 ChartJS.register(
   CategoryScale,
@@ -129,8 +153,12 @@ ChartJS.register(
 )
 
 // const $router = useRouter()
-
-const loaded = ref(false)
+/**
+ * state
+ */
+const yearOptions = ref(['2024', '2025', '2026'])
+const year = ref('2025')
+const bothDataloaded = ref(false)
 const ingresoDataLoaded = ref(false)
 const egresoDataLoaded = ref(false)
 const tab = ref('mails')
@@ -168,9 +196,22 @@ const dataBar = ref({
 onMounted(() => {})
 
 function obtenerDataSetIngresosEgresos() {
+  const instanceId = SessionStorage.getItem('current_instance').id
+  console.log('year.value:', year.value)
+  console.log('instanceId:', instanceId)
+  dataBar.value.datasets[0].data = []
+  dataBar.value.datasets[1].data = []
+  bothDataloaded.value = false
   api
-    .get('/stats/ingresos_egresos_dataset')
+    .get('/stats/ingresos_egresos_dataset', {
+      params: {
+        year: year.value,
+        instanceId
+      }
+    })
     .then(({ data }) => {
+      console.log('data:', data)
+      console.log('data.data:', data.data)
       const ingresosData = Array(12).fill(0)
       const egresosData = Array(12).fill(0)
 
@@ -187,7 +228,7 @@ function obtenerDataSetIngresosEgresos() {
 
       dataBar.value.datasets[0].data = ingresosData
       dataBar.value.datasets[1].data = egresosData
-      loaded.value = true
+      bothDataloaded.value = true
     })
     .catch((error) => {
       console.error(error)
@@ -243,8 +284,8 @@ const doughnutOptions = ref({
       labels: {
         font: {
           size: 12,
-          family: 'DM Sans',
-          style: 'bold'
+          family: 'DM Sans'
+          // style: 'bold'
         }
       }
       // subtitle: {
@@ -300,6 +341,12 @@ const doughnutStyle = computed({
   }
 })
 
+function cargar() {
+  console.log('cargar')
+  console.log('tab.value:', tab.value)
+  cambioDeTab(tab.value)
+}
+
 function cambioDeTab(value) {
   switch (value) {
     case 'both':
@@ -313,10 +360,19 @@ function cambioDeTab(value) {
       break
   }
 }
+
 function obtenerIngresosDataSet() {
   ingresoDataLoaded.value = false
+  const instanceId = SessionStorage.getItem('current_instance').id
+  dataDoughnutIngresos.value.datasets[0].data = []
+  ingresoDataLoaded.value = false
   api
-    .get('/stats/ingresos_dataset')
+    .get('/stats/ingresos_dataset', {
+      params: {
+        year: year.value,
+        instanceId
+      }
+    })
     .then(({ data }) => {
       const labels = []
       const colors = []
@@ -337,10 +393,18 @@ function obtenerIngresosDataSet() {
       console.error(error)
     })
 }
+
 function obtenerEgresosDataSet() {
+  const instanceId = SessionStorage.getItem('current_instance').id
   egresoDataLoaded.value = false
+  dataDoughnutEgresos.value.datasets[0].data = []
   api
-    .get('/stats/egresos_dataset')
+    .get('/stats/egresos_dataset', {
+      params: {
+        year: year.value,
+        instanceId
+      }
+    })
     .then(({ data }) => {
       const labels = []
       const colors = []

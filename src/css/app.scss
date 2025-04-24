@@ -220,7 +220,8 @@
   // border: 0px solid white;
   background-color: color-mix(in srgb, $primary-button 5%, white 40%);
   color: $toolbar-button !important;
-  box-shadow: rgba(17, 17, 26, 0.05) 0px 1px 0px,
+  box-shadow:
+    rgba(17, 17, 26, 0.05) 0px 1px 0px,
     rgba(17, 17, 26, 0.1) 0px 0px 8px;
   border-radius: 5px;
   // padding: 0px 10px;
@@ -241,7 +242,8 @@
 .credit-card {
   width: 350px;
   min-width: 350px;
-  box-shadow: rgba(206, 207, 209, 0.568) 1px 1px 26px,
+  box-shadow:
+    rgba(206, 207, 209, 0.568) 1px 1px 26px,
     rgba(195, 198, 202, 0.678) 1px 1px 3px;
   border-radius: 20px;
   // background-color: #2c5382;
@@ -254,7 +256,8 @@
   position: relative;
 
   &:hover {
-    box-shadow: rgba(104, 102, 102, 0.76) 5px 14px 28px,
+    box-shadow:
+      rgba(104, 102, 102, 0.76) 5px 14px 28px,
       rgba(105, 102, 102, 0.74) 5px 10px 10px;
     -webkit-font-smoothing: subpixel-antialiased;
     -webkit-transform: translateZ(0) scale(1, 1);
@@ -429,7 +432,8 @@
   left: 10px;
   z-index: 100;
   width: 98%;
-  box-shadow: rgba(124, 113, 113, 0.76) 5px 14px 28px,
+  box-shadow:
+    rgba(124, 113, 113, 0.76) 5px 14px 28px,
     rgba(112, 93, 93, 0.74) 5px 10px 10px;
 
   &__closeBtn {
@@ -589,12 +593,24 @@ $save-button-color: #0b387a;
   i {
     margin-right: 3px;
   }
+  &:hover {
+    background-color: $positive-pastel !important;
+  }
+  &:active {
+    background-color: $secondary !important;
+  }
+  &:focus {
+    background-color: $positive-pastel !important;
+  }
 }
 .small-button {
   font-size: 0.6rem !important;
   padding-inline: 5px !important;
   &:hover {
-    // color: $secondary !important;
+    // background-color: yellow !important;
+  }
+  &:active {
+    // background-color: $secondary !important;
   }
 }
 .extra-small-button {
