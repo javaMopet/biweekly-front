@@ -135,7 +135,7 @@
                       <q-tooltip> Abrir movimientos </q-tooltip>
                     </div>
                     <div class="row text-condensed text-blue-grey-4">
-                      {{ props.row.cuentaContable.nombreCompleto }}
+                      {{ props.row.cuentaContable?.nombreCompleto }}
                     </div>
                   </div>
                   <div class="text-subtitle2 full-width" align="right">

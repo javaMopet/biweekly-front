@@ -107,10 +107,10 @@
                   :subnivel="cuentaContableProps.subnivel"
                   :clasificacion="cuentaContableProps.clasificacion"
                   :tipo-afectacion="cuentaContableProps.tipoAfectacion"
-                  :is-alta="true"
+                  :is-alta="false"
                   input-label="Seleccione una Cuenta Contable"
-                  :rules="[(val) => val || 'Requerido']"
                 ></CuentaContableSelect>
+                <!-- :rules="[(val) => val || 'Requerido']" -->
               </div>
               <div class="column">
                 <div class=""></div>
