@@ -107,6 +107,8 @@ const props = defineProps({
   }
 })
 
+defineExpose({ focus })
+
 // const { isError } = toRefs(props)
 // const isErrors = toRef(props.isError)
 // watch(
@@ -179,6 +181,10 @@ function onBlur(e) {
 }
 function onFocus() {
   editing.value = true
+}
+
+function focus() {
+  inputEditing.value.focus()
 }
 
 const validar = () => {

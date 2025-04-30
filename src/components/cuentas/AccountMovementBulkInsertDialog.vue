@@ -94,6 +94,16 @@
                     @focus="focusDate(props)"
                     :autofocus="props.row.autofocus"
                     :tabindex="props.row.tabindex + 1"
+                    @keydown="(e) => handleKey(e, props, '1')"
+                    :ref="
+                      (el) => {
+                        if (el) {
+                          inputRefs[
+                            `${props.col.field}_${props.rowIndex + 1}`
+                          ] = el
+                        }
+                      }
+                    "
                   ></DateInput>
                 </q-td>
               </template>
@@ -110,6 +120,16 @@
                     label-color="input-label"
                     style="width: 100%"
                     :tabindex="props.row.tabindex + 2"
+                    @keydown="(e) => handleKey(e, props, '1')"
+                    :ref="
+                      (el) => {
+                        if (el) {
+                          inputRefs[
+                            `${props.col.field}_${props.rowIndex + 1}`
+                          ] = el
+                        }
+                      }
+                    "
                   ></q-input>
                 </q-td>
               </template>
@@ -119,6 +139,16 @@
                     v-model="props.row.importe"
                     label="Importe"
                     :tabindex="props.row.tabindex + 3"
+                    @keydown="(e) => handleKey(e, props, '1')"
+                    :ref="
+                      (el) => {
+                        if (el) {
+                          inputRefs[
+                            `${props.col.field}_${props.rowIndex + 1}`
+                          ] = el
+                        }
+                      }
+                    "
                   ></PriceInput>
                 </q-td>
               </template>
@@ -188,7 +218,7 @@ import {
   useQuasar,
   Dialog
 } from 'quasar'
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import { useFormato } from 'src/composables/utils/useFormato'
 import { DateTime } from 'luxon'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
@@ -273,6 +303,7 @@ const isLoading = ref(false)
 const loadingRows = ref(false)
 const tipoMovimientoId = ref('2')
 const editedCategoriaParam = ref({ tipoMovimientoId: tipoMovimientoId.value })
+const inputRefs = ref({})
 
 /**
  * onMounted
@@ -667,5 +698,68 @@ function openRegistroCategoriaDialog(itemToAddOrUpdate) {
 
 function cancel() {
   onDialogCancel()
+}
+function handleKey(event, props, tipo) {
+  // console.log('props:', props)
+  // console.log('colFieldOrigen:', props.col.field)
+  // console.log('col:', props.col)
+  // console.log('rowindex origen:', props.rowIndex)
+  const indiceRow = props.rowIndex + 1
+  switch (event.key) {
+    case 'ArrowUp':
+      // console.log('↑ Arriba')
+      focusInput(props.col.field, indiceRow - 1, tipo)
+      break
+    case 'ArrowDown':
+      // console.log('↓ Abajo')
+      focusInput(props.col.field, indiceRow + 1, tipo)
+      break
+    case 'ArrowLeft':
+      // console.log('← Izquierda')
+      var prevCol = obtenerColumnaPrevia(props.col, props.cols)
+      // console.log('prevCol:', prevCol)
+      focusInput(prevCol.field, indiceRow, tipo)
+      break
+    case 'ArrowRight':
+      // console.log('→ Derecha')
+      var nextCol = obtenerColumnaSiguiente(props.col, props.cols)
+      // console.log('nextCol:', nextCol)
+      focusInput(nextCol.field, indiceRow, tipo)
+      break
+    case 'Enter':
+      console.log('Enter')
+      // focusInput(Number(props.col.field) + 1, props.rowIndex + 1)
+      addItem(props)
+      break
+  }
+}
+function focusInput(colField, rowIndex, _tipo) {
+  // console.log('focusing........')
+  // console.log('colField:', colField)
+  // console.log('rowIndex:', rowIndex)
+  nextTick(() => {
+    const key = `${colField}_${rowIndex}`
+    // console.log('key:', key)
+    const inputElement = inputRefs.value[key]
+    // console.log('inputElement:', inputElement)
+    if (inputElement) {
+      inputElement.focus() // Enfoca el input
+    }
+  })
+}
+function obtenerColumnaSiguiente(col, cols) {
+  const columnIndex = cols.indexOf(col)
+  // console.log('columnIndex:', columnIndex)
+  const nextColumn = cols[columnIndex + 1]
+  // console.log('nextColumn:', nextColumn)
+  return nextColumn
+}
+
+function obtenerColumnaPrevia(col, cols) {
+  const columnIndex = cols.indexOf(col)
+  // console.log('columnIndex:', columnIndex)
+  const prevColumn = cols[columnIndex - 1]
+  // console.log('prevColumn:', prevColumn)
+  return prevColumn
 }
 </script>

@@ -10,6 +10,7 @@
     :readonly="readonly"
     :autofocus="autofocus"
     :tabindex="props.tabindex"
+    ref="inputEditing"
   >
     <template v-slot:append>
       <q-icon name="event" class="cursor-pointer">
@@ -51,6 +52,7 @@ import { ref, computed } from 'vue'
  */
 const events = ref()
 const popUpDate = ref(null)
+const inputEditing = ref(null)
 
 /**
  * emits
@@ -109,6 +111,7 @@ const props = defineProps({
     default: -1
   }
 })
+defineExpose({ focus })
 /**
  * computed
  */
@@ -135,6 +138,9 @@ function optionsFn(date) {
   } else {
     return true
   }
+}
+function focus() {
+  inputEditing.value.focus()
 }
 </script>
 

@@ -554,27 +554,39 @@ function obtenerMovimientosSantanderNuevo(wb) {
               ? parseFloat(deposito)
               : 0
 
-        const item = {
-          id: index,
-          consecutivo: index + 1,
-          tipo_afectacion,
-          fecha: fecha,
-          concepto: row.concepto,
+        // const item = {
+        //   id: index,
+        //   consecutivo: index + 1,
+        //   tipo_afectacion,
+        //   fecha: fecha,
+        //   concepto: row.concepto,
+        //   importe,
+        //   saldo: row.saldo,
+        //   referencia: row.referencia,
+        //   tipoMovimiento: {},
+        //   isValid: true,
+        //   autofocus,
+        //   fecha_registro: validDate
+        // }
+        // listaRegistros.value.push(item)
+        addItemToList(
+          row,
+          index,
+          fecha,
           importe,
-          saldo: row.saldo,
-          referencia: row.referencia,
-          tipoMovimiento: {},
-          isValid: true,
+          tipo_afectacion,
+          undefined,
           autofocus
-        }
-        listaRegistros.value.push(item)
+        )
         autofocus = false
       }
     }
   })
+  // console.log('listaRegistros.value:', listaRegistros.value)
 }
 
 function convertidorFecha(fecha) {
+  // console.log('convirtiendo fecha:', fecha)
   if (fecha.includes('/')) {
     const partes = fecha.split('/')
     if (isNaN(partes[1])) {
