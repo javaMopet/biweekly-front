@@ -159,7 +159,7 @@
               :rows="listaRegistrosFiltrados"
               :columns="columns"
               :rows-per-page-options="[0]"
-              row-key="consecutivo"
+              row-key="id"
               dense
               separator="cell"
               selection="multiple"
@@ -536,7 +536,7 @@ function obtenerMovimientosSantanderNuevo(wb) {
     referencia: row.F
   }))
 
-  // console.table(todos.value)
+  console.table(todos.value)
 
   let autofocus = true
   todos.value.forEach((row, index) => {
@@ -582,7 +582,7 @@ function obtenerMovimientosSantanderNuevo(wb) {
       }
     }
   })
-  // console.log('listaRegistros.value:', listaRegistros.value)
+  console.log('listaRegistros.value:', listaRegistros.value)
 }
 
 function convertidorFecha(fecha) {
