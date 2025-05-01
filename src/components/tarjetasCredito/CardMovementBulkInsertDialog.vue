@@ -18,83 +18,7 @@
       <DialogTitle
         >Tarjeta de crédito &nbsp;&nbsp;~ {{ cuenta.nombre }} ~</DialogTitle
       >
-      <q-card-section>
-        <q-toolbar class="q-gutter-x-md">
-          <!-- <q-separator vertical></q-separator> -->
-          <q-toolbar-title></q-toolbar-title>
-          <q-btn
-            :disable="!isSelected"
-            label="Eliminar"
-            @click="eliminarSeleccionados"
-            outline
-            color="negative"
-          />
-        </q-toolbar>
-
-        <transition name="fade">
-          <div class="errors-message bg-pink-1" v-if="isErrors">
-            <div class="row">
-              <div class="col-1">
-                <div
-                  class="row justify-center items-start q-pt-md"
-                  style="height: 100%"
-                >
-                  <q-icon name="warning" size="3rem" color="negative" />
-                </div>
-              </div>
-              <div class="col-10">
-                <div class="q-py-sm">
-                  <q-linear-progress
-                    query
-                    rounded
-                    color="primary-light"
-                    class="q-mt-sm"
-                    size="8px"
-                    stripe
-                  />
-                  <div
-                    class="row items-center q-gutter-x-lg"
-                    style="border: 0px solid red"
-                  >
-                    <span class="errors-message__title"
-                      >El formulario contiene los siguientes errores:</span
-                    >
-                  </div>
-                </div>
-                <q-list dense>
-                  <q-item
-                    dense
-                    v-for="item in errorItems"
-                    :key="item.id"
-                    class="errors-message__item"
-                  >
-                    {{
-                      !item.numeroLinea ? '' : `No. Línea ${item.numeroLinea}`
-                    }}
-                    -> {{ item.message }}
-                  </q-item>
-                </q-list>
-              </div>
-              <!-- <div class="col">
-              <q-spinner-tail color="blue-grey" size="25px" />
-            </div> -->
-              <div class="col">
-                <div class="column items-end">
-                  <q-btn
-                    color="primary"
-                    icon="close"
-                    dense
-                    flat
-                    class="errors-message__closeBtn"
-                    @click="closeErrors"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </transition>
-      </q-card-section>
-      <q-card-section style="max-height: 70vh; height: 60vh" class="scroll">
+      <q-card-section style="max-height: 80vh; height: 60vh" class="scroll">
         <q-table
           :rows="listaRegistrosTarjeta"
           :columns="columns"
@@ -116,17 +40,30 @@
               class="text-left"
               style="width: 120px; min-width: 120px; max-width: 120px"
             >
-              <q-btn
-                color="primary-button"
-                icon="add"
-                @click="addItem"
-                dense
-                glossy
-                push
-                class="small-button"
+              <div
+                class="row justify-between items-center"
+                style="border: 0px solid red; width: 100%"
+                width="100%"
               >
-                <q-tooltip> Agregar Registro </q-tooltip>
-              </q-btn>
+                <q-btn
+                  color="primary-button"
+                  icon="add"
+                  @click="addItem"
+                  dense
+                  glossy
+                  push
+                  class="small-button"
+                >
+                  <q-tooltip> Agregar Registro </q-tooltip>
+                </q-btn>
+                <q-btn
+                  :disable="!isSelected"
+                  label="Eliminar"
+                  @click="eliminarSeleccionados"
+                  color="negative"
+                  dense
+                />
+              </div>
             </q-th>
           </template>
           <template #header-cell-categoria="props">
@@ -162,6 +99,8 @@
                 :fecha-fin="fecha_fin"
                 :agregar="true"
                 @focus="focusDate(props)"
+                :autofocus="props.row.autofocus"
+                :tabindex="props.row.tabindex + 1"
               ></DateInput>
             </q-td>
           </template>
@@ -177,7 +116,17 @@
                 bg-color="blue-1"
                 label-color="input-label"
                 style="width: 100%"
+                :tabindex="props.row.tabindex + 2"
               ></q-input>
+            </q-td>
+          </template>
+          <template #body-cell-importe="props">
+            <q-td :props="props">
+              <PriceInput
+                v-model="props.row.importe"
+                label="Importe"
+                :tabindex="props.row.tabindex + 3"
+              ></PriceInput>
             </q-td>
           </template>
           <template #body-cell-categoria="props">
@@ -187,15 +136,8 @@
                 :tipo-afectacion="props.row.tipoAfectacion"
                 :agregar="false"
                 :clearable="false"
+                :tabindex="props.row.tabindex + 4"
               ></CategoriaSelect>
-            </q-td>
-          </template>
-          <template #body-cell-importe="props">
-            <q-td :props="props">
-              <PriceInput
-                v-model="props.row.importe"
-                label="Importe"
-              ></PriceInput>
             </q-td>
           </template>
         </q-table>
@@ -227,20 +169,6 @@
         </div>
       </q-card-actions>
     </q-card>
-
-    <!-- <Teleport to="#modal">
-    <q-dialog
-      v-model="showRegistroCategoria"
-      persistent
-      transition-show="jump-up"
-      transition-hide="jump-down"
-    >
-      <FormRegistroCategoria
-        :edited-item="editedCategoriaParam"
-        @categoriaSaved="categoriaSaved"
-      ></FormRegistroCategoria>
-    </q-dialog>
-  </Teleport> -->
   </q-dialog>
 </template>
 
@@ -258,6 +186,8 @@ import { useRegistrosTarjetaCrud } from 'src/composables/useRegistrosTarjetaCrud
 import PriceInput from '../formComponents/PriceInput.vue'
 import { Dialog, useDialogPluginComponent, useQuasar } from 'quasar'
 import RegistroCategoriaDialog from '../categorias/RegistroCategoriaDialog.vue'
+import { toast } from 'vue3-toastify'
+import 'vue3-toastify/dist/index.css'
 
 /**
  * state
@@ -267,7 +197,6 @@ const registrosSelected = ref([])
 const listaRegistrosTarjeta = ref([])
 const fecha_inicio = ref('01/01/1900')
 const fecha_fin = ref('01/01/1900')
-const errorItems = ref([])
 const isLoading = ref(false)
 const loadingRows = ref(false)
 
@@ -317,11 +246,14 @@ onMounted(() => {
   fecha_inicio.value = desde
   fecha_fin.value = hasta
   listaRegistrosTarjeta.value
+  let autofocus = true
+  let tabindex = 0
   for (let i = 0; i < 25; i++) {
     let fecha = ''
     if (i == 0) {
       fecha = desde
     }
+    tabindex = i * 4
     listaRegistrosTarjeta.value.push({
       id: undefined,
       fecha: fecha,
@@ -333,8 +265,11 @@ onMounted(() => {
         nombre: ''
       },
       tipoAfectacion: 'C',
-      clase: ''
+      clase: '',
+      autofocus,
+      tabindex
     })
+    autofocus = false
   }
 })
 /**
@@ -353,10 +288,17 @@ const { dialogRef, onDialogHide, onDialogOK, _onDialogCancel } =
 /**
  * computed
  */
-
-const isErrors = computed({
+const listaGuardar = computed({
   get() {
-    return errorItems.value.length > 0
+    return listaRegistrosTarjeta.value.filter((item) => {
+      return (
+        !!item.fecha &&
+        !!item.importe &&
+        !!item.categoria.id &&
+        item.categoria?.id !== 0 &&
+        item.importe != 0
+      )
+    })
   }
 })
 
@@ -369,49 +311,51 @@ const sumatoriaImporte = computed({
 })
 
 function saveItems() {
-  const containsErrors = validarMovimientos()
-  if (containsErrors) {
-    setTimeout(() => {
-      errorItems.value = []
-    }, 6000)
-  } else {
-    console.log('guardando items.....')
-    // var lista_registros_tarjeta = []
-    const listaGuardar = listaRegistrosTarjeta.value.filter((item) => {
-      return (
-        !!item.fecha && !!item.importe && !!item.categoria && item.importe != 0
-      )
-    })
-
-    console.log('listaGuardar size:', listaGuardar.length)
-    const message = `Se van a guardar ${listaGuardar.length} registros. ¿Desea continuar?`
-    $q.dialog({
-      title: 'Confirmar',
-      style: 'width:500px',
-      message,
-      ok: {
-        push: true,
-        color: 'positive',
-        label: 'Continuar'
-      },
-      cancel: {
-        push: true,
-        color: 'negative',
-        flat: true,
-        label: 'cancelar'
-      },
-      persistent: true
-    })
-      .onOk(() => {
-        onConfirmarGuardar(listaGuardar)
+  try {
+    const containsErrors = validarMovimientos()
+    if (!containsErrors) {
+      const message = `Se van a guardar ${listaGuardar.value.length} registros. ¿Desea continuar?`
+      $q.dialog({
+        title: 'Confirmar',
+        style: 'width:500px',
+        message,
+        ok: {
+          push: true,
+          color: 'positive',
+          label: 'Continuar'
+        },
+        cancel: {
+          push: true,
+          color: 'negative',
+          flat: true,
+          label: 'cancelar'
+        },
+        persistent: true
       })
-      .onCancel(() => {})
-      .onDismiss(() => {})
+        .onOk(() => {
+          onConfirmarGuardar(listaGuardar)
+        })
+        .onCancel(() => {})
+        .onDismiss(() => {})
+    }
+  } catch (error) {
+    console.error('Error al guardar los items:', error)
+    console.log('error.message:', error.message)
+    toast(`${error.message}`, {
+      theme: 'auto',
+      type: 'error',
+      dangerouslyHTMLString: true,
+      autoClose: 2000
+    })
   }
+  // console.log('lista_registros_tarjeta:', lista_registros_tarjeta)
+  // registrosTarjetaCrud.registroTarjetaMultipleCreate({
+  //   input: lista_registros_tarjeta
+  // })
 }
-function onConfirmarGuardar(listaGuardar) {
+function onConfirmarGuardar() {
   const lista_registros_tarjeta = []
-  listaGuardar.forEach((item) => {
+  listaGuardar.value.forEach((item) => {
     const registro = {
       estadoRegistroTarjetaId: 1, //pendiente
       tipoAfectacion: item.tipoAfectacion,
@@ -424,7 +368,7 @@ function onConfirmarGuardar(listaGuardar) {
     lista_registros_tarjeta.push(registro)
   })
 
-  console.table(listaGuardar)
+  console.table(listaGuardar.value)
   isLoading.value = true
   console.log('lista_registros_tarjeta:', lista_registros_tarjeta)
   registrosTarjetaCrud.registroTarjetaMultipleCreate({
@@ -479,30 +423,12 @@ registrosTarjetaCrud.onErrorRegistroTarjetaMultipleCreate((error) => {
  * Funcion utilizada para validar los movimiento al momento de guardar
  */
 function validarMovimientos() {
-  /*  errorItems.value = []
-  if (listaRegistroFiltrados.value.length <= 0) {
-    errorItems.value.push({
-      id: 1,
-      numeroLinea: undefined,
-      message: 'Favor de ingresar los datos que desea guardar.'
-    })
-  } else {
-    // console.table(listaRegistroFiltrados.value)
-    listaRegistroFiltrados.value.forEach((item, index) => {
-      if (!item.categoria) {
-        errorItems.value.push({
-          id: index,
-          numeroLinea: item.id,
-          message: 'Favor de ingresar la categoria.'
-        })
-      }
-    })
+  console.log('listaGuardar:', listaGuardar.value)
+  console.log('listaGuardar.length:', listaGuardar.value.length)
+  if (listaGuardar.value.length <= 0) {
+    throw new Error('No hay registros para guardar')
   }
-  return errorItems.value.length > 0
-  */
-  const listaGuardar = listaRegistrosTarjeta.value.filter((item) => {
-    return !!item.fecha && !!item.categoria
-  })
+
   console.log('listaGuardar:', listaGuardar)
 }
 
@@ -579,9 +505,6 @@ const columns = [
     headerStyle: 'width:400px;max-width:400px'
   }
 ]
-function closeErrors() {
-  errorItems.value = []
-}
 
 const importe_seleccionado = computed({
   get() {
