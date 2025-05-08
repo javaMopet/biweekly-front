@@ -144,8 +144,9 @@ import { useRouter } from 'vue-router'
 import { api } from 'src/boot/axios'
 import { useNotificacion } from 'src/composables/utils/useNotificacion'
 import { useSessionService } from 'src/composables/login/useSessionService'
-import { toast } from 'vue3-toastify'
 import { getActivePinia } from 'pinia'
+import { toast } from 'vue3-toastify'
+import 'vue3-toastify/dist/index.css'
 
 /**
  * composables
@@ -206,11 +207,12 @@ sessionService.onErrorUserLogin((response) => {
   //   'color: #007acc;',
   //   response
   // )
+  console.log('response:', response)
   let message = ''
   let error = false
   // console.log(response)
   if (response.toString().includes('NetworkError when')) {
-    message = 'Error de comunicación con servidor de datos'
+    message = 'Error de comunicación con servidor de datos. Server is down.'
     error = true
   } else if (response.toString().includes('Received status code 500')) {
     message = 'Error(500) originado en el servidor de datos, verificar.'
@@ -218,6 +220,8 @@ sessionService.onErrorUserLogin((response) => {
   }
 
   if (error) {
+    console.log('error:', error)
+
     toast.error(message, {
       position: toast.POSITION.TOP_RIGHT,
       autoClose: 10000,

@@ -32,6 +32,9 @@
         Is Admin: - <span class="text-bold">{{ user.isAdmin }}</span>
       </div>
       <div class="text-subtitle2">
+        Is Superuser: - <span class="text-bold">{{ user.isSuperuser }}</span>
+      </div>
+      <div class="text-subtitle2">
         Can modify: - <span class="text-bold">{{ user.canModify }}</span>
       </div>
 
@@ -43,7 +46,9 @@
         Logo: <span class="text-bold">{{ instance.logoImage }}</span>
       </div>
     </q-card-section>
-    <q-card-section> </q-card-section>
+    <q-card-section>
+      <pre>{{ user }}</pre>
+    </q-card-section>
   </q-card>
 
   <!-- <pre>{{ user }}</pre> -->
